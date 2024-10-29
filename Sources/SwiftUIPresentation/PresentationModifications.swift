@@ -1,0 +1,143 @@
+import SwiftUI
+import SwiftUICore
+
+
+// MARK: - Background
+
+struct PresentationBackgroundKeyValue: Equatable {
+    
+    static func == (lhs: PresentationBackgroundKeyValue, rhs: PresentationBackgroundKeyValue) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    let id: UUID
+    let view: AnyView
+    
+}
+
+struct PresentationBackgroundInteractionKey: PreferenceKey {
+    
+    static var defaultValue: [PresentationBackgroundInteraction] { [] }
+    
+    static func reduce(value: inout [PresentationBackgroundInteraction], nextValue: () -> [PresentationBackgroundInteraction]) {
+        value.append(contentsOf: nextValue())
+    }
+    
+}
+
+struct PresentationBackgroundKey: PreferenceKey {
+    
+    static var defaultValue: [PresentationBackgroundKeyValue] { [] }
+    
+    static func reduce(value: inout [PresentationBackgroundKeyValue], nextValue: () -> [PresentationBackgroundKeyValue]) {
+        value.append(contentsOf: nextValue())
+    }
+    
+}
+
+struct PresentationBackgroundModifier<BG: View>: ViewModifier {
+    
+    @State private var id = UUID()
+    
+    let background: BG
+    
+    func body(content: Content) -> some View {
+        content.preference(
+            key: PresentationBackgroundKey.self,
+            value: [ .init(id: id, view: AnyView(ZStack{ background })) ]
+        )
+    }
+    
+}
+
+public extension View {
+    
+    func presentationBackground<C: View>(
+        _ interaction: PresentationBackgroundInteraction = .touchEndedDismiss,
+        @ViewBuilder content: @escaping () -> C)
+    -> some View {
+        modifier(PresentationBackgroundModifier(
+            background: content()
+        ))
+        .preference(
+            key: PresentationBackgroundInteractionKey.self,
+            value: [ interaction ]
+        )
+    }
+    
+    
+    func presentationBackground(_ interaction: PresentationBackgroundInteraction) -> some View {
+        preference(
+            key: PresentationBackgroundInteractionKey.self,
+            value: [ interaction ]
+        )
+    }
+    
+}
+
+
+public enum PresentationBackgroundInteraction {
+    case touchEndedDismiss
+    case touchChangeDismiss
+    case disabled
+}
+
+
+// MARK: - Animation
+
+//
+//struct PresentationAnimationKey: PreferenceKey {
+//    
+//    static var defaultValue: ID<UUID, Animation>? { nil }
+//    
+//    static func reduce(value: inout ID<UUID, Animation>?, nextValue: () -> ID<UUID, Animation>?) {
+//        value = nextValue()
+//    }
+//    
+//}
+//
+//
+//struct PresentationAnimationModifier: ViewModifier {
+//    
+//    @State private var id = UUID()
+//    let animation: Animation
+//    
+//    func body(content: Content) -> some View {
+//        content.preference(
+//            key: PresentationAnimationKey.self,
+//            value: .init(id: id, payload: animation)
+//        )
+//    }
+//    
+//}
+
+
+//public extension View {
+//    
+//    func presentationAnimation(_ animation: Animation) -> some View {
+//        modifier(PresentationAnimationModifier(
+//            animation: animation
+//        ))
+//    }
+//    
+//}
+
+
+// MARK: - Presentation Depth
+
+
+struct PresentationDepthKey: EnvironmentKey {
+    
+    static var defaultValue: Int = 0
+    
+}
+
+
+extension EnvironmentValues {
+    
+    public var presentationDepth: Int {
+        get { self[PresentationDepthKey.self] }
+        set { self[PresentationDepthKey.self] = newValue }
+    }
+    
+}
