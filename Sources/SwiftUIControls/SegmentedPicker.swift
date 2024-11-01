@@ -20,11 +20,10 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
         items.firstIndex(where: { $0 == selection })!
     }
     
-    //@State private var size: CGSize = .zero
-    @State private var pendingStartElement: Data.Index?
-    @State private var pending: Data.Index?
+    @State private var pendingStartIndex: Data.Index?
+    @State private var pendingIndex: Data.Index?
     
-    private var pendingStartIsSelection: Bool { selectionIndex == pendingStartElement }
+    private var pendingStartIsSelection: Bool { selectionIndex == pendingStartIndex }
     private var layoutVertical: Bool { layoutDirectionSuggestion.useVertical }
     private var rightToLeft: Bool { layoutDirection == .rightToLeft }
     
@@ -70,30 +69,31 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
                 let step = layoutVertical ? g.location.y / viewSize.height : (xLocation / viewSize.width)
                 let offset = max(min(Int(step * Double(items.count)), items.count - 1), 0)
                 let pending = items.index(items.startIndex, offsetBy: offset)
-                self.pending = pending
-                if pendingStartElement == nil {
-                    pendingStartElement = pending
+                self.pendingIndex = pending
+                if pendingStartIndex == nil {
+                    pendingStartIndex = pending
                 }
             }
             .onEnded { _ in
-                if let pending {
-                    selection = items[pending]
-                    self.pending = nil
-                    self.pendingStartElement = nil
+                if let pendingIndex {
+                    selection = items[pendingIndex]
+                    self.pendingIndex = nil
+                    self.pendingStartIndex = nil
                 }
             }
     }
     
     private func opacity(for idx: Data.Index) -> Double {
-        guard pending != nil, !pendingStartIsSelection else { return 1 }
-        return idx == pending && pending != selectionIndex ? 0.4 : 1
+        guard pendingIndex != nil, !pendingStartIsSelection else { return 1 }
+        return idx == pendingIndex && pendingIndex != selectionIndex ? 0.4 : 1
     }
     
     private var spacerTicks: some View {
-        ForEach(items.indices, id: \.self){ idx in
+        let index = pendingIndex ?? selectionIndex
+        return ForEach(items.indices, id: \.self){ idx in
             Spacer()
             
-            if idx != items.indices.last && selectionIndex != idx && selectionIndex != (idx + 1) {
+            if idx != items.indices.last && index != idx && index != (idx + 1) {
                 Divider()
             }
         }
@@ -111,8 +111,8 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
                         }
                         .minimumScaleFactor(0.1)
                         .opacity(opacity(for: idx))
-                        .foregroundStyle(pending ?? selectionIndex == idx ? .black : .primary)
-                        .scaleEffect(pendingStartIsSelection && pending == idx ? 0.95 : 1)
+                        .foregroundStyle(pendingIndex ?? selectionIndex == idx ? .black : .primary)
+                        .scaleEffect(pendingStartIsSelection && pendingIndex == idx ? 0.95 : 1)
                         .padding(layoutVertical ? dimension / 8 : 0)
                         .contentShape(ContainerRelativeShape())
                         .accessibilityAddTraits(selectionIndex == idx ? .isSelected : [])
@@ -131,7 +131,7 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
                 let shape = RoundedRectangle(cornerRadius: (dimension / 2) * (controlRoundness ?? 0.4))
                 let width = proxy.size.width / Double(items.count)
                 let height = proxy.size.height / Double(items.count)
-                
+                let idx = pendingIndex ?? selectionIndex
                 ZStack(alignment: .topLeading){
                     SunkenControlMaterial(shape)
                     
@@ -143,8 +143,8 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
                     
                     RaisedControlMaterial(shape.inset(by: pendingStartIsSelection ? dimension / 8 : dimension / 12))
                         .offset(
-                            x: layoutVertical ? 0 : width * Double(selectionIndex),
-                            y: layoutVertical ? height * Double(selectionIndex) : 0
+                            x: layoutVertical ? 0 : width * Double(idx),
+                            y: layoutVertical ? height * Double(idx) : 0
                         )
                         .frame(
                             width: layoutVertical ? nil : width,
@@ -158,7 +158,7 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
             height: layoutVertical ? nil : dimension
         )
         .lineLimit(1)
-        .animation(.smooth, value: pending)
+        .animation(.smooth, value: pendingIndex)
         .opacity(isEnabled ? 1 : 0.5)
     }
     
