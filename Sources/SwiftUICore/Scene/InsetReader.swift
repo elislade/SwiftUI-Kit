@@ -31,16 +31,27 @@ public struct InsetReader<Content: View>: View {
 public extension View {
     
     /// Adds the negative of safeAreaInsets to this view if it's overlapping an edge that has safeAreaInsets
+    /// - Parameter edges: The Set of Edges you want to be included in the padding. Defaults to `.all`.
     /// - Returns: A view.
-    func paddingSubtractingSafeArea() -> some View {
+    func paddingSubtractingSafeArea(_ edges: Edge.Set = .all) -> some View {
         InsetReader{ inset in
-            self.padding(-inset)
+            self.padding(.leading, edges.contains(.leading) ? -inset.leading : 0)
+                .padding(.top, edges.contains(.top) ? -inset.top : 0)
+                .padding(.trailing, edges.contains(.trailing) ? -inset.trailing : 0)
+                .padding(.bottom, edges.contains(.bottom) ? -inset.bottom : 0)
         }
     }
     
-    func paddingAddingSafeArea() -> some View {
+    /// Adds the safeAreaInsets to this view if it's overlapping an edge that has safeAreaInsets.
+    /// - Parameter edges: The Set of Edges you want to be included in the padding.  Defaults to `.all`.
+    /// - Returns: A view.
+    func paddingAddingSafeArea(_ edges: Edge.Set = .all) -> some View {
         InsetReader{ inset in
-            self.padding(inset)
+            self
+                .padding(.leading, edges.contains(.leading) ? inset.leading : 0)
+                .padding(.top, edges.contains(.top) ? inset.top : 0)
+                .padding(.trailing, edges.contains(.trailing) ? inset.trailing : 0)
+                .padding(.bottom, edges.contains(.bottom) ? inset.bottom : 0)
         }
     }
     
