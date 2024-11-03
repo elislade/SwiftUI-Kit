@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 /// Abstracts bounds mapping and stepping to a property wrapper.

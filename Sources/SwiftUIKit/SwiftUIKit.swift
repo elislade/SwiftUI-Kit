@@ -1,5 +1,5 @@
 @_exported import SwiftUI
-@_exported import SwiftUICore
+@_exported import SwiftUIKitCore
 @_exported import SwiftUIPresentation
 @_exported import SwiftUINav
 @_exported import SwiftUIMenu

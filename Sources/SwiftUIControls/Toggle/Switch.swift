@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 /// An improved version of `SwiftUI.Toggle`.

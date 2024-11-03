@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 /// Allows sliders to be vertical, horizontal, or both at once. If x is set it will be horizontal. if y is set it will be vertical. If both x and y are set the slider will work on both axes at once.

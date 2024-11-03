@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 public protocol PresentationValueConformable {
     var id: UUID { get }

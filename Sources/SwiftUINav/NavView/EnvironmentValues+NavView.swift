@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 struct NavViewPendingDestinationValue: EnvironmentKey {
     static var defaultValue: NavViewDestinationValue? = nil

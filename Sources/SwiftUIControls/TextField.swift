@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 public enum TextFieldElementVisibility: UInt8, Sendable, Codable, Identifiable, CaseIterable {

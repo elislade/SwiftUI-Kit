@@ -7,7 +7,7 @@ let package = Package(
     platforms: [.iOS(.v15), .macOS(.v12), .tvOS(.v12), .watchOS(.v6)],
     products: [
         .library(name: "SwiftUIKit", targets: ["SwiftUIKit"]),
-        .library(name: "SwiftUICore", targets: ["SwiftUICore"]),
+        .library(name: "SwiftUIKitCore", targets: ["SwiftUIKitCore"]),
         .library(name: "SwiftUIPresentation", targets: ["SwiftUIPresentation"]),
         .library(name: "SwiftUINav", targets: ["SwiftUINav"]),
         .library(name: "SwiftUIMenu", targets: ["SwiftUIMenu"]),
@@ -20,17 +20,17 @@ let package = Package(
         .target(
             name: "SwiftUIKit",
             dependencies: [
-                "SwiftUICore", "SwiftUIPresentation", "SwiftUINav",
+                "SwiftUIKitCore", "SwiftUIPresentation", "SwiftUINav",
                 "SwiftUIMenu", "SwiftUIFont", "SwiftUIControls", "SwiftUILayout"
             ]
         ),
         .target(name: "SwiftUIExamples", dependencies: [ "SwiftUIKit"]),
-        .target(name: "SwiftUICore", dependencies: []),
-        .target(name: "SwiftUILayout", dependencies: ["SwiftUICore"]),
-        .target(name: "SwiftUIFont", dependencies: ["SwiftUICore"]),
-        .target(name: "SwiftUIControls", dependencies: ["SwiftUICore"]),
-        .target(name: "SwiftUIPresentation", dependencies: ["SwiftUICore"]),
-        .target(name: "SwiftUINav", dependencies: ["SwiftUICore", "SwiftUIPresentation"]),
-        .target(name: "SwiftUIMenu", dependencies: ["SwiftUICore", "SwiftUIPresentation"]),
+        .target(name: "SwiftUIKitCore", dependencies: []),
+        .target(name: "SwiftUILayout", dependencies: ["SwiftUIKitCore"]),
+        .target(name: "SwiftUIFont", dependencies: ["SwiftUIKitCore"]),
+        .target(name: "SwiftUIControls", dependencies: ["SwiftUIKitCore"]),
+        .target(name: "SwiftUIPresentation", dependencies: ["SwiftUIKitCore"]),
+        .target(name: "SwiftUINav", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
+        .target(name: "SwiftUIMenu", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
     ]
 )

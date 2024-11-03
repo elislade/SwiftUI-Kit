@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 /// A replica of SwiftUI Picker view with segmented style. The benifit of this is properly animated values and visibility when in drawing group. The base UIKit Representation does not participate in the Animation transaction properly.

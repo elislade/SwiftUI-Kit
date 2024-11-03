@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 /// An improved version of the default `SwiftUI.Stepper` with support for `ControlSize` environment value as well as ``LayoutDirectionSuggestion``.

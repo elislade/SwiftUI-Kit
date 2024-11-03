@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 public struct SunkenControlMaterial<Shape: InsettableShape>: View {

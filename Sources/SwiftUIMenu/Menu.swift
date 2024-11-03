@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 public struct Menu<Label: View, Content: View>: View {
     

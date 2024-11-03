@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 
 public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>: View where Data.Element == V {

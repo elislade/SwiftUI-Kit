@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 
 struct ToolTipPresenter<Tip: View>: ViewModifier {
     

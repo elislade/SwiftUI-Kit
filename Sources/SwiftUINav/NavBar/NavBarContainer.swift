@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 import SwiftUIPresentation
 
 public struct NavBarContainer<Content: View> : View {

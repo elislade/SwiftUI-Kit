@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUICore
+import SwiftUIKitCore
 import SwiftUIPresentation
 
 struct NavViewPresentingStackModifier<Data: Identifiable, Destination: View>: ViewModifier {
