@@ -42,7 +42,7 @@ struct VisualEffectViewExamples : View {
             }
             .ignoresSafeArea()
         } parameters: {
-            ExampleSection("Removing Filters", isExpanded: true){
+            ExampleSection("Disabling Filters", isExpanded: true){
                 ForEach(VisualEffectView.Filter.allCases) { filter in
                     Toggle(isOn: binding(for: filter)){
                         Text(filter.rawValue.splitCamelCaseFormat)

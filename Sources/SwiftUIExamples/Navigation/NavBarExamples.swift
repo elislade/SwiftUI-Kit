@@ -55,12 +55,13 @@ struct NavBarExamples: View {
                 }
                 .navBar(.accessory, identity: .changeOnUpdate){
                     if visiblePlacements.contains(.accessory) {
-                        Picker("", selection: $accessorySelection) {
-                            Text("A").tag("A")
-                            Text("B").tag("B")
-                            Text("C").tag("C")
+                        SegmentedPicker(
+                            selection: $accessorySelection.animation(.smooth),
+                            items: ["A", "B", "X"]
+                        ){
+                            Text($0)
                         }
-                        .pickerStyle(.segmented)
+                        .controlRoundness(0.6)
                     }
                 }
                 .navBarHidden(barHidden)

@@ -172,7 +172,8 @@ struct LineWrapLayoutExample: View {
                     .font(.body[.heavy])
                     .padding(4)
                 }
-                //.frame(width: 80)
+                .frame(width: 130)
+                .controlRoundness(1)
             }
             .padding()
         }

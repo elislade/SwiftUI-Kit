@@ -119,7 +119,6 @@ struct CustomTransition : TransitionProvider {
         func body(content: Content) -> some View {
            GeometryReader { proxy in
                 content
-                    //.clipShape(RoundedRectangle(cornerRadius: state == .identity ? 0 : 70))
                     .hinge(degrees: state.value * 90, edge: .trailing)
                     .offset(x: state.value * -proxy.size.width)
                     .ignoresSafeArea()

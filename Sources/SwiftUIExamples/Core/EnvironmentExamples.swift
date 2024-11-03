@@ -110,16 +110,13 @@ struct EnvironmentOnChangeExample : View {
             .preferredColorScheme(colorScheme)
             .environment(\.layoutDirection, layout)
         } parameters: {
-            HStack {
-                TextField("Filter Keys", text: $filter)
-                    .textFieldStyle(.plain)
-                    .safeAreaInset(edge: .leading){
-                        Image(systemName: "magnifyingglass.circle.fill")
-                            .symbolRenderingMode(.hierarchical)
-                            .allowsHitTesting(false)
-                    }
-                    .font(.exampleParameterTitle)
+            TextField("Filter Keys", text: $filter){
+                Image(systemName: "magnifyingglass")
+                    .allowsHitTesting(false)
+                    .font(.exampleParameterValue)
             }
+            .textFieldStyle(.plain)
+            .font(.exampleParameterTitle)
             .padding()
             
             Divider()

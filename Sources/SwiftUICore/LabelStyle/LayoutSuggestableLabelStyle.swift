@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUICore
 
 
 public struct LayoutSuggestableLabelStyle: LabelStyle {

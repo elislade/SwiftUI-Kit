@@ -12,7 +12,7 @@ public struct ViewThatFitsLabelStyle: LabelStyle {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             ViewThatFits{
                 Label(configuration)
-                    //FIXME: .labelStyle(.layoutSuggestable)
+                    .labelStyle(.layoutSuggestable)
                 
                 if prefersTitle {
                     Label(configuration)

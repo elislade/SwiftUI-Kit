@@ -75,12 +75,11 @@ struct LabelStyleExamples: View {
                 
                 Spacer()
                 
-                Picker("", selection: $prefersTitle){
-                    Text("Title").tag(true)
-                    Text("Icon").tag(false)
+                SegmentedPicker(selection: $prefersTitle.animation(.smooth), items: [true, false]){
+                    Text($0 ? "Title" : "Icon")
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 150)
+                .frame(width: 130)
+                .controlRoundness(1)
             }
             .padding()
             

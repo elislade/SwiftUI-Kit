@@ -1,4 +1,4 @@
-import SwiftUI
+import SwiftUIKit
 
 
 struct AnchorPresentationExample : View   {
@@ -85,15 +85,17 @@ struct AnchorPresentationExample : View   {
             
             Divider()
             
-            AnchorView(title: Text("Source Anchor"), anchor: $sourceAnchor)
-                .tint(sourceTint)
-                .disabled(useAutoAnchored)
-            
-            Divider()
-            
-            AnchorView(title: Text("Presentation Anchor"), anchor: $presentationAnchor)
-                .tint(presentedTint)
-                .disabled(useAutoAnchored)
+            HStack {
+                AnchorView(title: Text("Source Anchor"), anchor: $sourceAnchor)
+                    .tint(sourceTint)
+                    .disabled(useAutoAnchored)
+                
+                Divider()
+                
+                AnchorView(title: Text("Presentation Anchor"), anchor: $presentationAnchor)
+                    .tint(presentedTint)
+                    .disabled(useAutoAnchored)
+            }
             
             Divider()
             
@@ -112,43 +114,11 @@ struct AnchorPresentationExample : View   {
             VStack(alignment: .leading, spacing: 10){
                 title
                     .font(.exampleParameterTitle)
+                    .frame(maxWidth: 130, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
-                HStack {
-                    VStack {
-                        HStack {
-                            Image(systemName: "arrow.left.and.right")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30)
-                                .foregroundStyle(.tint)
-                            
-                            Picker("", selection: $anchor.x){
-                                Text("Leading").tag(CGFloat(0.0))
-                                Text("Center").tag(CGFloat(0.5))
-                                Text("Trailing").tag(CGFloat(1.0))
-                            }
-                            .pickerStyle(.segmented)
-                        }
-                        
-                        HStack {
-                            Image(systemName: "arrow.up.and.down")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30)
-                                .foregroundStyle(.tint)
-                            
-                            Picker("", selection: $anchor.y){
-                                Text("Top").tag(CGFloat(0.0))
-                                Text("Center").tag(CGFloat(0.5))
-                                Text("Bottom").tag(CGFloat(1.0))
-                            }
-                            .pickerStyle(.segmented)
-                        }
-                    }
-                    
-                    ExampleControl.Anchor(value: $anchor)
-                        .frame(height: 76)
-                }
+                ExampleControl.Anchor(value: $anchor)
+                    .frame(height: 110)
             }
             .animation(.fastSpringInteractive, value: anchor)
             .symbolVariant(.circle.fill)

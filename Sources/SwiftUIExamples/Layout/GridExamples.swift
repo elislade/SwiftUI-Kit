@@ -79,7 +79,7 @@ struct GridViewExample : View {
                     .foregroundStyle(.secondary)
                 
                 Spacer()
-                Stepper(value: $columns)
+                Stepper(value: $columns, in: 1...5)
             }.padding()
             
             Divider()
@@ -94,7 +94,7 @@ struct GridViewExample : View {
                 
                 Stepper(
                     onIncrement: add,
-                    onDecrement: { remove() }
+                    onDecrement: !colors.isEmpty ? { remove() } : nil
                 )
             }
             .padding()

@@ -58,12 +58,15 @@ struct ExampleCell {
                 
                 Spacer()
                 
-                Picker("", selection: $value){
-                    Text("Light").tag(SwiftUIKit.ColorScheme.light)
-                    Text("Dark").tag(SwiftUIKit.ColorScheme.dark)
+                SegmentedPicker(selection: $value.animation(.smooth), items: SwiftUIKit.ColorScheme.allCases){
+                    switch $0 {
+                    case .light: Text("Light")
+                    case .dark: Text("Dark")
+                    @unknown default: EmptyView()
+                    }
                 }
-                .pickerStyle(.segmented)
                 .frame(width: 120)
+                .controlRoundness(1)
             }
             .padding()
         }
