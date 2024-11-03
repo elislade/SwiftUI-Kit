@@ -19,43 +19,62 @@ public struct Stepper: View {
     
     private var isVertical: Bool { layoutDirectionSuggestion.useVertical }
     
-    private let onIncrement: () -> Void
-    private let onDecrement: () -> Void
+    private let onIncrement: (() -> Void)?
+    private let onDecrement: (() -> Void)?
     
     /// Initializes instance
     /// - Parameters:
-    ///   - label: A
     ///   - onIncrement: A
     ///   - onDecrement: A
-    public init(
-        label: String = "",
-        onIncrement: @escaping () -> Void = {},
-        onDecrement: @escaping () -> Void = {}
-    ){
+    public init(onIncrement: (() -> Void)? = nil, onDecrement: (() -> Void)? = nil){
         self.onIncrement = onIncrement
         self.onDecrement = onDecrement
     }
     
     /// Initializes instance
     /// - Parameters:
-    ///   - label: An Accessibility label for this control. Default is an Empty String. Matches `SwiftUI.Stepper` Initializes for minimum changes when switching to this version from SwiftUIs version.
     ///   - value: A binding to a value that conforms to `Strideable`.
     ///   - step: The `Stride` of the `Strideable` value that you want to increment and decrement by. Defaults to 1.
-    public init<V: Strideable>(label: String = "", value: Binding<V>, step: V.Stride = 1){
-        self.onIncrement = {
-            value.wrappedValue = value.wrappedValue.advanced(by: step)
-        }
-        self.onDecrement = {
-            value.wrappedValue = value.wrappedValue.advanced(by: -step)
+    @inlinable public init<V: Strideable>(value: Binding<V>, step: V.Stride = 1) {
+        self.init(
+            onIncrement: {
+                value.wrappedValue = value.wrappedValue.advanced(by: step)
+            },
+            onDecrement: {
+                value.wrappedValue = value.wrappedValue.advanced(by: -step)
+            }
+        )
+    }
+    
+    /// Initializes instance
+    /// - Parameters:
+    ///   - value: A binding to a value that conforms to `Strideable`.
+    ///   - bounds: The valid bounds the stepper can step in.
+    ///   - step: The `Stride` of the `Strideable` value that you want to increment and decrement by. Defaults to 1.
+    @inlinable public init<V: Strideable>(value: Binding<V>, in bounds: ClosedRange<V>, step: V.Stride = 1) {
+        self.init(
+            onIncrement: bounds.upperBound >= value.wrappedValue.advanced(by: step) ? {
+                value.wrappedValue = value.wrappedValue.advanced(by: step)
+            } : nil,
+            onDecrement: bounds.lowerBound <= (value.wrappedValue.advanced(by: -step)) ? {
+                value.wrappedValue = value.wrappedValue.advanced(by: -step)
+            } : nil
+        )
+    }
+    
+    private func canPerformAction(_ direction: AccessibilityAdjustmentDirection) -> Bool {
+        switch direction {
+        case .increment: onIncrement != nil && isEnabled
+        case .decrement: onDecrement != nil && isEnabled
+        @unknown default: false
         }
     }
     
-    private func performAction(_ direction: AccessibilityAdjustmentDirection? = nil){
-        guard let direction = direction ?? activeDirection else { return }
-        
+    private func performAction(_ direction: AccessibilityAdjustmentDirection){
+        guard canPerformAction(direction) else { return }
         switch direction {
-        case .increment: onIncrement()
-        case .decrement: onDecrement()
+        case .increment: onIncrement?()
+        case .decrement: onDecrement?()
         @unknown default: return
         }
     }
@@ -71,8 +90,7 @@ public struct Stepper: View {
                     timerCall()
                 }
             }
-            
-            performAction()
+
             actionTimerCount += 1
         }
         
@@ -111,16 +129,6 @@ public struct Stepper: View {
         (44 - (24 * interactionGranularity)) * controlFactor
     }
     
-//    private func background(for shape: some InsettableShape) -> some View {
-//        #if os(macOS)
-//        InlineEnvironmentValuesReader{ env in
-//            shape.resolveRaisedControlMaterial(in: env)
-//        }
-//        #else
-//        shape.fill(.gray.opacity(0.15))
-//        #endif
-//    }
-    
     private func button(for direction: AccessibilityAdjustmentDirection, _ shape: some InsettableShape) -> some View {
         Button(
             shape: shape,
@@ -128,6 +136,7 @@ public struct Stepper: View {
             isSelected: activeDirection == direction
         )
         .accessibilityAction { performAction(direction) }
+        .disabled(!canPerformAction(direction))
     }
     
     private func content(for shape: some InsettableShape) -> some View {
@@ -142,7 +151,6 @@ public struct Stepper: View {
         }
         .background {
             SunkenControlMaterial(shape)
-            //background(for: shape)
         }
     }
     
@@ -154,6 +162,19 @@ public struct Stepper: View {
                 height: isVertical ? nil : size
             )
             .fixedSize()
+            .onChangePolyfill(of: actionTimerCount){
+                guard let activeDirection else {
+                    stopActionRepitition()
+                    return
+                }
+                
+                if canPerformAction(activeDirection){
+                    performAction(activeDirection)
+                } else {
+                    stopActionRepitition()
+                    self.activeDirection = nil
+                }
+            }
             .overlay{
                 GeometryReader { proxy in
                     Color.clear
@@ -161,19 +182,28 @@ public struct Stepper: View {
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { g in
+                                    var directionCandidate: AccessibilityAdjustmentDirection
+                                    
                                     if isVertical {
-                                        activeDirection = g.location.y < (proxy.size.height / 2) ? .increment : .decrement
+                                        directionCandidate = g.location.y < (proxy.size.height / 2) ? .increment : .decrement
                                     } else if layoutDirection == .leftToRight {
-                                        activeDirection = g.location.x > (proxy.size.width / 2) ? .increment : .decrement
+                                        directionCandidate = g.location.x > (proxy.size.width / 2) ? .increment : .decrement
                                     } else {
-                                        activeDirection = g.location.x < (proxy.size.width / 2) ? .increment : .decrement
+                                        directionCandidate = g.location.x < (proxy.size.width / 2) ? .increment : .decrement
                                     }
                                     
-                                    startActionRepitition()
+                                    if canPerformAction(directionCandidate){
+                                        activeDirection = directionCandidate
+                                        startActionRepitition()
+                                    }
                                 }
                                 .onEnded { g in
                                     stopActionRepitition()
-                                    performAction()
+                                    
+                                    if let activeDirection {
+                                        performAction(activeDirection)
+                                    }
+                                    
                                     activeDirection = nil
                                 }
                         )
@@ -189,6 +219,7 @@ public struct Stepper: View {
     
     struct Button<Shape: InsettableShape>: View {
         
+        @Environment(\.isEnabled) private var isEnabled
         @Environment(\.interactionGranularity) private var interactionGranularity
         @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
         @Environment(\.controlSize) private var controlSize
@@ -254,12 +285,11 @@ public struct Stepper: View {
                 .background{
                     if isSelected {
                         RaisedControlMaterial(shape.inset(by: 2))
-                        //shape
-                            //.opacity(0.2)
                             .transitions(transition)
                     }
                 }
                 .contentShape(shape)
+                .opacity(isEnabled ? 1 : 0.5)
                 .accessibilityAddTraits(.isButton)
         }
     }

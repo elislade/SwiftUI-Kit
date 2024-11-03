@@ -19,12 +19,18 @@ struct StepperExamples: View {
                 
                 HStack {
                     ExampleCard(title: "SwiftUI") {
-                        SwiftUI.Stepper("", value: $value)
+                        VStack {
+                            SwiftUI.Stepper("", value: $value, in: -1...4)
+                            SwiftUI.Stepper("", onIncrement: {  value += 1 }, onDecrement: nil)
+                        }
                     }
                     .frame(maxWidth: .infinity)
 
                     ExampleCard(title: "SwiftUIKit"){
-                        Stepper(value: $value)
+                        VStack {
+                            Stepper(value: $value, in: -1...4)
+                            Stepper(onIncrement: { value += 1 }, onDecrement: nil)
+                        }
                     }
                     .frame(maxWidth: .infinity)
                 }
