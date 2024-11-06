@@ -103,7 +103,7 @@ public extension EnvironmentValues {
 }
 
 
-extension Font.Design: CustomStringConvertible {
+extension Font.Design: @retroactive CustomStringConvertible {
     
     public var description: String {
         switch self {

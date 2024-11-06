@@ -19,12 +19,12 @@ public extension Font {
 }
 
 
-extension Font.Design: Identifiable {
+extension Font.Design: @retroactive Identifiable {
     public var id: Int { codableValue }
 }
 
 
-extension Font.TextStyle: Identifiable {
+extension Font.TextStyle: @retroactive Identifiable {
     public var id: Int { codableValue }
 }
 

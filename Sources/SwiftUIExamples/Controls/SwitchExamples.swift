@@ -3,7 +3,6 @@ import SwiftUIKit
 
 struct SwitchExamples : View {
 
-    
     @State private var isOn = true
     @State private var disable = false
     @State private var direction = LayoutDirection.leftToRight

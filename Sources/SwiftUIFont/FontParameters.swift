@@ -3,7 +3,7 @@ import SwiftUI
 
 
 /// A set of parameters used to resolve a `Font`.
-/// - Note: These  parameters are suggestions for the ``ResolvedFont``, if the ``FontAsset`` being resolved does not support a parameter it will ignore it.
+/// - Note: These  parameters are suggestions for the ``ResolvedFont``, if the ``FontResource`` being resolved does not support a parameter it will ignore it.
 public struct FontParameters: Codable, Hashable, Sendable {
     
     /// Base identity is of a font with 16point size, standard width, regular weight, no slant and a transform of `.identity`.
@@ -26,7 +26,7 @@ public struct FontParameters: Codable, Hashable, Sendable {
     /// - Note: A slant of more than 0 or 1 is usually equivilent to an italic trait.
     public var slant: Double = 0
     
-    /// A transform to applied to every glyph.
+    /// A transform to apply to every glyph.
     public var transform: CGAffineTransform = .identity
     
     

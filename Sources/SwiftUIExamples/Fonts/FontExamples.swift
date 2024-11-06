@@ -3,12 +3,12 @@ import SwiftUIKit
 
 struct FontExamples: View {
     
-    @State private var asset: FontResource?
+    @State private var resource: FontResource?
     @State private var parameters = FontParameters.identity
     
     var body: some View {
         ExampleView(title: "Font"){
-            Preview(asset: $asset, parameters: $parameters)
+            Preview(resource: $resource, parameters: $parameters)
                 .ignoresSafeArea(edges: .bottom)
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
@@ -19,17 +19,14 @@ struct FontExamples: View {
             
             Inspector()
         }
-        .fontResource(asset)
+        .fontResource(resource)
         .fontParameters(parameters)
-//        .onAppear{
-//            FontFactory.shared = FontFactory.default
-//        }
     }
     
     
     struct AssetPicker : View {
         
-        @Binding var asset: FontResource?
+        @Binding var resource: FontResource?
         
         private func name(for design: Font.Design) -> String {
             switch design {
@@ -42,7 +39,7 @@ struct FontExamples: View {
         }
         
         var body: some View {
-            Picker("Font Asset", selection: $asset){
+            Picker("Font Asset", selection: $resource){
                 Section("Design"){
                     ForEach(Font.Design.allCases){
                         Text(name(for: $0))
@@ -203,7 +200,7 @@ struct FontExamples: View {
         @State private var mode: Mode = .paragraph
         @State private var sample = "Hello, World!"
         
-        @Binding var asset: FontResource?
+        @Binding var resource: FontResource?
         @Binding var parameters: FontParameters
         
         var body: some View {
@@ -229,7 +226,7 @@ struct FontExamples: View {
                 .animation(.smooth, value: parameters)
                 
                 HStack(spacing: 0) {
-                    AssetPicker(asset: $asset)
+                    AssetPicker(resource: $resource)
                     
                     Spacer(minLength: 10)
                     
@@ -410,14 +407,14 @@ struct FontExamples: View {
         @Environment(\.fontResolved) private var resolved
         @Namespace private var ns
         
-        private var set: CharacterSet { resolved.info.supportedCharacters }
+        private var set: CharacterSet { resolved.supportedCharacters }
         
         @State private var chars: [Character] = []
         @State private var selected: Character?
         @State private var isLoading: Bool = true
         
         private func load() {
-            Task.detached {
+            let t = Thread{
                 self.isLoading = true
                 
                 var nc: [Character] = []
@@ -433,6 +430,8 @@ struct FontExamples: View {
                 self.chars = nc
                 self.isLoading = false
             }
+            
+            t.start()
         }
         
         var body: some View {

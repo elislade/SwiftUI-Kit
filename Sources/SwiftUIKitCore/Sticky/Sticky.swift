@@ -18,7 +18,7 @@ public extension View {
     ///   - bottom: The bottom inset relative to its `StickyContext` bounds when the sticking should start taking place. Defaults to `nil`.
     ///   - leading: The leading inset relative to its `StickyContext` bounds when the sticking should start taking place. Defaults to `nil`.
     ///   - trailing: The trailing relative to its `StickyContext` bounds when the sticking should start taking place. Defaults to `nil`.
-    ///   - grouping: Special sticking behaviour for the current view. Defaults to `.default`.
+    ///   - grouping: Special sticking behaviour for the current view. Defaults to `nil`.
     ///   - categoryMask: A category mask indicating other views to account for. Defaults to `.none`. This means no mask, so all views will account for all other views while sticking. This mask will be scoped to its `StickyContext` and will not account for views in another context even if they share the same mask.
     ///   - stateDidChange: A closure that gets called every time the sticking state changes for this view. Defaults to an empty closure.
     ///
@@ -53,7 +53,7 @@ public extension View {
     /// - Parameters:
     ///   - edges : A set of edges that this view should stick to the `StickyContext`.
     ///   - inset: The amount that should be inset from the edges relative to the `StickyContext` bounds. Defaults to 0.
-    ///   - grouping: Special ``StickyGrouping`` for the current view. If no behaviour is defined it will use the default behaviour of the`StickyContext`. Defaults to `.default`.
+    ///   - grouping: Special ``StickyGrouping`` for the current view. If no behaviour is defined it will use the default behaviour of the`StickyContext`. Defaults to `nil`.
     ///   - categoryMask: A category mask indicating other views to account for. Defaults to `.none`. This means no mask, so all views will account for all other views while sticking. This mask will be scoped to its `StickyContext` and will not account for views in another context even if they share the same mask.
     ///   - stateDidChange: A closure that gets called every time the sticking state changes for this view. Defaults to an empty closure.
     ///

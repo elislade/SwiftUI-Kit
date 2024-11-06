@@ -11,13 +11,16 @@ struct NavBarExamples: View {
     @State private var accessorySelection = "A"
     
     private func view(for placement: NavBarItemMetadata.Placement) -> some View {
-        Toggle(isOn: .init(get: { visiblePlacements.contains(placement) }, set: {
-            if $0 {
-                visiblePlacements.insert(placement)
-            } else {
-                visiblePlacements.remove(placement)
+        Toggle(isOn: .init(
+            get: { visiblePlacements.contains(placement) },
+            set: {
+                if $0 {
+                    visiblePlacements.insert(placement)
+                } else {
+                    visiblePlacements.remove(placement)
+                }
             }
-        })){
+        )){
             Text("Show \(placement)")
                 .font(.exampleParameterTitle)
         }

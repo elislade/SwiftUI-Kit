@@ -1,5 +1,5 @@
 import SwiftUIKit
-import SwiftUIControls
+
 
 struct SliderViewExamples : View {
     

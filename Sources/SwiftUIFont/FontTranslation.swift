@@ -75,7 +75,7 @@ extension DynamicTypeSize {
 
 
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-extension Font.Width: CustomStringConvertible {
+extension Font.Width: @retroactive CustomStringConvertible {
     
     public var description: String {
         if self == .compressed {
@@ -154,7 +154,7 @@ public extension Font.Weight {
 }
 
 
-extension Font.Weight : CustomStringConvertible {
+extension Font.Weight : @retroactive CustomStringConvertible {
     
     public var description: String {
         if self == .black {

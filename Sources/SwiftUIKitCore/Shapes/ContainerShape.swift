@@ -21,7 +21,7 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    /// Sets the `containerShape(_:)` and the environment ``prefersContainerShape`` value to `true`. If the view supports this it will use the Shape instead of its default Shape. Eg. The ``Switch`` default `Capsule` will be replaced by the specified Shape.
+    /// Sets the `containerShape(_:)` and the environment ``prefersContainerShape`` value to `true`. If the view supports this it will use the Shape instead of its default Shape.
     /// - Note: This modifier should be applied directly to the view that should use this suggestion as `ContainerRelativeShape` can have undesired results if its bounds are too far away from the applied view.
     /// - Parameter shape: A shape conforming to `InsettableShape`.
     /// - Returns: A view.

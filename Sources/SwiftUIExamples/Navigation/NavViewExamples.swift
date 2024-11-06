@@ -16,20 +16,12 @@ struct NavViewExamples: View {
             Button("Next"){
                 valueToPresent = .random
             }
-            
-//                    NavViewLink(value: Color.blue){
-//                        Text("Next")
-//                            .foregroundStyle(.white)
-//                    }
         }
         .navBarTitle("Hello")
         .navDestination(value: $valueToPresent){
             Destination(color: $0)
                 .navBarTitle($0.description)
         }
-        //                .navDestination(for: Color.self){ color in
-        //                    color.colorInvert()
-        //                }
     }
     
     
@@ -122,8 +114,8 @@ struct CustomTransition : TransitionProvider {
                     .hinge(degrees: state.value * 90, edge: .trailing)
                     .offset(x: state.value * -proxy.size.width)
                     .ignoresSafeArea()
-                    
             }
+           .paddingAddingSafeArea()
         }
         
     }

@@ -15,12 +15,8 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     @State private var id = UUID()
     @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     
-//    @State private var destinationValues: [NavViewDestinationValue] = []
-//    @State private var pendingDestinationValues: [NavViewDestinationValue] = []
-    
     @State private var transitionFraction: CGFloat = 0
     @State private var isUpdatingTransition: Bool = false
-    @State private var indirectScrollTotal = 0.0
     
     
     /// - Parameters:
@@ -97,8 +93,8 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
         }
     }
     
-    private func offset(_ detail: PresentationValue<NavViewElementMetadata>, in proxy: GeometryProxy) -> CGFloat {
-        detail.id == elements.last?.id ? transitionFraction * proxy.size.width : 0
+    private func offset(_ index: Int, in proxy: GeometryProxy) -> CGFloat {
+        index == elements.indices.last ? transitionFraction * proxy.size.width : 0
     }
     
     private var baseModifier: Transition.TransitionModifier {
@@ -113,12 +109,12 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
         }
     }
     
-    private func detailModifier(_ detail: PresentationValue<NavViewElementMetadata>) -> Transition.TransitionModifier {
+    private func detailModifier(_ index: Int) -> Transition.TransitionModifier {
         guard elements.count > 1 else { return transition.identity }
         
-        if detail.id == elements.last?.id {
+        if index == elements.indices.last {
             return transition.modifier(percent: 0)
-        } else if isUpdatingTransition && elements[elements.count - 2].id == detail.id {
+        } else if isUpdatingTransition && elements.count - 2 == index {
             return transition.modifier(percent: 1 - transitionFraction)
         } else {
             return transition.modifier(percent: 1)
@@ -131,6 +127,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                 root
                     .modifier(baseModifier)
                     .allowsHitTesting(elements.isEmpty)
+                    .opacity(elements.count > 1 ? 0 : 1)
                     .accessibilityHidden(!elements.isEmpty)
                     .zIndex(1)
                     .environment(\.presentationDepth, elements.count)
@@ -139,18 +136,18 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                     .disableNavBarPreferences(!elements.isEmpty)
                 
                 ForEach(elements.indices, id: \.self){ index in
-                    let element = elements[index]
-                    element.view
-                        .modifier(detailModifier(element))
-                        .allowsHitTesting(element.id == elements.last?.id)
+                    elements[index].view
+                        .modifier(detailModifier(index))
+                        .allowsHitTesting(index == elements.indices.last)
                         .accessibilityHidden(index != elements.indices.last)
-                        .offset(x: offset(element, in: proxy))
-                        .zIndex(Double(index) + 2.0)
+                        .opacity(elements.count - 2 > index ? 0 : 1)
+                        .offset(x: elements.count - 2 > index ? -2000 : offset(index, in: proxy))
+                        .zIndex(elements.count - 2 > index ? 1 : Double(index) + 2.0)
                         .environment(\._isBeingPresented, index == elements.indices.last)
                         .environment(\.presentationDepth, elements.count - index)
                         .isBeingPresentedOn(index != elements.indices.last)
-                        .disableResetAction(element.id != elements.last?.id)
-                        .disableNavBarPreferences(element.id != elements.last?.id)
+                        .disableResetAction(index != elements.indices.last)
+                        .disableNavBarPreferences(index != elements.indices.last)
                         .transitions(
                             .move(edge: .trailing).animation(.smooth),
                             .offset(x: proxy.safeAreaInsets.trailing).animation(.smooth)
@@ -167,10 +164,10 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
             }
             .resetAction(active: !elements.isEmpty){
                 Task.detached {
-                    let elements = elements.reversed()
+                    let elements = await self.elements.reversed()
                     for element in elements {
                         element.dispose()
-                        while element.id == self.elements.last?.id { }
+                        while await element.id == self.elements.last?.id { }
                         usleep(10_000)
                     }
                 }
@@ -179,29 +176,15 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
             .mask {
                 Rectangle().ignoresSafeArea()
             }
-            //.environment(\.destinationNavValue, pendingDestinationValues.last)
             .handleDismissPresentation(id: id, action: popElement)
-//            .onPreferenceChange(NavViewElementPreferenceKey.self){ v in
-//                self.elements = v.sorted(by: { $0.date < $1.date })
-//            }
-//            .onPreferenceChange(NavViewDestinationValueKey.self){
-//                self.destinationValues = $0
-//            }
             .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){
                 let diff = $0.difference(from: self.elements, by: { $0.id == $1.id })
                 
-                for insert in diff.insertions {
-                    switch insert {
-                    case .insert(_, let element, _):
+                for item in diff {
+                    switch item {
+                    case let .insert(_, element, _):
                         self.elements.append(element)
-                    case .remove: continue
-                    }
-                }
-                
-                for removal in diff.removals {
-                    switch removal {
-                    case .insert: continue
-                    case .remove(_, let element, _):
+                    case let .remove(_, element, _):
                         self.elements.removeAll(where: { $0.id == element.id })
                     }
                 }

@@ -73,7 +73,7 @@ struct SwiftUIFontResolver: FontResolver {
             parameters: parameters,
             opaqueFont: font.weight(.init(closestToValue: parameters.weight)),
             info: .init(), // Info is unavailable to SwiftUI resolver.
-            metrics: .empty // Metrics is unavailable to SwiftUI resolver.
+            metrics: .zero // Metrics is unavailable to SwiftUI resolver.
         )
     }
     

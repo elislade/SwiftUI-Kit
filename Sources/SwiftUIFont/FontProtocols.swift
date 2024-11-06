@@ -1,6 +1,3 @@
-import Foundation
-import CoreText
-import SwiftUI
 
 
 public protocol FontResolver {

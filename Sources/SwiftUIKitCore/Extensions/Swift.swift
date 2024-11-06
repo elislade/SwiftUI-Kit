@@ -5,7 +5,7 @@ extension Int : EmptyInitalizable {}
 extension String : EmptyInitalizable {}
 
 
-extension String: Identifiable {
+extension String: @retroactive Identifiable {
     public var id: String { self }
 }
 

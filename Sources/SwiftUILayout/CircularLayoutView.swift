@@ -51,10 +51,10 @@ public struct CircularLayoutView<Data, ID, Content: View>: View where ID == Data
 }
 
 
-extension Color: Identifiable {
+extension Color: @retroactive Identifiable {
     public var id: Int { hashValue }
 }
 
-extension Int: Identifiable {
+extension Int: @retroactive Identifiable {
     public var id: Int { self }
 }

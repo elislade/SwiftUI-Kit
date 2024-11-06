@@ -82,6 +82,7 @@ struct AnchorPresentationContext: ViewModifier {
                     let dir = layoutDirection(for: presentedValue)
                     
                 GeometryReader{ proxy in
+                    let proxyWidth = proxy.size.width
                     let sourceFrame = proxy[presentedValue.anchor]
                     let presAnchor = presentationAnchor(for: presentedValue, in: proxy)
                     let sourceAnchor = sourceAnchor(for: presentedValue, in: proxy)
@@ -121,7 +122,7 @@ struct AnchorPresentationContext: ViewModifier {
                             let sourceStart = ((range[1] - range[0]) * sourceAnchor.x) + range[0]
                             
                             if dir == .rightToLeft {
-                                return -(proxy.size.width - (sourceStart + selfOffset))
+                                return -(proxyWidth - (sourceStart + selfOffset))
                             } else {
                                 return -(sourceStart - selfOffset)
                             }
@@ -219,6 +220,8 @@ struct AnchorPresentationContext2: ViewModifier {
             .onPreferenceChange(PresentationKey<Metadata>.self) { presentedValue = $0.last }
             .overlay {
                 GeometryReader{ proxy in
+                    let proxyWidth = proxy.size.width
+                    
                     ZStack(alignment: .topLeading) {
                         Color.clear
                         
@@ -247,7 +250,7 @@ struct AnchorPresentationContext2: ViewModifier {
                                     let sourceStart = ((range[1] - range[0]) * sourceAnchor.x) + range[0]
                                     
                                     if dir == .rightToLeft {
-                                        return -(proxy.size.width - (sourceStart + selfOffset))
+                                        return -(proxyWidth - (sourceStart + selfOffset))
                                     } else {
                                         return -(sourceStart - selfOffset)
                                     }

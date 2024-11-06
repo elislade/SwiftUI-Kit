@@ -86,9 +86,11 @@ struct WindowEventsModifier: ViewModifier {
                     started?()
                 }
                 
-                changed?(allTouches.sorted(by: {
-                    $0.estimationUpdateIndex?.intValue ?? 0 < $1.estimationUpdateIndex?.intValue ?? 0
-                }).map{ $0.location(in: nil) })
+                if let changed {
+                    changed(allTouches.sorted(by: {
+                        $0.estimationUpdateIndex?.intValue ?? 0 < $1.estimationUpdateIndex?.intValue ?? 0
+                    }).map{ $0.location(in: nil) })
+                }
                 
                 if allEnded {
                     ended?()

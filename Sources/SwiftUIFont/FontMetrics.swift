@@ -29,6 +29,6 @@ public struct FontMetrics : Hashable, Codable, Sendable {
     }
     
     
-    public static let empty = FontMetrics(size: 0, ascent: 0, descent: 0, unitsPerEm: 0, leading: 0, capHeight: 0, xHeight: 0, slantAngle: 0, underlineThickness: 0, underlinePosition: 0, numberOfGlyphs: 0)
+    public static let zero = FontMetrics(size: 0, ascent: 0, descent: 0, unitsPerEm: 0, leading: 0, capHeight: 0, xHeight: 0, slantAngle: 0, underlineThickness: 0, underlinePosition: 0, numberOfGlyphs: 0)
     
 }

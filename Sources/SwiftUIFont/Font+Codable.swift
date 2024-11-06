@@ -23,7 +23,7 @@ extension Font.Design {
 }
 
 
-extension Font.Design : Encodable {
+extension Font.Design : @retroactive Encodable {
     
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -33,7 +33,7 @@ extension Font.Design : Encodable {
 }
 
 
-extension Font.Design : Decodable {
+extension Font.Design : @retroactive Decodable {
     
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -76,7 +76,7 @@ extension Font.TextStyle {
     
 }
 
-extension Font.TextStyle : Encodable {
+extension Font.TextStyle : @retroactive Encodable {
     
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -85,7 +85,7 @@ extension Font.TextStyle : Encodable {
     
 }
 
-extension Font.TextStyle : Decodable {
+extension Font.TextStyle : @retroactive Decodable {
     
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -127,7 +127,7 @@ extension Font.Weight {
     }
 }
 
-extension Font.Weight : Encodable {
+extension Font.Weight : @retroactive Encodable {
     
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -136,7 +136,7 @@ extension Font.Weight : Encodable {
     
 }
 
-extension Font.Weight : Decodable {
+extension Font.Weight : @retroactive Decodable {
     
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -157,7 +157,7 @@ extension Font.Weight : Decodable {
 // MARK: Leading
 
 
-extension Font.Leading: CaseIterable {
+extension Font.Leading: @retroactive CaseIterable {
     
     public static var allCases: [Font.Leading] = [.tight, .standard, .loose]
     
@@ -173,7 +173,7 @@ extension Font.Leading: CaseIterable {
 }
 
 
-extension Font.Leading: Encodable {
+extension Font.Leading: @retroactive Encodable {
     
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -183,7 +183,7 @@ extension Font.Leading: Encodable {
 }
 
 
-extension Font.Leading: Decodable {
+extension Font.Leading: @retroactive Decodable {
     
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()

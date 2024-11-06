@@ -59,7 +59,7 @@ struct DragAndDropExamples: View {
 }
 
 
-extension String: DraggablePayload { }
+extension String: @retroactive DraggablePayload { }
 
 
 #Preview("Drag & Drop") {

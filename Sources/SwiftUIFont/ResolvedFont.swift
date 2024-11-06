@@ -4,7 +4,7 @@ import SwiftUI
 /// A Font that has been resolved
 @dynamicMemberLookup public struct ResolvedFont: Hashable, Sendable {
 
-    /// The set up parameters used to resolve this font.
+    /// The parameters used to resolve this font.
     public let parameters: FontParameters
     
     /// The opaqueFont that was resolved.
