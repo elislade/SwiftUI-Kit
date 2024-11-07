@@ -12,6 +12,7 @@ struct PresentationValuePresenter<Metadata: Equatable, Presentation: View>: View
     let behaviour: PresentationIdentityBehaviour
     @Binding var isPresented: Bool
     let tag: String?
+    var presentationRespondsToBoundsChange = false
     let metadata: Metadata
     @ViewBuilder let presentation: Presentation
     
@@ -23,6 +24,7 @@ struct PresentationValuePresenter<Metadata: Equatable, Presentation: View>: View
                     tag: tag,
                     metadata: metadata,
                     anchor: anchor,
+                    includeAnchorInEquatance: presentationRespondsToBoundsChange,
                     view: AnyView(presentation),
                     dispose: { isPresented = false },
                     requestIDChange: { id in
@@ -49,6 +51,7 @@ struct PresentationOptionalValuePresenter<Value, Metadata: Equatable, Presentati
     
     @Binding var value: Value?
     let tag: String?
+    var presentationRespondsToBoundsChange = false
     let metadata: Metadata
     
     @ViewBuilder let presentation: (Value) -> Presentation
@@ -62,6 +65,7 @@ struct PresentationOptionalValuePresenter<Value, Metadata: Equatable, Presentati
                         tag: tag,
                         metadata: metadata,
                         anchor: anchor,
+                        includeAnchorInEquatance: presentationRespondsToBoundsChange,
                         view: AnyView(presentation(value)),
                         dispose: { self.value = nil },
                         requestIDChange: { id in
