@@ -143,6 +143,7 @@ public extension Edge.Set {
     
 }
 
+extension Edge.Set: @retroactive Hashable { }
 
 public extension Axis {
     
