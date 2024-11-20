@@ -358,7 +358,7 @@ struct FontExamples: View {
             private func MetricCell(_ path: KeyPath<FontMetrics, Double>) -> some View {
                 Cell(
                     key: "\(path)".replacingOccurrences(of: "\\FontMetrics.", with: ""),
-                    value: "\(metrics[keyPath: path])"
+                    value: metrics[keyPath: path].formatted(.number.rounded(increment: 0.001))
                 )
             }
             
@@ -413,25 +413,28 @@ struct FontExamples: View {
         @State private var selected: Character?
         @State private var isLoading: Bool = true
         
-        private func load() {
-            let t = Thread{
-                self.isLoading = true
-                
-                var nc: [Character] = []
-                for i in 0x00000 ... 0xfffff {
-                    if let s = UnicodeScalar(i), set.contains(s) {
-                        let ch = Character(s)
-                        if !ch.isWhitespace {
-                            nc.append(Character(s))
-                        }
+        private func process(only includeSet: CharacterSet) -> [Character] {
+            var nc: [Character] = []
+            
+            for i in 0x00000 ... 0xfffff {
+                if let s = UnicodeScalar(i), includeSet.contains(s) {
+                    let ch = Character(s)
+                    if !ch.isWhitespace {
+                        nc.append(Character(s))
                     }
                 }
-                
-                self.chars = nc
-                self.isLoading = false
             }
             
-            t.start()
+            return nc
+        }
+        
+        
+        private func load() {
+            Task {
+                self.isLoading = true
+                self.chars = self.process(only: set)
+                self.isLoading = false
+            }
         }
         
         var body: some View {

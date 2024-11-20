@@ -159,7 +159,7 @@ extension Font.Weight : @retroactive Decodable {
 
 extension Font.Leading: @retroactive CaseIterable {
     
-    public static var allCases: [Font.Leading] = [.tight, .standard, .loose]
+    public static var allCases: [Font.Leading] { [.tight, .standard, .loose] }
     
     var codableValue: Int {
         switch self {

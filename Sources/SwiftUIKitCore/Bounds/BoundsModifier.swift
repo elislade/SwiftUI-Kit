@@ -54,7 +54,7 @@ struct TaggedBounds: Equatable, Sendable {
 public struct BoundsPreferenceKey: PreferenceKey {
     public typealias Value = [Anchor<CGRect>]
 
-    public static var defaultValue: Value = []
+    public static var defaultValue: Value { [] }
 
     public static func reduce(value: inout Value, nextValue: () -> Value) {
         value.append(contentsOf: nextValue())
@@ -64,7 +64,7 @@ public struct BoundsPreferenceKey: PreferenceKey {
 struct TaggedBoundsKey: PreferenceKey {
     public typealias Value = [TaggedBounds]
 
-    public static var defaultValue: Value = []
+    public static var defaultValue: Value { [] }
 
     public static func reduce(value: inout Value, nextValue: () -> Value) {
         value.append(contentsOf: nextValue())

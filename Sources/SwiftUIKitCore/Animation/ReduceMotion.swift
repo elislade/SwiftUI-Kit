@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ReduceMotionKey: EnvironmentKey {
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
 }
 
 

@@ -2,7 +2,7 @@ import SwiftUI
 
 
 struct DeviceOrientationKey: EnvironmentKey {
-    static var defaultValue: DeviceOrientation = .unknown
+    static var defaultValue: DeviceOrientation { .unknown }
 }
 
 

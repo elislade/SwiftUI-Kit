@@ -3,7 +3,7 @@
 
 import AppKit
 
-final class WindowState: NSObject, ObservableObject {
+@MainActor final class WindowState: NSObject, ObservableObject {
     
     private unowned let window: NSWindow
     private var previousWindowRadius: CGFloat?
@@ -18,6 +18,25 @@ final class WindowState: NSObject, ObservableObject {
         self.window.isReleasedWhenClosed = false
         super.init()
         self.window.delegate = self
+    }
+    
+    func perform(action: WindowAction) {
+        switch action {
+        case .close:
+            window.close()
+            
+        case .minimize: window.miniaturize(nil)
+        case .fullscreen: window.toggleFullScreen(nil)
+        case .translate(let translation):
+            let newFrame = window.frame.offsetBy(dx: translation.width, dy: -(translation.height / 2))
+            window.setFrame(newFrame, display: true)
+        }
+    }
+    
+    func setTitle(_ title: String) {
+        guard title != window.title else { return }
+        window.title = title
+        NSApplication.shared.addWindowsItem(window, title: title, filename: false)
     }
     
     func set(radius: CGFloat?) {
@@ -53,6 +72,12 @@ extension WindowState : NSWindowDelegate {
         isKey = false
     }
     
+    func windowWillClose(_ notification: Notification) {}
+    
+    public func windowDidResize(_ notification: Notification) {
+
+    }
+    
     public func windowDidEnterFullScreen(_ notification: Notification) {
         wantsFullscreen = true
         previousWindowRadius = window.contentView?.layer?.cornerRadius
@@ -64,10 +89,6 @@ extension WindowState : NSWindowDelegate {
         if let radius = overrideRadius ?? previousWindowRadius {
             window.contentView?.layer?.cornerRadius = radius
         }
-    }
-    
-    public func windowDidResize(_ notification: Notification) {
-
     }
     
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct EnvironmentModifierWrap <M: ViewModifier>: EnvironmentalModifier {
+public struct EnvironmentModifierWrap <M: ViewModifier>: @preconcurrency EnvironmentalModifier {
     
     let modifier: (EnvironmentValues) -> M
     

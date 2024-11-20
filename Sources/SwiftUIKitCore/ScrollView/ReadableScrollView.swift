@@ -3,9 +3,10 @@ import Combine
 
 public enum ScrollOffset {
     
-    public static let passthrough = PassthroughSubject<CGPoint, Never>()
+    @MainActor public static let passthrough = PassthroughSubject<CGPoint, Never>()
     
 }
+
 
 /// A SwiftUI ScrollView that you can read its content offset and content size
 public struct ReadableScrollView<Content: View>: View {
@@ -18,7 +19,7 @@ public struct ReadableScrollView<Content: View>: View {
     private let contentOffset: (CGPoint) -> Void
     private let contentSize: (CGSize) -> Void
     private let content: Content
-    
+    private let resetScrollThreshold: Double = 300
     
     /// Creates an instance of `ReadableScrollView`
     ///
@@ -61,7 +62,6 @@ public struct ReadableScrollView<Content: View>: View {
                 }
             }
         }
-        .ignoresSafeArea(edges: .bottom)
         .childBoundsOverlay(tag: "ScrollContent"){ value in
             if let value = value.last {
                 let offset = value.origin
@@ -74,8 +74,8 @@ public struct ReadableScrollView<Content: View>: View {
                         
                         // only expose reset action if the view has scrolled more than 300 points
                         handlesReset = {
-                            let xPass = axis.contains(.horizontal) ? offset.x < -300 : false
-                            let yPass = axis.contains(.vertical) ? offset.y < -300 : false
+                            let xPass = axis.contains(.horizontal) ? offset.x < -resetScrollThreshold : false
+                            let yPass = axis.contains(.vertical) ? offset.y < -resetScrollThreshold : false
                             return yPass || xPass
                         }()
                     }

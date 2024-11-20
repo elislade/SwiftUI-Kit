@@ -1,14 +1,14 @@
 import SwiftUI
 import SwiftUIKitCore
 
-public protocol PresentationValueConformable {
+public protocol PresentationValueConformable: Sendable {
     var id: UUID { get }
     var tag: String? { get }
     var anchor: Anchor<CGRect> { get }
     var includeAnchorInEquatance: Bool { get }
     var view: AnyView { get }
-    var dispose: () -> Void { get }
-    var requestIDChange: (UUID?) -> Void { get }
+    var dispose: @Sendable () -> Void { get }
+    var requestIDChange: @Sendable (UUID?) -> Void { get }
     var envProxy: ClosureKeyPath<EnvironmentValues> { get }
 }
 
@@ -23,7 +23,7 @@ public protocol Translatable {
 }
 
 
-@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable>: Equatable, PresentationValueConformable {
+@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable & Sendable>: Equatable, PresentationValueConformable, @unchecked Sendable {
     
     public static func == (lhs: PresentationValue, rhs: PresentationValue) -> Bool {
         var values: [Bool] = [lhs.id == rhs.id, lhs.tag == rhs.tag]
@@ -40,8 +40,8 @@ public protocol Translatable {
     public let anchor: Anchor<CGRect>
     public let includeAnchorInEquatance: Bool
     public let view: AnyView
-    public let dispose: () -> Void
-    public let requestIDChange: (UUID?) -> Void
+    public let dispose: @Sendable () -> Void
+    public let requestIDChange: @Sendable (UUID?) -> Void
     public let envProxy: ClosureKeyPath<EnvironmentValues>
     
     init(
@@ -51,8 +51,8 @@ public protocol Translatable {
         anchor: Anchor<CGRect>,
         includeAnchorInEquatance: Bool = true,
         view: AnyView,
-        dispose: @escaping () -> Void,
-        requestIDChange: @escaping (UUID?) -> Void = { _ in },
+        dispose: @Sendable @escaping () -> Void,
+        requestIDChange: @Sendable @escaping (UUID?) -> Void = { _ in },
         envProxy: ClosureKeyPath<EnvironmentValues>
     ) {
         self.id = id
@@ -78,11 +78,11 @@ public protocol Translatable {
         self.envProxy = other.envProxy
     }
     
-    public subscript<V>(dynamicMember path: KeyPath<Metadata, V>) -> V {
+    public subscript<V: Sendable>(dynamicMember path: KeyPath<Metadata, V>) -> V {
         metadata[keyPath: path]
     }
     
-    public subscript<V>(dynamicMember path: KeyPath<EnvironmentValues, V>) -> V {
+    public subscript<V: Sendable>(dynamicMember path: KeyPath<EnvironmentValues, V>) -> V {
         envProxy[path]
     }
     
@@ -118,7 +118,7 @@ public extension PresentationValue {
 
 public extension View {
     
-    func presentationValue<Metadata: Equatable, Content: View>(
+    func presentationValue<Metadata: Equatable & Sendable, Content: View>(
         behaviour: PresentationIdentityBehaviour = .stable,
         isPresented: Binding<Bool>,
         tag: String? = nil,
@@ -139,7 +139,7 @@ public extension View {
         })
     }
     
-    func presentationValue<Value, Metadata: Equatable, Content: View>(
+    func presentationValue<Value, Metadata: Equatable & Sendable, Content: View>(
         behaviour: PresentationIdentityBehaviour = .stable,
         value: Binding<Value?>,
         tag: String? = nil,
@@ -162,7 +162,7 @@ public extension View {
     
 }
 
-public struct PresentationKey<Metadata: Equatable>: PreferenceKey {
+public struct PresentationKey<Metadata: Equatable & Sendable>: PreferenceKey {
     
     public static var defaultValue: [PresentationValue<Metadata>] { [] }
     

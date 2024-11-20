@@ -13,8 +13,9 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     private let root: Root
     
     @State private var id = UUID()
-    @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
+    @MainActor @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     
+    @State private var pendingReset = false
     @State private var transitionFraction: CGFloat = 0
     @State private var isUpdatingTransition: Bool = false
     
@@ -44,7 +45,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
             })
     }
     
-    private func popElement() {
+    @MainActor private func popElement() {
         guard let last = elements.last else { return }
         last.dispose()
     }
@@ -162,15 +163,9 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                     .allowsHitTesting(elements.isEmpty == false)
                     .defersSystemGesturesPolyfill(on: .leading)
             }
-            .resetAction(active: !elements.isEmpty){
-                Task.detached {
-                    let elements = await self.elements.reversed()
-                    for element in elements {
-                        element.dispose()
-                        while await element.id == self.elements.last?.id { }
-                        usleep(10_000)
-                    }
-                }
+            .resetAction(active: !elements.isEmpty && !pendingReset){
+                pendingReset = true
+                popElement()
             }
             .animation(.fastSpringInterpolating, value: elements)
             .mask {
@@ -188,6 +183,16 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                         self.elements.removeAll(where: { $0.id == element.id })
                     }
                 }
+                
+                if pendingReset {
+                    if elements.isEmpty {
+                        pendingReset = false
+                    } else {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                            popElement()
+                        }
+                    }
+                }
             }
         }
     }
@@ -195,7 +200,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     
     public var body: some View {
         if useNavBar {
-            NavBarContainer(backAction: elements.isEmpty ? nil : popElement){
+            NavBarContainer{//(backAction: self.elements.isEmpty ? nil : { }){ // FIXME:
                 content
             }
         } else {

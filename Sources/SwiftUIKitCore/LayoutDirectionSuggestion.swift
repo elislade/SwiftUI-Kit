@@ -14,7 +14,7 @@ public extension EnvironmentValues {
 
 struct LayoutDirectionSuggestionKey: EnvironmentKey {
     
-    static var defaultValue: LayoutDirectionSuggestion = .useSystemDefault
+    static var defaultValue: LayoutDirectionSuggestion { .useSystemDefault }
     
 }
 

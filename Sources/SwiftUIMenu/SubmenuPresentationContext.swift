@@ -91,7 +91,7 @@ struct SubmenuPresentation: Identifiable, Equatable {
 
 struct SubmenuPresentationKey: PreferenceKey {
     
-    static var defaultValue: [SubmenuPresentation] = []
+    static var defaultValue: [SubmenuPresentation] { [] }
     
     static func reduce(value: inout [SubmenuPresentation], nextValue: () -> [SubmenuPresentation]) {
         value.append(contentsOf: nextValue())

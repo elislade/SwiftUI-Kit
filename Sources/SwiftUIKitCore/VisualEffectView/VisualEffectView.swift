@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A way to customize VisualEffectView. Note that values only take effect on initalization and will not update consistently after. If you want to update values live you will have to change the identity of the representation on every value change, which will teardown and setup this view.
-public struct VisualEffectView {
+@MainActor public struct VisualEffectView {
 
     public enum Filter: String, CaseIterable, Identifiable, Sendable {
         public var id: String { rawValue }

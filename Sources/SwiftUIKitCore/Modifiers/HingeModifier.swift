@@ -5,7 +5,7 @@ struct HingeModifier: ViewModifier {
     let degrees: Double
     let edge: Edge
     
-    init(degrees: Double = 0, edge: Edge = .top) {
+    nonisolated init(degrees: Double = 0, edge: Edge = .top) {
         self.degrees = degrees
         self.edge = edge
     }

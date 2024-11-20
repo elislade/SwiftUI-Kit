@@ -6,7 +6,7 @@ public struct FontFactory {
     
     /// Override this shared property to replace the default  ``FontResolver`` with a custom one.
     //public static var shared: FontFactoryComformable = Self.swiftUI
-    public static var shared: FontFactoryComformable = Self.default
+    @MainActor public static var shared: FontFactoryComformable = Self.default
     
 }
 
@@ -33,7 +33,7 @@ struct SwiftUIFontFactory : FontFactoryComformable {
 
 final class FontCache {
     
-    static var cache: [Int : ResolvedFont] = [:]
+    @MainActor static var cache: [Int : ResolvedFont] = [:]
     
 }
 

@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - SceneInsets
 
 struct SceneProxyKey: EnvironmentKey {
-    static var defaultValue: GeometryProxy? = nil
+    static var defaultValue: GeometryProxy? { nil }
 }
 
 struct SceneInsetsKey: EnvironmentKey {

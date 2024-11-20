@@ -2,6 +2,12 @@ import SwiftUI
 import SwiftUIKitCore
 import SwiftUIPresentation
 
+struct BackAction: Sendable {
+    
+    func action() {}
+    
+}
+
 public struct NavBarContainer<Content: View> : View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
@@ -29,7 +35,7 @@ public struct NavBarContainer<Content: View> : View {
         80 - (28 * interactionGranularity)
     }
     
-    private let backAction: (() -> Void)?
+    private let backAction: (@Sendable () -> Void)?
     private let content: () -> Content
     
     private var titleTransition: AnyTransition {
@@ -42,9 +48,9 @@ public struct NavBarContainer<Content: View> : View {
     
     /// Initializes instance
     /// - Parameters:
-    ///   - backAction: An optonal closure that when set will show a back button in leading position. Defaults to nil which means no back button.
+    ///   - backAction: An optonal closure that when set will show a back button in leading position. Defaults to nil.
     ///   - content: A view builder of the content that can set `NavBarContainer` items.
-    public init(backAction: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
+    @MainActor public init(backAction: (@Sendable () -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
         self.backAction = backAction
         self.content = content
     }

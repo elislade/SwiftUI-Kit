@@ -4,11 +4,15 @@ import SwiftUI
 struct InteractionGranularityKey: EnvironmentKey {
     
     #if os(macOS)
-    static let defaultValue: Double = 1
+    static var defaultValue: Double { 1 }
     #elseif os(iOS)
-    static let defaultValue: Double = 0.5
+    static var defaultValue: Double { 0.5 }
     #elseif os(tvOS)
-    static let defaultValue: Double = 0
+    static var defaultValue: Double { 0 }
+    #elseif os(visionOS)
+    static var defaultValue: Double { 0.25 }
+    #else
+    static var defaultValue: Double { 1 }
     #endif
     
 }

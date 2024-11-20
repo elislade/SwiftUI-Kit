@@ -3,7 +3,7 @@ import SwiftUIKitCore
 
 struct MenuItemInsetPreferenceKey: PreferenceKey {
     
-    static var defaultValue: [EdgeInsets] = []
+    static var defaultValue: [EdgeInsets] { [] }
     
     static func reduce(value: inout [EdgeInsets], nextValue: () -> [EdgeInsets]) {
         value.append(contentsOf: nextValue())
@@ -15,9 +15,13 @@ struct MenuItemInsetPreferenceKey: PreferenceKey {
 struct MenuItemInsetKey: EnvironmentKey {
     
     #if os(iOS)
-    static var defaultValue: EdgeInsets = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+    static var defaultValue: EdgeInsets {
+        .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+    }
     #else
-    static var defaultValue: EdgeInsets = .init(top: 6, leading: 10, bottom: 6, trailing: 10)
+    static var defaultValue: EdgeInsets {
+        .init(top: 6, leading: 10, bottom: 6, trailing: 10)
+    }
     #endif
     
 }

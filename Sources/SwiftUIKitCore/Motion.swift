@@ -5,7 +5,7 @@ import Combine
 
 enum WindowShake {
     
-    static let passthrough = PassthroughSubject<Void, Never>()
+    @MainActor static let passthrough = PassthroughSubject<Void, Never>()
     
 }
 

@@ -22,18 +22,18 @@ public extension AnyTransition {
         .asymmetric(insertion: .identity, removal: .merge(transitions))
     }
     
-    static var pageSlideReveal: AnyTransition {
-        .asymmetric(
-            insertion: .scaleFadeIn,
-            removal: .moveOffset(edge: .leading)
-        )
-    }
-    
+//    static var pageSlideReveal: AnyTransition {
+//        .asymmetric(
+//            insertion: .scaleFadeIn,
+//            removal: .moveOffset(edge: .leading)
+//        )
+//    }
+//    
     static func moveOffset(edge: Edge = .leading) -> AnyTransition {
         .merge(.move(edge: edge), .offset(x: edge == .leading ? -50 : 50))
     }
     
-    static var scaleFadeIn: AnyTransition = .merge(.scale(0.8, anchor: .center), .opacity)
+    //static var scaleFadeIn: AnyTransition = .merge(.scale(0.8, anchor: .center), .opacity)
     
     static func opacity(_ value: Double = 0) -> AnyTransition {
         .modifier(

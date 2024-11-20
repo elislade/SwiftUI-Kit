@@ -4,15 +4,17 @@ import SwiftUI
 // MARK: Window Action
 
 public enum WindowAction {
-    case close
+    case close(shouldQuit: Bool = false)
     case minimize
     case fullscreen
     case translate(CGSize)
+    
+    static var close: Self { .close() }
 }
 
 struct PerformWindowAction: EnvironmentKey {
     
-    static var defaultValue: (WindowAction) -> Void = { _ in }
+    static var defaultValue: (WindowAction) -> Void { { _ in } }
     
 }
 

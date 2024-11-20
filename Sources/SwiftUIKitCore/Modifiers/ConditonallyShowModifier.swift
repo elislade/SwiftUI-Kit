@@ -10,7 +10,7 @@ struct ConditonallyShowModifier: ViewModifier, Animatable {
         self.threshold = threshold
     }
     
-    var animatableData: Double {
+    nonisolated var animatableData: Double {
         get { isShown ? 1 : 0 }
         set { isShown = newValue > threshold }
     }

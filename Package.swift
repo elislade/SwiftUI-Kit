@@ -32,5 +32,6 @@ let package = Package(
         .target(name: "SwiftUIPresentation", dependencies: ["SwiftUIKitCore"]),
         .target(name: "SwiftUINav", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
         .target(name: "SwiftUIMenu", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
-    ]
+    ],
+    swiftLanguageVersions: [ .version("6") ]
 )

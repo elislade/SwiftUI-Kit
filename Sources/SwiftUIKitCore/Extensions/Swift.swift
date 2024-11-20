@@ -1,4 +1,4 @@
-import Darwin
+import Foundation
 
 extension Double: EmptyInitalizable {}
 extension Int : EmptyInitalizable {}
@@ -54,21 +54,23 @@ public func compare<T: Comparable>(_ lhs: T, _ type: CompareType, _ rhs: T) -> B
 
 
 /// Resolves the keypath of an object through an escaping closure by way of subscript.
-public struct ClosureKeyPath<T> {
+public struct ClosureKeyPath<T>: @unchecked Sendable {
     
     private let closure: () -> T
     
     public init(_ closure: @autoclosure @escaping () -> T) {
-        self.closure = closure
+        self.closure = {
+            DispatchQueue.global().sync {
+                return closure()
+            }
+        }
     }
     
-    public subscript<V>(key: KeyPath<T, V>) -> V {
+    public subscript<V: Sendable>(key: KeyPath<T, V>) -> V {
         closure()[keyPath: key]
     }
     
 }
-
-
 
 
 public extension ClosedRange where Bound : BinaryFloatingPoint {

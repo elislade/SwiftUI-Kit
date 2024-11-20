@@ -1,11 +1,11 @@
 import SwiftUI
 
 
-struct OpacityModifier: ViewModifier, Hashable {
+ struct OpacityModifier:  ViewModifier, Hashable {
     
     let value: Double
     
-    init(value: Double = 0) {
+    nonisolated init(value: Double = 0) {
         self.value = value
     }
     
@@ -21,7 +21,7 @@ struct BlurModifier: ViewModifier, Hashable {
     let radius: Double
     let opaque: Bool
     
-    init(radius: Double = 0, opaque: Bool = false) {
+    nonisolated init(radius: Double = 0, opaque: Bool = false) {
         self.radius = radius
         self.opaque = opaque
     }
@@ -38,7 +38,7 @@ struct ClipShapeModifier<S: Shape>: ViewModifier {
     let shape: S
     let style: FillStyle
     
-    init(shape: S, style: FillStyle = FillStyle()) {
+    nonisolated init(shape: S, style: FillStyle = FillStyle()) {
         self.shape = shape
         self.style = style
     }
@@ -56,7 +56,7 @@ struct ScaleModifier: ViewModifier, Hashable {
     let y: Double
     let anchor: UnitPoint
     
-    init(x: Double = 1, y: Double = 1, anchor: UnitPoint = .center) {
+    nonisolated init(x: Double = 1, y: Double = 1, anchor: UnitPoint = .center) {
         self.x = x
         self.y = y
         self.anchor = anchor
@@ -74,7 +74,7 @@ struct RotationModifier: ViewModifier, Hashable {
     let angle: Angle
     let anchor: UnitPoint
     
-    init(angle: Angle = .zero, anchor: UnitPoint = .center) {
+    nonisolated init(angle: Angle = .zero, anchor: UnitPoint = .center) {
         self.angle = angle
         self.anchor = anchor
     }
@@ -134,7 +134,7 @@ struct Rotation3DModifier: ViewModifier, Hashable {
     let anchor: UnitPoint
     let depth: Double
     
-    init(
+    nonisolated init(
         angle: Angle = .zero,
         axis: Axis3D = .x,
         anchor: UnitPoint = .center,
@@ -163,7 +163,7 @@ struct GrayscaleModifier: ViewModifier, Hashable {
     
     let amount: Double
     
-    init(amount: Double = 0) {
+    nonisolated init(amount: Double = 0) {
         self.amount = amount
     }
     
@@ -178,7 +178,7 @@ struct HueRotationModifier: ViewModifier, Hashable {
     
     let angle: Angle
     
-    init(angle: Angle = .zero) {
+    nonisolated init(angle: Angle = .zero) {
         self.angle = angle
     }
     
@@ -195,7 +195,7 @@ struct FrameModifier: ViewModifier {
     let maxHeight: CGFloat?
     let alignment: Alignment
     
-    init(maxWidth: CGFloat? = nil, maxHeight: CGFloat? = nil, alignment: Alignment = .center) {
+    nonisolated init(maxWidth: CGFloat? = nil, maxHeight: CGFloat? = nil, alignment: Alignment = .center) {
         self.maxWidth = maxWidth
         self.maxHeight = maxHeight
         self.alignment = alignment
@@ -203,7 +203,7 @@ struct FrameModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .frame(maxWidth: maxWidth, minHeight: 0, maxHeight: maxHeight, alignment: alignment)
+            .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: alignment)
     }
     
 }
@@ -213,7 +213,7 @@ struct ZIndexModifier: ViewModifier, Hashable {
     
     let index: Double
     
-    init(index: Double = 0) {
+    nonisolated init(index: Double = 0) {
         self.index = index
     }
     

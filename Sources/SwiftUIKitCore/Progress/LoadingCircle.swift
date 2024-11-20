@@ -75,7 +75,7 @@ public struct LoadingCircle: View {
                 }
             }
             //.rotationEffect(.degrees(rotation))
-            //FIXME: .layoutDirectionMirror()
+            .layoutDirectionMirror()
         }
         .aspectRatio(1, contentMode: .fit)
         .drawingGroup()

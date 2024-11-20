@@ -90,7 +90,7 @@ protocol FontParametersModifier {
 
 struct FontParametersKey: EnvironmentKey {
     
-    static var defaultValue: FontParameters = .init()
+    static var defaultValue: FontParameters { .identity }
     
 }
 
@@ -103,11 +103,11 @@ public extension EnvironmentValues {
         set { self[FontParametersKey.self] = newValue }
     }
     
-    var fontResolved: ResolvedFont {
+    @MainActor var fontResolved: ResolvedFont {
         fontResource.resolve(with: fontParameters, in: self)
     }
     
-    var fontResourceFont: Font {
+    @MainActor var fontResourceFont: Font {
         fontResolved.opaqueFont
     }
     

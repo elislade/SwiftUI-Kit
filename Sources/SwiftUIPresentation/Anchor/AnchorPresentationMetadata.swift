@@ -1,12 +1,12 @@
 import SwiftUI
 
-struct AnchorPresentationMetadata: Equatable {
+struct AnchorPresentationMetadata: Equatable, @unchecked Sendable {
     
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.anchorMode == rhs.anchorMode
     }
     
-    enum AnchorMode: Equatable {
+    enum AnchorMode: Equatable, Sendable {
         case auto
         case manual(source: UnitPoint, presentation: UnitPoint)
     }

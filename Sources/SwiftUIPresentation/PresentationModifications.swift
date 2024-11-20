@@ -128,7 +128,7 @@ public enum PresentationBackgroundInteraction {
 
 struct PresentationDepthKey: EnvironmentKey {
     
-    static var defaultValue: Int = 0
+    static var defaultValue: Int { 0 }
     
 }
 

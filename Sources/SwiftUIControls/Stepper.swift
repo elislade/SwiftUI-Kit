@@ -13,8 +13,7 @@ public struct Stepper: View {
     @Environment(\.isEnabled) private var isEnabled
     
     @State private var activeDirection: AccessibilityAdjustmentDirection?
-    @State private var actionTimerInterval: TimeInterval = 0.5
-    @State private var actionTimer: Timer?
+    @State private var actionTimerInterval: TimeInterval?
     @State private var actionTimerCount: Int = 0
     
     private var isVertical: Bool { layoutDirectionSuggestion.useVertical }
@@ -79,31 +78,9 @@ public struct Stepper: View {
         }
     }
     
-    private func startActionRepitition() {
-        guard actionTimerCount == 0, actionTimer == nil else { return }
-        
-        func timerCall() {
-            if actionTimerCount == 5 || actionTimerCount == 20 || actionTimerCount == 80 {
-                actionTimerInterval /= 3
-                actionTimer?.invalidate()
-                actionTimer = .scheduledTimer(withTimeInterval: actionTimerInterval, repeats: true){ _ in
-                    timerCall()
-                }
-            }
-
-            actionTimerCount += 1
-        }
-        
-        actionTimer = .scheduledTimer(withTimeInterval: actionTimerInterval, repeats: true){ _ in
-            timerCall()
-        }
-    }
-    
     private func stopActionRepitition() {
-        actionTimer?.invalidate()
-        actionTimer = nil
+        actionTimerInterval = nil
         actionTimerCount = 0
-        actionTimerInterval = 0.5
     }
     
     private var linePadding: CGFloat {
@@ -175,6 +152,17 @@ public struct Stepper: View {
                     self.activeDirection = nil
                 }
             }
+            .background{
+                if let actionTimerInterval {
+                    Color.clear.onReceive(Timer.every(actionTimerInterval).autoconnect()){ _ in
+                        if actionTimerCount == 5 || actionTimerCount == 20 || actionTimerCount == 80 {
+                            self.actionTimerInterval = actionTimerInterval / 3
+                        }
+                        
+                        actionTimerCount += 1
+                    }
+                }
+            }
             .overlay{
                 GeometryReader { proxy in
                     Color.clear
@@ -194,7 +182,9 @@ public struct Stepper: View {
                                     
                                     if canPerformAction(directionCandidate){
                                         activeDirection = directionCandidate
-                                        startActionRepitition()
+                                        if actionTimerInterval == nil {
+                                            actionTimerInterval = 0.5
+                                        }
                                     }
                                 }
                                 .onEnded { g in
@@ -213,7 +203,6 @@ public struct Stepper: View {
             .compositingGroup()
             .opacity(isEnabled ? 1 : 0.5)
             .accessibilityAdjustableAction(performAction)
-            .onDisappear(perform: stopActionRepitition)
     }
     
     

@@ -105,12 +105,12 @@ struct StickyContext : ViewModifier {
             .overlayPreferenceValue(StickyPreferenceKey.self) { value in
                 GeometryReader{ proxy in
                     Color.clear
-                        .onAppear{ calculateSticky(
-                            in: proxy,
-                            for: value
-                        ) }
-                        .onChange(of: value){
-                            calculateSticky(in: proxy, for: $0)
+//                        .onAppear{ calculateSticky(
+//                            in: proxy,
+//                            for: value
+//                        ) }
+                        .onChangePolyfill(of: value, initial: true){
+                            calculateSticky(in: proxy, for: value)
                         }
                 }
                 .hidden()
@@ -156,7 +156,7 @@ struct StickyContext : ViewModifier {
 
 struct StickyPreferenceKey: PreferenceKey {
     
-    static var defaultValue: [StickyPreferenceValue] = []
+    static var defaultValue: [StickyPreferenceValue] { [] }
     
     static func reduce(value: inout [StickyPreferenceValue], nextValue: () -> [StickyPreferenceValue]) {
         value.append(contentsOf: nextValue())

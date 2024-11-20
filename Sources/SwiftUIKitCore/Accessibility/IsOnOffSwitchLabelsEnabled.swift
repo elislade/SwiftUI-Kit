@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AccessibilityIsOnOffSwitchLabelsEnabledKey: EnvironmentKey {
-    static var defaultValue : Bool = false
+    static var defaultValue : Bool { false }
 }
 
 

@@ -132,7 +132,7 @@ struct NavBarMaterialModifier<V: View> : ViewModifier {
 
 struct IsInNavBarKey: EnvironmentKey {
     
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
     
 }
 
@@ -148,7 +148,7 @@ public extension EnvironmentValues {
 
 struct NavBarHiddenKey: PreferenceKey {
     
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
     
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
         let next = nextValue()
@@ -166,7 +166,7 @@ struct NavBarMaterialKey: PreferenceKey {
         value.append(contentsOf: nextValue())
     }
     
-    static let defaultValue: [NavBarMaterialValue] = []
+    static var defaultValue: [NavBarMaterialValue] { [] }
 }
 
 

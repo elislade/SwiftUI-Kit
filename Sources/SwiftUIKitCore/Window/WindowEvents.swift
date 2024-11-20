@@ -5,9 +5,9 @@ import Combine
 
 enum WindowEvents {
     
-    static var swizzledReferenceCount: UInt8 = 0
-    static var isSwizzled: Bool { swizzledReferenceCount > 0 }
-    static let passthrough = PassthroughSubject<UIEvent, Never>()
+    @MainActor static var swizzledReferenceCount: UInt8 = 0
+    @MainActor static var isSwizzled: Bool { swizzledReferenceCount > 0 }
+    @MainActor static let passthrough = PassthroughSubject<UIEvent, Never>()
     
 }
 
@@ -131,7 +131,7 @@ public extension EnvironmentValues {
 
 struct WantsWindowCoordinatedInteractionKey : PreferenceKey {
     
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
     
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
         if value == false {
@@ -168,7 +168,7 @@ public extension View {
 
 struct WindowCoordinationInteractionEventKey: EnvironmentKey {
     
-    static var defaultValue: [InteractionEvent] = []
+    static var defaultValue: [InteractionEvent] { [] }
     
 }
 

@@ -26,7 +26,7 @@ public struct ResetAction: Equatable {
 
 public struct ResetActionKey: PreferenceKey {
     
-    public static var defaultValue: ResetAction? = nil
+    public static var defaultValue: ResetAction? { nil }
     
     public static func reduce(value: inout ResetAction?, nextValue: () -> ResetAction?) {
         let next = nextValue()

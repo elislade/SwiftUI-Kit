@@ -49,7 +49,7 @@ public enum FontResource : Hashable, Codable {
     }
     
     
-    public func resolve(with params: FontParameters, in environment: EnvironmentValues = .init()) -> ResolvedFont {
+    @MainActor public func resolve(with params: FontParameters, in environment: EnvironmentValues = .init()) -> ResolvedFont {
         #if canImport(UIKit)
         let content = UIContentSizeCategory(environment.sizeCategory)
         let trait = UITraitCollection(preferredContentSizeCategory: content)
@@ -88,7 +88,7 @@ extension FontResource: CustomStringConvertible {
 
 struct FontResourceKey: EnvironmentKey {
     
-    static var defaultValue: FontResource = .system(design: .default)
+    static var defaultValue: FontResource { .system(design: .default) }
     
 }
 

@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-public struct GridView<Data: RandomAccessCollection, Label: View>: View where Data.Index == Int, Data.Element : Identifiable {
+public struct GridView<Data: RandomAccessCollection & Sendable, Label: View>: View where Data.Index == Int, Data.Element : Identifiable & Sendable {
 
     let spacing: CGFloat
     let columns: Int

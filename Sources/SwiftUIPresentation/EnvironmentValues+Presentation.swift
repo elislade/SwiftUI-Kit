@@ -29,7 +29,9 @@ public struct DismissPresentationAction: Equatable {
 
 struct DismissPresentation: EnvironmentKey {
     
-    static var defaultValue: DismissPresentationAction = .init(id: .init(), closure: {})
+    static var defaultValue: DismissPresentationAction {
+        .init(id: .init(), closure: {})
+    }
     
 }
 
@@ -63,7 +65,9 @@ public extension View {
 
 
 struct ScenePresentationTraitsKey: EnvironmentKey {
-    static var defaultValue: PresentationTraits = []
+    
+    static var defaultValue: PresentationTraits { [] }
+    
 }
 
 

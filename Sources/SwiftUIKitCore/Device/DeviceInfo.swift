@@ -4,7 +4,7 @@ import Foundation
 /// - Warning: Simulators do not report values correctly. Testing and usage needs to happen on physical devices.
 final public class Device {
     
-    public static let current: Device = .init()
+    @MainActor public static let current: Device = .init()
     
     private init() { }
     

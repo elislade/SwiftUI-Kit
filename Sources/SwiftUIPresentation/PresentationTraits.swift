@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-public struct PresentationTraits: OptionSet {
+public struct PresentationTraits: OptionSet, Sendable {
     
     public let rawValue: Int
     
@@ -34,19 +34,19 @@ public struct PresentationTraits: OptionSet {
 
 struct BeingPresentedKey: EnvironmentKey {
     
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
     
 }
 
 struct PresentationTraitsEnvironmentKey: EnvironmentKey {
     
-    static var defaultValue: PresentationTraits = .init()
+    static var defaultValue: PresentationTraits { .init() }
     
 }
 
 struct PresentedOnTraitsEnvironmentKey: EnvironmentKey {
     
-    static var defaultValue: PresentationTraits = .init()
+    static var defaultValue: PresentationTraits { .init() }
     
 }
 
@@ -87,7 +87,7 @@ public extension EnvironmentValues {
 
 struct PresentationTraitsPreferenceKey: PreferenceKey {
     
-    static var defaultValue: PresentationTraits = .init()
+    static var defaultValue: PresentationTraits { .init() }
     
     static func reduce(value: inout PresentationTraits, nextValue: () -> PresentationTraits) {
         value.formUnion(nextValue())

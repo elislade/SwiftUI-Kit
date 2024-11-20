@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct MenuBackgroundKey: EnvironmentKey {
-    static var defaultValue: AnyView? = nil
+    
+    static var defaultValue: AnyView? { nil }
+    
 }
 
 extension EnvironmentValues {

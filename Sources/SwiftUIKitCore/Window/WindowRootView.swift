@@ -4,7 +4,7 @@ import SwiftUI
 
 struct WindowRootView<Content: View>: View {
     
-    @State private var radius: CGFloat = SwiftUIWindow.defaultRadius
+    @State private var radius: CGFloat = 0
     @ObservedObject var state: WindowState
     
     let content: Content
@@ -13,11 +13,17 @@ struct WindowRootView<Content: View>: View {
         content
             .containerShape(RoundedRectangle(cornerRadius: radius))
             .environment(\._windowIsKey, state.isKey)
-            .onPreferenceChange(WindowCornerRadiusKey.self){ pendingDestinationValues in
-                state.set(radius: pendingDestinationValues.last)
-                radius = pendingDestinationValues.last ?? SwiftUIWindow.defaultRadius
+            .onPreferenceChange(WindowCornerRadiusKey.self){ values in
+                radius = values.last ?? 16
+            }
+            .onPreferenceChange(WindowTitleKey.self){ values in
+                state.setTitle(values.last ?? "")
             }
             .onAppear(perform: state.onappear)
+            .environment(\._performWindowAction){ state.perform(action: $0) }
+            .onChangePolyfill(of: radius){
+                state.set(radius: radius)
+            }
     }
     
 }

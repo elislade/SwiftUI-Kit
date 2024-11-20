@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct FocusPresentationMetadata: Equatable {
+struct FocusPresentationMetadata: Equatable, @unchecked Sendable {
     
     /// Stubbed true Equatable conformance will never update PresentationContext state on PreferenceKey Metadata changes
     /// This is to get around a Swift limitations discussed below.

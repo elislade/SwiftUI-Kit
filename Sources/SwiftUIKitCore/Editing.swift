@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EditingEnvironmentKey: EnvironmentKey {
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
 }
 
 public extension EnvironmentValues {

@@ -79,7 +79,7 @@ public struct LoadingLine: View {
                         .padding(.horizontal, 3)
                 }
             }
-            //FIXME: .layoutDirectionMirror()
+            .layoutDirectionMirror()
             .drawingGroup()
             .onReceive(Timer.every(1.3).autoconnect()){ _ in
                 toggle()

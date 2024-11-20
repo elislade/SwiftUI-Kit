@@ -2,7 +2,9 @@ import SwiftUI
 import SwiftUIKitCore
 
 struct NavViewPendingDestinationValue: EnvironmentKey {
-    static var defaultValue: NavViewDestinationValue? = nil
+    
+    static var defaultValue: NavViewDestinationValue? { nil }
+    
 }
 
 extension EnvironmentValues {

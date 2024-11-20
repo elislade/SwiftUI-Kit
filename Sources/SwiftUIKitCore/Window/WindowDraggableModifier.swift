@@ -6,10 +6,14 @@ struct WindowDraggableModifier: ViewModifier {
     
     @Environment(\.performWindowAction) private var performWindowAction
     
+    let enabled: Bool
+    
     private var dragGesture: some Gesture {
         DragGesture(coordinateSpace: .local)
             .onChanged{
-                performWindowAction(.translate($0.translation))
+                if enabled {
+                    performWindowAction(.translate($0.translation))
+                }
             }
     }
     
@@ -25,9 +29,9 @@ struct WindowDraggableModifier: ViewModifier {
 
 public extension View {
     
-    func windowDraggable() -> some View {
+    func windowDraggable(enabled: Bool = true) -> some View {
         #if canImport(AppKit)
-        modifier(WindowDraggableModifier())
+        modifier(WindowDraggableModifier(enabled: enabled))
         #else
         self
         #endif

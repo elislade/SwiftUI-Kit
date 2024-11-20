@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ControlRoundnessKey: EnvironmentKey {
     
-    static var defaultValue: Double? = nil
+    static var defaultValue: Double? { nil }
     
 }
 

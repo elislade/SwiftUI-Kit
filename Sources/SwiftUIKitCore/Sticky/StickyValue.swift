@@ -70,7 +70,7 @@ struct StickyPreferenceValue: Equatable {
 }
 
 
-public struct StickyCategoryMask: OptionSet {
+public struct StickyCategoryMask: OptionSet, Sendable {
     
     public let rawValue: Int8
     

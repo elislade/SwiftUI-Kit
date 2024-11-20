@@ -38,7 +38,7 @@ struct NavViewElementMetadata: Equatable {
 
 struct NavViewElementPreferenceKey: PreferenceKey {
     
-    static var defaultValue: [NavViewElement] = []
+    static var defaultValue: [NavViewElement] { [] }
     
     static func reduce(value: inout [NavViewElement], nextValue: () -> [NavViewElement]) {
         value.append(contentsOf: nextValue())

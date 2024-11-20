@@ -29,7 +29,7 @@ public extension View {
 
 struct WindowCornerRadiusKey: PreferenceKey {
     
-    static var defaultValue: [CGFloat] = []
+    static var defaultValue: [CGFloat] { [] }
     
     static func reduce(value: inout [CGFloat], nextValue: () -> [CGFloat]) {
         value.append(contentsOf: nextValue())

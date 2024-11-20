@@ -229,15 +229,15 @@ extension LineWrapLayout {
     
     
     struct NewlineKey: LayoutValueKey {
-        static var defaultValue: Int = 0
+        static var defaultValue: Int { 0 }
     }
 
     struct KerningKey: LayoutValueKey {
-        static var defaultValue: Double = 0
+        static var defaultValue: Double { 0 }
     }
 
     struct SeparatorKey: LayoutValueKey {
-        static var defaultValue: Bool = false
+        static var defaultValue: Bool { false }
     }
     
 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BeingPresentedOnKey: EnvironmentKey {
     
-    static var defaultValue: Bool = false
+    static var defaultValue: Bool { false }
     
 }
 

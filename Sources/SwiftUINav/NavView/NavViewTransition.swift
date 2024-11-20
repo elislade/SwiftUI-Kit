@@ -9,7 +9,7 @@ public protocol TransitionProvider {
 }
 
 
-public enum TransitionState: Equatable {
+public enum TransitionState: Equatable, Sendable {
     
     case identity
     case progress(_ value: Double)
@@ -35,7 +35,7 @@ extension TransitionProvider {
 
 public struct DefaultNavTransitionProvider: TransitionProvider {
     
-    public init(){}
+    public nonisolated init(){}
 
     public func modifier(_ state: TransitionState) -> some ViewModifier {
         DefaultNavTransitionModifier(state: state)
@@ -56,6 +56,10 @@ struct DefaultNavTransitionModifier: ViewModifier {
     @Environment(\.reduceMotion) private var reduceMotion: Bool
     
     let state: TransitionState
+    
+    nonisolated init(state: TransitionState) {
+        self.state = state
+    }
     
     func body(content: Content) -> some View {
         content

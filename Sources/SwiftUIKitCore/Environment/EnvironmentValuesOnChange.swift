@@ -1,12 +1,13 @@
 import SwiftUI
 
 
-struct EnvChangeModifier: EnvironmentalModifier {
+struct EnvChangeModifier: @preconcurrency EnvironmentalModifier {
     
     let onChange: (EnvironmentValues) -> Void
     
     func resolve(in environment: EnvironmentValues) -> some ViewModifier {
-        Modifier(environment: environment, onChange: onChange)
+        EmptyModifier()
+        //Modifier(environment: environment, onChange: onChange)
     }
     
     struct Modifier: ViewModifier {
@@ -14,6 +15,11 @@ struct EnvChangeModifier: EnvironmentalModifier {
         let environment: EnvironmentValues
         let onChange: (EnvironmentValues) -> Void
     
+        init(environment: EnvironmentValues, onChange: @escaping (EnvironmentValues) -> Void) {
+            self.environment = environment
+            self.onChange = onChange
+        }
+        
         func body(content: Content) -> some View {
             content.onChangePolyfill(of: environment.description, initial: true){
                 onChange(environment)

@@ -10,7 +10,7 @@ If you are interested in seeing an actual app using this you can check out [Wave
 
 ## Libraries
 
-- SwiftUICore
+- SwiftUIKitCore
 - SwiftUIControls
 - SwiftUILayout
 - SwiftUIPresentation

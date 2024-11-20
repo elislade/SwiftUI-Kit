@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NavBarItemMetadata: Equatable {
+public struct NavBarItemMetadata: Equatable, Sendable {
     
     public enum Placement: UInt8, Equatable, CaseIterable, Sendable, CustomStringConvertible {
         case leading

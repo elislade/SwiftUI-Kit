@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 
-public protocol DraggablePayload: Codable {
+public protocol DraggablePayload: Codable, Sendable {
     static var type: UTType { get }
 }
 
@@ -14,7 +14,7 @@ public extension DraggablePayload {
 
 public extension View {
     
-    func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
+    @inlinable nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
         onDrag({
             let item = NSItemProvider()
             
@@ -42,7 +42,7 @@ public extension View {
     }
     
     
-    func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
+    @inlinable nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
         onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
             var items: [Payload] = []
             let group = DispatchGroup()
@@ -51,7 +51,9 @@ public extension View {
                 group.enter()
                 provider.loadDataRepresentation(forTypeIdentifier: Payload.type.identifier){ data, err in
                     if let data, let item = try? JSONDecoder().decode(Payload.self, from: data) {
-                        items.append(item)
+                        DispatchQueue.main.sync {
+                            items.append(item)
+                        }
                     }
                     group.leave()
                 }
@@ -70,7 +72,7 @@ public extension View {
 
 public extension DynamicViewContent {
     
-    func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
+    @inlinable nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
         onInsert(of: [ Payload.type ]){ i, providers in
             var items: [Payload] = []
             let group = DispatchGroup()
@@ -79,7 +81,9 @@ public extension DynamicViewContent {
                 group.enter()
                 provider.loadDataRepresentation(forTypeIdentifier: Payload.type.identifier){ data, err in
                     if let data, let item = try? JSONDecoder().decode(Payload.self, from: data) {
-                        items.append(item)
+                        DispatchQueue.main.sync {
+                            items.append(item)
+                        }
                     }
                     group.leave()
                 }

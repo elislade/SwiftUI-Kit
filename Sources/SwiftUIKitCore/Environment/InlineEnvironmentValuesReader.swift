@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EnvReaderModifier<Reader: View>: EnvironmentalModifier {
+struct EnvReaderModifier<Reader: View>: @preconcurrency EnvironmentalModifier {
     
     let view: (EnvironmentValues) -> Reader
     

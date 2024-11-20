@@ -9,3 +9,4 @@
 
 public typealias Slider = SwiftUIControls.Slider
 public typealias TextField = SwiftUIControls.TextField
+public typealias KeyPress = SwiftUIKitCore.KeyPress

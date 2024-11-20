@@ -265,7 +265,7 @@ extension SwipeActionsModifier where Trailing == EmptyView {
 
 
 final class SwipeActionsState: ObservableObject {
-    static let shared = SwipeActionsState()
+    @MainActor static let shared = SwipeActionsState()
     
     private init(){}
     @Published var latestSwipeActionID: UUID?

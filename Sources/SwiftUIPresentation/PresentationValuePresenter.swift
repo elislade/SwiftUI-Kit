@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationValuePresenter<Metadata: Equatable, Presentation: View>: ViewModifier {
+struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
     
     let environment: EnvironmentValues
     
@@ -26,9 +26,15 @@ struct PresentationValuePresenter<Metadata: Equatable, Presentation: View>: View
                     anchor: anchor,
                     includeAnchorInEquatance: presentationRespondsToBoundsChange,
                     view: AnyView(presentation),
-                    dispose: { isPresented = false },
+                    dispose: {
+                        DispatchQueue.main.async {
+                            isPresented = false
+                        }
+                    },
                     requestIDChange: { id in
-                        stableID = id ?? .init()
+                        DispatchQueue.main.async {
+                            stableID = id ?? .init()
+                        }
                     },
                     envProxy: ClosureKeyPath(environment)
                 )] : []
@@ -42,7 +48,7 @@ struct PresentationValuePresenter<Metadata: Equatable, Presentation: View>: View
 }
 
 
-struct PresentationOptionalValuePresenter<Value, Metadata: Equatable, Presentation: View>: ViewModifier {
+struct PresentationOptionalValuePresenter<Value, Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
     
     let environment: EnvironmentValues
     let behaviour: PresentationIdentityBehaviour
@@ -67,9 +73,15 @@ struct PresentationOptionalValuePresenter<Value, Metadata: Equatable, Presentati
                         anchor: anchor,
                         includeAnchorInEquatance: presentationRespondsToBoundsChange,
                         view: AnyView(presentation(value)),
-                        dispose: { self.value = nil },
+                        dispose: {
+                            DispatchQueue.main.async {
+                                self.value = nil
+                            }
+                        },
                         requestIDChange: { id in
-                            stableID = id ?? .init()
+                            DispatchQueue.main.async {
+                                stableID = id ?? .init()
+                            }
                         },
                         envProxy: ClosureKeyPath(environment)
                     )]

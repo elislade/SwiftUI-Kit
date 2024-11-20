@@ -30,7 +30,7 @@ struct NavBarExamples: View {
     var body: some View {
         ExampleView(title: "NavBar"){
             NavBarContainer(
-                backAction: showBackAction ? { showBackAction = false } : nil
+                backAction: nil // FIXME: showBackAction ? { showBackAction = false } : nil 
             ){
                 ZStack {
                     Color.clear
