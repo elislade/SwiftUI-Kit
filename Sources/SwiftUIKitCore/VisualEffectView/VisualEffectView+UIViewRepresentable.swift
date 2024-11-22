@@ -38,8 +38,21 @@ public final class CustomVisualEffectView: UIVisualEffectView {
     
     private func updateFilters() {
         contentView.backgroundColor = .clear
+
+        #if targetEnvironment(macCatalyst)
+        guard let caFilters =  layer.sublayers?[0].sublayers?[0].sublayers?[0].filters as? [NSObject]
+        else {
+            return
+        }
+        
+        #else
+        
         guard let layers = layer.sublayers, let caFilters = layers[0].filters as? [NSObject]
-        else { return }
+        else {
+            return
+        }
+        
+        #endif
 
         caFilters.forEach {
             let name = $0.value(forKey: "name") as! String
