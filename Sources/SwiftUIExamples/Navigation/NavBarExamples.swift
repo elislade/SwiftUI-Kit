@@ -10,6 +10,14 @@ struct NavBarExamples: View {
     
     @State private var accessorySelection = "A"
     
+    private var backAction: Optional<@Sendable () -> Void> {
+        return showBackAction ? Optional<@Sendable () -> Void>({
+            DispatchQueue.main.async{
+                showBackAction = false
+            }
+        }) : Optional<@Sendable () -> Void>(nil)
+    }
+    
     private func view(for placement: NavBarItemMetadata.Placement) -> some View {
         Toggle(isOn: .init(
             get: { visiblePlacements.contains(placement) },
@@ -29,9 +37,7 @@ struct NavBarExamples: View {
     
     var body: some View {
         ExampleView(title: "NavBar"){
-            NavBarContainer(
-                backAction: nil // FIXME: showBackAction ? { showBackAction = false } : nil 
-            ){
+            NavBarContainer(backAction: backAction){
                 ZStack {
                     Color.clear
                     

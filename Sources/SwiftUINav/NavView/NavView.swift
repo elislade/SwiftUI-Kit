@@ -19,6 +19,13 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     @State private var transitionFraction: CGFloat = 0
     @State private var isUpdatingTransition: Bool = false
     
+    private var backAction: (@Sendable () -> Void)? {
+        elements.isEmpty ? Optional<@Sendable () -> Void>(nil) : Optional<@Sendable () -> Void>({
+            DispatchQueue.main.async{
+                popElement()
+            }
+        })
+    }
     
     /// - Parameters:
     ///   - transition: The ``TransitionProvider`` to use for push/pop transitions.
@@ -200,7 +207,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     
     public var body: some View {
         if useNavBar {
-            NavBarContainer{//(backAction: self.elements.isEmpty ? nil : { }){ // FIXME:
+            NavBarContainer(backAction: backAction){
                 content
             }
         } else {
