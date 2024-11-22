@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if canImport(AppKit)
+#if canImport(AppKit)  && !targetEnvironment(macCatalyst)
 
 extension VisualEffectView : NSViewRepresentable {
     

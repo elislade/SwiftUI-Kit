@@ -3,7 +3,7 @@ import SwiftUI
 
 struct InteractionGranularityKey: EnvironmentKey {
     
-    #if os(macOS)
+    #if os(macOS) || targetEnvironment(macCatalyst)
     static var defaultValue: Double { 1 }
     #elseif os(iOS)
     static var defaultValue: Double { 0.5 }

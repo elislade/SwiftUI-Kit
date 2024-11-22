@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
 import AppKit
 
@@ -174,7 +174,7 @@ struct IndirectScrollModifier: ViewModifier {
     var gesture: IndirectScrollGesture
     
     func body(content: Content) -> some View {
-        #if canImport(AppKit)
+        #if canImport(AppKit) && !targetEnvironment(macCatalyst)
         IndirectScrollRepresentation(gesture: gesture){
             content
         }
