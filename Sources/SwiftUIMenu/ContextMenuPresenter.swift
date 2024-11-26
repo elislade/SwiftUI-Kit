@@ -43,24 +43,12 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
         .onChangePolyfill(of: presentedBinding, initial: true){
             guard presentedBinding != isPresented else { return }
             isPresented = presentedBinding
-                
         }
         .onChange(of: isPresented){
             guard $0 != presentedBinding else { return }
             presentedBinding = $0
         }
-        .overlay {
-            #if canImport(UIKit)
-            MenuGestureRepresentation(
-                onChanged: { g in
-                    isPresented = true
-                },
-                onEnded: { _ in
-                    simulatedGesture = nil
-                }
-            )
-            #endif
-        }
+        .simultaneousLongPress { isPresented = true }
     }
     
     

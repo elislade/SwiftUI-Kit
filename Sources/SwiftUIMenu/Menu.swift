@@ -39,27 +39,25 @@ public struct Menu<Label: View, Content: View>: View {
                 content: { content }
             )
         } else {
-            label
-                .opacity(isOpen ? 0.3 : 1)
-                .contentShape(Rectangle())
-                .accessibilityAddTraits(.isButton)
-                .simultaneousGesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged{ _ in
-                            isOpen = true
-                        }
-                )
-                .autoAnchorPresentation(isPresented: $isOpen){ state in
-                    MenuContainer {
-                        content
-                    }
-                    .padding(.init(state.edge))
-                    .shadow(color: .black.opacity(0.1), radius: 30, y: 20)
-                    .coordinatedTouchesEffects([.scale(anchor: state.anchor)])
-                    .presentationBackground(.touchChangeDismiss){ Color.clear }
-                    .modifier(SubmenuPresentationContext())
-                    .environment(\.menuBackground, menuBackground)
+            Button(action: { isOpen = true }){
+                label
+                    .opacity(isOpen ? 0.3 : 1)
+                    .contentShape(Rectangle())
+                    .simultaneousLongPress { isOpen = true }
+            }
+            .buttonStyle(.plain)
+            .autoAnchorPresentation(isPresented: $isOpen){ state in
+                MenuContainer {
+                    content
                 }
+                .padding(.init(state.edge))
+                .shadow(color: .black.opacity(0.1), radius: 30, y: 20)
+                .coordinatedTouchesEffects([.scale(anchor: state.anchor)])
+                .presentationBackground(.touchChangeDismiss){ Color.clear }
+                .modifier(SubmenuPresentationContext())
+                .environment(\.menuBackground, menuBackground)
+            }
+            
         }
     }
     
