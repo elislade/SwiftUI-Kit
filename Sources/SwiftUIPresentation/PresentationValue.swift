@@ -6,16 +6,12 @@ public protocol PresentationValueConformable: Sendable {
     var tag: String? { get }
     var anchor: Anchor<CGRect> { get }
     var includeAnchorInEquatance: Bool { get }
-    var view: AnyView { get }
+    var view: @MainActor () -> AnyView { get }
     var dispose: @Sendable () -> Void { get }
     var requestIDChange: @Sendable (UUID?) -> Void { get }
     var envProxy: ClosureKeyPath<EnvironmentValues> { get }
 }
 
-protocol TranslatorTest {
-    associatedtype Translation
-    static func translate(source: Self) -> Translation
-}
 
 public protocol Translatable {
     associatedtype Translation
@@ -23,7 +19,7 @@ public protocol Translatable {
 }
 
 
-@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable & Sendable>: Equatable, PresentationValueConformable, @unchecked Sendable {
+@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable & Sendable>: Equatable, PresentationValueConformable, Sendable {
     
     public static func == (lhs: PresentationValue, rhs: PresentationValue) -> Bool {
         var values: [Bool] = [lhs.id == rhs.id, lhs.tag == rhs.tag]
@@ -39,7 +35,7 @@ public protocol Translatable {
     public let metadata: Metadata
     public let anchor: Anchor<CGRect>
     public let includeAnchorInEquatance: Bool
-    public let view: AnyView
+    public let view: @MainActor () -> AnyView
     public let dispose: @Sendable () -> Void
     public let requestIDChange: @Sendable (UUID?) -> Void
     public let envProxy: ClosureKeyPath<EnvironmentValues>
@@ -50,7 +46,7 @@ public protocol Translatable {
         metadata: Metadata,
         anchor: Anchor<CGRect>,
         includeAnchorInEquatance: Bool = true,
-        view: AnyView,
+        view: @escaping @MainActor () -> AnyView,
         dispose: @Sendable @escaping () -> Void,
         requestIDChange: @Sendable @escaping (UUID?) -> Void = { _ in },
         envProxy: ClosureKeyPath<EnvironmentValues>

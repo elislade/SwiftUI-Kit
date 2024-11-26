@@ -14,7 +14,7 @@ struct FocusPresentationMetadata: Equatable, @unchecked Sendable {
     }
     
     let sourceView: AnyView
-    let accessory: (AutoAnchorState) -> AnyView?
+    let accessory: @MainActor (AutoAnchorState) -> AnyView?
     
 }
 

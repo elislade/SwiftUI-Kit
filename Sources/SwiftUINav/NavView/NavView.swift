@@ -15,6 +15,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     @State private var id = UUID()
     @MainActor @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     
+    @State private var scrollGestureTotal: Double = 0
     @State private var pendingReset = false
     @State private var transitionFraction: CGFloat = 0
     @State private var isUpdatingTransition: Bool = false
@@ -131,6 +132,8 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     
     private var content: some View {
         GeometryReader { proxy in
+            let trailingInset = proxy.safeAreaInsets.trailing
+            
             ZStack(alignment: .topLeading) {
                 root
                     .modifier(baseModifier)
@@ -144,7 +147,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                     .disableNavBarPreferences(!elements.isEmpty)
                 
                 ForEach(elements.indices, id: \.self){ index in
-                    elements[index].view
+                    elements[index].view()
                         .modifier(detailModifier(index))
                         .allowsHitTesting(index == elements.indices.last)
                         .accessibilityHidden(index != elements.indices.last)
@@ -158,7 +161,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                         .disableNavBarPreferences(index != elements.indices.last)
                         .transitions(
                             .move(edge: .trailing).animation(.smooth),
-                            .offset(x: proxy.safeAreaInsets.trailing).animation(.smooth)
+                            .offset(x: trailingInset).animation(.smooth)
                         )
                 }
                 
@@ -178,9 +181,18 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
             .mask {
                 Rectangle().ignoresSafeArea()
             }
+//            .indirectGesture(IndirectScrollGesture().onChanged{ g in
+//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
+//                scrollGestureTotal += g.deltaX
+//                updateTransition(value: max(scrollGestureTotal, 0) * directionFactor, in: proxy)
+//            }.onEnded{ g in
+//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
+//                commitTransition(at: scrollGestureTotal * directionFactor)
+//                scrollGestureTotal = 0
+//            })
             .handleDismissPresentation(id: id, action: popElement)
-            .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){
-                let diff = $0.difference(from: self.elements, by: { $0.id == $1.id })
+            .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){ items in
+                let diff = items.difference(from: self.elements, by: { $0.id == $1.id })
                 
                 for item in diff {
                     switch item {

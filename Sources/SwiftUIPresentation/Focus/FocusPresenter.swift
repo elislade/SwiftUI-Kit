@@ -6,7 +6,7 @@ struct FocusPresenter<Content: View>: View {
     @Binding var isPresented: Bool
     let content: Content
     let focusView: AnyView
-    var accessory: (AutoAnchorState) -> AnyView? = { _ in nil }
+    var accessory: @MainActor (AutoAnchorState) -> AnyView? = { _ in nil }
     
     var body: some View {
         content

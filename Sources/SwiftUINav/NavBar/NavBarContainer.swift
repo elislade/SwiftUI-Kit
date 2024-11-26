@@ -2,11 +2,6 @@ import SwiftUI
 import SwiftUIKitCore
 import SwiftUIPresentation
 
-struct BackAction: Sendable {
-    
-    func action() {}
-    
-}
 
 public struct NavBarContainer<Content: View> : View {
     
@@ -70,7 +65,7 @@ public struct NavBarContainer<Content: View> : View {
                                 .transitions(.move(edge: .leading), .opacity)
                             }
                             
-                            items.filter({ $0.metadata.placement == .leading }).last?.view
+                            items.filter({ $0.metadata.placement == .leading }).last?.view()
                                 .transition(actionsTransition)
                         }
                         .boundsReader(readingToSize: $leadingSize)
@@ -78,16 +73,15 @@ public struct NavBarContainer<Content: View> : View {
                         Spacer(minLength: 44)
                         
                         HStack(spacing: 10) {
-                            items.filter({ $0.metadata.placement == .trailing }).last?.view
+                            items.filter({ $0.metadata.placement == .trailing }).last?.view()
                                .transition(actionsTransition)
                         }
                         .boundsReader(readingToSize: $trailingSize)
                     }
                     .boundsReader(readingToSize: $totalSize)
                     
-                    items.filter({ $0.metadata.placement == .title }).last?.view
+                    items.filter({ $0.metadata.placement == .title }).last?.view()
                         .frame(maxWidth: titleWidth)
-                       // .id(items.filter({ $0.metadata.placement == .title }).last?.id)
                         .transition(.merge(.scale, .opacity).animation(.bouncy))
                 }
                 #if canImport(AppKit)
@@ -97,7 +91,7 @@ public struct NavBarContainer<Content: View> : View {
                 #endif
             }
             
-            items.filter({ $0.metadata.placement == .accessory }).last?.view
+            items.filter({ $0.metadata.placement == .accessory }).last?.view()
                 .transition(actionsTransition)
         }
         .buttonStyle(.navBarStyle)
@@ -105,7 +99,6 @@ public struct NavBarContainer<Content: View> : View {
         .labelStyle(.titleIfFits)
         .padding(padding)
         .frame(maxWidth: .infinity, minHeight: minHeight)
-        //.clipped()
         .background {
             if bgMaterial.isEmpty {
                 NavBarDefaultMaterial().ignoresSafeArea()

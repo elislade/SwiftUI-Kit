@@ -14,7 +14,7 @@ struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: 
     let tag: String?
     var presentationRespondsToBoundsChange = false
     let metadata: Metadata
-    @ViewBuilder let presentation: Presentation
+    @MainActor @ViewBuilder let presentation: Presentation
     
     func body(content: Content) -> some View {
         content.overlay {
@@ -25,7 +25,9 @@ struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: 
                     metadata: metadata,
                     anchor: anchor,
                     includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                    view: AnyView(presentation),
+                    view: {
+                        AnyView(presentation)
+                    },
                     dispose: {
                         DispatchQueue.main.async {
                             isPresented = false
@@ -60,7 +62,7 @@ struct PresentationOptionalValuePresenter<Value, Metadata: Equatable & Sendable,
     var presentationRespondsToBoundsChange = false
     let metadata: Metadata
     
-    @ViewBuilder let presentation: (Value) -> Presentation
+    @MainActor @ViewBuilder let presentation: (Value) -> Presentation
     
     func body(content: Content) -> some View {
         content
@@ -72,7 +74,7 @@ struct PresentationOptionalValuePresenter<Value, Metadata: Equatable & Sendable,
                         metadata: metadata,
                         anchor: anchor,
                         includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                        view: AnyView(presentation(value)),
+                        view: { AnyView(presentation(value)) },
                         dispose: {
                             DispatchQueue.main.async {
                                 self.value = nil

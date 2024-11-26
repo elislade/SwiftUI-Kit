@@ -83,46 +83,6 @@ public enum PresentationBackgroundInteraction {
 }
 
 
-// MARK: - Animation
-
-//
-//struct PresentationAnimationKey: PreferenceKey {
-//    
-//    static var defaultValue: ID<UUID, Animation>? { nil }
-//    
-//    static func reduce(value: inout ID<UUID, Animation>?, nextValue: () -> ID<UUID, Animation>?) {
-//        value = nextValue()
-//    }
-//    
-//}
-//
-//
-//struct PresentationAnimationModifier: ViewModifier {
-//    
-//    @State private var id = UUID()
-//    let animation: Animation
-//    
-//    func body(content: Content) -> some View {
-//        content.preference(
-//            key: PresentationAnimationKey.self,
-//            value: .init(id: id, payload: animation)
-//        )
-//    }
-//    
-//}
-
-
-//public extension View {
-//    
-//    func presentationAnimation(_ animation: Animation) -> some View {
-//        modifier(PresentationAnimationModifier(
-//            animation: animation
-//        ))
-//    }
-//    
-//}
-
-
 // MARK: - Presentation Depth
 
 

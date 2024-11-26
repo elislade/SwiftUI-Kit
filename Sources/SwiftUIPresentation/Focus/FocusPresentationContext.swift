@@ -109,7 +109,7 @@ struct FocusPresentationContext: ViewModifier {
                             }
                         }
                         .onAppear {
-                            focusedView = value.view
+                            focusedView = value.view()
                             // use stub state to initially find out if the closure returns a view or not.
                             let stubState = AutoAnchorState(anchor: .bottom, edge: .bottom)
                             accessoryIsPresented = value.metadata.accessory(stubState) != nil
