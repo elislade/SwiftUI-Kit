@@ -61,25 +61,3 @@ public extension UnitPoint {
     }
     
 }
-
-
-#Preview {
-    let grad = Gradient(colors: [.purple, .yellow])
-    return InlineBinding(0){ a in
-        VStack(spacing: 16) {
-            Rectangle()
-                .fill(LinearGradient.topToBottom(grad))
-            
-            Rectangle()
-                .fill(LinearGradient.leftToRight(grad))
-            
-            Rectangle()
-                .fill(LinearGradient.rotated(grad, angle: .degrees(a.wrappedValue)))
-            
-            Slider(value: a, in: 0...360)
-            
-        }
-        .padding()
-        //.environment(\.layoutDirection, .rightToLeft)
-    }
-}
