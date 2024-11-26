@@ -33,7 +33,7 @@ public enum ContainedBoundsState: Hashable, Sendable {
     case notContained
     
     public var hasContainment: Bool {
-        if case .fullyContained = self {
+        if case .partiallyContained = self {
             return true
         }
         return self == .fullyContained
