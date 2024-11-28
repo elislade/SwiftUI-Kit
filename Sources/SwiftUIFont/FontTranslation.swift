@@ -26,7 +26,7 @@ public extension Font.TextStyle {
 
 extension Font.TextStyle {
     
-    var baseSize: CGFloat {
+    @inlinable var baseSize: CGFloat {
         switch self {
         case .largeTitle: 34
         case .title: 28

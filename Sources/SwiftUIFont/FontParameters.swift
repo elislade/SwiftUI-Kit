@@ -38,13 +38,13 @@ public struct FontParameters: Codable, Hashable, Sendable {
         hasher.combine(slant)
     }
     
-    public func copy<V>(replacing key: WritableKeyPath<Self, V>, with value: V) -> Self {
+    public nonisolated func copy<V>(replacing key: WritableKeyPath<Self, V>, with value: V) -> Self {
         var copy = self
         copy[keyPath: key] = value
         return copy
     }
     
-    public func copy<V>(replacing keys: WritableKeyPath<Self, V>..., from other: Self) -> Self {
+    public nonisolated func copy<V>(replacing keys: WritableKeyPath<Self, V>..., from other: Self) -> Self {
         var copy = self
         for key in keys {
             copy[keyPath: key] = other[keyPath: key]
@@ -52,15 +52,15 @@ public struct FontParameters: Codable, Hashable, Sendable {
         return copy
     }
     
-    public subscript(weight: Font.Weight) -> Self {
+    @inlinable public nonisolated subscript(weight: Font.Weight) -> Self {
         copy(replacing: \.weight, with: weight.value)
     }
     
-    public subscript(style: Font.TextStyle) -> Self {
+    @inlinable public nonisolated subscript(style: Font.TextStyle) -> Self {
         copy(replacing: \.size, with: style.baseSize)
     }
     
-    public subscript(trait: Font.Trait) -> Self {
+    public nonisolated subscript(trait: Font.Trait) -> Self {
         if traits.contains(trait){
             return self
         } else if trait == .italic {
@@ -73,7 +73,7 @@ public struct FontParameters: Codable, Hashable, Sendable {
     }
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    public subscript(width: Font.Width) -> Self {
+    @inlinable public nonisolated subscript(width: Font.Width) -> Self {
         copy(replacing: \.width, with: width.value)
     }
     
@@ -112,3 +112,6 @@ public extension EnvironmentValues {
     }
     
 }
+
+
+extension Font.Weight : Sendable {}
