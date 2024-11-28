@@ -15,6 +15,7 @@ extension KeyPressRepresentation: UIViewRepresentable {
     func updateUIView(_ uiView: KeyCaptureView, context: Context) {
         uiView.keymask = mask
         uiView.phases = phases
+        uiView.captured = captured
     }
     
 }
@@ -105,7 +106,6 @@ final class KeyCaptureView: UIView {
     
     override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
-        self.allowedPressTypes
     }
     
     override func shouldReceive(_ event: UIEvent) -> Bool {
@@ -169,11 +169,48 @@ extension KeyPress {
         } else {
             self.phase = mappedPhase
         }
-        
-        self.characters = key.charactersIgnoringModifiers
-    
+
         self.modifiers = .init(flags: key.modifierFlags)
-        self.key = .init(keyChar)
+
+        if let keyFromCode = KeyEquivalent(key.keyCode) {
+            self.characters = ""
+            self.key = keyFromCode
+        } else {
+            self.key = .init(keyChar)
+            self.characters = key.charactersIgnoringModifiers
+        }
+    }
+    
+}
+
+
+extension KeyEquivalent {
+    
+    init?(_ usage: UIKeyboardHIDUsage) {
+        switch usage {
+        case .keyboardErrorUndefined: self = .delete
+        case .keyboardReturnOrEnter: self = .return
+        case .keyboardEscape: self = .escape
+        case .keyboardDeleteOrBackspace: self = .delete
+        case .keyboardTab: self = .tab
+        case .keyboardSpacebar: self = .space
+        case .keyboardHome: self = .home
+        case .keyboardPageUp: self = .pageUp
+        case .keyboardDeleteForward: self = .deleteForward
+        case .keyboardEnd: self = .end
+        case .keyboardPageDown: self = .pageDown
+        case .keyboardRightArrow: self = .rightArrow
+        case .keyboardLeftArrow: self = .leftArrow
+        case .keyboardDownArrow: self = .downArrow
+        case .keyboardUpArrow: self = .upArrow
+        case .keypadSlash: self = .delete
+        case .keypadEnter: self = .return
+        case .keyboardAlternateErase: self = .delete
+        case .keyboardClear: self = .clear
+        case .keyboardReturn: self = .return
+        case .keyboardClearOrAgain: self = .clear
+        default: return nil
+        }
     }
     
 }

@@ -15,6 +15,7 @@ extension KeyPressRepresentation: NSViewRepresentable {
     func updateNSView(_ nsView: KeyCaptureView, context: Context) {
         nsView.mask = mask
         nsView.phases = phases
+        nsView.captured = captured
     }
     
 }
