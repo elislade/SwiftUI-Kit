@@ -268,7 +268,6 @@ public struct KeyPressExample: View {
                         .opacity(0.7)
                     
                     KeyPhaseView(phase: press.phase)
-                        //.font(.exampleParameterTitle)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -278,11 +277,10 @@ public struct KeyPressExample: View {
                         .opacity(0.7)
                     
                     KeyEquivalentView(key: press.key)
-                        //.font(.exampleParameterTitle)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                if CharacterSet.alphanumerics.isSuperset(of: CharacterSet(charactersIn: press.characters)) {
+                if !press.characters.isEmpty, CharacterSet.alphanumerics.isSuperset(of: CharacterSet(charactersIn: press.characters)) {
                     VStack(alignment: .leading) {
                         Text("Characters")
                             .font(.caption[.semibold])
@@ -301,13 +299,12 @@ public struct KeyPressExample: View {
                             .opacity(0.7)
                         
                         KeyModifiersView(modifiers: press.modifiers)
-                           // .font(.exampleParameterTitle)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .lineLimit(1)
-            //.labelStyle(.iconIfFits)
+            .lineLimit(1)
             .symbolVariant(.circle.fill)
             .symbolRenderingMode(.hierarchical)
         }
@@ -329,6 +326,14 @@ public struct KeyPressExample: View {
                     Label("Clear", systemImage: "clear")
                 } else if key == .space {
                     Label("Space", systemImage: "space")
+                } else if key == .leftArrow {
+                    Label("Left Arrow", systemImage: "arrowtriangle.left")
+                } else if key == .upArrow {
+                    Label("Up Arrow", systemImage: "arrowtriangle.up")
+                } else if key == .rightArrow {
+                    Label("Right Arrow", systemImage: "arrowtriangle.right")
+                } else if key == .downArrow {
+                    Label("Down Arrow", systemImage: "arrowtriangle.down")
                 } else {
                     Text("\(key.character)")
                 }

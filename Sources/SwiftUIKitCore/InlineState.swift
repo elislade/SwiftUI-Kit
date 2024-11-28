@@ -21,29 +21,3 @@ public struct InlineState<Value, Content: View>: View {
     }
     
 }
-
-
-fileprivate struct InlineStateExample: View {
-    
-    @State private var changeIdentity = 0
-    
-    var body: some View {
-        InlineState(UUID()){ id in
-            ZStack {
-                Color.random.ignoresSafeArea()
-                Text(id.uuidString)
-                    .foregroundStyle(Color.white)
-                    .blendMode(.exclusion)
-            }
-            .id(changeIdentity)
-            .onTapGesture {
-                changeIdentity = .random(in: 0...40)
-            }
-        }
-    }
-}
-
-
-#Preview {
-    InlineStateExample()
-}

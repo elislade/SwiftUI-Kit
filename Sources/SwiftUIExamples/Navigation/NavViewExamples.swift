@@ -3,6 +3,7 @@ import SwiftUIKit
 
 struct NavViewExamples: View {
    
+    @State private var layout: LayoutDirection = .leftToRight
     @State private var valueToPresent: Color?
     @State private var useCustomTransition = false
     @State private var useNavBar = true
@@ -39,6 +40,7 @@ struct NavViewExamples: View {
                 }
             }
             .childResetAction{ resetAction = $0 }
+            .environment(\.layoutDirection, layout)
         } parameters: {
             Toggle(isOn: $useCustomTransition){
                 Text("Use Custom Transition")
@@ -66,6 +68,10 @@ struct NavViewExamples: View {
                     .disabled(resetAction == nil)
             }
             .padding()
+            
+            Divider()
+            
+            ExampleCell.LayoutDirection(value: $layout)
         }
     }
     

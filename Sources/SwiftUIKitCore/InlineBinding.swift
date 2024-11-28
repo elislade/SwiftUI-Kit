@@ -19,21 +19,3 @@ public struct InlineBinding<Content: View, Value>: View {
     
     public var body: some View { content(value.projectedValue) }
 }
-
-
-#Preview {
-    InlineBinding(ColorScheme.light){ binding in
-        Text(binding.wrappedValue == .dark ? "Dark" : "Light")
-            .font(.largeTitle.weight(.heavy))
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(Rectangle())
-            .preferredColorScheme(binding.wrappedValue)
-            .onTapGesture {
-                if binding.wrappedValue == .dark {
-                    binding.wrappedValue = .light
-                } else {
-                    binding.wrappedValue = .dark
-                }
-            }
-    }
-}

@@ -14,10 +14,7 @@ struct ExampleControl {
         var body: some View {
             SliderView(x: _x, y: _y, hitTestHandle: false){
                 RaisedControlMaterial(Circle())
-//                Circle()
-//                    .fill(.white)
                     .frame(width: 32, height: 32)
-                    //.shadow(radius: 4, y: 2)
                     .overlay{
                         Text("⚓︎")
                             .font(.title2)
@@ -27,10 +24,6 @@ struct ExampleControl {
             .padding(2)
             .background{
                 SunkenControlMaterial(RoundedRectangle(cornerRadius: 20))
-//                RoundedRectangle(cornerRadius: 20)
-//                    .fill(.secondary)
-//                    .opacity(0.2)
-                
                 Dots(anchor: unit)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .opacity(0.2)

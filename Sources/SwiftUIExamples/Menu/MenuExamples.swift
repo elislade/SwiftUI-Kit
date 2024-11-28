@@ -37,36 +37,43 @@ struct MenuExamples: View {
     
     
     var body: some View {
-        ZStack {
-            Color.clear
-            
+        ScrollView{
             VStack {
-                ExampleCard(title: "SwiftUI"){
-                    SwiftUI.Menu{
-                        menuContent
+                ForEach(0..<30){ i in
+                    HStack {
+                        Spacer()
                         
-                        MenuGroupDivider()
-                        
-                        MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                            Text($0)
+                        ExampleCard(title: "SwiftUI"){
+                            SwiftUI.Menu{
+                                menuContent
+                                
+                                MenuGroupDivider()
+                                
+                                MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
+                                    Text($0)
+                                }
+                            } label: {
+                                Text("Menu")
+                            }
                         }
-                    } label: {
-                        Text("Menu")
+                        
+                        ExampleCard(title: "SwiftUI Kit"){
+                            Menu{
+                                menuContent
+                                
+                                MenuGroupDivider()
+                                
+                                MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
+                                    Text($0)
+                                }
+                            } label: {
+                                Text("Menu")
+                            }
+                        }
+                        
+                        Spacer()
                     }
                 }
-                
-                ExampleCard(title: "SwiftUI Kit"){
-                    Menu(label: { Text("Menu") }){
-                        menuContent
-                        
-                        MenuGroupDivider()
-                        
-                        MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                            Text($0)
-                        }
-                    }
-                }
-                
             }
         }
         .menuBackground{

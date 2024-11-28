@@ -47,6 +47,7 @@ struct BasicExamples: View {
             
             HStack {
                 Text("Vertical Alignment")
+                    .fixedSize(horizontal: true, vertical: false)
                     .font(.exampleParameterTitle)
                 
                 Spacer()
@@ -63,6 +64,7 @@ struct BasicExamples: View {
             
             HStack {
                 Text("Horizontal Alignment")
+                    .fixedSize(horizontal: true, vertical: false)
                     .font(.exampleParameterTitle)
                 
                 Spacer()
@@ -97,8 +99,9 @@ struct BasicExamples: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 28)
+                            .frame(width: 24)
                     }
+                    .buttonStyle(.tintStyle)
                 }
                 .symbolRenderingMode(.hierarchical)
   

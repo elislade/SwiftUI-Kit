@@ -41,8 +41,10 @@ struct ContextMenuExamples: View  {
                                 
                                 MenuDivider()
                                 
-                                Menu(label: { Text("Item B") }) {
+                                Menu {
                                     Label("Title", systemImage: "car")
+                                } label: {
+                                    Text("Item B")
                                 }
                             }
                     }

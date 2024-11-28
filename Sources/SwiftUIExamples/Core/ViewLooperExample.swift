@@ -6,8 +6,8 @@ struct ViewLooperExample: View {
     @State private var axis: Axis = .horizontal
     @State private var feather = true
     @State private var durationSpan: TimeSpanMode = .relative
-    @State private var duration: TimeInterval = 60
-    @State private var wait: TimeInterval = 1
+    @State private var duration: TimeInterval = 30
+    @State private var wait: TimeInterval = 3
     
     enum TimeSpanMode {
         case relative
@@ -33,8 +33,8 @@ struct ViewLooperExample: View {
                 wait: wait,
                 featherMask: feather
             ) {
-                Text("\(axis)".capitalized)
-                    .font(.system(size: 160).bold().italic())
+                Text("Supercalifragilisticexpialidocious".capitalized)
+                    .font(.system(size: 8, design: .serif).bold().italic())
                     .lineLimit(1)
                     .padding(.horizontal)
             }
