@@ -157,6 +157,7 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
             width: layoutVertical ? dimension : nil,
             height: layoutVertical ? nil : dimension
         )
+        .geometryGroupPolyfill()
         .lineLimit(1)
         .animation(.smooth, value: pendingIndex)
         .opacity(isEnabled ? 1 : 0.5)

@@ -32,7 +32,7 @@ struct OnChangeOldNewPolyfill<Value: Equatable>: ViewModifier {
  
 }
 
-struct OnChangePolyfill<Value: Equatable>: ViewModifier {
+@MainActor struct OnChangePolyfill<Value: Equatable>: ViewModifier, Sendable {
 
     @State private var lastState: Value?
     
@@ -169,32 +169,3 @@ public extension View {
     
     
 }
-
-
-//#Preview("Old New") {
-//    InlineBinding(false){ binding in
-//        Button(action: { binding.wrappedValue.toggle() }){
-//            Text("Example")
-//        }
-//        .onChangePolyfill(of: binding.wrappedValue){ old, new in
-//            print("Polyfill", old, new)
-//        }
-//        .onChange(of: binding.wrappedValue){ val in
-//            print("Old", binding.wrappedValue, val)
-//        }
-//    }
-//}
-//
-//#Preview("None") {
-//    InlineBinding(false){ binding in
-//        Button(action: { binding.wrappedValue.toggle() }){
-//            Text("Example")
-//        }
-//        .onChangePolyfill(of: binding.wrappedValue, initial: true){
-//            print("Polyfill", binding.wrappedValue)
-//        }
-//        .onChange(of: binding.wrappedValue){ val in
-//            print("Old", binding.wrappedValue, val)
-//        }
-//    }
-//}

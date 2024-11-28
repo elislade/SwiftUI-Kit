@@ -112,20 +112,14 @@ public struct TextField<Leading: View>: View {
             .foregroundColor(focusState ? .black : colorScheme == .dark ? .white : .black)
             .background{
                 SunkenControlMaterial(RoundedRectangle(cornerRadius: radius), isTinted: focusState)
-                    //.opacity(focusState ? 1 : 0)
-
                 RaisedControlMaterial(
                     RoundedRectangle(cornerRadius: radius).inset(by: focusState ? 2 : 0),
                     isPressed: true
                 )
                 .opacity(focusState ? 1 : 0)
-                
-//                if focusState {
-//                        RoundedRectangle(cornerRadius: radius)
-//                            .fill(.tint)
-//                            .blendMode(colorScheme == .dark ? .multiply : .screen)
-//                }
             }
+            .contentShape(RoundedRectangle(cornerRadius: radius))
+            .onTapGesture { focusState = true }
             .opacity(isEnabled ? 1 : 0.5)
             .animation(.fastSpringInterpolating, value: focusState)
             .animation(.bouncy, value: showClearButton)

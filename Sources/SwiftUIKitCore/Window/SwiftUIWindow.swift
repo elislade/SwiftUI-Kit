@@ -10,8 +10,6 @@ public final class SwiftUIWindow: NSWindow {
     public override var canBecomeKey: Bool { true }
     public override var canBecomeMain: Bool { intendsToBeMain }
     
-    //private lazy var ctrl: NSWindowController = .init(window: self)
-    
     public init<Content: View>(isMain: Bool = false, @ViewBuilder content: @escaping () -> Content){
         super.init(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 800),
@@ -21,7 +19,6 @@ public final class SwiftUIWindow: NSWindow {
         )
         
         self.intendsToBeMain = isMain
-        //print("INIT", ctrl)
         let contentView = WindowRootView(state: WindowState(self), content: content())
         
         self.collectionBehavior = [.managed, .fullScreenNone, .participatesInCycle]
@@ -112,11 +109,7 @@ public final class StandardWindowButtonView: NSView {
             btn = NSWindow.standardWindowButton(type, for: [.miniaturizable, .closable, .resizable, .docModalWindow])!
             addSubview(btn)
             btn.target = window
-            //NSObject
             btn.isHighlighted = isHighlighted
-           // NSWindow().sizeOf
-            //NSView()
-            //dump(btn)
         }
     }
     
