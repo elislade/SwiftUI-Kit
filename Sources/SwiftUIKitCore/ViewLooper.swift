@@ -12,7 +12,7 @@ public struct ViewLooper<Content: View>: View {
     @State private var isStarted = false
     @State private var scrollToCopy = false
     @State private var size: CGSize = .zero
-    @State private var activeTask: DispatchWorkItem?
+    @State private var timerDuration: TimeInterval = 100
     
     private let axis: Axis
     private let duration: TimeSpan
@@ -43,36 +43,15 @@ public struct ViewLooper<Content: View>: View {
         self.content = content()
     }
     
-    
-    private func tryStart(in size: CGSize) {
-        guard isStarted == false, size != .zero else { return }
-        isStarted = true
-        
-        let resolvedDuration: TimeInterval = {
-            switch duration {
-            case .absolute(let seconds): return seconds
-            case .relative(let pointsPerSecond):
-                switch axis {
-                case .horizontal: return (size.width / 2) / pointsPerSecond
-                case .vertical: return (size.height / 2) / pointsPerSecond
-                }
-            }
-        }()
-        
-        let item = DispatchWorkItem{
-            withAnimation(.easeInOut(duration: resolvedDuration)) {
-                scrollToCopy.toggle()
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + resolvedDuration) {
-                scrollToCopy.toggle()
-                isStarted = false
+    private func duration(in size: CGSize) -> TimeInterval {
+        switch duration {
+        case .absolute(let seconds): return seconds
+        case .relative(let pointsPerSecond):
+            switch axis {
+            case .horizontal: return (size.width / 2) / pointsPerSecond
+            case .vertical: return (size.height / 2) / pointsPerSecond
             }
         }
-        
-        activeTask = item
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + wait, execute: item)
     }
     
     private var maskContent: some View {
@@ -103,7 +82,6 @@ public struct ViewLooper<Content: View>: View {
         .environment(\.layoutDirection, .leftToRight)
     }
     
-    
     public var body: some View {
        content
             .hidden()
@@ -114,19 +92,29 @@ public struct ViewLooper<Content: View>: View {
                 }
                 .fixedSize()
                 .boundsReader(readingToSize: $size)
-                .drawingGroup()
                 .offset(
                     x: axis == .horizontal && scrollToCopy ? -(size.width / 2) : 0,
                     y: axis == .vertical && scrollToCopy ? -(size.height / 2) : 0
                 )
-                .onChangePolyfill(of: size, initial: true){
-                    tryStart(in: size)
-                }
-                .id("\(axis)_\(isStarted)")
             }
-            .mask(maskContent)  
-            .onDisappear{
-                activeTask?.cancel()
+            .clipped()
+            .mask(maskContent)
+            .onChangePolyfill(of: size, initial: true){
+                guard size != .zero, !isStarted else { return }
+                isStarted = true
+                let d = duration(in: size)
+                timerDuration = d + wait + wait
+                withAnimation(.easeInOut(duration: d).delay(wait)){
+                    scrollToCopy = true
+                }
+            }
+            .onReceive(Timer.every(timerDuration).autoconnect()){ _ in
+                scrollToCopy = false
+                timerDuration = duration(in: size) + wait
+                withAnimation(.easeInOut(duration: duration(in: size))){
+                    scrollToCopy = true
+                }
             }
     }
+    
 }
