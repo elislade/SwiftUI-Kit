@@ -3,10 +3,11 @@ import SwiftUI
 
 // MARK: Window Action
 
-public enum WindowAction {
+public enum WindowAction: Sendable {
     case close(shouldQuit: Bool = false)
     case minimize
     case fullscreen
+    case zoom
     case translate(CGSize)
     
     static var close: Self { .close() }

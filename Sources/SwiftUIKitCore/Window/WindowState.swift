@@ -30,6 +30,7 @@ import AppKit
         case .translate(let translation):
             let newFrame = window.frame.offsetBy(dx: translation.width, dy: -(translation.height / 2))
             window.setFrame(newFrame, display: true)
+        case .zoom: window.performZoom(nil)
         }
     }
     
