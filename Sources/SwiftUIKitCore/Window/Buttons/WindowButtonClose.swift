@@ -12,9 +12,9 @@ public struct WindowButtonClose: View {
     }
     
     public var body: some View {
-        Button(action: { perform(.close(shouldQuit: shouldQuit)) }){
+        Button(role: .destructive, action: { perform(.close(shouldQuit: shouldQuit)) }){
             Label{
-                Text("Close Window")
+                Text("Close Window\(shouldQuit ? "and Quit" : "")")
             } icon: {
                 Image(systemName: "xmark")
             }

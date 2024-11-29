@@ -22,15 +22,17 @@ import AppKit
     
     func perform(action: WindowAction) {
         switch action {
-        case .close:
+        case let .close(shouldQuit):
             window.close()
-            
+            if shouldQuit {
+                NSApplication.shared.terminate(nil)
+            }
         case .minimize: window.miniaturize(nil)
         case .fullscreen: window.toggleFullScreen(nil)
         case .translate(let translation):
             let newFrame = window.frame.offsetBy(dx: translation.width, dy: -(translation.height / 2))
             window.setFrame(newFrame, display: true)
-        case .zoom: window.performZoom(nil)
+        case .zoom: window.zoom(nil)
         }
     }
     

@@ -18,7 +18,10 @@ public struct WindowMainButtonStyle: ButtonStyle {
             .foregroundStyle(Color.black.opacity(opacity))
             .frame(width: 14, height: 14)
             .background{
-                Circle().fill(.tint)
+                Circle()
+                    .fill(.tint)
+                    .grayscale(windowIsKey ? 0 : 1)
+                    .opacity(windowIsKey ? 1 : 0.5)
                 
                 Circle().fill(.linearGradient(
                     colors: [.white.opacity(0.5), .clear],
@@ -27,13 +30,14 @@ public struct WindowMainButtonStyle: ButtonStyle {
                 .blendMode(.overlay)
                 
                 Circle()
+                    .fill(Color.black)
                     .opacity(configuration.isPressed ? 0.3 : 0)
             }
             .onHover{ hovering = $0 }
             .overlay {
                 Circle()
-                    .strokeBorder()
-                    .opacity(0.12)
+                    .strokeBorder(Color.black, lineWidth: 0.5)
+                    .opacity(0.3)
             }
     }
     
@@ -55,7 +59,7 @@ public struct WindowPanelButtonStyle: ButtonStyle {
         configuration.label
             .labelStyle(.iconOnly)
             .font(.system(size: 7).weight(.heavy))
-            .foregroundStyle(Color.black.opacity(opacity))
+            .foregroundStyle(Color.primary.opacity(opacity))
             .frame(width: 14, height: 14)
             .background{
                 Circle()

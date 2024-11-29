@@ -18,11 +18,10 @@ public struct WindowButtonEmpty: View {
 #Preview {
     HStack {
         WindowButtonEmpty()
-            .padding()
             .buttonStyle(.windowMain)
         
         WindowButtonEmpty()
-            .padding()
             .buttonStyle(.windowPanel)
     }
+    .padding()
 }
