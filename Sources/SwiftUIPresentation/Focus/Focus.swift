@@ -5,7 +5,7 @@ public extension View {
     
     /// Defines the context for which to present children `focusPresentations` in.
     /// - Returns: A view that sets the focus presentation context.
-    func focusPresentationContext() -> some View {
+    nonisolated func focusPresentationContext() -> some View {
         modifier(FocusPresentationContext())
     }
     
@@ -16,8 +16,8 @@ public extension View {
     func focusPresentation(isPresented: Binding<Bool>) -> some View {
         FocusPresenter(
             isPresented: isPresented,
-            content: self,
-            focusView: AnyView(self)
+            content: { self },
+            focusView: { AnyView(self) }
         )
     }
     
@@ -28,12 +28,12 @@ public extension View {
     /// - Returns: A view that presents the focus view for presentation.
     func focusPresentation<Focus: View>(
         isPresented: Binding<Bool>,
-        @ViewBuilder focus: @escaping () -> Focus
+        @ViewBuilder focus: @MainActor @escaping () -> Focus
     ) -> some View {
         FocusPresenter(
             isPresented: isPresented,
-            content: self,
-            focusView: AnyView(focus())
+            content: { self },
+            focusView: { AnyView(focus()) }
         )
     }
     
@@ -46,13 +46,13 @@ public extension View {
     /// - Returns: A view that presents the focus view for presentation.
     func focusPresentation<Focus: View, Accessory: View>(
         isPresented: Binding<Bool>,
-        @ViewBuilder focus: @escaping () -> Focus,
-        @ViewBuilder accessory: @escaping (AutoAnchorState) -> Accessory
+        @ViewBuilder focus: @MainActor @escaping () -> Focus,
+        @ViewBuilder accessory: @MainActor @escaping (AutoAnchorState) -> Accessory
     ) -> some View {
         FocusPresenter(
             isPresented: isPresented,
-            content: self,
-            focusView: AnyView(focus()),
+            content: { self },
+            focusView: { AnyView(focus()) },
             accessory: { AnyView(accessory($0)) }
         )
     }
@@ -65,12 +65,12 @@ public extension View {
     /// - Returns: A view that presents this view for focus presentation.
     func focusPresentation<Accessory: View>(
         isPresented: Binding<Bool>,
-        @ViewBuilder accessory: @escaping (AutoAnchorState) -> Accessory
+        @ViewBuilder accessory: @MainActor @escaping (AutoAnchorState) -> Accessory
     ) -> some View {
         FocusPresenter(
             isPresented: isPresented,
-            content: self,
-            focusView: AnyView(self),
+            content: { self },
+            focusView: { AnyView(self) },
             accessory: { AnyView(accessory($0)) }
         )
     }

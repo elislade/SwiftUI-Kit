@@ -1,18 +1,22 @@
 import SwiftUI
 
-struct AnchorPresentationMetadata: Equatable, @unchecked Sendable {
+struct AnchorPresentationMetadata: Hashable, @unchecked Sendable {
     
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.anchorMode == rhs.anchorMode
     }
     
-    enum AnchorMode: Equatable, Sendable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(anchorMode)
+    }
+    
+    enum AnchorMode: Hashable, Sendable {
         case auto
         case manual(source: UnitPoint, presentation: UnitPoint)
     }
     
     let anchorMode: AnchorMode
-    let view: (AutoAnchorState) -> AnyView
+    let view: @MainActor (AutoAnchorState) -> AnyView
     
     func translate() -> BasicPresentationMetadata {
         .init(alignment: .bottom)

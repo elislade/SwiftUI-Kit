@@ -11,9 +11,11 @@ struct FocusPresentationContext: ViewModifier {
     @State private var focusedView: AnyView?
     @State private var accessoryIsPresented = false
     
-    private var focusSizeIncrease: CGFloat { 0 }
-    private var edgePadding: CGFloat { 16 }
+    nonisolated private var focusSizeIncrease: CGFloat { 0 }
+    nonisolated private var edgePadding: CGFloat { 16 }
 
+    nonisolated init(){}
+    
     private func safeOffsets(for rect: CGRect, in size: CGSize) -> CGSize {
         let additional = focusSizeIncrease + edgePadding
         

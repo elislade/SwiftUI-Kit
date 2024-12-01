@@ -120,7 +120,7 @@ public extension View {
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
         metadata: Metadata,
-        @ViewBuilder content: @escaping () -> Content
+        @ViewBuilder content: @MainActor @escaping () -> Content
     ) -> some View {
         modifier(EnvironmentModifierWrap {
             PresentationValuePresenter(
@@ -141,7 +141,7 @@ public extension View {
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
         metadata: Metadata,
-        @ViewBuilder content: @escaping (Value) -> Content
+        @ViewBuilder content: @MainActor @escaping (Value) -> Content
     ) -> some View {
         modifier(EnvironmentModifierWrap{
             PresentationOptionalValuePresenter(
@@ -199,7 +199,7 @@ public enum PresentationIdentityBehaviour: Hashable {
 
 
 
-public enum PresentationEnvironmentBehaviour {
+public enum PresentationEnvironmentBehaviour: Sendable {
     
     /// uses the environment of the presentation
     case usePresentation

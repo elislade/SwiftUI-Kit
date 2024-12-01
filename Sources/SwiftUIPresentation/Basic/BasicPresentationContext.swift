@@ -15,6 +15,10 @@ struct BasicPresentationContext: ViewModifier {
         }
     }
     
+    nonisolated init() {
+        
+    }
+    
     func body(content: Content) -> some View {
         content
             .isBeingPresentedOn(!values.isEmpty)

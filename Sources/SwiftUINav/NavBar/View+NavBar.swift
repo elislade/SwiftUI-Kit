@@ -13,7 +13,7 @@ public extension View {
     func navBar<V: View>(
         _ placement: NavBarItemMetadata.Placement,
         identity: PresentationIdentityBehaviour = .stable,
-        @ViewBuilder view: @escaping () -> V
+        @ViewBuilder view: @MainActor @escaping () -> V
     ) -> some View {
         presentationValue(
             behaviour: identity,
@@ -40,7 +40,7 @@ public extension View {
     /// A
     /// - Parameter view: A
     /// - Returns: A
-    func navBarTitle<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
+    func navBarTitle<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
         presentationValue(
             isPresented: .constant(true),
             metadata: NavBarItemMetadata(placement: .title),
@@ -52,7 +52,7 @@ public extension View {
     /// A
     /// - Parameter view: A
     /// - Returns: A
-    func navBarLeading<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
+    func navBarLeading<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
         presentationValue(
             isPresented: .constant(true),
             metadata: NavBarItemMetadata(placement: .leading),
@@ -64,7 +64,7 @@ public extension View {
     /// A
     /// - Parameter view: A
     /// - Returns: A
-    func navBarTrailing<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
+    func navBarTrailing<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
         presentationValue(
             isPresented: .constant(true),
             metadata: NavBarItemMetadata(placement: .trailing),
@@ -76,7 +76,7 @@ public extension View {
     /// A
     /// - Parameter view: A
     /// - Returns: A
-    func navBarAccessory<V: View>(_ behaviour: PresentationIdentityBehaviour = .stable, @ViewBuilder view: @escaping () -> V) -> some View {
+    func navBarAccessory<V: View>(_ behaviour: PresentationIdentityBehaviour = .stable, @ViewBuilder view: @MainActor @escaping () -> V) -> some View {
         presentationValue(
             behaviour: behaviour,
             isPresented: .constant(true),

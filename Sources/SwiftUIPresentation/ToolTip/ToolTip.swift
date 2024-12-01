@@ -4,7 +4,7 @@ public extension View {
     
     /// Sets the presentation context for ToolTips.
     /// - Returns: A view that will show tool tip presentations.
-    func toolTipContext() -> some View {
+    @inlinable nonisolated func toolTipContext() -> some View {
         anchorPresentationContext()
     }
     
@@ -15,10 +15,10 @@ public extension View {
     ///   - isPresented: A binded bool indicating whether the view is presented or not. Defaults to nil. Set to a non-nil binding if you want programatic access to its presentation.
     ///   - content: A view build of the content you want to show in the tool tip.
     /// - Returns: A
-    func toolTip<Tip: View>(
+    nonisolated func toolTip<Tip: View>(
         edge: Edge,
         isPresented: Binding<Bool>? = nil,
-        @ViewBuilder content: @escaping () -> Tip
+        @ViewBuilder content: @MainActor @escaping () -> Tip
     ) -> some View {
         modifier(ToolTipPresenter(
             edge: edge,

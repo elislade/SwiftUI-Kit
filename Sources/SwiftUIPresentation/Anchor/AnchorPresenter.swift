@@ -7,7 +7,7 @@ struct AnchorPresenter<PresentationView: View>: ViewModifier {
     @Binding var isPresented: Bool
     
     var anchorMode: AnchorPresentationMetadata.AnchorMode
-    let presentation: (AutoAnchorState) -> PresentationView
+    let presentation: @MainActor (AutoAnchorState) -> PresentationView
     
     func body(content: Content) -> some View {
         content

@@ -8,20 +8,20 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
     @Binding private var isPresented: Bool
     
     let edge: Edge
-    let tip: Tip
+    let tip: @MainActor () -> Tip
 
-    private var sourceAnchor: UnitPoint {
+    nonisolated private var sourceAnchor: UnitPoint {
         UnitPoint(edge)
     }
     
-    init(
+    nonisolated init(
         edge: Edge,
         isPresented: Binding<Bool>? = nil,
-        content: @escaping () -> Tip
+        content: @MainActor @escaping () -> Tip
     ) {
         self._isPresented = isPresented ?? .constant(false)
         self.edge = edge
-        self.tip = content()
+        self.tip = content
     }
     
     func body(content: Content) -> some View {
@@ -45,7 +45,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
                 sourceAnchor: sourceAnchor,
                 presentationAnchor: sourceAnchor.inverse
             ){
-                tip
+                tip()
                     .presentationBackground(.disabled){ Color.clear }
                     .onTapGesture { isShowing = false }
                     .font(.caption.weight(.semibold))

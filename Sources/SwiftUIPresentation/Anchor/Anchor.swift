@@ -8,7 +8,7 @@ public extension View {
     /// Defines an anchor presentation context for children to present in.
     /// - Parameter environmentBehaviour: The ``PresentationEnvironmentBehaviour`` to use when presenting views. Defaults to `.useContext`.
     /// - Returns: Modified content that handles child anchor presentations.
-    func anchorPresentationContext(environmentBehaviour: PresentationEnvironmentBehaviour = .useContext) -> some View {
+    nonisolated func anchorPresentationContext(environmentBehaviour: PresentationEnvironmentBehaviour = .useContext) -> some View {
         modifier(AnchorPresentationContext2(environmentBehaviour: environmentBehaviour))
     }
     
@@ -20,9 +20,9 @@ public extension View {
     ///   - isPresented: A binding to the presentation for programatic presentation and dismissal.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func autoAnchorPresentation<P: View>(
+    nonisolated func autoAnchorPresentation<P: View>(
         isPresented: Binding<Bool>,
-        @ViewBuilder presentation: @escaping (AutoAnchorState) -> P
+        @ViewBuilder presentation: @MainActor @escaping (AutoAnchorState) -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -44,11 +44,11 @@ public extension View {
     ///   - presentationAnchor: The anchor of the presented view that will be relative to its source anchor.  Defaults to `.center`.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func anchorPresentation<P: View>(
+    nonisolated func anchorPresentation<P: View>(
         isPresented: Binding<Bool>,
         sourceAnchor: UnitPoint = .center,
         presentationAnchor: UnitPoint = .center,
-        @ViewBuilder presentation: @escaping () -> P
+        @ViewBuilder presentation: @MainActor @escaping () -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -68,10 +68,10 @@ public extension View {
     ///   - alignment: `HorizontalAlignment` of the views between source and presentation. Defaults to `.center`. Eg. If set to `leading`, the presented views `bottomLeading` anchor will be aligned to the `topLeading` anchor of the source view.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func anchorBottomPresentation<P: View>(
+    nonisolated func anchorBottomPresentation<P: View>(
         isPresented: Binding<Bool>,
         alignment: HorizontalAlignment = .center,
-        @ViewBuilder presentation: @escaping () -> P
+        @ViewBuilder presentation: @MainActor @escaping () -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -90,10 +90,10 @@ public extension View {
     ///   - alignment: `HorizontalAlignment` of the views between source and presentation. Defaults to `.center`. Eg. If set to `leading`, the presented views `bottomLeading` anchor will be aligned to the `topLeading` anchor of the source view.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func anchorTopPresentation<P: View>(
+    nonisolated func anchorTopPresentation<P: View>(
         isPresented: Binding<Bool>,
         alignment: HorizontalAlignment = .center,
-        @ViewBuilder presentation: @escaping () -> P
+        @ViewBuilder presentation: @MainActor @escaping () -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -112,10 +112,10 @@ public extension View {
     ///   - alignment: `VerticalAlignment` of the views between source and presentation. Defaults to `.center`. Eg. If set to `top`, the presented views `bottomLeading` anchor will be aligned to the `topLeading` anchor of the source view.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func anchorLeadingPresentation<P: View>(
+    nonisolated func anchorLeadingPresentation<P: View>(
         isPresented: Binding<Bool>,
         alignment: VerticalAlignment = .center,
-        @ViewBuilder presentation: @escaping () -> P
+        @ViewBuilder presentation: @MainActor @escaping () -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -134,10 +134,10 @@ public extension View {
     ///   - alignment: `VerticalAlignment` of the views between source and presentation. Defaults to `.center`. Eg. If set to `top`, the presented views `bottomLeading` anchor will be aligned to the `topLeading` anchor of the source view.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    func anchorTrailingPresentation<P: View>(
+    nonisolated func anchorTrailingPresentation<P: View>(
         isPresented: Binding<Bool>,
         alignment: VerticalAlignment = .center,
-        @ViewBuilder presentation: @escaping () -> P
+        @ViewBuilder presentation: @MainActor @escaping () -> P
     ) -> some View {
         modifier(AnchorPresenter(
             isPresented: isPresented,
@@ -148,23 +148,5 @@ public extension View {
             presentation: { _ in presentation() }
         ))
     }
-    
-    
-//    func padding(for presentedAnchor: UnitPoint, _ length: CGFloat? = nil) -> some View {
-//        var set = Edge.Set()
-//        if presentedAnchor.y < 0.5 {
-//            set.insert(.top)
-//        } else if presentedAnchor.y > 0.5 {
-//            set.insert(.bottom)
-//        }
-//        
-//        if presentedAnchor.x < 0.5 {
-//            set.insert(.leading)
-//        } else if presentedAnchor.x > 0.5 {
-//            set.insert(.trailing)
-//        }
-//        
-//        return padding(set, length)
-//    }
     
 }
