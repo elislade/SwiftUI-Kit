@@ -61,5 +61,4 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
         }
         .padding()
     }
-    .coordinatedWindowEvents()
 }

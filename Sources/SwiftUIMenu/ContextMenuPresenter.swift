@@ -31,12 +31,12 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
                     }
                 }
                 .presentationBackground { ctxMenuBG }
-                .coordinatedTouchesEffects([.parallax()])
+                .windowInteractionEffects([.parallax()])
             },
             accessory: { state in
                 MenuContainer{ content }
                     .shadow(radius: 10, y: 5)
-                    .coordinatedTouchesEffects([.scale(anchor: state.anchor)])
+                    .windowInteractionEffects([.scale(anchor: state.anchor)])
                     .padding(.init(state.edge))
             }
         )

@@ -37,51 +37,57 @@ struct MenuExamples: View {
     
     
     var body: some View {
-        ScrollView{
-            VStack {
-                ForEach(0..<30){ i in
-                    HStack {
-                        Spacer()
-                        
-                        ExampleCard(title: "SwiftUI"){
-                            SwiftUI.Menu{
-                                menuContent
-                                
-                                MenuGroupDivider()
-                                
-                                MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                                    Text($0)
+        VStack(spacing: 0){
+            ScrollView{
+                VStack {
+                    ForEach(0..<30){ i in
+                        HStack {
+                            Spacer()
+                            
+                            ExampleCard(title: "SwiftUI"){
+                                SwiftUI.Menu{
+                                    menuContent
+                                    
+                                    MenuGroupDivider()
+                                    
+                                    MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
+                                        Text($0)
+                                    }
+                                } label: {
+                                    Text("Menu")
                                 }
-                            } label: {
-                                Text("Menu")
                             }
-                        }
-                        
-                        ExampleCard(title: "SwiftUI Kit"){
-                            Menu{
-                                menuContent
-                                
-                                MenuGroupDivider()
-                                
-                                MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                                    Text($0)
+                            
+                            ExampleCard(title: "SwiftUI Kit"){
+                                Menu{
+                                    menuContent
+                                    
+                                    MenuGroupDivider()
+                                    
+                                    MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
+                                        Text($0)
+                                    }
+                                } label: {
+                                    Text("Menu")
                                 }
-                            } label: {
-                                Text("Menu")
                             }
+                            
+                            Spacer()
                         }
-                        
-                        Spacer()
                     }
                 }
             }
+            
+            Divider().ignoresSafeArea()
+            
+            ExampleTitle("Menu")
+                .padding()
         }
         .menuBackground{
             VisualEffectView(blurRadius: 15)
             LinearGradient(colors: [.white, .white, .clear], startPoint: .top, endPoint: .bottom)
         }
         .anchorPresentationContext()
-        .coordinatedWindowEvents()
     }
     
 }

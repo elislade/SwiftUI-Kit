@@ -52,7 +52,6 @@ struct ContextMenuExamples: View  {
                 .padding()
             }
             .focusPresentationContext()
-            .coordinatedWindowEvents()
             .background(.bar)
             
             Divider().ignoresSafeArea()

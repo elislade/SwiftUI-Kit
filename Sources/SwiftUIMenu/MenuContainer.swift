@@ -5,7 +5,6 @@ public struct MenuContainer<Content: View>: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.dismissPresentation) private var dismissPresentation
-    @Environment(\.lastWindowCoordinatedInteractionLocation) private var lastCoordinatedGestureLocation
     @Environment(\.isInMenu) private var isInMenu
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
     @Environment(\.presentationDepth) private var presentationDepth
@@ -58,8 +57,8 @@ public struct MenuContainer<Content: View>: View {
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }
-            .onChangePolyfill(of: lastCoordinatedGestureLocation, initial: true){ old, new in
-                if let new {
+            .windowInteractionChanged{ points in
+                if let new = points.last {
                     //if simulatedSelectionIndex == nil  {
                         selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
                     //}
@@ -76,10 +75,8 @@ public struct MenuContainer<Content: View>: View {
                     self.selectedIndex = nil
                 } else {
                     self.selectedIndex = nil
-                    //self.simulatedSelectionIndex = nil
                 }
             }
-            .wantsWindowCoordinatedInteraction()
             .onChangePolyfill(of: selectedIndex, initial: true){
                 for idx in buttons.indices {
                     buttons[idx].active(idx == selectedIndex)

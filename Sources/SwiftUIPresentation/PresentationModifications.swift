@@ -76,7 +76,7 @@ public extension View {
 }
 
 
-public enum PresentationBackgroundInteraction {
+public enum PresentationBackgroundInteraction: Sendable {
     case touchEndedDismiss
     case touchChangeDismiss
     case disabled

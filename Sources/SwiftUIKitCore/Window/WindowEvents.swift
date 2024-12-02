@@ -48,6 +48,8 @@ extension UIWindow {
 
 struct WindowEventsModifier: ViewModifier {
     
+    @Environment(\._disableWindowEvents) private var isDisabled
+    
     var started: (() -> Void)?
     var ended: (() -> Void)?
     var changed: (([CGPoint]) -> Void)?
@@ -60,7 +62,7 @@ struct WindowEventsModifier: ViewModifier {
         content
         #if canImport(UIKit)
             .onAppear {
-                if hasListener {
+                if hasListener, !isDisabled {
                     UIWindow.enterSwizzleSendEvents()
                 }
             }
@@ -72,12 +74,12 @@ struct WindowEventsModifier: ViewModifier {
             .onChangePolyfill(of: hasListener){ old, new in
                 if old && !new {
                     UIWindow.exitSwizzleSendEvents()
-                } else if !old && new {
+                } else if !old && new && !isDisabled {
                     UIWindow.enterSwizzleSendEvents()
                 }
             }
             .onReceive(WindowEvents.passthrough){ event in
-                guard event.type == .touches, let allTouches = event.allTouches else { return }
+                guard !isDisabled, event.type == .touches, let allTouches = event.allTouches else { return }
                 
                 let allEnded = allTouches.allSatisfy({ $0.phase == .ended || $0.phase == .cancelled })
                 let allStarted = allTouches.allSatisfy({ $0.phase == .began })
@@ -120,73 +122,27 @@ public extension View {
 }
 
 
-
-public extension EnvironmentValues {
-    
-    var lastWindowCoordinatedInteractionLocation: CGPoint? {
-        windowCoordinatedInteractionEvents.last?.location
-    }
-    
-}
-
-struct WantsWindowCoordinatedInteractionKey : PreferenceKey {
+struct DisableWindowEventsKey: EnvironmentKey {
     
     static var defaultValue: Bool { false }
     
-    static func reduce(value: inout Bool, nextValue: () -> Bool) {
-        if value == false {
-            value = nextValue()
-        }
+}
+
+
+extension EnvironmentValues {
+    
+    var _disableWindowEvents: Bool {
+        get { self[DisableWindowEventsKey.self] }
+        set { self[DisableWindowEventsKey.self] = newValue }
     }
     
 }
+
 
 public extension View {
     
-    func wantsWindowCoordinatedInteraction(_ flag: Bool = true) -> some View {
-        preference(key: WantsWindowCoordinatedInteractionKey.self, value: flag)
-    }
-    
-    func simulatedInteractionEvent(_ value: InteractionEvent?) -> some View {
-        preference(key: WindowCoordinationInteractionEventKey.self, value: value != nil ? [value!] : [])
-    }
-    
-    func simulatedInteractionEventsDidChange(_ closure: @escaping ([InteractionEvent]) -> Void) -> some View {
-        onPreferenceChange(WindowCoordinationInteractionEventKey.self, perform: closure)
-    }
-    
-    func disableSimulatedInteractionEvents(_ disable: Bool = true) -> some View {
-        transformPreference(WindowCoordinationInteractionEventKey.self) { value in
-            if disable {
-                value = []
-            }
-        }
-    }
-    
-}
-
-
-struct WindowCoordinationInteractionEventKey: EnvironmentKey {
-    
-    static var defaultValue: [InteractionEvent] { [] }
-    
-}
-
-
-extension WindowCoordinationInteractionEventKey: PreferenceKey {
-    
-    static func reduce(value: inout [InteractionEvent], nextValue: () -> [InteractionEvent]) {
-        value.append(contentsOf: nextValue())
-    }
-    
-}
-
-
-public extension EnvironmentValues {
-    
-    var windowCoordinatedInteractionEvents: [InteractionEvent] {
-        get { self[WindowCoordinationInteractionEventKey.self] }
-        set { self[WindowCoordinationInteractionEventKey.self] = newValue }
+    func disableWindowEvents(disable: Bool = true) -> some View {
+        environment(\._disableWindowEvents, disable)
     }
     
 }

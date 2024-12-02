@@ -19,7 +19,6 @@ struct SceneEnvironmentModifier: ViewModifier {
                 .presentationContext()
                 .anchorPresentationContext()
                 .focusPresentationContext()
-                .coordinatedWindowEvents()
                 .ignoresSafeArea()
                 .environment(\.sceneProxy, proxy)
                 .environment(\.sceneInsets, proxy.safeAreaInsets)
