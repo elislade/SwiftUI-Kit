@@ -12,11 +12,9 @@ public extension View {
     /// - Returns: A
     func navBar<V: View>(
         _ placement: NavBarItemMetadata.Placement,
-        identity: PresentationIdentityBehaviour = .stable,
         @ViewBuilder view: @MainActor @escaping () -> V
     ) -> some View {
         presentationValue(
-            behaviour: identity,
             isPresented: .constant(true),
             metadata: NavBarItemMetadata(placement: placement),
             content: view
@@ -37,7 +35,7 @@ public extension View {
     }
     
     
-    /// A
+    /// Adds an titleview to the NavBar.
     /// - Parameter view: A
     /// - Returns: A
     func navBarTitle<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
@@ -49,7 +47,7 @@ public extension View {
     }
     
     
-    /// A
+    /// Adds an leading view to the NavBar.
     /// - Parameter view: A
     /// - Returns: A
     func navBarLeading<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
@@ -61,7 +59,7 @@ public extension View {
     }
     
     
-    /// A
+    /// Adds an trailing view to the NavBar.
     /// - Parameter view: A
     /// - Returns: A
     func navBarTrailing<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
@@ -73,12 +71,11 @@ public extension View {
     }
     
     
-    /// A
+    /// Adds an accessory view to the NavBar.
     /// - Parameter view: A
     /// - Returns: A
-    func navBarAccessory<V: View>(_ behaviour: PresentationIdentityBehaviour = .stable, @ViewBuilder view: @MainActor @escaping () -> V) -> some View {
+    func navBarAccessory<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
         presentationValue(
-            behaviour: behaviour,
             isPresented: .constant(true),
             metadata: NavBarItemMetadata(placement: .accessory),
             content: view
@@ -86,7 +83,7 @@ public extension View {
     }
     
     
-    /// A
+    /// Replaces the NavBar background material.
     /// - Parameter view: A
     /// - Returns: A
     func navBarMaterial<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
@@ -94,7 +91,7 @@ public extension View {
     }
     
     
-    /// A
+    /// Hides the nav bar.
     /// - Parameter bool: A
     /// - Returns: A
     func navBarHidden(_ bool: Bool) -> some View {
@@ -123,7 +120,7 @@ struct NavBarMaterialModifier<V: View> : ViewModifier {
     func body(content: Content) -> some View {
         content.preference(
             key: NavBarMaterialKey.self,
-            value: [.init(id: .init(), view: AnyView(view()))]
+            value: [.init(id: .init(), view: { AnyView(view()) })]
         )
     }
     
@@ -170,13 +167,13 @@ struct NavBarMaterialKey: PreferenceKey {
 }
 
 
-struct NavBarMaterialValue: Equatable {
+struct NavBarMaterialValue: Equatable, Sendable {
     
     static func == (lhs: NavBarMaterialValue, rhs: NavBarMaterialValue) -> Bool {
         lhs.id == rhs.id
     }
     
     let id: UUID
-    let view: AnyView
+    let view: @MainActor () -> AnyView
     
 }

@@ -6,7 +6,7 @@ struct LayoutDirectionMirrorModifier: ViewModifier {
     @Environment(\.layoutDirection) private var direction
     private let enabled: Bool
     
-    init(enabled: Bool) {
+    nonisolated init(enabled: Bool) {
         self.enabled = enabled
     }
     
@@ -22,7 +22,7 @@ public extension View {
     /// Flips the view on the x axis when  in `rightToLeft` layoutDirection.
     /// - Parameter enabled: A Bool indicating if its enbaled or not.
     /// - Returns: A view that will mirror horizontally to align to RTL layouts
-    func layoutDirectionMirror(enabled: Bool = true) -> some View {
+    nonisolated func layoutDirectionMirror(enabled: Bool = true) -> some View {
         modifier(LayoutDirectionMirrorModifier(enabled: enabled))
     }
     

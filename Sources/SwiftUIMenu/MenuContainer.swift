@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftUIKitCore
 
+
 public struct MenuContainer<Content: View>: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
@@ -37,14 +38,15 @@ public struct MenuContainer<Content: View>: View {
     }
     
     public var body: some View {
-        VStack(spacing: 0){content}
-        //FIXME: LayoutSuggestableVStack(spacing: 0){ content }
+        VStack(spacing: 0){ content }
             //.disabled(isBeingPresentedOn)
             .menuItemInset(
                 .leading,
                 isInMenu || childInsetPreferences.contains(where: { $0 != .init() }) ? .menuLeadingSpacerSize : nil
             )
-            .onPreferenceChange(MenuItemInsetPreferenceKey.self){ childInsetPreferences = $0 }
+            .onPreferenceChange(MenuItemInsetPreferenceKey.self){
+                _childInsetPreferences.wrappedValue = $0
+            }
             .opacity(1 - (Double(presentationDepth) / 3))
             .symbolRenderingMode(.hierarchical)
             .environment(\.isInMenu, true)
@@ -53,7 +55,7 @@ public struct MenuContainer<Content: View>: View {
             .buttonStyle(MenuButtonStyle())
             .labelStyle(MenuLabelStyle())
             .sensoryFeedbackPolyfill(value: selectedIndex)
-            .onPreferenceChange(MenuButtonPreferenceKey.self){ buttons = $0 }
+            .onPreferenceChange(MenuButtonPreferenceKey.self){ _buttons.wrappedValue = $0 }
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }

@@ -9,7 +9,7 @@ struct MenuLabelStyle: LabelStyle {
             Spacer(minLength: 10)
             configuration.icon
         }
-        .applyMenuItemInsets()
+        .paddingAddingMenuItemInsets()
     }
     
 }
@@ -24,7 +24,7 @@ struct MenuLabeledContentStyle: LabeledContentStyle {
             Spacer(minLength: 10)
             configuration.content
         }
-        .applyMenuItemInsets()
+        .paddingAddingMenuItemInsets()
     }
     
 }
@@ -59,7 +59,7 @@ struct MenuToggleStyle: ToggleStyle {
                 
                 configuration.label
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .applyMenuItemInsets([.vertical, .trailing])
+                    .paddingAddingMenuItemInsets([.vertical, .trailing])
             }
         }
         .preferMenuItemInsets(.leading, .menuLeadingSpacerSize)

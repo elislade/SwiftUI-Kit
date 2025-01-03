@@ -20,11 +20,17 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
                     .init(
                         id: id,
                         labelAnchor: anchor,
-                        menu: AnyView(Submenu(
-                            label: label,
-                            content: content
-                        )),
-                        dismiss: { isPresented = false }
+                        menu: {
+                            AnyView(Submenu(
+                                label: label,
+                                content: content
+                            ))
+                        },
+                        dismiss: {
+                            DispatchQueue.main.sync {
+                                isPresented = false
+                            }
+                        }
                     )
                 ] : []
             }
@@ -72,7 +78,7 @@ struct Header<L: View> : View {
                 label()
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .menuItemInset(.leading, 0)
-                    .applyMenuItemInsets([.vertical, .trailing])
+                    .paddingAddingMenuItemInsets([.vertical, .trailing])
             }
         }
         .drawingGroup()

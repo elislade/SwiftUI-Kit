@@ -3,7 +3,7 @@ import SwiftUIKitCore
 import SwiftUIPresentation
 
 
-public struct NavBarContainer<Content: View> : View {
+@MainActor public struct NavBarContainer<Content: View> : View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.reduceMotion) private var reduceMotion
@@ -30,7 +30,7 @@ public struct NavBarContainer<Content: View> : View {
         80 - (28 * interactionGranularity)
     }
     
-    private let backAction: (@Sendable () -> Void)?
+    private let backAction: BackAction
     private let content: () -> Content
     
     private var titleTransition: AnyTransition {
@@ -43,21 +43,21 @@ public struct NavBarContainer<Content: View> : View {
     
     /// Initializes instance
     /// - Parameters:
-    ///   - backAction: An optonal closure that when set will show a back button in leading position. Defaults to nil.
+    ///   - backAction: A `BackAction` that has a visible flag. Defaults to `.none` equivilant to a `BackAction` with an empty closure and visible set to false.
     ///   - content: A view builder of the content that can set `NavBarContainer` items.
-    @MainActor public init(backAction: (@Sendable () -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
+    @MainActor public init(backAction: BackAction = .none, @ViewBuilder content: @escaping () -> Content) {
         self.backAction = backAction
         self.content = content
     }
     
     private func barView() -> some View {
         VStack(spacing: 10) {
-            if !(items.isEmpty && backAction == nil) {
+            if !(items.isEmpty && !backAction.visible) {
                 ZStack {
                     HStack(spacing: 0) {
                         HStack(spacing: 10) {
-                            if let backAction {
-                                Button(action: backAction) {
+                            if backAction.visible {
+                                Button(action: backAction.action) {
                                     Image(systemName: "arrow.left")
                                         .layoutDirectionMirror()
                                         .accessibility(label: Text("Go Back"))
@@ -103,12 +103,12 @@ public struct NavBarContainer<Content: View> : View {
             if bgMaterial.isEmpty {
                 NavBarDefaultMaterial().ignoresSafeArea()
             } else {
-                bgMaterial.last?.view.ignoresSafeArea()
+                bgMaterial.last?.view().ignoresSafeArea()
             }
         }
         .accessibility(addTraits: .isHeader)
         .environment(\.isInNavBar, true)
-        .animation(.fastSpringInterpolating, value: backAction == nil)
+        .animation(.fastSpringInterpolating, value: !backAction.visible)
         .windowDraggable()
         #if canImport(AppKit)
         .controlSize(.small)
@@ -123,8 +123,29 @@ public struct NavBarContainer<Content: View> : View {
             }
         }
         .animation(.fastSpringInterpolating, value: barIsHidden)
-        .onPreferenceChange(NavBarMaterialKey.self){ bgMaterial = $0 }
-        .onPreferenceChange(PresentationKey.self){ items = $0 }
-        .onPreferenceChange(NavBarHiddenKey.self){ barIsHidden = $0 }
+        .onPreferenceChange(NavBarMaterialKey.self){ _bgMaterial.wrappedValue = $0 }
+        .onPreferenceChange(PresentationKey.self){ _items.wrappedValue = $0 }
+        .onPreferenceChange(NavBarHiddenKey.self){ _barIsHidden.wrappedValue = $0 }
     }
+}
+
+
+public struct BackAction {
+    
+    public var visible: Bool
+    public let action: () -> Void
+    
+    public init(visible: Bool = true, action: @escaping () -> Void) {
+        self.visible = visible
+        self.action = action
+    }
+    
+    public func callAsFunction() {
+        action()
+    }
+    
+    public static var none: BackAction {
+        BackAction(visible: false, action: {})
+    }
+    
 }

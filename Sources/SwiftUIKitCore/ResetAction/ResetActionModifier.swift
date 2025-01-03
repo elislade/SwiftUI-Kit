@@ -5,7 +5,7 @@ struct ResetActionModifier: ViewModifier {
     @State private var id = UUID()
     
     let active: Bool
-    let action: () -> Void
+    let action: @MainActor () -> Void
     
     func body(content: Content) -> some View {
         content

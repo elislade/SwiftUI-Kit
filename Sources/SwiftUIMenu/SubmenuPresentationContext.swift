@@ -31,7 +31,7 @@ struct SubmenuPresentationContext: ViewModifier {
                             let isPresentedOn = hasBeenPresented.contains(stack[i].id) && i != stack.indices.last
                             let releventStack = hasBeenPresented.contains(stack[i].id) ? presentedStack : stack
                             
-                            stack[i].menu
+                            stack[i].menu()
                                 .frame(width: resolvedBounds.width)
                                 .environment(\.presentationDepth, releventStack.count - i - 1)
                                 .environment(\._isBeingPresentedOn, isPresentedOn)
@@ -60,13 +60,15 @@ struct SubmenuPresentationContext: ViewModifier {
         }
         .animation(.bouncy, value: hasBeenPresented)
         //.animation(.bouncy, value: stack.count)
-        .onPreferenceChange(SubmenuPresentationKey.self) { stack = $0 }
+        .onPreferenceChange(SubmenuPresentationKey.self) {
+            _stack.wrappedValue = $0
+        }
     }
     
 }
 
 
-struct SubmenuPresentation: Identifiable, Equatable {
+struct SubmenuPresentation: Identifiable, Equatable, Sendable {
     
     static func == (lhs: SubmenuPresentation, rhs: SubmenuPresentation) -> Bool {
         lhs.id == rhs.id
@@ -74,8 +76,8 @@ struct SubmenuPresentation: Identifiable, Equatable {
     
     let id: UUID
     let labelAnchor: Anchor<CGRect>
-    let menu: AnyView
-    let dismiss: () -> Void
+    let menu: @MainActor() -> AnyView
+    let dismiss: @Sendable () -> Void
     
 }
 

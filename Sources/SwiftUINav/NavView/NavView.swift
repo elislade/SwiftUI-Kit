@@ -12,21 +12,12 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     private let useNavBar: Bool
     private let root: Root
     
-    @State private var id = UUID()
-    @MainActor @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
+    @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     
     @State private var scrollGestureTotal: Double = 0
     @State private var pendingReset = false
     @State private var transitionFraction: CGFloat = 0
     @State private var isUpdatingTransition: Bool = false
-    
-    private var backAction: (@Sendable () -> Void)? {
-        elements.isEmpty ? Optional<@Sendable () -> Void>(nil) : Optional<@Sendable () -> Void>({
-            DispatchQueue.main.async{
-                popElement()
-            }
-        })
-    }
     
     /// - Parameters:
     ///   - transition: The ``TransitionProvider`` to use for push/pop transitions.
@@ -130,6 +121,24 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
         }
     }
     
+    private nonisolated func newElements(_ new: [PresentationValue<NavViewElementMetadata>]) {
+        var elements = self._elements.wrappedValue
+        let diff = new.difference(from: elements, by: { $0.id == $1.id })
+
+        for item in diff {
+            switch item {
+            case let .insert(_, element, _):
+                elements.append(element)
+            case let .remove(_, element, _):
+                elements.removeAll(where: { $0.id == element.id })
+            }
+        }
+
+        self._elements.wrappedValue = elements
+                        
+
+    }
+    
     private var content: some View {
         GeometryReader { proxy in
             let trailingInset = proxy.safeAreaInsets.trailing
@@ -190,19 +199,8 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
 //                commitTransition(at: scrollGestureTotal * directionFactor)
 //                scrollGestureTotal = 0
 //            })
-            .handleDismissPresentation(id: id, action: popElement)
-            .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){ items in
-                let diff = items.difference(from: self.elements, by: { $0.id == $1.id })
-                
-                for item in diff {
-                    switch item {
-                    case let .insert(_, element, _):
-                        self.elements.append(element)
-                    case let .remove(_, element, _):
-                        self.elements.removeAll(where: { $0.id == element.id })
-                    }
-                }
-                
+            .handleDismissPresentation(popElement)
+            .onChangePolyfill(of: elements){
                 if pendingReset {
                     if elements.isEmpty {
                         pendingReset = false
@@ -213,13 +211,16 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                     }
                 }
             }
+            .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){ items in
+                self.newElements(items)
+            }
         }
     }
     
     
     public var body: some View {
         if useNavBar {
-            NavBarContainer(backAction: backAction){
+            NavBarContainer(backAction: BackAction(visible: !elements.isEmpty, action: popElement)){
                 content
             }
         } else {

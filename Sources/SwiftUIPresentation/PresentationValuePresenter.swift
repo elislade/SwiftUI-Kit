@@ -4,12 +4,13 @@ import SwiftUIKitCore
 
 struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
     
+    @Environment(\.presentationIdentityBehaviour) private var behaviourEnv
+    
     let environment: EnvironmentValues
     
     @State private var stableID = UUID()
     @State private var customID: UUID?
     
-    let behaviour: PresentationIdentityBehaviour
     @Binding var isPresented: Bool
     let tag: String?
     var presentationRespondsToBoundsChange = false
@@ -20,7 +21,7 @@ struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: 
         content.overlay {
             Color.clear.anchorPreference(key: PresentationKey.self, value: .bounds){ anchor in
                 isPresented ? [.init(
-                    id: behaviour.isStable ? stableID : customID ?? .init(),
+                    id: behaviourEnv.isStable ? stableID : customID ?? .init(),
                     tag: tag,
                     metadata: metadata,
                     anchor: anchor,
@@ -42,7 +43,7 @@ struct PresentationValuePresenter<Metadata: Equatable & Sendable, Presentation: 
                 )] : []
             }
         }
-        .onChange(of: behaviour.customHashable){
+        .onChange(of: behaviourEnv.customHashable){
             customID = $0 == nil ? nil : .init()
         }
     }

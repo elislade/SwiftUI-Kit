@@ -115,17 +115,15 @@ public extension PresentationValue {
 public extension View {
     
     func presentationValue<Metadata: Equatable & Sendable, Content: View>(
-        behaviour: PresentationIdentityBehaviour = .stable,
         isPresented: Binding<Bool>,
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
         metadata: Metadata,
         @ViewBuilder content: @MainActor @escaping () -> Content
     ) -> some View {
-        modifier(EnvironmentModifierWrap {
+        modifier(EnvironmentModifierWrap { environment in
             PresentationValuePresenter(
-                environment: $0,
-                behaviour: behaviour,
+                environment: environment,
                 isPresented: isPresented,
                 tag: tag,
                 presentationRespondsToBoundsChange: respondsToBoundsChange,
@@ -143,9 +141,9 @@ public extension View {
         metadata: Metadata,
         @ViewBuilder content: @MainActor @escaping (Value) -> Content
     ) -> some View {
-        modifier(EnvironmentModifierWrap{
+        modifier(EnvironmentModifierWrap{ environment in
             PresentationOptionalValuePresenter(
-                environment: $0,
+                environment: environment,
                 behaviour: behaviour,
                 value: value,
                 tag: tag,
@@ -167,36 +165,6 @@ public struct PresentationKey<Metadata: Equatable & Sendable>: PreferenceKey {
     }
     
 }
-
-/// `PresentationIdentityBehaviour` gives control over how presentation id is to be handled. By default most implimentations should use `.stable` as default as it's most performant.
-/// - Note: Since presentation views are type erased to `AnyView` it's recommended that all state needed for a presentation view be inside of it or passed to it through a binding as this will **NOT** be effected by the `AnyView` type eraser. Doing this along with `.stable` behaviour will lead to the most performant presentation.  If you use `.changeOnUpdate` behaviour you don't need to worry about the presentation view wrapping its own state, so you can pass state through normal let vars and from values in the view managing the presentation, but with a tradeoff that the preference key delivering this presentation will re-evaluate on every view update even if the view has no state changes.
-/// - Note: This behaviour is only for id of the presentation preference if any other component of the preference value changes such as `tag`, `anchor`, or `metadata`, the view will be re-evaluated.
-public enum PresentationIdentityBehaviour: Hashable {
-    
-    /// The presentation id will only update on view setup.
-    /// - Note: This is the most performant out of all the options as the presentation id for the preference key will be updated once.
-    case stable
-    
-    /// The presentation id will update on every view update cycle.
-    /// - Note: This is the least performant as it will update when any view updates are detected.
-    case changeOnUpdate
-    
-    /// The presentation id will change with a custom hashable value.
-    /// - Note: Performance is dependant on how often the Hashable value is updated.
-    case custom(AnyHashable)
-    
-    
-    public var customHashable: AnyHashable? {
-        if case .custom(let anyHashable) = self {
-            return anyHashable
-        } else { return nil }
-    }
-    
-    
-    public var isStable: Bool { self == .stable }
-    
-}
-
 
 
 public enum PresentationEnvironmentBehaviour: Sendable {

@@ -4,14 +4,14 @@ import SwiftUIKitCore
 
 // MARK: - Background
 
-struct PresentationBackgroundKeyValue: Equatable {
+struct PresentationBackgroundKeyValue: Equatable, Sendable {
     
     static func == (lhs: PresentationBackgroundKeyValue, rhs: PresentationBackgroundKeyValue) -> Bool {
         lhs.id == rhs.id
     }
     
     let id: UUID
-    let view: AnyView
+    let view: @MainActor () -> AnyView
     
 }
 
@@ -44,7 +44,7 @@ struct PresentationBackgroundModifier<BG: View>: ViewModifier {
     func body(content: Content) -> some View {
         content.preference(
             key: PresentationBackgroundKey.self,
-            value: [ .init(id: id, view: AnyView(ZStack{ background })) ]
+            value: [ .init(id: id, view: { AnyView(ZStack{ background }) }) ]
         )
     }
     

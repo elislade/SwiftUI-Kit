@@ -6,7 +6,9 @@ struct FocusPresentationContext: ViewModifier {
     @Namespace private var ns
     
     @State private var bgInteraction: PresentationBackgroundInteraction?
-    @State private var bgView: AnyView?
+    @State private var bg: PresentationBackgroundKeyValue?
+    
+    private var bgView: AnyView? { bg?.view() }
     
     @State private var focusedView: AnyView?
     @State private var accessoryIsPresented = false
@@ -76,10 +78,10 @@ struct FocusPresentationContext: ViewModifier {
                                     .matchedGeometryEffect(id: "View", in: ns)
                                     .zIndex(2)
                                     .onPreferenceChange(PresentationBackgroundKey.self){
-                                        bgView = $0.last?.view
+                                        _bg.wrappedValue = $0.last
                                     }
                                     .onPreferenceChange(PresentationBackgroundInteractionKey.self){
-                                        bgInteraction = $0.last
+                                        _bgInteraction.wrappedValue = $0.last
                                     }
                                     .autoAnchorPresentation(isPresented: $accessoryIsPresented){ state in
                                         value

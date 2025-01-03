@@ -10,8 +10,10 @@ struct AnchorPresentationContext2: ViewModifier {
     @Environment(\.layoutDirection) private var envLayoutDirection
     
     @State private var bgInteraction: PresentationBackgroundInteraction?
-    @State private var bgView: AnyView?
+    @State private var bg: PresentationBackgroundKeyValue?
     @State private var presentedValue: Presentation?
+
+    private var bgView: AnyView? { bg?.view() }
     
     let environmentBehaviour: PresentationEnvironmentBehaviour
     
@@ -60,7 +62,9 @@ struct AnchorPresentationContext2: ViewModifier {
         content
             .isBeingPresentedOn(presentedValue != nil)
             .accessibilityHidden(presentedValue != nil)
-            .onPreferenceChange(PresentationKey<Metadata>.self) { presentedValue = $0.last }
+            .onPreferenceChange(PresentationKey<Metadata>.self) {
+                _presentedValue.wrappedValue = $0.last
+            }
             .overlay {
                 GeometryReader{ proxy in
                     let proxyWidth = proxy.size.width
@@ -82,8 +86,12 @@ struct AnchorPresentationContext2: ViewModifier {
                                     .animation(.bouncy)
                                 )
                                 .environment(\.dismissPresentation, .init(id: presentedValue.id, closure: dismiss))
-                                .onPreferenceChange(PresentationBackgroundKey.self){ bgView = $0.last?.view }
-                                .onPreferenceChange(PresentationBackgroundInteractionKey.self){ bgInteraction = $0.last }
+                                .onPreferenceChange(PresentationBackgroundKey.self){
+                                    _bg.wrappedValue = $0.last
+                                }
+                                .onPreferenceChange(PresentationBackgroundInteractionKey.self){
+                                    _bgInteraction.wrappedValue = $0.last
+                                }
                                 .alignmentGuide(.leading){ dimension in
                                     let selfOffset = dimension.width * presAnchor.x
                                     

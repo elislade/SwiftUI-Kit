@@ -29,7 +29,7 @@ struct BasicPresentationContext: ViewModifier {
                     
                     if let last = values.last {
                         PresentationBackground(
-                            bgView: bgPreferences.last?.view,
+                            bgView: bgPreferences.last?.view(),
                             bgInteraction: bgInteractionPreferences.last,
                             dismiss: last.dispose
                         )
@@ -45,14 +45,20 @@ struct BasicPresentationContext: ViewModifier {
                             .accessibilityHidden(values.count > 1 ? value != values.last : false)
                     }
                 }
-                .onPreferenceChange(PresentationBackgroundKey.self){ bgPreferences = $0 }
-                .onPreferenceChange(PresentationBackgroundInteractionKey.self){ bgInteractionPreferences = $0 }
-                .animation(.fastSpringInteractive, value: values)
+                .onPreferenceChange(PresentationBackgroundKey.self){
+                    _bgPreferences.wrappedValue = $0
+                }
+                .onPreferenceChange(PresentationBackgroundInteractionKey.self){
+                    _bgInteractionPreferences.wrappedValue = $0
+                }
+                .animation(.smooth, value: values)
                 .mask{
                     Rectangle().ignoresSafeArea()
                 }
             }
-            .onPreferenceChange(PresentationKey<BasicPresentationMetadata>.self){ values = $0 }
+            .onPreferenceChange(PresentationKey<BasicPresentationMetadata>.self){
+                _values.wrappedValue = $0
+            }
             .transformPreference(PresentationKey<BasicPresentationMetadata>.self){
                 // don't let presentations continue up the chain if caught by this context
                 $0 = []

@@ -8,16 +8,16 @@ import SwiftUI
 /// The view itself decides what a reset means and can be arbitrary but should stick to the concept of resetting state that is not an identity change.
 /// Eg. Scrolling a ScrollView to its initial state, popping a navigation stack to its root, etc...
 ///
-public struct ResetAction: Equatable {
+public struct ResetAction: Equatable, Sendable {
     
     public static func == (lhs: ResetAction, rhs: ResetAction) -> Bool {
         lhs.id == rhs.id
     }
     
     let id: UUID
-    let action: () -> Void
+    let action: @MainActor () -> Void
 
-    public func callAsFunction() {
+    @MainActor public func callAsFunction() {
         action()
     }
     
@@ -61,14 +61,14 @@ public extension View {
     ///   - action : The action that the view wants to be called to reset itself.
     ///
     /// - Returns: A view that set its ResetAction.
-    func resetAction(active: Bool = true, _ action: @escaping () -> Void) -> some View {
+    func resetAction(active: Bool = true, _ action: @escaping @MainActor() -> Void) -> some View {
         modifier(ResetActionModifier(active: active, action: action))
     }
     
     
     /// - Parameter closure: A closure that gets called with the bottom most ResetAction available. If no action is available a nil value will be returned.
     /// - Returns: A view that handles child ResetActions.
-    func childResetAction(_ closure: @escaping (ResetAction?) -> Void) -> some View {
+    func childResetAction(_ closure: @escaping @Sendable (ResetAction?) -> Void) -> some View {
         onPreferenceChange(ResetActionKey.self, perform: closure)
     }
     

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct KeyPressPolyfill: ViewModifier {
     
-    enum MaskType: Hashable {
+    enum MaskType: Hashable, Sendable {
         case charSet(CharacterSet)
         case equivalentSet(Set<KeyEquivalent>)
         

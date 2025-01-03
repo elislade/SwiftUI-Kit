@@ -47,12 +47,14 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    func handleDismissPresentation(id: UUID, action: @escaping () -> Void) -> some View {
-        InlineEnvironmentReader(\.isBeingPresentedOn){ isBeingPresentedOn in
-            self.transformEnvironment(\.dismissPresentation) { value in
-                // only set value if view is not being presented on
-                if isBeingPresentedOn == false {
-                    value = .init(id: id, closure: action)
+    @inlinable func handleDismissPresentation(_ action: @escaping () -> Void) -> some View {
+        InlineState(UUID()){ id in
+            InlineEnvironmentReader(\.isBeingPresentedOn){ isBeingPresentedOn in
+                self.transformEnvironment(\.dismissPresentation) { value in
+                    // only set value if view is not being presented on
+                    if isBeingPresentedOn == false {
+                        value = .init(id: id, closure: action)
+                    }
                 }
             }
         }
