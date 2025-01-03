@@ -59,7 +59,7 @@ public struct MenuContainer<Content: View>: View {
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }
-            .windowInteractionChanged{ points in
+            .windowInteraction(started: { _ in }){ points in
                 if let new = points.last {
                     //if simulatedSelectionIndex == nil  {
                         selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })

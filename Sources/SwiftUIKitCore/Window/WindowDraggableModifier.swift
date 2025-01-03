@@ -29,12 +29,14 @@ struct WindowDraggableModifier: ViewModifier {
 
 public extension View {
     
+#if canImport(AppKit)
     func windowDraggable(enabled: Bool = true) -> some View {
-        #if canImport(AppKit)
         modifier(WindowDraggableModifier(enabled: enabled))
-        #else
-        self
-        #endif
     }
+#else
+    func windowDraggable(enabled: Bool = true) -> Self {
+        self
+    }
+#endif
     
 }

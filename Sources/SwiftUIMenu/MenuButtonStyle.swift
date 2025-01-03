@@ -86,8 +86,12 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                                 globalRect: proxy.frame(in: .global),
                                 autoTriggerAfter: hoverTriggerInterval,
                                 dismissOnAction: dismissOnAction,
-                                active: { isActive = $0 },
-                                action: configuration.trigger
+                                active: { _isActive.wrappedValue = $0 },
+                                action: {
+                                    DispatchQueue.main.async {
+                                        configuration.trigger()
+                                    }
+                                }
                             )
                         ] : []
                     )

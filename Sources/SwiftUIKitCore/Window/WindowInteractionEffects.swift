@@ -18,8 +18,8 @@ struct WindowInteractionEffects: ViewModifier {
         content
             .scaleEffect(scale, anchor:  scaleAnchor)
             .offset(offset)
-            .boundsReader(readingToRect: $rect)
-            .windowInteractionChanged(enabled: !effects.isEmpty){ points in
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ rect = $0 }
+            .windowInteraction(started: { _ in }){ points in
                 guard !effects.isEmpty, let location = points.last else {
                     return
                 }
@@ -46,11 +46,11 @@ struct WindowInteractionEffects: ViewModifier {
                         )
                     }
                 }
-            }
-            .windowInteractionEnded(enabled: !effects.isEmpty) {
+            } ended: { _ in
                 self.offset = .zero
                 self.scale = 1
             }
+            .disableWindowEvents(effects.isEmpty)
             .animation(.bouncy, value: scale)
             .animation(.bouncy, value: offset)
     }

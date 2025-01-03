@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct MenuButtonValue: Equatable {
+struct MenuButtonValue: Equatable, Sendable {
     
     static func == (lhs: MenuButtonValue, rhs: MenuButtonValue) -> Bool {
         lhs.id == rhs.id && lhs.globalRect == rhs.globalRect
@@ -13,8 +13,8 @@ struct MenuButtonValue: Equatable {
     //let anchor: Anchor<CGRect>
     let autoTriggerAfter: TimeInterval?
     let dismissOnAction: Bool
-    let active: (Bool) -> Void
-    let action: () -> Void
+    let active: @Sendable (Bool) -> Void
+    let action: @MainActor() -> Void
     
     init(
         id: UUID,
@@ -22,8 +22,8 @@ struct MenuButtonValue: Equatable {
         //anchor: Anchor<CGRect>,
         autoTriggerAfter: TimeInterval? = nil,
         dismissOnAction: Bool = true,
-        active: @escaping (Bool) -> Void,
-        action: @escaping () -> Void
+        active: @escaping @Sendable (Bool) -> Void,
+        action: @escaping @MainActor () -> Void
     ) {
         self.id = id
         //self.anchor = anchor
