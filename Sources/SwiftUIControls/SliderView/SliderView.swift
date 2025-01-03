@@ -7,7 +7,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     
     @Environment(\.layoutDirection) private var layoutDirection
     
-    @State private var handleBounds: CGRect = .zero
+    @State private var handleSize: CGSize = .zero
     @State private var hovering = false
     
     let x: SliderState<Value>?
@@ -69,12 +69,12 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
         
         if let x {
             _x = CGFloat(x.percentComplete) * size.width
-            _x -= CGFloat(x.percentComplete) * handleBounds.width
+            _x -= CGFloat(x.percentComplete) * handleSize.width
         }
         
         if let y {
             _y = CGFloat(y.percentComplete) * size.height
-            _y -= CGFloat(y.percentComplete) * handleBounds.height
+            _y -= CGFloat(y.percentComplete) * handleSize.height
         }
         
         return CGSize(width: _x, height: _y)
@@ -103,7 +103,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
                 ZStack(alignment: .topLeading) {
                     handle()
                         .hoverEffectPolyfill()
-                        .boundsChange(in: proxy){ handleBounds = $0 }
+                        .onGeometryChangePolyfill(of: { $0.size }){ handleSize = $0 }
                         .offset(handleOffset(in: proxy.size))
                         .gesture(hitTestHandle ? gesture(in: proxy.size) : nil)
                     

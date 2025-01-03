@@ -68,7 +68,7 @@ import SwiftUIPresentation
                             items.filter({ $0.metadata.placement == .leading }).last?.view()
                                 .transition(actionsTransition)
                         }
-                        .boundsReader(readingToSize: $leadingSize)
+                        .onGeometryChangePolyfill(of: { $0.size }){ leadingSize = $0 }
                         
                         Spacer(minLength: 44)
                         
@@ -76,9 +76,9 @@ import SwiftUIPresentation
                             items.filter({ $0.metadata.placement == .trailing }).last?.view()
                                .transition(actionsTransition)
                         }
-                        .boundsReader(readingToSize: $trailingSize)
+                        .onGeometryChangePolyfill(of: { $0.size }){ trailingSize = $0 }
                     }
-                    .boundsReader(readingToSize: $totalSize)
+                    .onGeometryChangePolyfill(of: { $0.size }){ totalSize = $0 }
                     
                     items.filter({ $0.metadata.placement == .title }).last?.view()
                         .frame(maxWidth: titleWidth)

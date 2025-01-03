@@ -144,13 +144,13 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             .offset(x: totalOffset)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded(close))
-            .boundsReader(readingToRect: $contentRect)
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ contentRect = $0 }
             .highPriorityGesture(contentGesture)
             .overlay {
                 HStack(spacing: 0) {
                     if let activeEdge, activeEdge == .leading {
                         HStack(spacing: 1, content: { leading })
-                            .boundsReader(readingToSize: $leadingSize)
+                            .onGeometryChangePolyfill(of: { $0.size }){ leadingSize = $0 }
                             .clipShape(
                                 Rectangle()
                                     .offset(x: min(-leadingSize.width + totalOffset, 0) * layoutFactor)
@@ -162,7 +162,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                     
                     if let activeEdge, activeEdge == .trailing {
                         HStack(spacing: 1, content: { trailing })
-                            .boundsReader(readingToSize: $trailingSize)
+                            .onGeometryChangePolyfill(of: { $0.size }){ trailingSize = $0 }
                             .clipShape(
                                 Rectangle()
                                     .offset(x: max(trailingSize.width + totalOffset, 0) * layoutFactor)
