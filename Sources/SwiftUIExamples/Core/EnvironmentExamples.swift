@@ -1,10 +1,15 @@
 import SwiftUIKit
 
 
-#Preview("Environment Values Reader") {
-    InlineBinding(ColorScheme.dark){ binding in
+public struct InlineEnvironmentValuesReaderExample: View {
+    
+    @State private var colorScheme: ColorScheme = .light
+    
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
-            InlineEnvironmentValuesReader{ values in
+            InlineEnvironmentValuesReader { values in
                 Rectangle()
                     .fill(.background)
                     .ignoresSafeArea()
@@ -13,42 +18,58 @@ import SwiftUIKit
                             .font(.largeTitle.bold())
                     }
             }
-            .environment(\.colorScheme, binding.wrappedValue)
+            .environment(\.colorScheme, colorScheme)
             
             Divider()
             
             ExampleTitle("Environment Values")
                 .padding(.vertical)
             
-            ExampleCell.ColorScheme(value: binding)
-    
+            ExampleCell.ColorScheme(value: $colorScheme)
         }
     }
+}
+
+
+#Preview("Environment Values Reader") {
+    InlineEnvironmentValuesReaderExample()
+        .previewSize()
+}
+
+public struct InlineEnvironmentReaderExample: View {
+    
+    public init() {}
+    
+    public var body: some View {
+        InlineEnvironmentReader(\.displayScale){ scale in
+            VStack(spacing: 0) {
+                ZStack {
+                    Color.clear
+                    
+                    Text("Display Scale ").foregroundColor(.gray) + Text(scale, format: .number)
+                }
+                .font(.title.bold())
+                .background(.bar)
+                
+                Divider().ignoresSafeArea()
+                
+                ExampleTitle("Inline Environment Reader")
+                    .padding(.vertical)
+            }
+        }
+    }
+    
 }
 
 
 #Preview("Inline Environment Reader") {
-    InlineEnvironmentReader(\.displayScale){ scale in
-        VStack(spacing: 0) {
-            ZStack {
-                Color.clear
-                
-                Text("Display Scale ").foregroundColor(.gray) + Text(scale, format: .number)
-            }
-            .font(.title.bold())
-            .background(.bar)
-            
-            Divider().ignoresSafeArea()
-            
-            ExampleTitle("Inline Environment Reader")
-                .padding(.vertical)
-        }
-    }
+    InlineEnvironmentReaderExample()
+        .previewSize()
 }
 
 
 
-struct EnvironmentOnChangeExample : View {
+public struct EnvironmentOnChangeExample : View {
     
     struct Pair: Identifiable {
         public var id: String { key + value }
@@ -69,7 +90,9 @@ struct EnvironmentOnChangeExample : View {
         return parsed.filter({ $0.key.lowercased().contains(filter.lowercased())})
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Environment On Change"){
             ScrollView {
                 VStack(spacing: 0){
@@ -109,6 +132,7 @@ struct EnvironmentOnChangeExample : View {
             .environment(\.colorScheme, colorScheme)
             .preferredColorScheme(colorScheme)
             .environment(\.layoutDirection, layout)
+            .environment(\.reduceMotion, reduceMotion)
         } parameters: {
             TextField("Filter Keys", text: $filter){
                 Image(systemName: "magnifyingglass")
@@ -141,6 +165,8 @@ struct EnvironmentOnChangeExample : View {
     
 }
 
+
 #Preview("Environment On Change") {
     EnvironmentOnChangeExample()
+        .previewSize()
 }

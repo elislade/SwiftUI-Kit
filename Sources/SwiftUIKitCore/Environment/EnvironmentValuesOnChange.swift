@@ -6,8 +6,7 @@ struct EnvChangeModifier: @preconcurrency EnvironmentalModifier {
     let onChange: (EnvironmentValues) -> Void
     
     func resolve(in environment: EnvironmentValues) -> some ViewModifier {
-        EmptyModifier()
-        //Modifier(environment: environment, onChange: onChange)
+        Modifier(environment: environment, onChange: onChange)
     }
     
     struct Modifier: ViewModifier {

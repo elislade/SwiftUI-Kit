@@ -57,14 +57,14 @@ public struct OptionalEdgeInsets: Hashable, Sendable, EdgeConformance {
     
     public static let none: OptionalEdgeInsets = .init()
     
-    public var top: CGFloat?
-    public var bottom: CGFloat?
-    public var leading: CGFloat?
-    public var trailing: CGFloat?
+    public var top: Double?
+    public var bottom: Double?
+    public var leading: Double?
+    public var trailing: Double?
     
     public var allNil: Bool { self == .none }
     
-    public init(top: CGFloat? = nil, bottom: CGFloat? = nil, leading: CGFloat? = nil, trailing: CGFloat? = nil) {
+    public init(top: Double? = nil, bottom: Double? = nil, leading: Double? = nil, trailing: Double? = nil) {
         self.top = top
         self.bottom = bottom
         self.leading = leading

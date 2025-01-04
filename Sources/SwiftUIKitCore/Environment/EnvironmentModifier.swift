@@ -1,15 +1,15 @@
 import SwiftUI
 
-public struct EnvironmentModifierWrap <M: ViewModifier>: @preconcurrency EnvironmentalModifier {
+public struct EnvironmentModifierWrap <Modifier: ViewModifier>: @preconcurrency EnvironmentalModifier {
     
-    let modifier: (EnvironmentValues) -> M
+    private let closure: (EnvironmentValues) -> Modifier
     
-    public init(_ modifier: @escaping (EnvironmentValues) -> M) {
-        self.modifier = modifier
+    public init(_ closure: @escaping (EnvironmentValues) -> Modifier) {
+        self.closure = closure
     }
     
-    public func resolve(in environment: EnvironmentValues) -> M {
-        modifier(environment)
+    public func resolve(in environment: EnvironmentValues) -> Modifier {
+        closure(environment)
     }
     
 }
