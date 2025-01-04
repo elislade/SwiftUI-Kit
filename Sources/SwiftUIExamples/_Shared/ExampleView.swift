@@ -81,5 +81,21 @@ struct ExampleView<E: View, P: View>: View {
                 .padding()
         }
     }
+    .previewSize()
 }
 
+
+
+extension View {
+    
+#if canImport(AppKit)
+    func previewSize() -> some View {
+        frame(width: 340, height: 600)
+    }
+#else
+    func previewSize() -> Self {
+        self
+    }
+#endif
+    
+}

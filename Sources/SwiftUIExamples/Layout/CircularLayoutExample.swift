@@ -1,28 +1,40 @@
 import SwiftUIKit
 
 
-struct CircularLayoutExample : View {
+public struct CircularLayoutExample : View {
 
     @State private var items: [Color] = [.random, .random, .random]
-    @State private var width: Double = 260
+    @State private var radius: Double = 100
+    @State private var rangeLower: Angle = .zero
+    @State private var rangeUpper: Angle = .degrees(360)
+    @State private var offset: Angle = .zero
     @State private var compensateForRotation = false
     
-    var body: some View {
+    private var layout: some RelativeCollectionLayoutModifier {
+        CircularCollectionLayout(
+            radius: radius,
+            offset: offset,
+            range: rangeLower...rangeUpper,
+            compensateForRotation: compensateForRotation
+        )
+    }
+    
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Circular Layout"){
-            CircularLayoutView(
-                data: items,
-                compensateForRotation: compensateForRotation
-            ){ color in
+            ZStackCollectionLayout(layout, data: items) { color in
                 SunkenControlMaterial(RoundedRectangle(cornerRadius: 10), isTinted: true)
                     .tint(color)
                     .frame(width: 60, height: 60)
                     .drawingGroup()
+                    .transitions(.scale)
                     .onTapGesture {
                         items.removeAll(where: { $0 == color })
                     }
             }
-            .frame(width: width)
             .animation(.fastSpring, value: compensateForRotation)
+            .animation(.bouncy, value: items)
         } parameters: {
             HStack {
                 Text("Number of Items")
@@ -35,8 +47,7 @@ struct CircularLayoutExample : View {
                 
                 Stepper(
                     onIncrement: { items.append(.random) },
-                    onDecrement: {
-                        guard items.isEmpty == false else { return }
+                    onDecrement: items.isEmpty ? nil : {
                         items.removeLast()
                     }
                 )
@@ -47,16 +58,65 @@ struct CircularLayoutExample : View {
             
             VStack {
                 HStack {
-                    Text("Width")
+                    Text("Radius")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-                    Text(width, format: .number)
+                    Text(radius, format: .number)
                         .font(.exampleParameterValue)
                 }
                 
-                Slider(value: $width, in: 100...400, step: 1)
+                Slider(value: $radius, in: 50...150, step: 1)
+            }
+            .padding()
+            
+            Divider()
+            
+            VStack {
+                HStack {
+                    Text("Offset")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Text(offset.degrees, format: .number)
+                        .font(.exampleParameterValue)
+                }
+                
+                Slider(value: $offset.degrees, in: 0...360, step: 1)
+            }
+            .padding()
+            
+            Divider()
+            
+            VStack {
+                HStack {
+                    Text("Range")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+//                    Text(rangeLower.degrees, format: .number)
+//                        .font(.exampleParameterValue)
+                    
+                    Text(rangeUpper.degrees, format: .number)
+                        .font(.exampleParameterValue)
+                }
+                
+                HStack {
+//                    Slider(
+//                        value: $rangeLower.degrees,
+//                        in: 0...179,
+//                        step: 1
+//                    )
+    
+                    Slider(
+                        value: $rangeUpper.degrees,
+                        in: 0...360,
+                        step: 1
+                    )
+                }
             }
             .padding()
             
@@ -74,4 +134,5 @@ struct CircularLayoutExample : View {
 
 #Preview("Circular Layout") {
     CircularLayoutExample()
+        .previewSize()
 }

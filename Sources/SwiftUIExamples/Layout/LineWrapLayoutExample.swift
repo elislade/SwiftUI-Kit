@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct LineWrapLayoutExample: View {
+public struct LineWrapLayoutExample: View {
     
     @State private var phrases: [[IdentifiedChar]]
     
@@ -24,7 +24,7 @@ struct LineWrapLayoutExample: View {
         .system(size: size, design: .serif)
     }
     
-    init(){
+    public init(){
         phrases = [
            "Hello, World!",
            "Hollow woods are spooky.",
@@ -33,7 +33,7 @@ struct LineWrapLayoutExample: View {
         ].map{ $0.identifiedSequence() }
     }
     
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Line Wrap Layout"){
             Group{
                 if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *), true {
@@ -186,6 +186,7 @@ struct LineWrapLayoutExample: View {
 
 #Preview("Line Wrap Layout") {
     LineWrapLayoutExample()
+        .previewSize()
 }
 
 

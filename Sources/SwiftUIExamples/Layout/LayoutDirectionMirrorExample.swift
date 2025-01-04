@@ -1,11 +1,13 @@
 import SwiftUIKit
 
 
-struct LayoutDirectionMirrorExample: View {
+public struct LayoutDirectionMirrorExample: View {
     
     @State private var mirror = false
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Mirror Layout"){
             VStack(spacing: 0) {
                 ForEach(LayoutDirection.allCases, id: \.self){ layout in
@@ -40,4 +42,5 @@ struct LayoutDirectionMirrorExample: View {
 
 #Preview("Layout Direction Mirror") {
     LayoutDirectionMirrorExample()
+        .previewSize()
 }
