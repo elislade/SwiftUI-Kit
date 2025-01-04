@@ -5,7 +5,7 @@ extension CGAffineTransform : EmptyInitalizable {}
 extension CGPoint : EmptyInitalizable {}
 extension CGSize : EmptyInitalizable {}
 extension CGRect : EmptyInitalizable {}
-extension CGFloat: EmptyInitalizable {}
+extension CGFloat : EmptyInitalizable {}
 
 public extension CGSize {
     
@@ -38,11 +38,11 @@ public extension CGPoint {
     /// Calls rounded on both `x` and `y` of the point.
     /// - Parameter rule: The rounding rule to use for both `x` and `y`.
     /// - Returns: A `CGPoint` with `x` and `y` rounded.
-    func rounded(_ rule: FloatingPointRoundingRule) -> CGPoint {
+    nonisolated func rounded(_ rule: FloatingPointRoundingRule) -> CGPoint {
         CGPoint(x: x.rounded(rule), y: y.rounded(rule))
     }
     
-    func distance(from rect: CGRect) -> CGFloat {
+    nonisolated func distance(from rect: CGRect) -> CGFloat {
         var vd: CGFloat = 0
         var hd: CGFloat = 0
         
@@ -81,14 +81,44 @@ public extension CGRect {
         case .trailing: (container.width - width) - origin.x
         }
     }
+       
+}
+
+extension CGAffineTransform: StaticIdentityConformance { }
+
+extension CGFloat : ReplaceWhenFloatKeyIsTrueConformance {}
+
+extension CGPoint : ReplaceWhenFloatKeyIsTrueConformance {
     
-    var rectReplacingNanWithZero: CGRect {
-        .init(
-            x: origin.x.isNaN ? 0 : origin.x,
-            y: origin.y.isNaN ? 0 : origin.y,
-            width: width.isNaN ? 0 : width,
-            height: height.isNaN ? 0 : height
+    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGPoint {
+        CGPoint(
+            x: x.replace(key, with: replacement),
+            y: y.replace(key, with: replacement)
         )
     }
-       
+    
+}
+
+
+extension CGSize : ReplaceWhenFloatKeyIsTrueConformance {
+    
+    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGSize {
+        CGSize(
+            width: width.replace(key, with: replacement),
+            height: height.replace(key, with: replacement)
+        )
+    }
+    
+}
+
+
+extension CGRect : ReplaceWhenFloatKeyIsTrueConformance {
+
+    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGRect {
+        CGRect(
+            origin: origin.replace(key, with: replacement),
+            size: size.replace(key, with: replacement)
+        )
+    }
+    
 }

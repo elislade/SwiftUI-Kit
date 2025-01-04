@@ -19,7 +19,7 @@ public extension Image {
 public extension ColorScheme {
     
     /// Computes the inverse of the current `ColorScheme`.
-    /// - Note: This may be unwise to rely on as ColorScheme's may not always have an inverse equivilent in the future. Under these circumstances it will just return self as the inverse.
+    /// - Note: This may be unwise to rely on as ColorScheme's may not always have an inverse equivalent in the future. Under these circumstances it will just return self as the inverse.
     var inverse: ColorScheme {
         switch self {
         case .light: .dark
@@ -37,7 +37,6 @@ public extension View {
             .frame(maxWidth: value)
             .frame(maxWidth: .infinity)
     }
-    
     
     @ViewBuilder func geometryGroupPolyfill() -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
@@ -71,6 +70,44 @@ public extension Set {
     
 }
 
+public extension SetAlgebra {
+    
+    mutating func toggle(_ member: Element, included: Bool) {
+        if included {
+            insert(member)
+        } else {
+            remove(member)
+        }
+    }
+    
+}
+
+
+public extension Binding where Value == Bool {
+    
+    init<Set : SetAlgebra & Sendable>(_ binding: Binding<Set>, contains element: Set.Element) where Set.Element : Sendable {
+        self.init(
+            get: { binding.wrappedValue.contains(element) },
+            set: { binding.wrappedValue.toggle(element, included: $0) }
+        )
+    }
+    
+    init<Set : SetAlgebra & Sendable>(_ binding: Binding<Set>, subset: Set) {
+        self.init(
+            get: { binding.wrappedValue.isSuperset(of: subset) },
+            set: {
+                if $0 {
+                    binding.wrappedValue.formUnion(subset)
+                } else {
+                    binding.wrappedValue.subtract(subset)
+                }
+            }
+        )
+    }
+    
+}
+
+extension CharacterSet: @retroactive @unchecked Sendable { }
 
 public extension Edge {
     
@@ -171,9 +208,4 @@ public extension Axis {
         }
     }
     
-}
-
-
-public protocol EmptyInitalizable {
-    init()
 }

@@ -1,5 +1,29 @@
 import Foundation
 
+public protocol EmptyInitalizable {
+    init()
+}
+
+extension Never : EmptyInitalizable {
+    
+    public init() { fatalError() }
+    
+}
+
+public protocol StaticIdentityConformance {
+    
+    static var identity: Self { get }
+    
+}
+
+
+extension Never: StaticIdentityConformance {
+    
+    public static var identity: Never { fatalError() }
+
+}
+
+
 extension Double: EmptyInitalizable {}
 extension Int : EmptyInitalizable {}
 extension String : EmptyInitalizable {}
@@ -114,6 +138,7 @@ public extension BinaryFloatingPoint {
     func round(to place: Self) -> Self {
         (self * place).rounded() / place
     }
+    
 }
 
 
@@ -124,3 +149,25 @@ public extension BinaryInteger {
     }
     
 }
+
+
+public protocol ReplaceWhenFloatKeyIsTrueConformance {
+    
+    associatedtype Replacement : BinaryFloatingPoint
+    
+    nonisolated func replace(_ key: KeyPath<Replacement, Bool>, with replacement: Replacement) -> Self
+    
+}
+
+public extension ReplaceWhenFloatKeyIsTrueConformance where Self == Replacement {
+    
+    func replace(_ key: KeyPath<Replacement, Bool>, with replacement: Replacement) -> Self {
+        self[keyPath: key] ? replacement : self
+    }
+    
+}
+
+
+extension Double : ReplaceWhenFloatKeyIsTrueConformance {}
+extension Float : ReplaceWhenFloatKeyIsTrueConformance {}
+extension Float16 : ReplaceWhenFloatKeyIsTrueConformance {}
