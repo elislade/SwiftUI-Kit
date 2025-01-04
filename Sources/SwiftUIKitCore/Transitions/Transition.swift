@@ -21,19 +21,10 @@ public extension AnyTransition {
     static func removal(_ transitions: AnyTransition...) -> AnyTransition {
         .asymmetric(insertion: .identity, removal: .merge(transitions))
     }
-    
-//    static var pageSlideReveal: AnyTransition {
-//        .asymmetric(
-//            insertion: .scaleFadeIn,
-//            removal: .moveOffset(edge: .leading)
-//        )
-//    }
-//    
+
     static func moveOffset(edge: Edge = .leading) -> AnyTransition {
         .merge(.move(edge: edge), .offset(x: edge == .leading ? -50 : 50))
     }
-    
-    //static var scaleFadeIn: AnyTransition = .merge(.scale(0.8, anchor: .center), .opacity)
     
     static func opacity(_ value: Double = 0) -> AnyTransition {
         .modifier(
@@ -51,6 +42,13 @@ public extension AnyTransition {
     
     static func scale(_ amount: Double = 0, anchor: UnitPoint = .center) -> AnyTransition {
         .scale(scale: amount, anchor: anchor)
+    }
+    
+    static func offset(_ simd: SIMD2<Double>) -> AnyTransition {
+        .modifier(
+            active: OffsetModifier(offset: simd),
+            identity: OffsetModifier(offset: .zero)
+        )
     }
     
     static func scale(x: Double = 1, y: Double = 1, anchor: UnitPoint = .center) -> AnyTransition {
