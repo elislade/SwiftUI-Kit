@@ -110,7 +110,10 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
                     if hitTestHandle == false {
                         Color.clear
                             .contentShape(Rectangle())
-                            .gesture(gesture(in: proxy.size))
+                            .gesture(
+                                LongPressGesture(minimumDuration: 0.08, maximumDistance: 6)
+                                    .sequenced(before: gesture(in: proxy.size))
+                            )
                     }
                 }
             }

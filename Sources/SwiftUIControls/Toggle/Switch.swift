@@ -31,7 +31,7 @@ public struct Switch<OnLabel: View, OffLabel: View>: View {
         layoutDirectionSuggestion.useVertical
     }
     
-    private var controlFactor: CGFloat {
+    private var controlFactor: Double {
         switch controlSize {
         case .mini: 0.7
         case .small: 0.85

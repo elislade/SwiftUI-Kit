@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct SwitchExamples : View {
+public struct SwitchExamples : View {
 
     @State private var isOn = true
     @State private var disable = false
@@ -26,7 +26,9 @@ struct SwitchExamples : View {
             .foregroundStyle(Color.white)
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Switch"){
             HStack {
                 ExampleCard(title: "SwiftUI") {
@@ -103,4 +105,5 @@ struct SwitchExamples : View {
 
 #Preview("Switch") {
     SwitchExamples()
+        .previewSize()
 }

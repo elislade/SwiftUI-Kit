@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct StepperExamples: View {
+public struct StepperExamples: View {
     
     @State private var value = 0.0
     @State private var disable = false
@@ -10,7 +10,9 @@ struct StepperExamples: View {
     @State private var direction = LayoutDirection.leftToRight
     @State private var directionSuggestion = LayoutDirectionSuggestion.useSystemDefault
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Stepper"){
             VStack(spacing: 10){
                 Text(value, format: .number.rounded(increment: 1))
@@ -74,6 +76,7 @@ struct StepperExamples: View {
 
 #Preview("Stepper") {
     StepperExamples()
+        .previewSize()
 }
 
 

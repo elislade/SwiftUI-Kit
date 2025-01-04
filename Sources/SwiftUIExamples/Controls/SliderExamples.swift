@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct SliderExamples: View {
+public struct SliderExamples: View {
     
     @State private var value: Double = 0
     
@@ -12,7 +12,9 @@ struct SliderExamples: View {
     @State private var controlRoundness: Double = 1
     @State private var animation: Animation?
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Slider"){
             AxisStack(directionSuggestion.useVertical ? .horizontal : .vertical) {
                 ExampleCard(title: "SwiftUI Slider") {
@@ -75,4 +77,5 @@ struct SliderExamples: View {
 
 #Preview("Slider") {
     SliderExamples()
+        .previewSize()
 }

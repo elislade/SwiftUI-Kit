@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct SliderViewExamples : View {
+public struct SliderViewExamples : View {
     
     @State private var direction = LayoutDirection.leftToRight
     @State private var useStepping = false
@@ -22,7 +22,9 @@ struct SliderViewExamples : View {
         SunkenControlMaterial(RoundedRectangle(cornerRadius: radius))
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Slider View"){
             VStack(spacing: spacing) {
                 HStack(spacing: spacing) {
@@ -61,13 +63,16 @@ struct SliderViewExamples : View {
             .environment(\.layoutDirection, direction)
         } parameters: {
             HStack {
-                Text("X ").font(.exampleParameterTitle) + Text(x, format: .number.rounded(increment: 0.01))
-                    .font(.exampleParameterValue)
-                    .foregroundColor(.secondary)
+                Text("Value")
+                    .font(.exampleParameterTitle)
                 
                 Spacer()
                 
-                Text("Y ").font(.exampleParameterTitle) + Text(y, format: .number.rounded(increment: 0.01))
+                Text("X ") + Text(x, format: .number.rounded(increment: 0.01))
+                    .font(.exampleParameterValue)
+                    .foregroundColor(.secondary)
+                
+                Text("Y ") + Text(y, format: .number.rounded(increment: 0.01))
                     .font(.exampleParameterValue)
                     .foregroundColor(.secondary)
             }
@@ -102,4 +107,5 @@ struct SliderViewExamples : View {
 
 #Preview("Slider View") {
     SliderViewExamples()
+        .previewSize()
 }

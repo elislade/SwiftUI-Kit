@@ -10,7 +10,7 @@ public struct Checkbox: View {
     
     @Binding var isOn: Bool
     
-    private var size: CGFloat {
+    private var size: Double {
         switch controlSize {
         case .mini: 20
         case .small: 24

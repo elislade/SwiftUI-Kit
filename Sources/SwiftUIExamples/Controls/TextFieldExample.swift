@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct TextFieldExample: View {
+public struct TextFieldExample: View {
     
     @FocusState private var focusState
     @State private var isFocused: Bool = false
@@ -11,7 +11,9 @@ struct TextFieldExample: View {
     @State private var showLeading = false
     @State private var clearVisibility: TextFieldElementVisibility = .whileEditing
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Text Field"){
             Group {
                 if showLeading {
@@ -85,4 +87,5 @@ struct TextFieldExample: View {
 
 #Preview("Text Field") {
     TextFieldExample()
+        .previewSize()
 }

@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct SegmentedPickerExamples : View {
+public struct SegmentedPickerExamples : View {
     
     private let options = ["A", "B", "C", "D"]
     
@@ -21,7 +21,9 @@ struct SegmentedPickerExamples : View {
         selection = options[i]
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Segmented Control"){
             AxisStack(
                 suggetion.useVertical ? .horizontal : .vertical,
@@ -63,12 +65,12 @@ struct SegmentedPickerExamples : View {
             .padding()
         } parameters: {
             HStack {
-                Text("Test Animation")
+                Text("Actions")
                     .font(.exampleParameterTitle)
                 
                 Spacer()
                 
-                Button("Animate"){
+                Button("Select Next"){
                     set(index: selectionIndex + 1)
                 }
             }
@@ -105,4 +107,5 @@ struct SegmentedPickerExamples : View {
 
 #Preview("Segmented Picker") {
     SegmentedPickerExamples()
+        .previewSize()
 }

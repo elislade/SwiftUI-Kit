@@ -83,15 +83,15 @@ public struct Stepper: View {
         actionTimerCount = 0
     }
     
-    private var linePadding: CGFloat {
+    private var linePadding: Double {
         12 - (12 * interactionGranularity)
     }
     
-    private var dividerPadding: CGFloat {
+    private var dividerPadding: Double {
         12 - (12 * interactionGranularity)
     }
     
-    private var controlFactor: CGFloat {
+    private var controlFactor: Double {
         switch controlSize {
         case .mini: 0.7
         case .small: 0.85
@@ -102,7 +102,7 @@ public struct Stepper: View {
         }
     }
     
-    private var size: CGFloat {
+    private var size: Double {
         (44 - (24 * interactionGranularity)) * controlFactor
     }
     
@@ -253,7 +253,7 @@ public struct Stepper: View {
             }
         }
         
-        private var padding: CGFloat {
+        private var padding: Double {
             (12 - (8 * interactionGranularity)) * controlFactor
         }
         

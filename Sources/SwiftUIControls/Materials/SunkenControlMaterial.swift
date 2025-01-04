@@ -44,7 +44,6 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
         }
         .clipShape(shape)
         .blendMode(isTinted ? .normal : .luminosity)
-
     }
     
 }
@@ -60,6 +59,9 @@ public extension SunkenControlMaterial where Shape == Rectangle {
 
 
 #Preview {
-    SunkenControlMaterial(Circle())
-        .padding()
+    HStack {
+        SunkenControlMaterial(Circle())
+        SunkenControlMaterial(Circle(), isTinted: true)
+    }
+    .padding()
 }

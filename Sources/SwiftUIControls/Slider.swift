@@ -44,13 +44,13 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
         )
     }
     
-    private var handleSize: CGFloat {
+    private var handleSize: Double {
         40 - (26 * interactionGranularity)
     }
     
     public var body: some View {
         SliderView(x: layoutVertical ? nil : _state, y: layoutVertical ? _state : nil){
-            RaisedControlMaterial(handleShape)
+            RaisedControlMaterialSecondary(handleShape)
                 .frame(width: handleSize, height: handleSize)
                 .scaleEffect(y: layoutDirectionSuggestion == .useBottomToTop ? -1 : 1)
         }
@@ -61,8 +61,8 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
                 
                 SunkenControlMaterial(Capsule(), isTinted: true)
                     .scaleEffect(
-                        x: layoutVertical ? 1 : CGFloat(_state.percentComplete),
-                        y: layoutVertical ? CGFloat(_state.percentComplete) : 1,
+                        x: layoutVertical ? 1 : Double(_state.percentComplete),
+                        y: layoutVertical ? Double(_state.percentComplete) : 1,
                         anchor: .init(alignment)
                     )
             }
