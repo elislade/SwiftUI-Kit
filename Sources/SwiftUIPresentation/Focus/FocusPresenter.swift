@@ -37,3 +37,41 @@ struct FocusPresenter<Content: View>: View {
     }
     
 }
+
+
+struct FocusOptionalPresenter<Value : Sendable, Content: View>: View {
+    
+    @Binding var value: Value?
+    let content: @MainActor () -> Content
+    let focusView: @MainActor (Value) -> AnyView
+    let accessory: @MainActor (AutoAnchorState) -> AnyView?
+    
+    nonisolated init(
+        value: Binding<Value?>,
+        @ViewBuilder content: @MainActor @escaping () -> Content,
+        focusView: @MainActor @escaping (Value) -> AnyView,
+        accessory: @MainActor @escaping (AutoAnchorState) -> AnyView? = { _ in nil }
+    ) {
+        self._value = value
+        self.content = content
+        self.focusView = focusView
+        self.accessory = accessory
+    }
+    
+    var body: some View {
+        content()
+            .allowsHitTesting(value == nil)
+            .disabled(value != nil)
+            .opacity(value != nil ? 0 : 1)
+            .presentationValue(
+                value: $value,
+                metadata: FocusPresentationMetadata(
+                    sourceView: AnyView(content()),
+                    accessory: accessory
+                )
+            ){
+                focusView($0)
+            }
+    }
+    
+}
