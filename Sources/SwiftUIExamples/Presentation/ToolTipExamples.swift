@@ -1,12 +1,14 @@
 import SwiftUIKit
 
 
-struct ToolTipExamples: View {
+public struct ToolTipExamples: View {
         
     @State private var isPresented = false
     @State private var edge: Edge = .top
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Tool Tip"){
             ZStack {
                 Color.clear
@@ -54,4 +56,5 @@ struct ToolTipExamples: View {
 
 #Preview {
     ToolTipExamples()
+        .previewSize()
 }

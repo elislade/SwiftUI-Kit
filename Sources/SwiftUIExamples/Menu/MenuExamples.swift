@@ -1,24 +1,26 @@
 import SwiftUIKit
 
 
-struct MenuExamples: View {
+public struct MenuExamples: View {
     
     @State private var selection = "Option B"
     
+    public init() {}
+    
     @ViewBuilder private var menuContent: some View {
         Menu(
-            label: { Text("Item 1").applyMenuItemInsets() },
+            label: { Text("Item 1").paddingAddingMenuItemInsets() },
             content: {
                 Button(action: { print("A") }){
                     Text("A Item")
-                        .applyMenuItemInsets()
+                        .paddingAddingMenuItemInsets()
                 }
             }
         )
         
         MenuDivider()
         
-        Menu(label: { Text("Options").applyMenuItemInsets() }){
+        Menu(label: { Text("Options").paddingAddingMenuItemInsets() }){
             MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
                 Text($0)
             }
@@ -35,8 +37,7 @@ struct MenuExamples: View {
         }
     }
     
-    
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0){
             ScrollView{
                 VStack {

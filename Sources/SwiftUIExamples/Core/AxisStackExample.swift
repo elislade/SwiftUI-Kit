@@ -1,14 +1,16 @@
 import SwiftUIKit
 
 
-struct AxisStackExampleView : View {
+public struct AxisStackExampleView : View {
     
     @State private var axis: Axis = .vertical
     @State private var alignment: Alignment = .center
     @State private var spacing: Double = 0
     @State private var items: [Color] = [.random, .random, .random, .random]
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Axis Stack"){
             AxisStack(axis, alignment: alignment, spacing: spacing){
                 ForEach(items.indices, id: \.self){ i in
@@ -51,4 +53,5 @@ struct AxisStackExampleView : View {
 
 #Preview("Axis Stack") {
     AxisStackExampleView()
+        .previewSize()
 }

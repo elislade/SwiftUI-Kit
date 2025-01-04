@@ -1,13 +1,15 @@
 import SwiftUIKit
 
 
-struct LineShapeExample: View {
+public struct LineShapeExample: View {
     
     @State private var thickness: Double = 6
     @State private var axis: Axis = .vertical
     @State private var anchor: UnitPoint = .center
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Line Shape") {
             LineShape(axis: axis, anchor: anchor)
                 .stroke(lineWidth: thickness)
@@ -88,4 +90,5 @@ struct LineShapeExample: View {
 
 #Preview("Line Shape") {
     LineShapeExample()
+        .previewSize()
 }

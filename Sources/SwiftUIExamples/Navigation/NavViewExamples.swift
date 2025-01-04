@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct NavViewExamples: View {
+public struct NavViewExamples: View {
    
     @State private var layout: LayoutDirection = .leftToRight
     @State private var valueToPresent: Color?
@@ -26,7 +26,7 @@ struct NavViewExamples: View {
     }
     
     
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Nav View"){
             Group {
                 if useCustomTransition {
@@ -39,7 +39,7 @@ struct NavViewExamples: View {
                     }
                 }
             }
-            .childResetAction{ resetAction = $0 }
+            .childResetAction{ _resetAction.wrappedValue = $0 }
             .environment(\.layoutDirection, layout)
         } parameters: {
             Toggle(isOn: $useCustomTransition){
@@ -100,6 +100,7 @@ struct NavViewExamples: View {
 
 #Preview("NavView") {
     NavViewExamples()
+        .previewSize()
 }
 
 

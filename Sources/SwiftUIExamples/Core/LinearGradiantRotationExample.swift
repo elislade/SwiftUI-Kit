@@ -1,11 +1,13 @@
 import SwiftUIKit
 
 
-struct LinearGradiantRotationExample : View {
+public struct LinearGradiantRotationExample : View {
     
     @State private var rotationDegrees: Double = .zero
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 16) {
             RoundedRectangle(cornerRadius: 30)
                 .fill(LinearGradient.rotated(
@@ -25,4 +27,5 @@ struct LinearGradiantRotationExample : View {
 
 #Preview("LinearGradiant Rotation"){
     LinearGradiantRotationExample()
+        .previewSize()
 }

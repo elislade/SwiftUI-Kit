@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct SwipeActionExamples: View {
+public struct SwipeActionExamples: View {
     
     enum Action: String, CaseIterable {
         case delete
@@ -31,8 +31,10 @@ struct SwipeActionExamples: View {
     @State private var activeEdges: HorizontalEdge.Set = .leading
     @State private var layoutDirection: LayoutDirection = .leftToRight
     @State private var cellRadius: Double = 16
-    @State private var leadingActions: [Action] = [.pin]
-    @State private var trailingActions: [Action] = [.archive, .delete]
+    @State private var leadingActions: Set<Action> = [.pin]
+    @State private var trailingActions: Set<Action> = [.archive, .delete]
+    
+    public init() {}
     
     private func activeEdges(at index: Int) -> Binding<HorizontalEdge.Set> {
         if index == 0 {
@@ -67,20 +69,7 @@ struct SwipeActionExamples: View {
         .tint(action.color)
     }
     
-    private func binding(for action: Action, in actions: Binding<[Action]>) -> Binding<Bool> {
-        .init(
-            get: { actions.wrappedValue.contains(action) },
-            set: {
-                if $0 {
-                    actions.wrappedValue.append(action)
-                } else {
-                    actions.wrappedValue.removeAll(where: { $0 == action })
-                }
-            }
-        )
-    }
-    
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Swipe Actions"){
             ScrollView {
                 VStack(spacing: cellRadius == 0 ? 0 : 16) {
@@ -159,7 +148,7 @@ struct SwipeActionExamples: View {
                     Divider()
                     
                     ForEach(Action.allCases, id: \.self){ action in
-                        Toggle(isOn: binding(for: action, in: $leadingActions)){
+                        Toggle(isOn: Binding($leadingActions, contains: action)){
                             view(for: action)
                         }
                         .padding()
@@ -182,7 +171,7 @@ struct SwipeActionExamples: View {
                     Divider()
                     
                     ForEach(Action.allCases, id: \.self){ action in
-                        Toggle(isOn: binding(for: action, in: $trailingActions)){
+                        Toggle(isOn: Binding($trailingActions, contains: action)){
                             view(for: action)
                         }
                         .padding()
@@ -232,4 +221,5 @@ struct SwipeActionExamples: View {
 
 #Preview {
     SwipeActionExamples()
+        .previewSize()
 }

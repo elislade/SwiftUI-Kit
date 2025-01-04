@@ -1,25 +1,14 @@
 import SwiftUIKit
 
 
-struct ContextMenuExamples: View  {
+public struct ContextMenuExamples: View  {
         
     @State private var presentedIndices: Set<Int> = []
     @State private var tint: Color = .random
     
-    private func binding(for index: Int) -> Binding<Bool> {
-        .init(
-            get: { presentedIndices.contains(index) },
-            set: {
-                if $0 {
-                    presentedIndices.insert(index)
-                } else {
-                    presentedIndices.remove(index)
-                }
-            }
-        )
-    }
+    public init() {}
     
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
             ScrollView {
                 LazyVGrid(columns: [.init(.adaptive(minimum: 100, maximum: 180))]){
@@ -29,10 +18,10 @@ struct ContextMenuExamples: View  {
                             .opacity(0.1 + Double(i) / 15)
                             .background(.background)
                             .aspectRatio(1, contentMode: .fit)
-                            .contextCustomMenu(isPresented: binding(for: i)) {
+                            .contextCustomMenu(isPresented: Binding($presentedIndices, contains:  i)) {
                                 Button(action: {}){
                                     Text("Item A")
-                                        .applyMenuItemInsets()
+                                        .paddingAddingMenuItemInsets()
                                 }
                                 
                                 MenuGroupDivider()

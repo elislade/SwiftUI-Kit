@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct BasicExamples: View {
+public struct BasicExamples: View {
     
     @State private var isPresented = false
     @State private var anchor: UnitPoint = .bottom
@@ -22,7 +22,9 @@ struct BasicExamples: View {
         return result
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Basic Presentation"){
             Button("Show Presented View"){
                 isPresented.toggle()
@@ -124,4 +126,5 @@ struct BasicExamples: View {
 
 #Preview("Basic Presentation") {
     BasicExamples()
+        .previewSize()
 }

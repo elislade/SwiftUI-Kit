@@ -8,20 +8,9 @@ struct ReadableScrollViewExample : View {
     @State private var offset = CGPoint()
     @State private var axis: Axis.Set = [.vertical]
     
-    private func binding(for axis: Axis.Set) -> Binding<Bool> {
-        .init(
-            get: { self.axis.contains(axis) },
-            set: {
-                if $0 {
-                    self.axis.formUnion(axis)
-                } else {
-                    self.axis.remove(axis)
-                }
-            }
-        )
-    }
+    public init() {}
     
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Readable Scroll View"){
             ReadableScrollView(
                 axis,
@@ -72,9 +61,9 @@ struct ReadableScrollViewExample : View {
                 .font(.title[.semibold][.monospacedDigit])
                 .symbolRenderingMode(.hierarchical)
             }
-            .childResetAction{ resetAction = $0 }
+            .childResetAction{ _resetAction.wrappedValue = $0 }
         } parameters: {
-            Toggle(isOn: binding(for: .horizontal)){
+            Toggle(isOn: Binding($axis, contains: .horizontal)){
                 Text("Horizontal Axis")
                     .font(.exampleParameterTitle)
             }
@@ -82,7 +71,7 @@ struct ReadableScrollViewExample : View {
             
             Divider()
             
-            Toggle(isOn: binding(for: .vertical)){
+            Toggle(isOn: Binding($axis, contains: .vertical)){
                 Text("Vertical Axis")
                     .font(.exampleParameterTitle)
             }
@@ -125,4 +114,5 @@ struct ReadableScrollViewExample : View {
 
 #Preview("Readable Scroll View") {
     ReadableScrollViewExample()
+        .previewSize()
 }

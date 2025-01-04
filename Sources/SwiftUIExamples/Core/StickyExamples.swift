@@ -123,7 +123,7 @@ struct StickyExamples  {
         var body: some View {
             ScrollViewReader{ proxy in
                 ScrollView([.horizontal, .vertical]){
-                    GridView(0..<numberOfItems, spacing: 1, columns: 6){ i in
+                    AlignmentGuideGrid(0..<numberOfItems, spacing: 1, columns: 6){ i in
                         let isSticking = self.isSticking.contains(i)
                         
                         Button(action: { action(for: i) }){
@@ -214,62 +214,74 @@ struct StickyExamples  {
     struct CategoryMask: View {
         
         var body: some View {
-            ScrollView{
-                VStack(spacing: 16) {
-                    Rectangle()
-                        .frame(height: 100)
-                    
-                    HStack {
-                        Spacer()
+            VStack {
+                ScrollView{
+                    VStack(spacing: 16) {
+                        Rectangle()
+                            .frame(height: 100)
+                        
+                        HStack {
+                            Spacer()
+                            
+                            Rectangle()
+                                .aspectRatio(2, contentMode: .fit)
+                                .sticky(edges: .top, categoryMask: .span1)
+                            
+                            Spacer()
+                            
+                            Rectangle()
+                                .aspectRatio(0.6, contentMode: .fit)
+                                .sticky(edges: .top, inset: 10, categoryMask: .span2)
+                            
+                            Spacer()
+                        }
+                        .opacity(0.8)
                         
                         Rectangle()
-                            .aspectRatio(2, contentMode: .fit)
-                            .sticky(edges: .top, categoryMask: .span1)
+                            .frame(height: 100)
+                            .opacity(0.6)
                         
-                        Spacer()
+                        HStack {
+                            Spacer()
+                            
+                            Rectangle()
+                                .aspectRatio(2, contentMode: .fit)
+                                .sticky(edges: .top, categoryMask: .span1)
+                            
+                            Spacer()
+                            
+                            Rectangle()
+                                .aspectRatio(0.6, contentMode: .fit)
+                                .sticky(edges: .top, inset: 40, categoryMask: .span2)
+                            
+                            Spacer()
+                        }
+                        .foregroundStyle(Color(white: 0.6))
                         
                         Rectangle()
-                            .aspectRatio(0.6, contentMode: .fit)
-                            .sticky(edges: .top, inset: 10, categoryMask: .span2)
+                            .opacity(0.2)
+                            .frame(height: 800)
+                            .sticky(edges: .top, categoryMask: .fullSpan)
                         
-                        Spacer()
+                        Rectangle()
+                            .opacity(0)
+                            .frame(height: 1)
+                            .sticky(edges: .top, categoryMask: .fullSpan)
+                        
                     }
-                    .opacity(0.8)
-                    
-                    Rectangle()
-                        .frame(height: 100)
-                        .opacity(0.6)
-                    
-                    HStack {
-                        Spacer()
-                        
-                        Rectangle()
-                            .aspectRatio(2, contentMode: .fit)
-                            .sticky(edges: .top, categoryMask: .span1)
-                        
-                        Spacer()
-                        
-                        Rectangle()
-                            .aspectRatio(0.6, contentMode: .fit)
-                            .sticky(edges: .top, inset: 40, categoryMask: .span2)
-                        
-                        Spacer()
-                    }
-                    .foregroundStyle(Color(white: 0.6))
-                    
-                    Rectangle()
-                        .opacity(0.2)
-                        .frame(height: 800)
-                        .sticky(edges: .top, categoryMask: .fullSpan)
-                    
-                    Rectangle()
-                        .opacity(0)
-                        .frame(height: 1)
-                        .sticky(edges: .top, categoryMask: .fullSpan)
-                    
                 }
+                .stickyContext()
+                .background{ Color.secondary.opacity(0.2) }
+                .overlay{
+                    RoundedRectangle(cornerRadius: 30)
+                        .strokeBorder()
+                        .opacity(0.2)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 30))
+                
+                ExampleTitle("Sticky Category Mask")
             }
-            .stickyContext()
+            .padding()
         }
     }
     
@@ -278,10 +290,12 @@ struct StickyExamples  {
 
 #Preview("Sticky Example") {
     StickyExamples.Sticky()
+        .previewSize()
 }
 
 #Preview("Sticky Category Mask") {
     StickyExamples.CategoryMask()
+        .previewSize()
 }
 
 fileprivate extension StickyCategoryMask {

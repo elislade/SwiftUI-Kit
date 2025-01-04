@@ -3,33 +3,47 @@ import SwiftUIKit
 
 public struct IndirectScrollExample: View {
     
+    @State private var hue: Double = .random(in: 0...1)
+    @State private var scroll: SIMD2<Double> = .zero
+    @State private var useMomentum: Bool = false
+    
     public init() {}
     
     public var body: some View {
-        InlineBinding(CGPoint.zero){ value in
+        VStack(spacing: 0) {
             ZStack {
-                Color.clear
-                    .contentShape(Rectangle())
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(.gray.opacity(0.2))
                 
                 RoundedRectangle(cornerRadius: 30)
-                    .fill(.gray)
-                    .offset(x: value.wrappedValue.x, y: value.wrappedValue.y)
-                    .padding()
+                    .fill(Color(hue: hue, saturation: 1, brightness: 0.8))
+                    .offset(x: scroll.x, y: scroll.y)
                 
-                Button("Test"){}
+                Button("Child Responder Test"){
+                    hue = .random(in: 0...1)
+                }
             }
             .indirectGesture(
-                IndirectScrollGesture(useMomentum: false)
+                IndirectScrollGesture(useMomentum: useMomentum)
                     .onChanged { g in
-                        value.x.wrappedValue += g.deltaX
-                        value.y.wrappedValue += g.deltaY
+                        scroll += g.delta
                     }
                     .onEnded { g in
                         withAnimation(.snappy){
-                            value.wrappedValue = .zero
+                            scroll = .zero
                         }
                     }
             )
+            .padding()
+            
+            ExampleTitle("Indirect Scroll")
+            
+            Toggle(isOn: $useMomentum){
+                Text("Use Momentum")
+                    .font(.exampleParameterTitle)
+            }
+            .padding()
+            .toggleStyle(.swiftUIKitSwitch)
         }
     }
     
@@ -38,4 +52,5 @@ public struct IndirectScrollExample: View {
 
 #Preview {
     IndirectScrollExample()
+        .previewSize()
 }

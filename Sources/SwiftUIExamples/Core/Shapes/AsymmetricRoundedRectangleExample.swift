@@ -1,14 +1,16 @@
 import SwiftUIKit
 
 
-struct AsymmetricRoundedRectangleExamples: View {
+public struct AsymmetricRoundedRectangleExamples: View {
     
     @State private var inset: Double = 16
     @State private var values = RadiusValues(30)
     
     private let radiusRange = 0.0...180.0
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Asymmetric Rounded Rectangle"){
             ZStack {
                 AsymmetricRoundedRectangle(values: values)
@@ -124,7 +126,7 @@ struct AsymmetricRoundedRectangleExamples: View {
                 Divider()
             }
         }
-        .animation(.smooth, value: values)
+        .animation(.interactiveSpring, value: values)
     }
     
 }
@@ -132,4 +134,5 @@ struct AsymmetricRoundedRectangleExamples: View {
 
 #Preview("Asymmetric Rounded Rectangle") {
     AsymmetricRoundedRectangleExamples()
+        .previewSize()
 }

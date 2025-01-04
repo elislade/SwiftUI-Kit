@@ -1,11 +1,13 @@
 import SwiftUIKit
 
 
-struct InlineStateExample: View {
+public struct InlineStateExample: View {
     
     @State private var changeIdentity = 0
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
             InlineState(UUID()){ id in
                 ZStack {
@@ -15,13 +17,20 @@ struct InlineStateExample: View {
                         .blendMode(.exclusion)
                 }
                 .id(changeIdentity)
-                .onTapGesture {
-                    changeIdentity += 1
-                }
             }
             
             ExampleTitle("Inline State")
-                .padding()
+                .padding([.horizontal, .top])
+            
+            HStack {
+                Text("Actions")
+                    .font(.exampleParameterTitle)
+                
+                Spacer()
+                
+                Button("Change Identity") { changeIdentity += 1 }
+            }
+            .padding()
         }
     }
     
@@ -29,4 +38,5 @@ struct InlineStateExample: View {
 
 #Preview {
     InlineStateExample()
+        .previewSize()
 }

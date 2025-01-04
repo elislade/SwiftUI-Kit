@@ -1,23 +1,30 @@
 import SwiftUIKit
 
 
-struct InlineBindingExample: View {
+public struct InlineBindingExample: View {
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
             InlineBinding(ColorScheme.light){ binding in
-                Text(binding.wrappedValue == .dark ? "Dark" : "Light")
-                    .font(.largeTitle.weight(.heavy))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background()
-                    .environment(\.colorScheme, binding.wrappedValue)
-                    .onTapGesture {
-                        if binding.wrappedValue == .dark {
-                            binding.wrappedValue = .light
-                        } else {
-                            binding.wrappedValue = .dark
-                        }
+                ZStack {
+                    Rectangle()
+                        .fill(.background)
+                        .ignoresSafeArea()
+                    
+                    SegmentedPicker(
+                        selection: binding.animation(.bouncy),
+                        items: [.light, .dark]
+                    ){ scheme in
+                        Text("\(scheme)".capitalized)
+                            .font(.title3[.bold])
                     }
+                    .frame(width: 200)
+                    .controlSize(.large)
+                    .controlRoundness(1)
+                }
+                .environment(\.colorScheme, binding.wrappedValue)
             }
             
             Divider().ignoresSafeArea()
@@ -31,4 +38,5 @@ struct InlineBindingExample: View {
 
 #Preview {
     InlineBindingExample()
+        .previewSize()
 }

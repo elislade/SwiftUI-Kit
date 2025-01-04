@@ -1,37 +1,29 @@
 import SwiftUIKit
 
 
-struct FocusExamples : View {
+public struct FocusExamples : View {
 
     @State private var presentedIndices: Set<Int> = []
     @State private var useAccessory = false
     @State private var useCustomFocusedView = false
     
-    private func binding(for index: Int) -> Binding<Bool> {
-        .init(
-            get: { presentedIndices.contains(index) },
-            set: {
-                if $0 {
-                    presentedIndices.insert(index)
-                } else {
-                    presentedIndices.remove(index)
-                }
-            }
-        )
-    }
+    public init() {}
     
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Focus Presentation"){
             ZStack {
                 Color.clear
                 
                 LazyVGrid(columns: [.init(.adaptive(minimum: 90, maximum: 120))]){
                     ForEach(0...8){ i in
-                        Button(action: { binding(for: i).wrappedValue.toggle() }){
+                        Button(action: {
+                            Binding($presentedIndices, contains: i).wrappedValue.toggle()
+                        }){
                             RoundedRectangle(cornerRadius: 20)
                                 .aspectRatio(1.3, contentMode: .fit)
                                 .scaleEffect(presentedIndices.contains(i) ? 1.1 : 1)
                         }
+                        .buttonStyle(.plain)
                         .presentationBackground {
                             Rectangle().fill(.tint)
                                 .colorInvert()
@@ -40,7 +32,7 @@ struct FocusExamples : View {
 //                                .fill(.black)
 //                                .blendMode(.saturation)
                         }
-                        .focusPresentation(isPresented: binding(for: i)){ state in
+                        .focusPresentation(isPresented: Binding($presentedIndices, contains: i)){ state in
                             TipView(next: { presentedIndices = [i+1] })
                                 .padding(.init(state.edge))
                         }
@@ -118,4 +110,5 @@ struct FocusExamples : View {
 
 #Preview("Focus Examples"){
     FocusExamples()
+        .previewSize()
 }

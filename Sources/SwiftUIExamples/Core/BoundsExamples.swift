@@ -1,13 +1,15 @@
 import SwiftUIKit
 
 
-struct BoundsExamples: View {
+public struct BoundsExamples: View {
 
     @State private var randomStartLocations: [CGPoint] = []
     @State private var bounds: [CGRect] = []
     @State private var boundIndicesTouching: Set<Int> = []
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
             GeometryReader { proxy in
                 ZStack {
@@ -119,4 +121,5 @@ struct BoundsExamples: View {
 
 #Preview("Bounds") {
     BoundsExamples()
+        .previewSize()
 }

@@ -10,20 +10,10 @@ struct SystemUIOverrideExamples: View {
     @State private var mask: SystemUIMask = .bars
     
     private func view(_ label: String, for mask: SystemUIMask) -> some View {
-         Toggle(isOn: .init(
-            get: { self.mask.contains(mask) },
-            set: {
-                if $0 {
-                    self.mask.insert(mask)
-                } else {
-                    self.mask.remove(mask)
-                }
-            }
-        )){
+        Toggle(isOn: Binding($mask, contains: mask)){
             Text(label)
                 .font(.exampleParameterTitle)
-        }
-        .padding()
+        }.padding()
     }
     
     
@@ -68,19 +58,21 @@ struct SystemUIOverrideExamples: View {
             
             Divider()
             
-            view("Status Bar", for: .sceneStatusbar)
-            Divider()
-            
-            view("Tab Bar", for: .tabbar)
-            Divider()
-            
-            view("Tool Bar", for: .bottomToolbar)
-            Divider()
-            
-            view("Navigation Bar", for: .navigationTitlebar)
-            Divider()
-            
-            view("Alert", for: .alert)
+            ExampleSection("UI Mask", isExpanded: true){
+                view("Status Bar", for: .sceneStatusbar)
+                Divider()
+                
+                view("Tab Bar", for: .tabbar)
+                Divider()
+                
+                view("Tool Bar", for: .bottomToolbar)
+                Divider()
+                
+                view("Navigation Bar", for: .navigationTitlebar)
+                Divider()
+                
+                view("Alert", for: .alert)
+            }
         }
     }
     

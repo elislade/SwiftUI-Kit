@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct ViewLooperExample: View {
+public struct ViewLooperExample: View {
     
     @State private var axis: Axis = .horizontal
     @State private var feather = true
@@ -25,7 +25,9 @@ struct ViewLooperExample: View {
         }
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "View Looper"){
             ViewLooper(
                 axis,
@@ -34,7 +36,7 @@ struct ViewLooperExample: View {
                 featherMask: feather
             ) {
                 Text("Supercalifragilisticexpialidocious".capitalized)
-                    .font(.system(size: 8, design: .serif).bold().italic())
+                    .font(.system(size: 18, design: .serif).bold().italic())
                     .lineLimit(1)
                     .padding(.horizontal)
             }
@@ -108,4 +110,5 @@ struct ViewLooperExample: View {
 
 #Preview("View Looper") {
     ViewLooperExample()
+        .previewSize()
 }

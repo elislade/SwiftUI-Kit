@@ -6,7 +6,9 @@ struct ResetActionExamples: View {
     @State private var resetAction: ResetAction?
     @State private var resetAll = false
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
             ZStack {
                 Color.clear
@@ -20,11 +22,12 @@ struct ResetActionExamples: View {
                 }
                 .padding()
                 .childResetAction { action in
-                    resetAction = action
-                    
+                    _resetAction.wrappedValue = action
+                }
+                .onChangePolyfill(of: resetAction){
                     if resetAll {
-                        if let action {
-                            action()
+                        if let resetAction {
+                            resetAction()
                         } else {
                             resetAll = false
                         }
@@ -39,7 +42,7 @@ struct ResetActionExamples: View {
                 ExampleTitle("Reset Action")
                     .padding(.vertical)
                 
-                HStack(spacing: 16) {
+                HStack {
                     Text("Actions")
                         .font(.exampleParameterTitle)
                     
@@ -76,4 +79,5 @@ struct ResetActionExamples: View {
 
 #Preview("ResetAction Example") {
     ResetActionExamples()
+        .previewSize()
 }

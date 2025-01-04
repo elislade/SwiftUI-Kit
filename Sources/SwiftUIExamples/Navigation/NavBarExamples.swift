@@ -1,68 +1,56 @@
 import SwiftUIKit
 
 
-struct NavBarExamples: View {
+public struct NavBarExamples: View {
     
-    @State private var customBarColor: Color = .random
     @State private var barHidden = false
     @State private var showBackAction = false
     @State private var visiblePlacements = Set(NavBarItemMetadata.Placement.allCases)
-    
     @State private var accessorySelection = "A"
     
-    private var backAction: Optional<@Sendable () -> Void> {
-        return showBackAction ? Optional<@Sendable () -> Void>({
-            DispatchQueue.main.async{
-                showBackAction = false
-            }
-        }) : Optional<@Sendable () -> Void>(nil)
-    }
-    
-    private func view(for placement: NavBarItemMetadata.Placement) -> some View {
-        Toggle(isOn: .init(
-            get: { visiblePlacements.contains(placement) },
-            set: {
-                if $0 {
-                    visiblePlacements.insert(placement)
-                } else {
-                    visiblePlacements.remove(placement)
-                }
-            }
-        )){
+    private func toggle(for placement: NavBarItemMetadata.Placement) -> some View {
+        Toggle(isOn: Binding($visiblePlacements, contains: placement)){
             Text("Show \(placement)")
                 .font(.exampleParameterTitle)
         }
         .padding()
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "NavBar"){
-            NavBarContainer(backAction: backAction){
-                ZStack {
-                    Color.clear
-                    
-                    Image(systemName: "photo.fill")
-                        .font(.system(size: 72))
-                        .opacity(0.2)
+            NavBarContainer(backAction: .init(visible: showBackAction, action: {
+                DispatchQueue.main.async{
+                    showBackAction = false
                 }
-                .navBar(.trailing, identity: .stable) {
+            })){
+                ScrollView {
+                    LinearGradient(
+                        colors: [.clear, .accentColor.opacity(0.6)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 1000)
+                }
+                .navBar(.trailing) {
                     if visiblePlacements.contains(.trailing) {
-                        StableIdentityView()
+                        TrailingView()
                     }
                 }
-                .navBar(.leading, identity: .changeOnUpdate) {
+                .navBar(.leading) {
                     if visiblePlacements.contains(.leading) {
                         Button("Leading \(accessorySelection)", action: {})
                     }
                 }
-                .navBar(.title, identity: .custom(visiblePlacements.contains(.title))) {
+                .navBar(.title) {
                     if visiblePlacements.contains(.title) {
                         Text("Title")
                             .font(.title2[.bold])
                             .lineLimit(1)
                     }
                 }
-                .navBar(.accessory, identity: .changeOnUpdate){
+                .navBar(.accessory){
                     if visiblePlacements.contains(.accessory) {
                         SegmentedPicker(
                             selection: $accessorySelection.animation(.smooth),
@@ -71,28 +59,18 @@ struct NavBarExamples: View {
                             Text($0)
                         }
                         .controlRoundness(0.6)
+                        .transitions(.move(edge: .top).animation(.bouncy), .blur(radius: 10), .opacity)
                     }
                 }
                 .navBarHidden(barHidden)
                 .navBarMaterial{
-                    VStack(spacing: 0){
-                        customBarColor
-                            .opacity(0.8)
-                            .saturation(0.1)
-                        Divider()
-                    }
+                    Color.primary.opacity(0.05)
                 }
             }
+            .animation(.smooth, value: visiblePlacements)
+            .presentationIdentityBehaviour(.changeOnUpdate)
         } parameters: {
             ExampleSection("Bar", isExpanded: true){
-                ColorPicker(selection: $customBarColor){
-                    Text("Color")
-                        .font(.exampleParameterTitle)
-                }
-                .padding()
-                
-                Divider()
-               
                 Toggle(isOn: $barHidden){
                     Text("Hide")
                         .font(.exampleParameterTitle)
@@ -112,27 +90,33 @@ struct NavBarExamples: View {
             
             ExampleSection("Placements", isExpanded: true){
                 Divider()
-                view(for: .leading)
+                toggle(for: .leading)
                 Divider()
-                view(for: .title)
+                toggle(for: .title)
                 Divider()
-                view(for: .trailing)
+                toggle(for: .trailing)
                 Divider()
-                view(for: .accessory)
+                toggle(for: .accessory)
             }
             .disabled(barHidden)
         }
     }
     
     
-    struct StableIdentityView: View {
+    struct TrailingView: View {
         
         @State private var arbitraryState = false
         
         var body: some View {
-            Toggle(arbitraryState ? "Unselect" : "Select", isOn: $arbitraryState)
-                //.contentTransitionIdentity()
-                //.animation(.smooth, value: arbitraryState)
+            Toggle(isOn: $arbitraryState.animation(.bouncy)){
+                if arbitraryState {
+                    Text("Unselect")
+                        .transition(.scale)
+                } else {
+                    Text("Select")
+                        .transition(.scale)
+                }
+            }
         }
         
     }
@@ -141,4 +125,5 @@ struct NavBarExamples: View {
 
 #Preview("NavBar") {
     NavBarExamples()
+        .previewSize()
 }

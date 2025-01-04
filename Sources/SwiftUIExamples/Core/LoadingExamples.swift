@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct LoadingExamples: View {
+public struct LoadingExamples: View {
     
     @State private var layoutDirection: LayoutDirection = .leftToRight
     @State private var loadingIndefinite = true
@@ -15,7 +15,9 @@ struct LoadingExamples: View {
         }
     }
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Loading"){
             VStack(spacing: 30) {
                 LoadingCircle(state: loadingState)
@@ -65,4 +67,5 @@ struct LoadingExamples: View {
 
 #Preview("Loading") {
     LoadingExamples()
+        .previewSize()
 }

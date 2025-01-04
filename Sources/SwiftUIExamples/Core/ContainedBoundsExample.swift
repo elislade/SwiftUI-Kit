@@ -1,29 +1,38 @@
 import SwiftUIKit
 
-struct ContainedBoundsExample: View {
+
+public struct ContainedBoundsExample: View {
     
-    var body: some View {
-        VStack {
-            Color.clear
-            
-            ScrollView {
-                VStack(spacing: 0.5) {
-                    ForEach(0...100){ i in
-                        Cell(i: i)
-                        Divider()
+    public init() {}
+    
+    public var body: some View {
+        VStack(spacing: 30) {
+            RoundedRectangle(cornerRadius: 30)
+                .fill(.secondary.opacity(0.2))
+                .overlay {
+                    VStack(spacing: 0) {
+                        Spacer()
+                        
+                        ScrollView {
+                            VStack(spacing: 1) {
+                                ForEach(0...100){ i in
+                                    Cell(i: i)
+                                }
+                            }
+                        }
+                        .containedBoundsContext("Test")
+                        .scrollClipDisabledPolyfill()
+                        .border(.tint, width: 2)
+                        .aspectRatio(2, contentMode: .fit)
+                        
+                        Spacer()
                     }
                 }
-            }
-            .containedBoundsContext("Test")
-            .scrollClipDisabledPolyfill()
-            .border(.tint, width: 6)
-            
-            Color.clear
-        }
-        .overlay(alignment: .bottom) {
+                .clipShape(RoundedRectangle(cornerRadius: 30))
+
             ExampleTitle("Contained Bounds")
-                .padding()
         }
+        .padding()
     }
     
     
@@ -57,4 +66,5 @@ struct ContainedBoundsExample: View {
 
 #Preview("Contained Bounds") {
     ContainedBoundsExample()
+        .previewSize()
 }

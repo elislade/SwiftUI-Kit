@@ -13,7 +13,7 @@ struct ExampleTitle: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)
                 .frame(width: 16, height: 10)
-                .transformEffect(.init(1, 0, -0.3, 1, 0, 0))
+                .shearHorizontal(.degrees(-20))
             
             Text(title)
                 .font(.exampleTitle)
@@ -24,7 +24,7 @@ struct ExampleTitle: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)
                 .frame(height: 10)
-                .transformEffect(.init(1, 0, -0.3, 1, 0, 0))
+                .shearHorizontal(.degrees(-20))
         }
     }
     

@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-struct AnchorPresentationExample : View   {
+public struct AnchorPresentationExample : View   {
     
     @State private var direction: LayoutDirection = .leftToRight
     @State private var sourceAnchor: UnitPoint = .center
@@ -16,6 +16,8 @@ struct AnchorPresentationExample : View   {
     private let sourceTint = Color.blue
     private let presentedTint = Color.pink
     
+    public init() {}
+    
     private var sourceView: some View {
         Button(action: { isPresented = true }){
             RoundedRectangle(cornerRadius: 20)
@@ -26,10 +28,10 @@ struct AnchorPresentationExample : View   {
         .environment(\.layoutDirection, direction)
     }
     
-    var body: some View {
+    public var body: some View {
         ExampleView(
-            title: "Anchor Presentation",
-            maxSize: .init(width: CGFloat.infinity, height: 500)
+            title: "Anchor Presentation"//,
+            //maxSize: .init(width: CGFloat.infinity, height: 500)
         ){
             ZStack {
                 Color.clear
@@ -176,4 +178,5 @@ struct AnchorPresentationExample : View   {
 
 #Preview("Anchor Presentation") {
     AnchorPresentationExample()
+        .previewSize()
 }

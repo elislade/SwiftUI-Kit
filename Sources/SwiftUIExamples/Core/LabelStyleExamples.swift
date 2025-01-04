@@ -1,13 +1,15 @@
 import SwiftUIKit
 
 
-struct LabelStyleExamples: View {
+public struct LabelStyleExamples: View {
     
     @State private var suggestion: LayoutDirectionSuggestion = .useSystemDefault
     @State private var size = CGSize(width: 40, height: 40)
     @State private var prefersTitle: Bool = true
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Label That Fits"){
             HStack {
                 Label{
@@ -61,8 +63,8 @@ struct LabelStyleExamples: View {
                 }
                 
                 HStack {
-                    Slider(value: $size.width, in: 100...400)
-                    Slider(value: $size.height, in: 100...400)
+                    Slider(value: $size.width, in: 100...800)
+                    Slider(value: $size.height, in: 100...800)
                 }
             }
             .padding()
@@ -95,4 +97,5 @@ struct LabelStyleExamples: View {
 
 #Preview("Label Styles") {
     LabelStyleExamples()
+        .previewSize()
 }

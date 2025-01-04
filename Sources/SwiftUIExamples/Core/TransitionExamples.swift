@@ -1,12 +1,14 @@
 import SwiftUIKit
 
 
-struct TransitionExamples: View {
+public struct TransitionExamples: View {
     
     @State private var transitions: [AnyTransition] = []
     @State private var show = false
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Transitions"){
             VStack(spacing: 0) {
                 ZStack {
@@ -354,4 +356,5 @@ struct TransitionExamples: View {
 
 #Preview("Transitions") {
     TransitionExamples()
+        .previewSize()
 }

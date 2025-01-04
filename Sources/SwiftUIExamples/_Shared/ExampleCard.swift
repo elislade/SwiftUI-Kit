@@ -27,4 +27,5 @@ struct ExampleCard<C: View>: View {
     ExampleCard(title: "Example Card"){
         Button("Content"){}
     }
+    .padding()
 }
