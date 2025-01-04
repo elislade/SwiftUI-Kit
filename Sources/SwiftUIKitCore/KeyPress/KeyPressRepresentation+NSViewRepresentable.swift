@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if canImport(AppKit)  && !targetEnvironment(macCatalyst)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
 extension KeyPressRepresentation: NSViewRepresentable {
     

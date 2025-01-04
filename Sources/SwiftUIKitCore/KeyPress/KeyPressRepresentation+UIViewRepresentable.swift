@@ -153,14 +153,12 @@ extension KeyPress {
     @MainActor init?(event: UIPressesEvent, repeated: Bool = false){
         let keys = event.allPresses.sorted(by: { $0.timestamp < $1.timestamp }).compactMap(\.key)
         
-        // TODO: Report bug to Apple: Caps Lock will not recognize as a persistent modifier with live previews in Xcode, but will work in simulator and on device.
         guard
             let key = keys.last(where: { !$0.charactersIgnoringModifiers.isEmpty }),
             let phase = event.allPresses.compactMap(\.phase).first,
-            let keyChar = key.charactersIgnoringModifiers.first,
+            let keyChar = key.characters.first,
             let mappedPhase: KeyPress.Phases = .init(phase: phase)
         else {
-            print("Fail Press")
             return nil
         }
 
@@ -169,11 +167,11 @@ extension KeyPress {
         } else {
             self.phase = mappedPhase
         }
-
+        
         self.modifiers = .init(flags: key.modifierFlags)
 
         if let keyFromCode = KeyEquivalent(key.keyCode) {
-            self.characters = ""
+            self.characters = key.charactersIgnoringModifiers
             self.key = keyFromCode
         } else {
             self.key = .init(keyChar)
