@@ -66,12 +66,11 @@ public struct RadiusValues: Hashable, Animatable, Sendable {
             return AnimatableData(top, bottom)
         }
         set {
-            let top = newValue.first
-            let bottom = newValue.second
-            topLeft = top.first
-            topRight = top.second
-            bottomLeft = bottom.first
-            bottomRight = bottom.second
+            topLeft = newValue.first.first
+            topRight = newValue.first.second
+            
+            bottomLeft = newValue.second.first
+            bottomRight = newValue.second.second
         }
     }
     

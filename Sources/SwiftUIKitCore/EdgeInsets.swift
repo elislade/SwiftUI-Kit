@@ -76,15 +76,19 @@ public struct OptionalEdgeInsets: Hashable, Sendable, EdgeConformance {
 
 extension OptionalEdgeInsets: Animatable {
     
+    public typealias VerticalData = AnimatablePair<Double, Double>
+    public typealias HorizontalData = AnimatablePair<Double, Double>
+    
     /// The type defining the data to animate.
-    public typealias AnimatableData = AnimatablePair<AnimatablePair<CGFloat,CGFloat>, AnimatablePair<CGFloat, CGFloat>>
+    public typealias AnimatableData = AnimatablePair<VerticalData, HorizontalData>
 
     /// The data to animate.
     public var animatableData: AnimatableData {
         get {
-            let v = AnimatablePair(top ?? 0, bottom ?? 0)
-            let h = AnimatablePair(leading ?? 0, trailing ?? 0)
-            return AnimatablePair(v, h)
+            AnimatableData(
+                VerticalData(top ?? 0, bottom ?? 0),
+                HorizontalData(leading ?? 0, trailing ?? 0)
+            )
         }
         set {
             let v = newValue.first
