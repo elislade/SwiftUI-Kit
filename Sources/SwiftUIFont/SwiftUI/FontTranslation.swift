@@ -6,7 +6,7 @@ import SwiftUI
 
 public extension Font.TextStyle {
     
-    init(closestToStaticSize size: CGFloat, in envrionment: EnvironmentValues = .init()) {
+    init(closestToStaticSize size: Double, in envrionment: EnvironmentValues = .init()) {
         
         let allValues = Self.allCases.map(\.baseSize)
         let distanceToValues: [(distance: Double, index: Int)] = allValues.indices.map{ i in

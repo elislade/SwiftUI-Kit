@@ -4,13 +4,13 @@
 import CoreText
 import SwiftUI
 
-final class CTFontResolver : FontResolver  {
+public final class CTFontResolver : FontResolver  {
     
     
-    init() { }
+    public init() { }
     
     
-    private func symbolic(for trait: Font.Trait) -> CTFontSymbolicTraits? {
+    private func symbolic(for trait: FontTrait) -> CTFontSymbolicTraits? {
         switch trait {
         case .italic: .traitItalic
         case .smallCaps: nil
@@ -40,7 +40,7 @@ final class CTFontResolver : FontResolver  {
         ] as CFDictionary
     }
     
-    func resolve(resource: FontResource, with parameters: FontParameters) -> ResolvedFont {
+    public func resolve(resource: FontResource, with parameters: FontParameters) -> ResolvedFont {
         let attributes = resolveAttributes(resource: resource, for: parameters)
         let descriptor = CTFontDescriptorCreateWithAttributes(attributes)
         let fontBeforeApplyingAttributesAndSymbolicTraits = CTFontCreateWithFontDescriptor(descriptor, parameters.size, .none)

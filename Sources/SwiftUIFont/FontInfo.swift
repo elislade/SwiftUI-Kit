@@ -1,5 +1,6 @@
 import Foundation
 
+
 public struct FontInfo: Hashable, Codable, Sendable {
     
     public let supportedLanguageCodes: [String]
@@ -33,13 +34,13 @@ public struct FontInfo: Hashable, Codable, Sendable {
     public let manufacturer: String
     
     public let designer: String
-    public let designerURL: URL?
+    public let designerURL: FontURL?
     
     public let copyright: String
     public let license: String
-    public let licenseURL: URL?
+    public let licenseURL: FontURL?
     
-    public let vendorURL: URL?
+    public let vendorURL: FontURL?
     public let sampleText: String
     
     
@@ -58,11 +59,11 @@ public struct FontInfo: Hashable, Codable, Sendable {
         version: String = "",
         manufacturer: String = "",
         designer: String = "",
-        designerURL: URL? = nil,
+        designerURL: FontURL? = nil,
         copyright: String = "",
         license: String = "",
-        licenseURL: URL? = nil,
-        vendorURL: URL? = nil,
+        licenseURL: FontURL? = nil,
+        vendorURL: FontURL? = nil,
         sampleText: String = ""
     ) {
         self.supportedLanguageCodes = supportedLanguageCodes

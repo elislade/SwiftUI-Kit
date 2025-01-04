@@ -1,17 +1,16 @@
-import Foundation
-import SwiftUI
+import CoreFoundation.CFCGTypes
 
 
 /// A set of parameters used to resolve a `Font`.
 /// - Note: These  parameters are suggestions for the ``ResolvedFont``, if the ``FontResource`` being resolved does not support a parameter it will ignore it.
 public struct FontParameters: Codable, Hashable, Sendable {
     
-    /// Base identity is of a font with 16point size, standard width, regular weight, no slant and a transform of `.identity`.
+    /// Base identity is of a font with 16 point size, standard width, regular weight, no slant and a transform of `.identity`.
     public static let identity = FontParameters()
     
     
     /// A set of symbolic traits for the font.
-    public var traits: Set<Font.Trait> = []
+    public var traits: Set<FontTrait> = []
     
     /// -1 is most compact, 0 is normal/regular and 1 is widest.
     public var width: Double = 0
@@ -27,7 +26,7 @@ public struct FontParameters: Codable, Hashable, Sendable {
     public var slant: Double = 0
     
     /// A transform to apply to every glyph.
-    public var transform: CGAffineTransform = .identity
+    public var transform: FontTransform = .identity
     
     
     public func hash(into hasher: inout Hasher) {
@@ -52,15 +51,7 @@ public struct FontParameters: Codable, Hashable, Sendable {
         return copy
     }
     
-    @inlinable public nonisolated subscript(weight: Font.Weight) -> Self {
-        copy(replacing: \.weight, with: weight.value)
-    }
-    
-    @inlinable public nonisolated subscript(style: Font.TextStyle) -> Self {
-        copy(replacing: \.size, with: style.baseSize)
-    }
-    
-    public nonisolated subscript(trait: Font.Trait) -> Self {
+    public nonisolated subscript(trait: FontTrait) -> Self {
         if traits.contains(trait){
             return self
         } else if trait == .italic {
@@ -72,11 +63,6 @@ public struct FontParameters: Codable, Hashable, Sendable {
         }
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    @inlinable public nonisolated subscript(width: Font.Width) -> Self {
-        copy(replacing: \.width, with: width.value)
-    }
-    
 }
 
 
@@ -85,33 +71,3 @@ protocol FontParametersModifier {
     func modify(_ parameters: inout FontParameters)
     
 }
-
-
-
-struct FontParametersKey: EnvironmentKey {
-    
-    static var defaultValue: FontParameters { .identity }
-    
-}
-
-
-
-public extension EnvironmentValues {
-    
-    var fontParameters: FontParameters {
-        get { self[FontParametersKey.self] }
-        set { self[FontParametersKey.self] = newValue }
-    }
-    
-    @MainActor var fontResolved: ResolvedFont {
-        fontResource.resolve(with: fontParameters, in: self)
-    }
-    
-    @MainActor var fontResourceFont: Font {
-        fontResolved.opaqueFont
-    }
-    
-}
-
-
-extension Font.Weight : Sendable {}

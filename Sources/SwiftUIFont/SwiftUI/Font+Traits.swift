@@ -3,16 +3,7 @@ import SwiftUI
 
 public extension Font {
     
-    enum Trait: Int, Hashable, Sendable, Codable, CaseIterable {
-        case italic = 0
-        case smallCaps = 1
-        case smallCapsUppercase = 2
-        case smallCapsLowercase = 3
-        case monospaced = 4
-        case monospacedDigit = 5
-    }
-    
-    static func modifier(for trait: Trait) -> FontModifier {
+    static func modifier(for trait: FontTrait) -> FontModifier {
         switch trait {
         case .italic: .italic
         case .smallCaps: .smallCaps
@@ -23,23 +14,23 @@ public extension Font {
         }
     }
     
-    func traits<Traits: Collection>(_ traits: Traits) -> Font where Traits.Element == Trait {
+    func traits<Traits: Collection>(_ traits: Traits) -> Font where Traits.Element == FontTrait {
         traits.reduce(into: self){ font, trait in
             font = Self.modifier(for: trait).modify(font: font)
         }
     }
     
-    func traits(_ traits: Trait...) -> Font {
+    func traits(_ traits: FontTrait...) -> Font {
         traits.reduce(into: self){ font, trait in
             font = Self.modifier(for: trait).modify(font: font)
         }
     }
     
-    func trait(_ trait: Trait) -> Font {
+    func trait(_ trait: FontTrait) -> Font {
         traits(trait)
     }
     
-    subscript(trait: Trait) -> Font {
+    subscript(trait: FontTrait) -> Font {
         self.trait(trait)
     }
     

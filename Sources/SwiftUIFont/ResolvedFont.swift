@@ -1,4 +1,3 @@
-import SwiftUI
 
 
 /// A Font that has been resolved
@@ -8,7 +7,7 @@ import SwiftUI
     public let parameters: FontParameters
     
     /// The opaqueFont that was resolved.
-    public let opaqueFont: Font
+    public let opaqueFont: OpaqueFont
     
     /// Info about the resolved font.
     public let info: FontInfo
@@ -16,7 +15,7 @@ import SwiftUI
     /// Metrics about the resolved font.
     public let metrics: FontMetrics
     
-    public init(parameters: FontParameters, opaqueFont: Font, info: FontInfo, metrics: FontMetrics) {
+    public init(parameters: FontParameters, opaqueFont: OpaqueFont, info: FontInfo, metrics: FontMetrics) {
         self.parameters = parameters
         self.opaqueFont = opaqueFont
         self.info = info

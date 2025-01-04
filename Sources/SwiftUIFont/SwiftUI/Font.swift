@@ -68,33 +68,48 @@ public extension View {
     }
  
     func resolveFont<V>(_ resource: FontResource? = nil, overriding key: WritableKeyPath<FontParameters, V>, value: V) -> some View {
-        InlineEnvironmentValuesReader{ env in
-            let r = resource ?? env.fontResource
-            font(r.resolve(with: env.fontParameters.copy(replacing: key, with: value), in: env).opaqueFont)
+        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+            font(resolvedFont.opaqueFont)
+        }
+        .transformEnvironment(\.fontResource){
+            if let resource {
+                $0 = resource
+            }
+        }
+        .transformEnvironment(\.fontParameters){ params in
+            params = params.copy(replacing: key, with: value)
         }
     }
     
     func resolveFont(_ resource: FontResource? = nil, with parameters: FontParameters? = nil) -> some View {
-        InlineEnvironmentValuesReader{ env in
-            let r = resource ?? env.fontResource
-            let p = parameters ?? env.fontParameters
-            font(r.resolve(with: p, in: env).opaqueFont)
+        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+            font(resolvedFont.opaqueFont)
+        }
+        .transformEnvironment(\.fontResource){
+            if let resource {
+                $0 = resource
+            }
+        }
+        .transformEnvironment(\.fontParameters){
+            if let parameters {
+                $0 = parameters
+            }
         }
     }
     
     func font(_ parameters: FontParameters) -> some View {
-        InlineEnvironmentValuesReader{ env in
-            font(env.fontResource.resolve(with: parameters, in: env).opaqueFont)
+        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+            font(resolvedFont.opaqueFont)
         }
+        .transformEnvironment(\.fontParameters){ $0 = parameters }
     }
     
     func font(_ resource: FontResource, modifier: @escaping (FontParameters) -> FontParameters = { $0 }) -> some View {
-        InlineEnvironmentValuesReader{ env in
-            font(resource.resolve(
-                with: modifier(env.fontParameters),
-                in: env
-            ).opaqueFont)
+        InlineEnvironmentReader(\.resolvedFont){ font in
+            self.font(font.opaqueFont)
         }
+        .transformEnvironment(\.fontResource){ $0 = resource }
+        .transformEnvironment(\.fontParameters){ $0 = modifier($0) }
     }
     
 }

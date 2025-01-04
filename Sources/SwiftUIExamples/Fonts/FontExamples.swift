@@ -1,18 +1,40 @@
 import SwiftUIKit
 
 
-struct FontExamples: View {
+public struct FontExamples: View {
     
     @State private var resource: FontResource?
     @State private var parameters = FontParameters.identity
+    @State private var resolver = FontCacheResolver(CTFontResolver())
+    @State private var dynamicSize: DynamicTypeSize = .medium
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Font"){
             Preview(resource: $resource, parameters: $parameters)
                 .ignoresSafeArea(edges: .bottom)
+                .dynamicTypeSize(dynamicSize)
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
                 ParameterEditor(parameters: $parameters)
+                
+                Divider()
+ 
+                HStack {
+                    Text("Dynamic Type")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Picker("", selection: $dynamicSize){
+                        ForEach(DynamicTypeSize.allCases, id: \.hashValue){ size in
+                            Text("\(size)".splitCamelCaseFormat)
+                                .tag(size)
+                        }
+                    }
+                }
+                .padding()
             }
             
             Divider()
@@ -21,10 +43,11 @@ struct FontExamples: View {
         }
         .fontResource(resource)
         .fontParameters(parameters)
+        .fontResolver(resolver)
     }
     
     
-    struct AssetPicker : View {
+    struct ResourcePicker : View {
         
         @Binding var resource: FontResource?
         
@@ -57,50 +80,61 @@ struct FontExamples: View {
         }
     }
     
+    struct FontParameterSlider: View {
+        
+        @Binding var value: Double
+        @SliderState(in: -1...1, step: 0.1) private var sliderValue: Double = 0
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                Button(action: { value = -1 }){
+                    Text("-1")
+                        .fontWeight(.semibold)
+                        .frame(width: 24, alignment: .leading)
+                }
+                .disabled(value == -1)
+                
+                SliderView(_sliderValue, hitTestHandle: false){
+                    SunkenControlMaterial(Capsule(), isTinted: true)
+                        .frame(width: 8)
+                        .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
+                }
+                .background {
+                    HStack(spacing: 0) {
+                        ForEach(0...20){ i in
+                            if i == 10 {
+                                Capsule()
+                                    .frame(width: 4)
+                                    .frame(maxWidth: .infinity)
+                            } else {
+                                Capsule()
+                                    .frame(width: i.isMultiple(of: 5) ? 2 : 1)
+                                    .frame(maxWidth: .infinity)
+                                    .opacity(i.isMultiple(of: 5) ? 1 : 0.3)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, -4)
+                }
+                .frame(height: 34)
+                .buttonStyle(.tintStyle)
+                
+                Button(action: { value = 1 }){
+                    Text("+1")
+                        .fontWeight(.semibold)
+                        .frame(width: 24, alignment: .trailing)
+                }
+                .disabled(value == 1)
+            }
+            .syncValue(_value.animation(.interactiveSpring), _sliderValue)
+            .buttonStyle(.tintStyle)
+        }
+    }
     
     struct ParameterEditor: View {
         
         @Binding var parameters: FontParameters
-        
-        private func slider(for value: Binding<Double>) -> some View {
-            VStack {
-                Slider(value: value, in: -1...1, step: 0.01)
-                
-                HStack(spacing: 0) {
-                    Button(action: { value.wrappedValue = -1}){
-                        Text("-1")
-                            .fontWeight(.semibold)
-                            .frame(width: 24, alignment: .leading)
-                    }
-                    .disabled(value.wrappedValue == -1)
-                    
-                    ForEach(1...19){ i in
-                        if i == 10 {
-                            Button(action: { value.wrappedValue = 0 }) {
-                                Capsule()
-                                    .frame(width: 6)
-                            }
-                            .disabled(value.wrappedValue == 0)
-                            .frame(maxWidth: .infinity)
-                        } else {
-                            Capsule()
-                                .frame(width: i.isMultiple(of: 5) ? 2 : 1)
-                                .frame(maxWidth: .infinity)
-                                .opacity(i.isMultiple(of: 5) ? 1 : 0.3)
-                        }
-                    }
-                    
-                    Button(action: { value.wrappedValue = 1 }){
-                        Text("+1")
-                            .fontWeight(.semibold)
-                            .frame(width: 24, alignment: .trailing)
-                    }
-                    .disabled(value.wrappedValue == 1)
-                }
-                .frame(height: 14)
-                .buttonStyle(.tintStyle)
-            }
-        }
         
         var body: some View {
             VStack(spacing: 0) {
@@ -143,7 +177,7 @@ struct FontExamples: View {
                         }
                     }
                     
-                    slider(for: $parameters.width)
+                    FontParameterSlider(value: $parameters.width)
                 }
                 .padding()
                 
@@ -161,7 +195,7 @@ struct FontExamples: View {
                             .font(.exampleParameterValue)
                     }
                     
-                    slider(for: $parameters.slant)
+                    FontParameterSlider(value: $parameters.slant)
                 }
                 .padding()
                 
@@ -181,7 +215,7 @@ struct FontExamples: View {
                             .opacity(0.6)
                     }
                     
-                    slider(for: $parameters.weight)
+                    FontParameterSlider(value: $parameters.weight)
                 }
                 .padding()
             }
@@ -226,7 +260,7 @@ struct FontExamples: View {
                 .animation(.smooth, value: parameters)
                 
                 HStack(spacing: 0) {
-                    AssetPicker(resource: $resource)
+                    ResourcePicker(resource: $resource)
                     
                     Spacer(minLength: 10)
                     
@@ -259,7 +293,7 @@ struct FontExamples: View {
 
     struct Inspector: View  {
         
-        @Environment(\.fontResolved) private var resolved
+        @Environment(\.resolvedFont) private var resolved
         
         struct Cell: View {
             let key: String
@@ -404,7 +438,7 @@ struct FontExamples: View {
     struct Chars: View {
         
         @Environment(\.fontResource) private var fa
-        @Environment(\.fontResolved) private var resolved
+        @Environment(\.resolvedFont) private var resolved
         @Namespace private var ns
         
         private var set: CharacterSet { resolved.supportedCharacters }
@@ -514,4 +548,5 @@ struct FontExamples: View {
 
 #Preview("Font") {
     FontExamples()
+        .previewSize()
 }
