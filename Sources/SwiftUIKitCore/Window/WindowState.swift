@@ -37,9 +37,10 @@ import AppKit
     }
     
     func setTitle(_ title: String) {
-        guard title != window.title else { return }
-        window.title = title
-        NSApplication.shared.addWindowsItem(window, title: title, filename: false)
+        if window.title != title {
+            window.title = title
+            NSApplication.shared.changeWindowsItem(window, title: title, filename: false)
+        }
     }
     
     func set(radius: CGFloat?) {

@@ -23,12 +23,27 @@ public struct TrafficLightsView: View {
 
 
 #Preview {
-    VStack {
-        TrafficLightsView()
-            .buttonStyle(.windowMain)
+    HStack {
+        Spacer()
         
-        TrafficLightsView()
-            .buttonStyle(.windowPanel)
+        VStack {
+            TrafficLightsView()
+                .buttonStyle(.windowMain)
+            
+            TrafficLightsView()
+                .buttonStyle(.windowPanel)
+        }
+        
+        Spacer()
+        
+        HStack {
+            TrafficLightsView(axis: .vertical)
+                .buttonStyle(.windowMain)
+            
+            TrafficLightsView(axis: .vertical)
+                .buttonStyle(.windowPanel)
+        }
+        
+        Spacer()
     }
-    .padding()
 }

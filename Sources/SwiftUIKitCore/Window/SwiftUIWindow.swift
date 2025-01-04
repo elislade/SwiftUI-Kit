@@ -27,7 +27,6 @@ public final class SwiftUIWindow: NSWindow {
         //self.contentView?.layer?.borderWidth = 0.2
         //self.contentView?.layer?.borderColor = CGColor(red: 0, green: 0, blue: 0, alpha: 0.2)
         self.backgroundColor = .clear
-        self.center()
     }
     
 }
