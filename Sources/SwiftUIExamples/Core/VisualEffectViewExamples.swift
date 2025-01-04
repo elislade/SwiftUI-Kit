@@ -1,25 +1,14 @@
 import SwiftUIKit
 
 
-struct VisualEffectViewExamples : View {
+public struct VisualEffectViewExamples : View {
 
     @State private var filters: Set<VisualEffectView.Filter> = []
-    @State private var blur: CGFloat = 29.5
+    @State private var blur: Double = 29.5
     
-    private func binding(for filter: VisualEffectView.Filter) -> Binding<Bool> {
-        .init(
-            get: { filters.contains(filter) },
-            set: {
-                if $0 {
-                    filters.insert(filter)
-                } else {
-                    filters.remove(filter)
-                }
-            }
-        )
-    }
+    public init() {}
     
-    var body: some View {
+    public var body: some View {
         ExampleView(title: "Visual Effect View"){
             ZStack {
                 Canvas { ctx, canvasSize in
@@ -44,8 +33,8 @@ struct VisualEffectViewExamples : View {
         } parameters: {
             ExampleSection("Disabling Filters", isExpanded: true){
                 ForEach(VisualEffectView.Filter.allCases) { filter in
-                    Toggle(isOn: binding(for: filter)){
-                        Text(filter.rawValue.splitCamelCaseFormat)
+                    Toggle(isOn: Binding($filters, contains: filter)){
+                        Text("\(filter)".splitCamelCaseFormat)
                             .font(.exampleParameterTitle)
                     }
                     .padding()
@@ -68,4 +57,5 @@ struct VisualEffectViewExamples : View {
 
 #Preview("Visual Effect View") {
     VisualEffectViewExamples()
+        .previewSize()
 }

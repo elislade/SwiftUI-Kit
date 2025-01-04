@@ -32,7 +32,7 @@ public final class CustomVisualEffectView: UIVisualEffectView {
         didSet { updateFilters() }
     }
     
-    var blurRadius: CGFloat? {
+    var blurRadius: Double? {
         didSet { updateFilters() }
     }
     
@@ -40,7 +40,7 @@ public final class CustomVisualEffectView: UIVisualEffectView {
         contentView.backgroundColor = .clear
 
         #if targetEnvironment(macCatalyst)
-        guard let caFilters =  layer.sublayers?[0].sublayers?[0].sublayers?[0].filters as? [NSObject]
+        guard let caFilters = layer.sublayers?[0].sublayers?[0].sublayers?[0].filters as? [NSObject]
         else {
             return
         }
@@ -57,7 +57,7 @@ public final class CustomVisualEffectView: UIVisualEffectView {
         caFilters.forEach {
             let name = $0.value(forKey: "name") as! String
             
-            if let filter = VisualEffectView.Filter(rawValue: name) {
+            if let filter = VisualEffectView.Filter(name) {
                 $0.setValue(!disableFilters.contains(filter), forKey: "enabled")
                 
                 if filter == .gaussianBlur {

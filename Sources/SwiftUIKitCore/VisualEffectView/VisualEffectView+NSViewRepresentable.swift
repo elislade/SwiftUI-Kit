@@ -34,7 +34,7 @@ public class CustomVisualEffectView : NSVisualEffectView {
         didSet { updateFilters() }
     }
     
-    var blurRadius: CGFloat? {
+    var blurRadius: Double? {
         didSet { updateFilters() }
     }
     
@@ -51,7 +51,7 @@ public class CustomVisualEffectView : NSVisualEffectView {
         caFilters.forEach {
             let name = $0.value(forKey: "name") as! String
             
-            if let filter = VisualEffectView.Filter(rawValue: name) {
+            if let filter = VisualEffectView.Filter(name) {
                 $0.setValue(!disableFilters.contains(filter), forKey: "enabled")
                 
                 if filter == .gaussianBlur {
