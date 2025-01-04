@@ -1,4 +1,4 @@
-import SwiftUI
+@preconcurrency import SwiftUI
 
 public extension View {
     
@@ -38,12 +38,7 @@ public extension View {
     ///   - didChange: A callback that gets called every time this views bounds change.
     /// - Returns: A view that listens to bound changes.
     func childBoundsChange(tag: String, in proxy: GeometryProxy, didChange: @escaping ([CGRect]) -> Void) -> some View {
-        onPreferenceChange(TaggedBoundsKey.self){ value in
-            didChange(value.filter{ $0.tag == tag }.map{ proxy[$0.bounds] })
-        }
-        .transformPreference(TaggedBoundsKey.self) { value in
-            value.removeAll(where: { $0.tag == tag })
-        }
+        modifier(ChildBoundsChangeModifier(tag: tag, proxy: proxy, didChange: didChange))
     }
     
     
@@ -111,3 +106,43 @@ public extension View {
 }
 
 
+
+
+protocol AnchorResolvable {
+    
+    func resolve<T>(_ anchor: Anchor<T>) -> T
+    
+}
+
+
+extension GeometryProxy : AnchorResolvable {
+    
+    public func resolve<T>(_ anchor: Anchor<T>) -> T {
+        self[anchor]
+    }
+    
+}
+
+
+struct ChildBoundsChangeModifier: ViewModifier {
+    
+    private let bounds: State<[TaggedBounds]> = .init(initialValue: [])
+    
+    let tag: String
+    let proxy: GeometryProxy
+    let didChange: ([CGRect]) -> Void
+    
+    func body(content: Content) -> some View {
+        content
+            .onPreferenceChange(TaggedBoundsKey.self){ value in
+                self.bounds.wrappedValue = value.filter{ $0.tag == tag }
+            }
+            .transformPreference(TaggedBoundsKey.self) { value in
+                value.removeAll(where: { $0.tag == tag })
+            }
+            .onChangePolyfill(of: bounds.wrappedValue){
+                didChange(bounds.wrappedValue.map{ proxy[$0.bounds] })
+            }
+    }
+    
+}

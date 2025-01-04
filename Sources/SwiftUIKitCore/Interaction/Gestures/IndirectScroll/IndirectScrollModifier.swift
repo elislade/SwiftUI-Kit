@@ -17,6 +17,10 @@ public struct IndirectScrollGesture: IndirectGesture {
         public let time: Double
         public let deltaX: Double
         public let deltaY: Double
+        
+        public var delta: SIMD2<Double> {
+            .init(deltaX, deltaY)
+        }
     }
     
     public func onChanged(_ action: @escaping (Value) -> Void) -> IndirectScrollGesture {

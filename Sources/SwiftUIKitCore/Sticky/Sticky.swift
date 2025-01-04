@@ -11,8 +11,10 @@ public extension View {
     }
     
     
-    /// Sticks this view to the bounds of the first parent ``SwiftUI/View/stickyContext(grouping:)`` with given insets. If an inset is nil it will not stick.
+    /// Sticks this view to the bounds of the first parent ``SwiftUI/View/stickyContext(grouping:)`` with given insets. If inset is nil it will not stick.
+    ///
     /// - Note: Sticky modifiers do not work with lazy views once it's removed off screen. Use `PinnedScrollableViews/sectionHeaders` and `PinnedScrollableViews/sectionFooters` for SwiftUI `LazyStack` and `LazyGrid` layouts.
+    ///
     /// - Parameters:
     ///   - top : The top inset relative to its `StickyContext` bounds when the sticking should start taking place. Defaults to `nil`.
     ///   - bottom: The bottom inset relative to its `StickyContext` bounds when the sticking should start taking place. Defaults to `nil`.
@@ -24,10 +26,10 @@ public extension View {
     ///
     /// - Returns: A view that will stick to its `StickyContext`.
     func sticky(
-        top: CGFloat? = nil,
-        bottom: CGFloat? = nil,
-        leading: CGFloat? = nil,
-        trailing: CGFloat? = nil,
+        top: Double? = nil,
+        bottom: Double? = nil,
+        leading: Double? = nil,
+        trailing: Double? = nil,
         grouping: StickyGrouping? = nil,
         categoryMask: StickyCategoryMask = .none,
         stateDidChange: @escaping (StickingState) -> Void = { _ in }
@@ -60,7 +62,7 @@ public extension View {
     /// - Returns: A view that will stick to its `StickyContext`.
     func sticky(
         edges: Edge.Set,
-        inset: CGFloat = 0,
+        inset: Double = 0,
         grouping: StickyGrouping? = nil,
         categoryMask: StickyCategoryMask = .none,
         stateDidChange: @escaping (StickingState) -> Void = { _ in }

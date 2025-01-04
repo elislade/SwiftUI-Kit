@@ -32,7 +32,7 @@ struct OnChangeOldNewPolyfill<Value: Equatable>: ViewModifier {
  
 }
 
-@MainActor struct OnChangePolyfill<Value: Equatable>: ViewModifier, Sendable {
+struct OnChangePolyfill<Value: Equatable>: ViewModifier, Sendable {
 
     @State private var lastState: Value?
     

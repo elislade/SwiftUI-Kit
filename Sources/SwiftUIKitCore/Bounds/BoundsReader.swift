@@ -10,7 +10,7 @@ struct BoundsReaderModifier: ViewModifier {
         content
             .onDisappear {
                 //sizeBinding?.wrappedValue = .zero
-                rectBinding?.wrappedValue = .zero
+                //rectBinding?.wrappedValue = .zero
             }
             .overlay {
                 GeometryReader{ proxy in

@@ -12,7 +12,11 @@ struct ValueSyncModifier<A: PropertyWrapper, B: PropertyWrapper>: ViewModifier w
     @State private var hasUsedInitialA: Bool = false
     @State private var hasUsedInitialB: Bool = false
     
-    init(_ a: A, mapA: SyncMap<A.Value,B.Value>?, _ b: B, mapB: SyncMap<B.Value,A.Value>?, options: ValueSyncOptions = .all){
+    init(
+        _ a: A, mapA: SyncMap<A.Value,B.Value>?,
+        _ b: B, mapB: SyncMap<B.Value,A.Value>?,
+        options: ValueSyncOptions = .all
+    ){
         self.a = a
         self.b = b
         self.mapA = mapA

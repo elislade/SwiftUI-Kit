@@ -91,7 +91,7 @@ public struct ViewLooper<Content: View>: View {
                     content
                 }
                 .fixedSize()
-                .boundsReader(readingToSize: $size)
+                .onGeometryChangePolyfill(of: { $0.size }){ size = $0 }
                 .offset(
                     x: axis == .horizontal && scrollToCopy ? -(size.width / 2) : 0,
                     y: axis == .vertical && scrollToCopy ? -(size.height / 2) : 0
