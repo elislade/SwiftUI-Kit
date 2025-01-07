@@ -1,13 +1,15 @@
 import SwiftUIKit
 
 
-struct FlipExamplesView: View {
+public struct FlipExamplesView: View {
     
     @State private var isFlipped = false
     @State private var horizontal: HorizontalEdge? = .leading
     @State private var vertical: VerticalEdge? = .top
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ExampleView(title: "Flip"){
             AxisStack(isFlipped ? .vertical : .horizontal) {
                 ForEach(1...2){ i in
@@ -25,12 +27,25 @@ struct FlipExamplesView: View {
             .animation(.bouncy, value: horizontal)
             .animation(.bouncy, value: vertical)
             .animation(.bouncy, value: isFlipped)
-            .onTapGesture {
-                vertical = .allCases.randomElement()
-                horizontal = .allCases.randomElement()
-                isFlipped.toggle()
-            }
         } parameters: {
+            HStack {
+                Text("Actions")
+                    .font(.exampleParameterTitle)
+                
+                Spacer()
+                
+                Button("Random Flip"){
+                    vertical = Bool.random() ? .allCases.randomElement() : .none
+                    horizontal = Bool.random() ? .allCases.randomElement() : .none
+                    isFlipped.toggle()
+                }
+                .font(.exampleParameterValue)
+            }
+            .padding()
+            
+            Divider()
+            
+            
             Toggle(isOn: $isFlipped){
                 Text("Is flipped")
                     .font(.exampleParameterTitle)
@@ -92,4 +107,5 @@ struct FlipExamplesView: View {
 
 #Preview("Flip") {
     FlipExamplesView()
+        .previewSize()
 }

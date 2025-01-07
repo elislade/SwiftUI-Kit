@@ -44,11 +44,14 @@ struct FlipModifier<FlipView: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         ZStack {
-            content.conditonallyShow(animatingCondition: !isFlipped)
+            content
+                .conditonallyShow(animatingCondition: !isFlipped)
+                .zIndex(1)
             
             flippedContent()
                 .rotation3DEffect(.degrees(180), axis: axis)
                 .conditonallyShow(animatingCondition: isFlipped)
+                .zIndex(2)
         }
         .rotation3DEffect(
             .degrees(isFlipped ? 180 : 0),

@@ -5,7 +5,7 @@ struct ConditonallyShowModifier: ViewModifier, Animatable {
     private var isShown: Bool
     private let threshold: Double
     
-    init(isShown: Bool, threshold: Double = 0.5) {
+    nonisolated init(isShown: Bool, threshold: Double = 0.5) {
         self.isShown = isShown
         self.threshold = threshold
     }

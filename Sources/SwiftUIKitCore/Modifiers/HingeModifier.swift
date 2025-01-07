@@ -31,15 +31,17 @@ struct HingeModifier: ViewModifier {
             Angle(degrees: normalizedDeg),
             axis: axis,
             anchor: UnitPoint(x: xA, y: yA),
-            perspective: -1
+            perspective: -0.5
         )
     }
 }
 
 public extension View {
+    
     func hinge(degrees: Double, edge: Edge) -> some View {
         modifier(HingeModifier(degrees: degrees, edge: edge))
     }
+    
 }
 
 public extension AnyTransition {
@@ -55,16 +57,26 @@ public extension AnyTransition {
 
 
 #Preview{
-    InlineBinding(0.5){ value in
-        VStack {
-            ForEach(Edge.allCases, id: \.rawValue){
-                Text("Hinge \($0)")
-                    .hinge(degrees: value.wrappedValue * -90, edge: $0)
+    InlineBinding(false){ away in
+        InlineBinding(0.5){ value in
+            VStack{
+                ZStack {
+                    Color.clear
+                    
+                    VStack {
+                        ForEach(Edge.allCases, id: \.rawValue){
+                            Text("Hinge \($0)")
+                                .font(.largeTitle.bold())
+                                .hinge(degrees: value.wrappedValue * 90, edge: $0)
+                        }
+                    }
+                }
+                
+                Divider()
+                
+                Slider(value: value)
+                    .padding()
             }
-            
-            Slider(value: value)
         }
-        .padding()
-        .font(.largeTitle.bold())
     }
 }

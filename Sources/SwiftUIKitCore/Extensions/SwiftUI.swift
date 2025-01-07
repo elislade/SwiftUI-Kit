@@ -105,9 +105,41 @@ public extension Binding where Value == Bool {
         )
     }
     
+    var inverse: Self {
+        Binding(
+            get: { !wrappedValue },
+            set: { wrappedValue = !$0 }
+        )
+    }
+    
+    prefix static func ! (_ binding: Self) -> Self {
+        binding.inverse
+    }
+    
 }
 
 extension CharacterSet: @retroactive @unchecked Sendable { }
+
+public extension HorizontalEdge {
+    
+    var inverse: HorizontalEdge {
+        switch self {
+        case .leading: .trailing
+        case .trailing: .leading
+        }
+    }
+}
+
+public extension VerticalEdge {
+    
+    var inverse: VerticalEdge {
+        switch self {
+        case .top: .bottom
+        case .bottom: .top
+        }
+    }
+    
+}
 
 public extension Edge {
     

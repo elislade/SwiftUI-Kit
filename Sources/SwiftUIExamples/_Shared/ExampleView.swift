@@ -1,4 +1,5 @@
-import SwiftUI
+import SwiftUIKit
+
 
 struct ExampleView<E: View, P: View>: View {
     
@@ -43,10 +44,11 @@ struct ExampleView<E: View, P: View>: View {
                         parameters
                     }
                     .toggleStyle(.swiftUIKitSwitch)
+                    .paddingAddingSafeArea()
                 }
                 .scrollClipDisabledPolyfill()
-                .sceneInset(proxy.safeAreaInsets)
-                .environment(\.sceneProxy, proxy)
+                //.sceneInset(proxy.safeAreaInsets)
+                //.environment(\.sceneProxy, proxy)
                 .stickyContext()
             }
             .safeAreaInset(edge: .top, spacing: 0){
@@ -56,11 +58,13 @@ struct ExampleView<E: View, P: View>: View {
                         example
                     }
                     .frame(width: proxy.size.width, height: maxSize.height)
+                    .paddingAddingSafeArea()
                     .background(.bar)
                     .overlay(alignment: .bottom) { Divider().ignoresSafeArea() }
                 }
             }
         }
+        .presentationContext()
         .tint(color)
     }
     

@@ -118,5 +118,55 @@ struct ExampleCell {
     }
     
     
-}
+    struct Alignment: View {
 
+        @Binding var value: SwiftUI.Alignment
+        
+        @State private var horzOptionIndex: Int = 1
+        @State private var vertOptionIndex: Int = 1
+    
+        let horizontalOptions: [HorizontalAlignment] = [.leading, .center, .trailing]
+        let verticalOptions: [VerticalAlignment] = [.top, .center, .bottom]
+        
+        
+        var body: some View {
+            HStack {
+                Text("Horizontal Alignment")
+                    .font(.exampleParameterTitle)
+                
+                Spacer()
+                
+                Picker("", selection: $horzOptionIndex){
+                    Text("Leading").tag(0)
+                    Text("Center").tag(1)
+                    Text("Trailing").tag(2)
+                }
+            }
+            .padding()
+            .onChangePolyfill(of: horzOptionIndex){
+                value.horizontal = horizontalOptions[horzOptionIndex]
+            }
+            
+            Divider()
+           
+            HStack {
+                Text("Vertical Alignment")
+                    .font(.exampleParameterTitle)
+                
+                Spacer()
+                
+                Picker("", selection: $vertOptionIndex){
+                    Text("Top").tag(0)
+                    Text("Center").tag(1)
+                    Text("Bottom").tag(2)
+                }
+            }
+            .padding()
+            .onChangePolyfill(of: vertOptionIndex){
+                value.vertical = verticalOptions[vertOptionIndex]
+            }
+        }
+    }
+    
+    
+}
