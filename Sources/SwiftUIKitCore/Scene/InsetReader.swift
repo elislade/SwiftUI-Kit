@@ -63,6 +63,38 @@ public extension View {
         }
     }
     
+    /// Takes the current scene insets and applies them to this view using the system `safeAreaInset` modifier.
+    ///
+    /// - Warning: Using this modifer more then once on the same decendent will have undefined behaviour.
+    ///
+    /// - Parameter edges: The edges to apply the insets on. Defaults to all.
+    /// - Returns: A view will applied `safeAreaInsets`
+    func safeAreaFromSceneInset(_ edges: Edge.Set = .all) -> some View {
+        InsetReader{ inset in
+            safeAreaInset(edge: .top, spacing: 0){
+                if edges.contains(.top) {
+                    Color.clear.frame(height: inset.top)
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0){
+                if edges.contains(.bottom) {
+                    Color.clear.frame(height: inset.bottom)
+                }
+            }
+            .safeAreaInset(edge: .trailing, spacing: 0){
+                if edges.contains(.trailing) {
+                    Color.clear.frame(width: inset.trailing)
+                }
+            }
+            .safeAreaInset(edge: .leading, spacing: 0){
+                if edges.contains(.leading) {
+                    Color.clear.frame(width: inset.leading)
+                }
+            }
+            .animation(.fastSpringInterpolating, value: inset)
+        }
+    }
+    
 }
 
 
@@ -73,7 +105,7 @@ struct DisableInsetReaderKey: EnvironmentKey {
 }
 
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
     
     var insetReadingDisabled: Bool {
         get { self[DisableInsetReaderKey.self] }
@@ -85,7 +117,15 @@ extension EnvironmentValues {
 
 public extension View {
     
-    nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
+    /// Disables inset reading to all decendent views.
+    /// While disabled, all inset reading will use last inset values before disabling.
+    /// Upon re-enabling of reading, values will update to new values.
+    /// 
+    /// - Note: You can use this to temporarly disable inset reading while animating or dragging a view across inset bounds to stop sudden jumps to the UI as insets change.
+    /// 
+    /// - Parameter disabled: Bool indicating whether it's disabled or not.
+    /// - Returns: A view with the `insetReadingDisabled` environment value set.
+    @inlinable nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
         environment(\.insetReadingDisabled, disabled)
     }
     
