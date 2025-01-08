@@ -61,21 +61,23 @@ public struct MenuContainer<Content: View>: View {
             }
             .windowInteraction(started: { _ in }){ points in
                 if let new = points.last {
-                    //if simulatedSelectionIndex == nil  {
-                        selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
-                    //}
-                } else if let selectedIndex, buttons.indices.contains(selectedIndex) {
+                    selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
+                } else {
+                    self.selectedIndex = nil
+                }
+            } ended: { points in
+                if let selectedIndex, buttons.indices.contains(selectedIndex) {
                     if dismissOnAction {
                         dismissPresentation()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                            buttons[selectedIndex].action()
+                            if buttons.indices.contains(selectedIndex) {
+                                buttons[selectedIndex].action()
+                            }
                         }
                     } else {
                         buttons[selectedIndex].action()
                     }
                     
-                    self.selectedIndex = nil
-                } else {
                     self.selectedIndex = nil
                 }
             }
@@ -83,10 +85,6 @@ public struct MenuContainer<Content: View>: View {
                 for idx in buttons.indices {
                     buttons[idx].active(idx == selectedIndex)
                 }
-                
-//                if selectedIndex != selectionIndexBinding?.wrappedValue {
-//                    selectionIndexBinding?.wrappedValue = selectedIndex
-//                }
             }
             //.frame(maxHeight: isBeingPresentedOn ? 150 : nil)
             .menuStyleTreatment(disabled: false)

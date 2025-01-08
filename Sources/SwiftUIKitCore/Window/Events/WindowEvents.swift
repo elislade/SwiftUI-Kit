@@ -4,9 +4,9 @@ import SwiftUI
 public extension View {
     
     func windowInteraction(
-        started: @escaping ([CGPoint]) -> Void = { _ in },
-        changed: @escaping ([CGPoint]) -> Void = { _ in },
-        ended: @escaping ([CGPoint]) -> Void = { _ in }
+        started: @MainActor @escaping ([CGPoint]) -> Void = { _ in },
+        changed: @MainActor @escaping ([CGPoint]) -> Void = { _ in },
+        ended: @MainActor @escaping ([CGPoint]) -> Void = { _ in }
     ) -> some View {
         modifier(WindowEventsModifier(
             started: started,
@@ -38,7 +38,12 @@ extension EnvironmentValues {
 public extension View {
     
     func disableWindowEvents(_ disabled: Bool = true) -> some View {
-        environment(\._disableWindowEvents, disabled)
+        //environment(\._disableWindowEvents, disabled)
+        transformEnvironment(\._disableWindowEvents){ val in
+            if disabled {
+                val = true
+            }
+        }
     }
     
 }

@@ -20,7 +20,7 @@ struct MenuItemInsetKey: EnvironmentKey {
     }
     #else
     static var defaultValue: EdgeInsets {
-        .init(top: 6, leading: 10, bottom: 6, trailing: 10)
+        .init(top: 4, leading: 8, bottom: 4, trailing: 8)
     }
     #endif
     

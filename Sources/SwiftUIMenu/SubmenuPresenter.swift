@@ -6,8 +6,8 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
     @State private var id = UUID()
     @State private var isPresented = false
     
-    @ViewBuilder let label: () -> Label
-    @ViewBuilder let content: () -> Content
+    @ViewBuilder let label: @MainActor() -> Label
+    @ViewBuilder let content: @MainActor() -> Content
     
     private func present() {
         isPresented = true
@@ -27,7 +27,7 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
                             ))
                         },
                         dismiss: {
-                            DispatchQueue.main.sync {
+                            DispatchQueue.main.async {
                                 isPresented = false
                             }
                         }
@@ -49,9 +49,9 @@ struct Header<L: View> : View {
     
     var isStandalone = false
     
-    var action: () -> Void = {}
+    var action: @MainActor () -> Void = {}
     
-    @ViewBuilder let label: () -> L
+    @ViewBuilder let label: @MainActor () -> L
     
     private var isExpanded: Bool { !isStandalone && isPresented }
     
@@ -97,8 +97,8 @@ struct Submenu<C: View, L: View> : View {
     
     @Environment(\.isBeingPresented) private var isPresented
     
-    @ViewBuilder let label: () -> L
-    @ViewBuilder let content: () -> C
+    @ViewBuilder let label: @MainActor () -> L
+    @ViewBuilder let content: @MainActor () -> C
     
     var body: some View {
         MenuContainer {

@@ -49,9 +49,9 @@ struct WindowEventsModifier : ViewModifier {
     @Environment(\._disableWindowEvents) private var isDisabled
     @State private var hasStarted: Bool = false
     
-    var started: ([CGPoint]) -> Void
-    var changed: ([CGPoint]) -> Void
-    var ended: ([CGPoint]) -> Void
+    var started: @MainActor ([CGPoint]) -> Void
+    var changed: @MainActor ([CGPoint]) -> Void
+    var ended: @MainActor ([CGPoint]) -> Void
     
     func body(content: Content) -> some View {
         content.overlay {
@@ -66,12 +66,12 @@ struct WindowEventsModifier : ViewModifier {
                         .scan((order: [UITouch](), sorted: [UITouch]())) { state, current in
                             var order = state.order
                             for touch in current {
-                                if touch.phase == .began {
+                                if !order.contains(touch) {
                                     order.append(touch)
                                 }
                             }
 
-                            let sorted = current.sorted(by: {
+                            let sorted:[UITouch] = order.isEmpty ? [] : current.sorted(by: {
                                 return order.firstIndex(of: $0)! < order.firstIndex(of: $1)!
                             })
                             
@@ -92,9 +92,8 @@ struct WindowEventsModifier : ViewModifier {
                         let allEnded = touches.allSatisfy({ $0.phase == .ended || $0.phase == .cancelled })
                         let allStarted = touches.allSatisfy({ $0.phase == .began })
                         let locations = touches.map{ $0.location(in: nil) }
-                        
+                    
                         if allStarted {
-                            print("Started")
                             started(locations)
                         }
                         

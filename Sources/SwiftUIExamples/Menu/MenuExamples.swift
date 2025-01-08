@@ -32,7 +32,7 @@ public struct MenuExamples: View {
         
         MenuDivider()
         
-        Button(action: {}){
+        Button(action: { print("Four") }){
             Label("Item 4", systemImage: "4.circle.fill")
         }
     }
@@ -84,10 +84,6 @@ public struct MenuExamples: View {
             ExampleTitle("Menu")
                 .padding()
         }
-        .menuBackground{
-            VisualEffectView(blurRadius: 15)
-            LinearGradient(colors: [.white, .white, .clear], startPoint: .top, endPoint: .bottom)
-        }
         .anchorPresentationContext()
     }
     
@@ -96,5 +92,5 @@ public struct MenuExamples: View {
 
 #Preview("Menu") {
     MenuExamples()
-        //.environment(\.layoutDirection, .rightToLeft)
+        .previewSize()
 }

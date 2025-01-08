@@ -48,9 +48,9 @@ struct WindowEventsModifier: ViewModifier {
     
     @Environment(\._disableWindowEvents) private var isDisabled
     
-    var started: ([CGPoint]) -> Void
-    var changed: ([CGPoint]) -> Void
-    var ended: ([CGPoint]) -> Void
+    var started: @MainActor ([CGPoint]) -> Void
+    var changed: @MainActor ([CGPoint]) -> Void
+    var ended: @MainActor ([CGPoint]) -> Void
     
     private func flipYCoordinate(_ point: CGPoint, in window: NSWindow) -> CGPoint {
         CGPoint(x: point.x, y: window.frame.height - point.y)

@@ -13,7 +13,7 @@ struct MenuButtonValue: Equatable, Sendable {
     //let anchor: Anchor<CGRect>
     let autoTriggerAfter: TimeInterval?
     let dismissOnAction: Bool
-    let active: @Sendable (Bool) -> Void
+    let active: @MainActor (Bool) -> Void
     let action: @MainActor() -> Void
     
     init(

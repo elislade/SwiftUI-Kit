@@ -36,15 +36,19 @@ struct SubmenuPresentationContext: ViewModifier {
                                 .environment(\.presentationDepth, releventStack.count - i - 1)
                                 .environment(\._isBeingPresentedOn, isPresentedOn)
                                 .environment(\._isBeingPresented, hasBeenPresented.contains(stack[i].id))
-                                .environment(\.dismissPresentation, .init(id: stack[i].id, closure: {
+                                .handleDismissPresentation {
                                     hasBeenPresented.remove(stack[i].id)
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                                        stack[i].dismiss()
+                                        if stack.indices.contains(i){
+                                            stack[i].dismiss()
+                                        }
                                     }
-                                }))
+                                }
                                 .onAppear {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                                        hasBeenPresented.insert(stack[i].id)
+                                        if stack.indices.contains(i){
+                                            hasBeenPresented.insert(stack[i].id)
+                                        }
                                     }
                                 }
                                 .offset(y: hasBeenPresented.contains(stack[i].id) ? 0 : resolvedBounds.midY - (proxy.size.height / 2))

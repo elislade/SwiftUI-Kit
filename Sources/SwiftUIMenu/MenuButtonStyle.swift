@@ -88,9 +88,9 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                                 dismissOnAction: dismissOnAction,
                                 active: { _isActive.wrappedValue = $0 },
                                 action: {
-                                    DispatchQueue.main.async {
+                                    //DispatchQueue.main.async {
                                         configuration.trigger()
-                                    }
+                                    //}
                                 }
                             )
                         ] : []

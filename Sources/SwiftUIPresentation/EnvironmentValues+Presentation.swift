@@ -14,14 +14,14 @@ public struct DismissPresentationAction: Equatable {
     }
     
     let id: UUID
-    let closure: () -> Void
+    let closure: @MainActor () -> Void
     
-    public init(id: UUID = .init(), closure: @escaping () -> Void) {
+    public init(id: UUID = .init(), closure: @MainActor @escaping () -> Void) {
         self.id = id
         self.closure = closure
     }
     
-    public func callAsFunction() {
+    @MainActor public func callAsFunction() {
         closure()
     }
     
@@ -47,7 +47,7 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    @inlinable func handleDismissPresentation(_ action: @escaping () -> Void) -> some View {
+    @inlinable func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
         InlineState(UUID()){ id in
             InlineEnvironmentReader(\.isBeingPresentedOn){ isBeingPresentedOn in
                 self.transformEnvironment(\.dismissPresentation) { value in
