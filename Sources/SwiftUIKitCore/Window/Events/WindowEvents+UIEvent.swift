@@ -78,8 +78,8 @@ struct WindowEventsModifier : ViewModifier {
                             var indicesToRemove: IndexSet = []
                             
                             for touch in current {
-                                if touch.phase == .ended || touch.phase == .cancelled {
-                                    indicesToRemove.insert(order.firstIndex(of: touch)!)
+                                if let index = order.firstIndex(of: touch), touch.phase == .ended || touch.phase == .cancelled {
+                                    indicesToRemove.insert(index)
                                 }
                             }
                             
