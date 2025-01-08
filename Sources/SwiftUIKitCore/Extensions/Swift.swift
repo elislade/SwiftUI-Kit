@@ -170,7 +170,6 @@ public extension ReplaceWhenFloatKeyIsTrueConformance where Self == Replacement 
 
 extension Double : ReplaceWhenFloatKeyIsTrueConformance {}
 extension Float : ReplaceWhenFloatKeyIsTrueConformance {}
-extension Float16 : ReplaceWhenFloatKeyIsTrueConformance {}
 
 
 extension FormatStyle where Self == FloatingPointFormatStyle<Double> {
