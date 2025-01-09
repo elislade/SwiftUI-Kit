@@ -40,11 +40,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
                 isPresented = $0
             }
             .onAppear{ isShowing = isPresented }
-            .anchorPresentation(
-                isPresented: $isShowing,
-                sourceAnchor: sourceAnchor,
-                presentationAnchor: sourceAnchor.inverse
-            ){
+            .autoAnchorOrthogonalToEdgePresentation(isPresented: $isShowing, edge: edge){
                 tip()
                     .presentationBackground(.disabled){ Color.clear }
                     .onTapGesture { isShowing = false }
@@ -62,7 +58,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
                             .opacity(0.1)
                     }
                     .padding(2)
-                    .transition(.merge(.scale(0.8), .opacity).animation(.bouncy))
+                    .transition((.scale(0.8) + .opacity).animation(.bouncy))
                     
             }
     }

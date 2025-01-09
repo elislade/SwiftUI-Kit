@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct AnchorPresentationContext2: ViewModifier {
+struct AnchorPresentationContext: ViewModifier {
     
     typealias Metadata = AnchorPresentationMetadata
     typealias Presentation = PresentationValue<Metadata>
@@ -33,24 +33,22 @@ struct AnchorPresentationContext2: ViewModifier {
         }
     }
     
-    private func sourceAnchor(for value: Presentation, in proxy: GeometryProxy) -> UnitPoint {
+    private func anchors(for value: Presentation, in proxy: GeometryProxy) -> (source: UnitPoint, presentation: UnitPoint) {
+        let rect = proxy[value.anchor]
+        let alignment = value.anchorAlignment
         let dir = layoutDirection(for: value)
-        switch value.anchorMode {
-        case .auto:
-            let a = AnchorHelper.sourceAnchor(for: proxy[value.anchor], in: proxy.size)
-            return dir == .rightToLeft ? a.invert(.horizontal) : a
-        case .manual(let source, _ ): return source
-        }
-    }
-    
-    private func presentationAnchor(for value: Presentation, in proxy: GeometryProxy) -> UnitPoint {
-        let dir = layoutDirection(for: value)
-        switch value.metadata.anchorMode {
-        case .auto:
-            let a = AnchorHelper.presentationAnchor(for: proxy[value.anchor], in: proxy.size)
-            return dir == .rightToLeft ? a.invert(.horizontal) : a
-        case .manual(_, let presentation): return presentation
-        }
+        
+        let source = UnitPoint(
+            x: alignment.source.x.fraction ?? AnchorHelper.sourceAnchorX(for: rect, in: proxy.size),
+            y: alignment.source.y.fraction ?? AnchorHelper.sourceAnchorY(for: rect, in: proxy.size)
+        )
+        
+        let presentation = UnitPoint(
+            x: alignment.presentation.x.fraction ?? AnchorHelper.presentationAnchorX(for: rect, in: proxy.size),
+            y: alignment.presentation.y.fraction ?? AnchorHelper.presentationAnchorY(for: rect, in: proxy.size)
+        )
+       
+        return dir == .leftToRight ? (source, presentation) : (source.invert(.horizontal), presentation.invert(.horizontal))
     }
     
     private func dismiss() {
@@ -72,17 +70,16 @@ struct AnchorPresentationContext2: ViewModifier {
                     ZStack(alignment: .topLeading) {
                         Color.clear
                         
-                        if let presentedValue = presentedValue {
+                        if let presentedValue {
                             let dir = layoutDirection(for: presentedValue)
                             let sourceFrame = proxy[presentedValue.anchor]
-                            let presAnchor = presentationAnchor(for: presentedValue, in: proxy)
-                            let sourceAnchor = sourceAnchor(for: presentedValue, in: proxy)
-                            let presEdge = AnchorHelper.presentationEdge(for: presAnchor, and: sourceAnchor)
+                            let anchors = anchors(for: presentedValue, in: proxy)
+                            let presEdge = AnchorHelper.presentationEdge(for: anchors.presentation, and: anchors.source)
                             
-                            presentedValue.metadata.view(.init(anchor: presAnchor, edge: presEdge ?? .bottom))
+                            presentedValue.metadata.view(.init(anchor: anchors.presentation, edge: presEdge ?? .bottom))
                                 .environment(\._isBeingPresented, true)
                                 .transition(
-                                    .merge(.scale(0, anchor: presAnchor), .opacity)
+                                    (.scale(0, anchor: anchors.presentation) + .opacity)
                                     .animation(.bouncy)
                                 )
                                 .environment(\.dismissPresentation, .init(id: presentedValue.id, closure: dismiss))
@@ -93,10 +90,10 @@ struct AnchorPresentationContext2: ViewModifier {
                                     _bgInteraction.wrappedValue = $0.last
                                 }
                                 .alignmentGuide(.leading){ dimension in
-                                    let selfOffset = dimension.width * presAnchor.x
+                                    let selfOffset = dimension.width * anchors.presentation.x
                                     
                                     let range = dir == .leftToRight ? [sourceFrame.minX, sourceFrame.maxX] : [sourceFrame.maxX, sourceFrame.minX]
-                                    let sourceStart = ((range[1] - range[0]) * sourceAnchor.x) + range[0]
+                                    let sourceStart = ((range[1] - range[0]) * anchors.source.x) + range[0]
                                     
                                     if dir == .rightToLeft {
                                         return -(proxyWidth - (sourceStart + selfOffset))
@@ -105,10 +102,10 @@ struct AnchorPresentationContext2: ViewModifier {
                                     }
                                 }
                                 .alignmentGuide(.top){ dimension in
-                                    let selfOffset = dimension.height * presAnchor.y
+                                    let selfOffset = dimension.height * anchors.presentation.y
                                     
                                     let range = [sourceFrame.minY, sourceFrame.maxY]
-                                    let sourceStart = ((range[1] - range[0]) * sourceAnchor.y) + range[0]
+                                    let sourceStart = ((range[1] - range[0]) * anchors.source.y) + range[0]
                                     
                                     return -(sourceStart - selfOffset)
                                 }
@@ -132,47 +129,5 @@ struct AnchorPresentationContext2: ViewModifier {
                 $0 = []
             }
         }
-    
-}
-
-
-public struct AnchorHelper {
-    
-    public static func presentationEdge(for presentationAnchor: UnitPoint, and sourceAnchor: UnitPoint) -> Edge? {
-        
-        if presentationAnchor.x == 0 && sourceAnchor.x == 1 {
-            return .leading
-        } else if presentationAnchor.x == 1 && sourceAnchor.x == 0 {
-            return .trailing
-        }
-        
-        if presentationAnchor.y == 0 && sourceAnchor.y == 1 {
-            return .top
-        } else if presentationAnchor.y == 1 && sourceAnchor.y == 0 {
-            return .bottom
-        }
-        
-        return nil
-    }
-    
-    public static func sourceAnchor(for rect: CGRect, in size: CGSize) -> UnitPoint {
-        let midX = size.width / 2
-        let h: Double = rect.midX > midX ? 1 : rect.midX < midX ? 0 : 0.5
-        let v: Double = rect.midY > size.height / 2 ? 0 : 1
-        
-        if size.height < size.width {
-            return UnitPoint(x: h, y: v).inverse
-        } else {
-            return UnitPoint(x: h, y: v)
-        }
-    }
-    
-    public static func presentationAnchor(for rect: CGRect, in size: CGSize) -> UnitPoint {
-        let midX = size.width / 2
-        let h: Double = rect.midX > midX ? 1 : rect.midX < midX ? 0 : 0.5
-        let v: Double = rect.midY > size.height / 2 ? 1 : 0
-        
-        return UnitPoint(x: h, y: v)
-    }
     
 }

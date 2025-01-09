@@ -9,7 +9,7 @@ public extension View {
     /// - Parameter environmentBehaviour: The ``PresentationEnvironmentBehaviour`` to use when presenting views. Defaults to `.useContext`.
     /// - Returns: Modified content that handles child anchor presentations.
     nonisolated func anchorPresentationContext(environmentBehaviour: PresentationEnvironmentBehaviour = .useContext) -> some View {
-        modifier(AnchorPresentationContext2(environmentBehaviour: environmentBehaviour))
+        modifier(AnchorPresentationContext(environmentBehaviour: environmentBehaviour))
     }
     
     
@@ -145,6 +145,26 @@ public extension View {
                 source: UnitPoint(Alignment(horizontal: .trailing, vertical: alignment)),
                 presentation: UnitPoint(Alignment(horizontal: .leading, vertical: alignment))
             ),
+            presentation: { _ in presentation() }
+        ))
+    }
+    
+    
+    /// Auto anchors orthogonal to the given edge.
+    ///
+    /// - Parameters:
+    ///   - isPresented: A binding to the presentation for programatic presentation and dismissal.
+    ///   - edge: The edge you want the presentation to appear on.
+    ///   - presentation: The view builder of the view to present.
+    /// - Returns: Modified content that handles the anchor presentation.
+    nonisolated func autoAnchorOrthogonalToEdgePresentation<P: View>(
+        isPresented: Binding<Bool>,
+        edge: Edge,
+        @ViewBuilder presentation: @MainActor @escaping () -> P
+    ) -> some View {
+        modifier(AnchorPresenter(
+            isPresented: isPresented,
+            anchor: .init(autoAlignedOrthogonalToEdge: edge),
             presentation: { _ in presentation() }
         ))
     }

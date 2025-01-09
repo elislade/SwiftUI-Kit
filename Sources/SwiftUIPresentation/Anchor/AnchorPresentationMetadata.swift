@@ -3,11 +3,11 @@ import SwiftUI
 struct AnchorPresentationMetadata: Hashable, @unchecked Sendable {
     
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.anchorMode == rhs.anchorMode
+        lhs.anchorAlignment == rhs.anchorAlignment
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(anchorMode)
+        hasher.combine(anchorAlignment)
     }
     
     enum AnchorMode: Hashable, Sendable {
@@ -15,7 +15,7 @@ struct AnchorPresentationMetadata: Hashable, @unchecked Sendable {
         case manual(source: UnitPoint, presentation: UnitPoint)
     }
     
-    let anchorMode: AnchorMode
+    let anchorAlignment: AnchorAlignment
     let view: @MainActor (AutoAnchorState) -> AnyView
     
     func translate() -> BasicPresentationMetadata {
@@ -41,4 +41,5 @@ public struct AutoAnchorState: Hashable, Sendable {
         self.anchor = anchor
         self.edge = edge
     }
+    
 }
