@@ -81,7 +81,28 @@ public extension CGRect {
         case .trailing: (container.width - width) - origin.x
         }
     }
-       
+    
+    func min(_ axis: Axis) -> CGFloat {
+        switch axis {
+        case .horizontal: minX
+        case .vertical: minY
+        }
+    }
+      
+    func mid(_ axis: Axis) -> CGFloat {
+        switch axis {
+        case .horizontal: midX
+        case .vertical: midY
+        }
+    }
+    
+    func max(_ axis: Axis) -> CGFloat {
+        switch axis {
+        case .horizontal: maxX
+        case .vertical: maxY
+        }
+    }
+    
 }
 
 extension CGAffineTransform: StaticIdentityConformance { }
