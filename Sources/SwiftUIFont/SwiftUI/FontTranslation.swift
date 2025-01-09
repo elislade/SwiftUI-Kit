@@ -52,18 +52,18 @@ extension DynamicTypeSize {
     
     var fontScale: CGFloat {
         switch self {
-        case .xSmall: 1
-        case .small: 1
+        case .xSmall: 0.8
+        case .small: 0.9
         case .medium: 1
-        case .large: 1
-        case .xLarge: 1
-        case .xxLarge: 1
-        case .xxxLarge: 1
-        case .accessibility1: 1
-        case .accessibility2: 1
-        case .accessibility3: 1
-        case .accessibility4: 1
-        case .accessibility5: 1
+        case .large: 1.1
+        case .xLarge: 1.2
+        case .xxLarge: 1.3
+        case .xxxLarge: 1.4
+        case .accessibility1: 1.5
+        case .accessibility2: 1.6
+        case .accessibility3: 1.7
+        case .accessibility4: 1.8
+        case .accessibility5: 1.9
         @unknown default: 1
         }
     }

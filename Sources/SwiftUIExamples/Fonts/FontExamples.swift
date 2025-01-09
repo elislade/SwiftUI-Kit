@@ -3,10 +3,25 @@ import SwiftUIKit
 
 public struct FontExamples: View {
     
+    enum ResolverType: Hashable, CaseIterable {
+        case swiftUI
+        case coreText
+    }
+    
     @State private var resource: FontResource?
     @State private var parameters = FontParameters.identity
-    @State private var resolver = FontCacheResolver(CTFontResolver())
+    @State private var ctResolver = FontCacheResolver(CTFontResolver())
+    @State private var swiftResolver = FontCacheResolver(SwiftUIFontResolver())
+    
+    @State private var fontResolverType: ResolverType = .coreText
     @State private var dynamicSize: DynamicTypeSize = .medium
+    
+    private var fontResolver: FontResolver {
+        switch fontResolverType {
+        case .coreText: ctResolver
+        case .swiftUI: swiftResolver
+        }
+    }
     
     public init() {}
     
@@ -17,10 +32,21 @@ public struct FontExamples: View {
                 .dynamicTypeSize(dynamicSize)
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
-                ParameterEditor(parameters: $parameters)
+                HStack {
+                    Text("Font Resolver")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Picker("", selection: $fontResolverType){
+                        Text("Core Text").tag(ResolverType.coreText)
+                        Text("SwiftUI").tag(ResolverType.swiftUI)
+                    }
+                }
+                .padding()
                 
                 Divider()
- 
+                
                 HStack {
                     Text("Dynamic Type")
                         .font(.exampleParameterTitle)
@@ -35,15 +61,20 @@ public struct FontExamples: View {
                     }
                 }
                 .padding()
+                
+                Divider()
+                
+                ParameterEditor(parameters: $parameters)
             }
             
-            Divider()
-            
-            Inspector()
+            if fontResolverType == .coreText {
+                Divider()
+                Inspector()
+            }
         }
         .fontResource(resource)
         .fontParameters(parameters)
-        .fontResolver(resolver)
+        .fontResolver(fontResolver)
     }
     
     
@@ -62,7 +93,7 @@ public struct FontExamples: View {
         }
         
         var body: some View {
-            Picker("Font Asset", selection: $resource){
+            Picker("", selection: $resource){
                 Section("Design"){
                     ForEach(Font.Design.allCases){
                         Text(name(for: $0))
@@ -82,8 +113,14 @@ public struct FontExamples: View {
     
     struct FontParameterSlider: View {
         
+        @Environment(\.interactionGranularity) private var interactionGranularity
+        
         @Binding var value: Double
         @SliderState(in: -1...1, step: 0.1) private var sliderValue: Double = 0
+        
+        private var height: CGFloat {
+            50 - (interactionGranularity * 28)
+        }
         
         var body: some View {
             HStack(spacing: 0) {
@@ -117,7 +154,7 @@ public struct FontExamples: View {
                     .padding(.vertical, 6)
                     .padding(.horizontal, -4)
                 }
-                .frame(height: 34)
+                .frame(height: height)
                 .buttonStyle(.tintStyle)
                 
                 Button(action: { value = 1 }){
@@ -152,6 +189,7 @@ public struct FontExamples: View {
                             .font(.exampleParameterValue)
                             .opacity(0.6)
                     }
+                    .animation(nil, value: parameters.size)
                     
                     Slider(value: $parameters.size, in: 10...120, step: 1)
                 }
@@ -176,6 +214,7 @@ public struct FontExamples: View {
                                 .opacity(0.6)
                         }
                     }
+                    .animation(nil, value: parameters.width)
                     
                     FontParameterSlider(value: $parameters.width)
                 }
@@ -194,6 +233,7 @@ public struct FontExamples: View {
                             .opacity(0.6)
                             .font(.exampleParameterValue)
                     }
+                    .animation(nil, value: parameters.slant)
                     
                     FontParameterSlider(value: $parameters.slant)
                 }
@@ -214,6 +254,7 @@ public struct FontExamples: View {
                         Text("\(Font.Weight(closestToValue: parameters.weight))")
                             .opacity(0.6)
                     }
+                    .animation(nil, value: parameters.weight)
                     
                     FontParameterSlider(value: $parameters.weight)
                 }
@@ -275,12 +316,14 @@ public struct FontExamples: View {
                         .controlRoundness(1)
                         .frame(width: 140)
                         
-                        Button("Reset", systemImage: "arrow.clockwise.circle.fill"){ parameters = .identity }
-                            .font(.title)
-                            .labelStyle(.iconOnly)
-                            .symbolRenderingMode(.hierarchical)
-                            .disabled(parameters == .identity)
-                            .buttonStyle(.tintStyle)
+                        Button("Reset", systemImage: "arrow.clockwise.circle.fill"){
+                            parameters = .identity
+                        }
+                        .font(.title)
+                        .labelStyle(.iconOnly)
+                        .symbolRenderingMode(.hierarchical)
+                        .disabled(parameters == .identity)
+                        .buttonStyle(.tintStyle)
                     }
                 }
                 .padding([.vertical, .trailing])
@@ -340,6 +383,8 @@ public struct FontExamples: View {
         
         struct Info: View {
             
+            @Environment(\.openURL) private var openURL
+            
             let info: SwiftUIFont.FontInfo
             
             @ViewBuilder private func InfoCell(_ path: KeyPath<SwiftUIFont.FontInfo, String>) -> some View {
@@ -373,6 +418,34 @@ public struct FontExamples: View {
                 Divider().padding(.vertical, 8)
                 
                 InfoCell(\.copyright)
+                
+                if info.licenseURL != nil || info.vendorURL != nil {
+                    HStack {
+                        Spacer()
+                        
+                        if let url = info.licenseURL {
+                            Button("License"){ openURL(url) }
+                                .toolTip(edge: .top){
+                                    Text(url.absoluteString)
+                                }
+                        }
+                        
+                        if let url = info.vendorURL {
+                            if info.licenseURL != nil {
+                                Text("•")
+                                    .opacity(0.3)
+                            }
+                            
+                            Button("Vendor"){ openURL(url) }
+                                .toolTip(edge: .top){
+                                    Text(url.absoluteString)
+                                }
+                        }
+                    }
+                    .buttonStyle(.tintStyle)
+                    .padding(.horizontal)
+                    .lineLimit(1)
+                }
                 
                 Divider().padding(.vertical, 8)
                 
@@ -441,7 +514,10 @@ public struct FontExamples: View {
         @Environment(\.resolvedFont) private var resolved
         @Namespace private var ns
         
-        private var set: CharacterSet { resolved.supportedCharacters }
+        private var set: CharacterSet {
+            let candidate = resolved.supportedCharacters
+            return candidate.isEmpty ? .alphanumerics.union(.punctuationCharacters).union(.symbols) : candidate
+        }
         
         @State private var chars: [Character] = []
         @State private var selected: Character?
@@ -462,7 +538,6 @@ public struct FontExamples: View {
             return nc
         }
         
-        
         private func load() {
             Task {
                 self.isLoading = true
@@ -476,10 +551,10 @@ public struct FontExamples: View {
                 let rows: Double = proxy.size.height < 320 ? 5 : 8
                 let tileSize = proxy.size.height / rows
                 ZStack {
-                    ScrollView(.horizontal) {
+                    ScrollView(.horizontal, showsIndicators: false) {
                         LazyHGrid(
-                            rows: Array(repeating: .init(.fixed(tileSize), spacing: 0), count: Int(rows)),
-                            spacing: 0
+                            rows: Array(repeating: .init(.fixed(tileSize), spacing: 1), count: Int(rows)),
+                            spacing: 1
                         ) {
                             ForEach(chars, id: \.self){ c in
                                 if selected != c {
@@ -498,6 +573,9 @@ public struct FontExamples: View {
                             }
                         }
                         .padding(.horizontal)
+                        #if os(macOS)
+                        .padding(.bottom, 14) // Removes weird dead zone on macOS. Probably has to do with hidden scroll bar not removing its event tracker.
+                        #endif
                     }
                     .opacity(selected == nil ? 1 : 0)
                     .opacity(isLoading ? 0.1 : 1)
@@ -520,6 +598,7 @@ public struct FontExamples: View {
                                 .padding()
                                 .opacity(0.2)
                         }
+                        .keyboardShortcut(.escape)
                         .transition(
                             .move(edge: .leading).animation(.easeInOut.delay(0.5))
                         )

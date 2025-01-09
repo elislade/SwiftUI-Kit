@@ -2,9 +2,11 @@ import Foundation
 import SwiftUI
 
 
-struct SwiftUIFontResolver: FontResolver {
+public struct SwiftUIFontResolver: FontResolver {
     
-    func resolve(resource: FontResource, with parameters: FontParameters) -> ResolvedFont {
+    public init(){}
+    
+    public func resolve(resource: FontResource, with parameters: FontParameters) -> ResolvedFont {
         var font: Font = .system(.body)
         
         if let design = resource.design {
@@ -15,7 +17,10 @@ struct SwiftUIFontResolver: FontResolver {
         
         font = font.traits(parameters.traits)
         
-        //let modifiers = parameters.traits.map{ }
+        if parameters.slant > 0 {
+            font = font.italic()
+        }
+        
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             font = font.width(.init(parameters.width))
         }
@@ -51,7 +56,7 @@ extension EnvironmentValues {
         let trait = UITraitCollection(preferredContentSizeCategory: content)
         let dynamicSize = UIFontMetrics.default.scaledValue(for: fontParameters.size, compatibleWith: trait)
         #else
-        let dynamicSize = fontParameters.size
+        let dynamicSize = fontParameters.size * dynamicTypeSize.fontScale
         #endif
         
         let parameters = fontParameters.copy(replacing: \.size, with: dynamicSize)
