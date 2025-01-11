@@ -40,8 +40,3 @@ public struct MenuDivider: View {
     }
     
 }
-
-
-#Preview {
-    MenuGroupDivider()
-}

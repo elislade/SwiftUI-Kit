@@ -44,12 +44,13 @@ struct Header<L: View> : View {
     
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.isBeingPresented) private var isPresented
+    @Environment(\.isBeingPresentedOn) private var isPresentedOn
     @Environment(\.dismissPresentation) private var dismiss
     
+    @State private var leadingWidth: CGFloat = .menuLeadingSpacerSize
+    
     var isStandalone = false
-    
     var action: @MainActor () -> Void = {}
-    
     @ViewBuilder let label: @MainActor () -> L
     
     private var isExpanded: Bool { !isStandalone && isPresented }
@@ -58,7 +59,7 @@ struct Header<L: View> : View {
         layoutDirection == .leftToRight ? 1 : -1
     }
     
-    private func onTap() {
+    private func closure() {
         if isExpanded {
             dismiss()
         } else {
@@ -67,22 +68,23 @@ struct Header<L: View> : View {
     }
     
     var body: some View {
-        Button(action: onTap){
+        Button(action: closure){
             label()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .equalInsetItem(.leading, .menuLeadingSpacerSize)
+                .equalInsetItem(.leading, leadingWidth)
                 .overlay(alignment: .leading){
                     Image(systemName: "chevron.right")
                         .rotationEffect(isExpanded ? .degrees(90 * layoutNormalizeFactor) : .zero)
-                        .frame(width: 12)
+                        //.frame(width: 12)
                         .layoutDirectionMirror()
-                        .padding(.leading, 12)
+                        .padding(.horizontal, 12)
+                        .onGeometryChangePolyfill(of: { $0.size.width }){ leadingWidth = $0 }
+                        
                 }
         }
-        .buttonStyle(MenuButtonStyle(
-            hoverTriggerInterval: 0.5,
-            dismissOnAction: false
-        ))
+        .buttonStyle(MenuButtonStyle(dismissOnAction: false))
+        .animation(.smooth, value: isPresentedOn)
+        .menuActionDwellDuration(0.4)
     }
     
 }

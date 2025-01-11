@@ -4,19 +4,19 @@ import SwiftUIKitCore
 
 struct MenuToggleStyle: ToggleStyle {
     
+    @State private var leadingSize: CGFloat = .menuLeadingSpacerSize
+    
     func makeBody(configuration: Configuration) -> some View {
         Button(action: { configuration.$isOn.wrappedValue.toggle() }){
             configuration.label
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .equalInsetItem(.leading, .menuLeadingSpacerSize)
+                .equalInsetItem(.leading, leadingSize)
                 .overlay(alignment: .leading) {
                     Image(systemName: "checkmark")
-                        .resizable()
-                        .scaledToFit()
                         .opacity(configuration.isOn ? 1 : 0)
-                        .frame(width: 12)
-                        .padding(.leading, 10)
+                        .padding(.horizontal, 10)
                         .font(.body.weight(.semibold))
+                        .onGeometryChangePolyfill(of: { $0.size.width }){ leadingSize = $0 }
                 }
         }
     }

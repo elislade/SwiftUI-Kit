@@ -34,7 +34,9 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
             VStack(spacing: 0){
                 ForEach(data, id: \.self){ i in
                     Toggle(isOn: binding(for: i)){
-                        label(i)
+                        HStack {
+                            label(i)
+                        }
                     }
                     
                     if i != data.last {
@@ -44,6 +46,7 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
                 
             }
             .toggleStyle(MenuToggleStyle())
+            .menuActionTriggerBehaviour(.immediate)
         } else {
             Picker("", selection: $selection){
                 ForEach(data, id: \.self){

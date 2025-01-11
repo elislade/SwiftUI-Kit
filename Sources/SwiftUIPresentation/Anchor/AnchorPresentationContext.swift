@@ -76,11 +76,12 @@ struct AnchorPresentationContext: ViewModifier {
                             let anchors = anchors(for: presentedValue, in: proxy)
                             let presEdge = AnchorHelper.presentationEdge(for: anchors.presentation, and: anchors.source)
                             
-                            presentedValue.metadata.view(.init(anchor: anchors.presentation, edge: presEdge ?? .bottom))
+                            presentedValue.metadata
+                                .view(.init(anchor: anchors.presentation, edge: presEdge ?? .bottom))
                                 .environment(\._isBeingPresented, true)
                                 .transition(
                                     (.scale(0, anchor: anchors.presentation) + .opacity)
-                                    .animation(.bouncy)
+                                        .animation(.bouncy.speed(1.6))
                                 )
                                 .environment(\.dismissPresentation, .init(id: presentedValue.id, closure: dismiss))
                                 .onPreferenceChange(PresentationBackgroundKey.self){

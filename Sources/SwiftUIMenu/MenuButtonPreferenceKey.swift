@@ -10,28 +10,26 @@ struct MenuButtonValue: Equatable, Sendable {
     
     let id: UUID
     let globalRect: CGRect
-    //let anchor: Anchor<CGRect>
-    let autoTriggerAfter: TimeInterval?
+    var dwellDuration: TimeInterval?
     let dismissOnAction: Bool
+    var actionBehaviour: MenuActionTriggerBehaviour
     let active: @MainActor (Bool) -> Void
     let action: @MainActor() -> Void
     
     init(
         id: UUID,
         globalRect: CGRect,
-        //anchor: Anchor<CGRect>,
-        autoTriggerAfter: TimeInterval? = nil,
         dismissOnAction: Bool = true,
         active: @escaping @Sendable (Bool) -> Void,
         action: @escaping @MainActor () -> Void
     ) {
         self.id = id
-        //self.anchor = anchor
         self.globalRect = globalRect
-        self.autoTriggerAfter = autoTriggerAfter
+        self.dwellDuration = nil
         self.dismissOnAction = dismissOnAction
         self.active = active
         self.action = action
+        self.actionBehaviour = .afterDismissal
     }
     
 }

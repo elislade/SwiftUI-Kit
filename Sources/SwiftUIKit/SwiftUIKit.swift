@@ -7,6 +7,7 @@
 @_exported import SwiftUILayout
 @_exported import SwiftUIControls
 
+public typealias Menu = SwiftUIMenu.Menu
 public typealias Slider = SwiftUIControls.Slider
 public typealias TextField = SwiftUIControls.TextField
 public typealias KeyPress = SwiftUIKitCore.KeyPress

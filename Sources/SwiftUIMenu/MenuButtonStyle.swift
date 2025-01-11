@@ -6,41 +6,14 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
     @Environment(\.dismissPresentation) private var dismiss
     @Environment(\.isEnabled) private var isEnabled
     
-    private let hoverTriggerInterval: TimeInterval?
     private let dismissOnAction: Bool
     
     @State private var id = UUID()
     @State private var isActive = false
     
-    public init(
-        hoverTriggerInterval: TimeInterval? = nil,
-        dismissOnAction: Bool = true
-    ) {
-        self.hoverTriggerInterval = hoverTriggerInterval
+    public init(dismissOnAction: Bool = true) {
         self.dismissOnAction = dismissOnAction
     }
-    
-//    private func end(_ action: @escaping () -> Void) {
-//        isEndingGesture = true
-//        triggerTask?.cancel()
-//        triggerTask = nil
-//        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-//            isEndingGesture = false
-//            enteredBoundsGestureTime = nil
-//            if dismissOnAction {
-//                dismissPresentation()
-//            } else {
-//                action()
-//            }
-//        }
-//        
-//        if dismissOnAction {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7){
-//                action()
-//            }
-//        }
-//    }
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -72,10 +45,6 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     .opacity(isActive ? 0.6 : 0)
             }
             .opacity(isEnabled ? 1 : 0.5)
-//            .onDisappear {
-//                triggerTask?.cancel()
-//                triggerTask = nil
-//            }
             .background {
                 GeometryReader { proxy in
                     Color.clear.preference(
@@ -84,14 +53,9 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                             .init(
                                 id: id,
                                 globalRect: proxy.frame(in: .global),
-                                autoTriggerAfter: hoverTriggerInterval,
                                 dismissOnAction: dismissOnAction,
                                 active: { _isActive.wrappedValue = $0 },
-                                action: {
-                                    //DispatchQueue.main.async {
-                                        configuration.trigger()
-                                    //}
-                                }
+                                action: { configuration.trigger() }
                             )
                         ] : []
                     )
@@ -130,5 +94,35 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
 
 
 public extension PrimitiveButtonStyle where Self == MenuButtonStyle {
+    
     var menuStyle: MenuButtonStyle { .init() }
+    
+}
+
+
+
+public enum MenuActionTriggerBehaviour: Hashable, Sendable {
+    case immediate
+    case afterDismissal
+}
+
+
+public extension View {
+    
+    func menuActionTriggerBehaviour(_ behaviour: MenuActionTriggerBehaviour) -> some View {
+        transformPreference(MenuButtonPreferenceKey.self){ actions in
+            for i in actions.indices {
+                actions[i].actionBehaviour = behaviour
+            }
+        }
+    }
+    
+    func menuActionDwellDuration(_ duration: TimeInterval?) -> some View {
+        transformPreference(MenuButtonPreferenceKey.self){ actions in
+            for i in actions.indices {
+                actions[i].dwellDuration = duration
+            }
+        }
+    }
+    
 }

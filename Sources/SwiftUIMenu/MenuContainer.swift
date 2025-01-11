@@ -8,25 +8,25 @@ public struct MenuContainer<Content: View>: View {
     @Environment(\.dismissPresentation) private var dismissPresentation
     @Environment(\.isInMenu) private var isInMenu
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
+    @Environment(\.isBeingPresented) private var isBeingPresented
     @Environment(\.presentationDepth) private var presentationDepth
 
     //@Environment(\.menuOrder) private var menuOrder
     
+    @State private var callSelectedOnDissappear: Bool = false
     @State private var buttons: [MenuButtonValue] = []
     @State private var simulatedGesture: InteractionEvent?
     @State private var selectedIndex: Int?
     @State private var triggerTask: DispatchWorkItem?
+    @State private var dwellTimer: Timer?
     
-    private let dismissOnAction: Bool
     private let selectionIndexBinding: Binding<Int?>?
     private let content: Content
     
     public init(
-        dismissOnAction: Bool = true,
         selectionIndex: Binding<Int?>? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
-        self.dismissOnAction = dismissOnAction
         self.selectionIndexBinding = selectionIndex
         self.content = content()
     }
@@ -74,17 +74,26 @@ public struct MenuContainer<Content: View>: View {
                 }
             } ended: { points in
                 if let selectedIndex, buttons.indices.contains(selectedIndex) {
-                    if dismissOnAction {
-                        dismissPresentation()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                            if buttons.indices.contains(selectedIndex) {
-                                buttons[selectedIndex].action()
-                            }
+                    if buttons[selectedIndex].dismissOnAction {
+                        if buttons[selectedIndex].actionBehaviour == .immediate {
+                            buttons[selectedIndex].action()
+                            callSelectedOnDissappear = false
+                            self.selectedIndex = nil
+                        } else {
+                            callSelectedOnDissappear = true
                         }
+                        
+                        dismissPresentation()
                     } else {
+                        callSelectedOnDissappear = true
                         buttons[selectedIndex].action()
+                        self.selectedIndex = nil
                     }
-                    
+                }
+            }
+            .onDisappear{
+                if let selectedIndex, buttons.indices.contains(selectedIndex), callSelectedOnDissappear {
+                    buttons[selectedIndex].action()
                     self.selectedIndex = nil
                 }
             }
@@ -92,8 +101,18 @@ public struct MenuContainer<Content: View>: View {
                 for idx in buttons.indices {
                     buttons[idx].active(idx == selectedIndex)
                 }
+                
+                dwellTimer?.invalidate()
+                
+                if let selectedIndex, buttons.indices.contains(selectedIndex), let dwell = buttons[selectedIndex].dwellDuration {
+                    dwellTimer = .scheduledTimer(withTimeInterval: dwell, repeats: false){ _ in
+                        DispatchQueue.main.async{
+                            buttons[selectedIndex].action()
+                            self.selectedIndex = nil
+                        }
+                    }
+                }
             }
-            //.frame(maxHeight: isBeingPresentedOn ? 150 : nil)
             .menuStyleTreatment(disabled: false)
             .frame(width: width)
     }
