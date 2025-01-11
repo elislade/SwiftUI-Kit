@@ -12,10 +12,18 @@ public protocol EdgeConformance {
 
 public extension EdgeConformance {
     
-    mutating func invert(_ edge: Edge) {
-        let savedEdge = get(edge)
-        self[edge] = self[edge.inverse]
-        self[edge.inverse] = savedEdge
+    mutating func swap(_ axis: Axis) {
+        switch axis {
+        case .horizontal: swap(.leading, with: .trailing)
+        case .vertical: swap(.top, with: .bottom)
+        }
+    }
+    
+    mutating func swap(_ edgeA: Edge, with edgeB: Edge) {
+        guard edgeA != edgeB else { return }
+        let savedEdge = get(edgeA)
+        self[edgeA] = self[edgeB]
+        self[edgeB] = savedEdge
     }
     
     mutating func set(edges: Edge.Set, value: Value) {

@@ -9,7 +9,7 @@ struct MenuLabelStyle: LabelStyle {
             Spacer(minLength: 10)
             configuration.icon
         }
-        .paddingAddingMenuItemInsets()
+        .equalInsetItem()
     }
     
 }
@@ -24,7 +24,7 @@ struct MenuLabeledContentStyle: LabeledContentStyle {
             Spacer(minLength: 10)
             configuration.content
         }
-        .paddingAddingMenuItemInsets()
+        .equalInsetItem()
     }
     
 }
@@ -40,30 +40,3 @@ extension View {
     }
     
 }
-
-
-struct MenuToggleStyle: ToggleStyle {
-    
-    @Environment(\.menuItemInsets) private var menuItemInsets
-    
-    func makeBody(configuration: Configuration) -> some View {
-        Button(action: { configuration.$isOn.wrappedValue.toggle() }){
-            HStack(spacing: 0) {
-                Image(systemName: "checkmark")
-                    .resizable()
-                    .scaledToFit()
-                    .opacity(configuration.isOn ? 1 : 0)
-                    .frame(width: 12)
-                    .frame(width: menuItemInsets.leading)
-                    .font(.body.weight(.semibold))
-                
-                configuration.label
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .paddingAddingMenuItemInsets([.vertical, .trailing])
-            }
-        }
-        .preferMenuItemInsets(.leading, .menuLeadingSpacerSize)
-    }
-    
-}
-

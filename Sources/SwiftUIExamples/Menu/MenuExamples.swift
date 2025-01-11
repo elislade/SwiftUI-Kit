@@ -9,18 +9,18 @@ public struct MenuExamples: View {
     
     @ViewBuilder private var menuContent: some View {
         Menu(
-            label: { Text("Item 1").paddingAddingMenuItemInsets() },
+            label: { Text("Item 1") },
             content: {
                 Button(action: { print("A") }){
                     Text("A Item")
-                        .paddingAddingMenuItemInsets()
+                        .equalInsetItem()
                 }
             }
         )
         
         MenuDivider()
         
-        Menu(label: { Text("Options").paddingAddingMenuItemInsets() }){
+        Menu(label: { Text("Options") }){
             MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
                 Text($0)
             }

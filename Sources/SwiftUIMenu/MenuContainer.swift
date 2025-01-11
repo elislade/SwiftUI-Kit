@@ -9,11 +9,9 @@ public struct MenuContainer<Content: View>: View {
     @Environment(\.isInMenu) private var isInMenu
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
     @Environment(\.presentationDepth) private var presentationDepth
-    
-    //@Environment(\.font) private var font: FontProperties
+
     //@Environment(\.menuOrder) private var menuOrder
     
-    @State private var childInsetPreferences: [EdgeInsets] = []
     @State private var buttons: [MenuButtonValue] = []
     @State private var simulatedGesture: InteractionEvent?
     @State private var selectedIndex: Int?
@@ -37,16 +35,19 @@ public struct MenuContainer<Content: View>: View {
         360 - (200 * interactionGranularity)
     }
     
+    private var defaultInsets: EdgeInsets {
+#if os(iOS)
+    .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+#else
+    .init(top: 4, leading: 8, bottom: 4, trailing: 8)
+#endif
+    }
+    
+    
     public var body: some View {
         VStack(spacing: 0){ content }
+            .equalInsetContext(defaultInsets: defaultInsets)
             //.disabled(isBeingPresentedOn)
-            .menuItemInset(
-                .leading,
-                isInMenu || childInsetPreferences.contains(where: { $0 != .init() }) ? .menuLeadingSpacerSize : nil
-            )
-            .onPreferenceChange(MenuItemInsetPreferenceKey.self){
-                _childInsetPreferences.wrappedValue = $0
-            }
             .opacity(1 - (Double(presentationDepth) / 3))
             .symbolRenderingMode(.hierarchical)
             .environment(\.isInMenu, true)
@@ -59,7 +60,13 @@ public struct MenuContainer<Content: View>: View {
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }
-            .windowInteraction(started: { _ in }){ points in
+            .windowInteraction{ points in
+                if let new = points.last {
+                    selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
+                } else {
+                    self.selectedIndex = nil
+                }
+            } changed: { points in
                 if let new = points.last {
                     selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
                 } else {

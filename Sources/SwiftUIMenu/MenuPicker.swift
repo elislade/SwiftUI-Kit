@@ -6,11 +6,15 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
     
     @Environment(\.isInMenu) private var isInMenu
     
-    @Binding var selection: V
+    @Binding private var selection: V
     let data: Data
-    @ViewBuilder let label: (Data.Element) -> Label
+    @ViewBuilder private let label: @MainActor (Data.Element) -> Label
     
-    public init(selection: Binding<V>, data: Data, @ViewBuilder label: @escaping (Data.Element) -> Label) {
+    public init(
+        selection: Binding<V>,
+        data: Data, @ViewBuilder
+        label: @MainActor @escaping (Data.Element) -> Label
+    ) {
         self._selection = selection
         self.data = data
         self.label = label
@@ -57,6 +61,13 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
         MenuContainer{
             MenuPicker(selection: binding, data: ["A", "B", "C"]){ ele in
                 Text(ele)
+            }
+            
+            MenuGroupDivider()
+            
+            Button(action: {}){
+                Text("Non-picker Item")
+                    .equalInsetItem()
             }
         }
         .padding()

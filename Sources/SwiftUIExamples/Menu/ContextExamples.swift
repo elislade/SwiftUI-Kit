@@ -21,7 +21,7 @@ public struct ContextMenuExamples: View  {
                             .contextCustomMenu(isPresented: Binding($presentedIndices, contains:  i)) {
                                 Button(action: {}){
                                     Text("Item A")
-                                        .paddingAddingMenuItemInsets()
+                                        .equalInsetItem()
                                 }
                                 
                                 MenuGroupDivider()

@@ -43,7 +43,6 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
 struct Header<L: View> : View {
     
     @Environment(\.layoutDirection) private var layoutDirection
-    @Environment(\.menuItemInsets) private var menuItemInsets
     @Environment(\.isBeingPresented) private var isPresented
     @Environment(\.dismissPresentation) private var dismiss
     
@@ -69,25 +68,21 @@ struct Header<L: View> : View {
     
     var body: some View {
         Button(action: onTap){
-            HStack(spacing: 0) {
-                Image(systemName: "chevron.right")
-                    .rotationEffect(isExpanded ? .degrees(90 * layoutNormalizeFactor) : .zero)
-                    .frame(width: menuItemInsets.leading)
-                    .layoutDirectionMirror()
-                
-                label()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .menuItemInset(.leading, 0)
-                    .paddingAddingMenuItemInsets([.vertical, .trailing])
-            }
+            label()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .equalInsetItem(.leading, .menuLeadingSpacerSize)
+                .overlay(alignment: .leading){
+                    Image(systemName: "chevron.right")
+                        .rotationEffect(isExpanded ? .degrees(90 * layoutNormalizeFactor) : .zero)
+                        .frame(width: 12)
+                        .layoutDirectionMirror()
+                        .padding(.leading, 12)
+                }
         }
-        .drawingGroup()
         .buttonStyle(MenuButtonStyle(
             hoverTriggerInterval: 0.5,
             dismissOnAction: false
         ))
-        .menuItemInset(.leading, 0)
-        .preferMenuItemInsets(.leading, .menuLeadingSpacerSize)
     }
     
 }
