@@ -56,4 +56,5 @@ public struct ContextMenuExamples: View  {
 
 #Preview("Context Menu") {
     ContextMenuExamples()
+        .previewSize()
 }

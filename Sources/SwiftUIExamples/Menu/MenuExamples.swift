@@ -41,7 +41,7 @@ public struct MenuExamples: View {
         VStack(spacing: 0){
             ScrollView{
                 VStack {
-                    ForEach(0..<30){ i in
+                    ForEach(0..<20){ i in
                         HStack {
                             Spacer()
                             
@@ -77,6 +77,7 @@ public struct MenuExamples: View {
                         }
                     }
                 }
+                .padding()
             }
             
             Divider().ignoresSafeArea()

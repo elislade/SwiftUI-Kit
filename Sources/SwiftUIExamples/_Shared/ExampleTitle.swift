@@ -13,6 +13,14 @@ struct ExampleTitle: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)
                 .frame(width: 16, height: 10)
+                .overlay{
+                    LinearGradient(
+                        colors: [.white.opacity(0.2), .black.opacity(0.2)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .blendMode(.overlay)
+                }
                 .shearHorizontal(.degrees(-20))
             
             Text(title)
@@ -24,6 +32,14 @@ struct ExampleTitle: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)
                 .frame(height: 10)
+                .overlay{
+                    LinearGradient(
+                        colors: [.white.opacity(0.2), .black.opacity(0.2)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .blendMode(.overlay)
+                }
                 .shearHorizontal(.degrees(-20))
         }
     }
