@@ -60,7 +60,7 @@ public struct MenuContainer<Content: View>: View {
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }
-            .windowInteraction{ points in
+            .windowDrag{ points in
                 if let new = points.last {
                     selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
                 } else {
@@ -90,6 +90,9 @@ public struct MenuContainer<Content: View>: View {
                         self.selectedIndex = nil
                     }
                 }
+            }
+            .windowHover{ point in
+                selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(point) })
             }
             .onDisappear{
                 if let selectedIndex, buttons.indices.contains(selectedIndex), callSelectedOnDissappear {

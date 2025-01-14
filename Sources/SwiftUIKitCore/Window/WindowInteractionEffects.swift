@@ -19,7 +19,7 @@ struct WindowInteractionEffects: ViewModifier {
             .scaleEffect(scale, anchor:  scaleAnchor)
             .offset(offset)
             .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ rect = $0 }
-            .windowInteraction(started: { _ in }){ points in
+            .windowDrag(started: { _ in }){ points in
                 guard !effects.isEmpty, let location = points.last else {
                     return
                 }

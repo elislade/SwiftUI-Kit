@@ -94,6 +94,7 @@ struct WindowEventsModifier : ViewModifier {
                         let locations = touches.map{ $0.location(in: nil) }
                     
                         if allStarted {
+                            //print("Started")
                             started(locations)
                         }
                         
@@ -102,11 +103,38 @@ struct WindowEventsModifier : ViewModifier {
                         }
                         
                         if allEnded {
-                            print("Ended")
+                            //print("Ended")
                             ended(locations)
                         }
                     }
                     .hidden()
+            }
+        }
+    }
+    
+}
+
+
+struct WindowHoverModifier: ViewModifier {
+    
+    @Environment(\._disableWindowEvents) private var isDisabled
+    
+    var hover: @MainActor (CGPoint) -> Void
+    
+    func body(content: Content) -> some View {
+        content.overlay {
+            if !isDisabled {
+                Color.clear
+                    .onAppear{ UIWindow.enterSwizzleSendEvents() }
+                    .onDisappear{ UIWindow.exitSwizzleSendEvents() }
+                    .onReceive(WindowEvents.passthrough){ event in
+                        guard
+                            event.type == .hover,
+                            let touch = event.allTouches?.first(where: { $0.type != .direct })
+                        else { return }
+                        
+                        hover(touch.location(in: nil))
+                    }
             }
         }
     }

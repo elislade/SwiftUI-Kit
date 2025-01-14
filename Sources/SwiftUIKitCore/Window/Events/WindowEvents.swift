@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    func windowInteraction(
+    func windowDrag(
         started: @MainActor @escaping ([CGPoint]) -> Void = { _ in },
         changed: @MainActor @escaping ([CGPoint]) -> Void = { _ in },
         ended: @MainActor @escaping ([CGPoint]) -> Void = { _ in }
@@ -13,6 +13,10 @@ public extension View {
             changed: changed,
             ended: ended
         ))
+    }
+    
+    func windowHover(_ hover: @MainActor @escaping (CGPoint) -> Void) -> some View {
+        modifier(WindowHoverModifier(hover: hover))
     }
     
 }

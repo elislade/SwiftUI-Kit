@@ -44,27 +44,35 @@ extension NSWindow {
     
 }
 
+extension NSEvent {
+    
+    @MainActor var flippedYLocationInWindow: CGPoint {
+        guard let window else { return locationInWindow }
+        return CGPoint(x: locationInWindow.x, y: window.frame.height - locationInWindow.y)
+    }
+    
+}
+
+
 struct WindowEventsModifier: ViewModifier {
     
     @Environment(\._disableWindowEvents) private var isDisabled
+    @State private var windowRef: NSWindow?
     
     var started: @MainActor ([CGPoint]) -> Void
     var changed: @MainActor ([CGPoint]) -> Void
     var ended: @MainActor ([CGPoint]) -> Void
     
-    private func flipYCoordinate(_ point: CGPoint, in window: NSWindow) -> CGPoint {
-        CGPoint(x: point.x, y: window.frame.height - point.y)
-    }
-    
     func body(content: Content) -> some View {
         content.overlay {
             if !isDisabled {
                 Color.clear
-                    .onAppear { NSWindow.enterSwizzleSendEvents() }
+                    .onAppear{ NSWindow.enterSwizzleSendEvents() }
                     .onDisappear{ NSWindow.exitSwizzleSendEvents() }
+                    .windowReference{ windowRef = $0 }
                     .onReceive(WindowEvents.passthrough){ event in
-                        guard let window = event.window else { return }
-                        let location = flipYCoordinate(event.locationInWindow, in: window)
+                        guard let window = event.window, window == windowRef else { return }
+                        let location = event.flippedYLocationInWindow
                         
                         if event.type.isMouseDown {
                             started([location])
@@ -73,6 +81,35 @@ struct WindowEventsModifier: ViewModifier {
                         } else if event.type.isMouseDrag {
                             changed([location])
                         }
+                    }
+            }
+        }
+    }
+    
+}
+
+struct WindowHoverModifier: ViewModifier {
+    
+    @Environment(\._disableWindowEvents) private var isDisabled
+    @State private var windowRef: NSWindow?
+    
+    let hover: @MainActor (CGPoint) -> Void
+    
+    func body(content: Content) -> some View {
+        content.overlay {
+            if !isDisabled {
+                Color.clear
+                    .onAppear{ NSWindow.enterSwizzleSendEvents() }
+                    .onDisappear{ NSWindow.exitSwizzleSendEvents() }
+                    .windowReference{ windowRef = $0 }
+                    .onReceive(WindowEvents.passthrough){ event in
+                        guard
+                            let window = event.window,
+                            window == windowRef,
+                            event.type == .mouseMoved || event.type.isMouseUp
+                        else { return }
+                        
+                        hover(event.flippedYLocationInWindow)
                     }
             }
         }

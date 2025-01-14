@@ -3,50 +3,24 @@ import SwiftUIKitCore
 
 struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View {
     
-    @Binding var presentedBinding: Bool
+    var presentedBinding: Binding<Bool>?
     
     let source: Source
     @ViewBuilder let presentedView: Presented
     @ViewBuilder let content: Content
     
     @State private var isPresented = false
-    @State private var simulatedGesture: InteractionEvent?
+    @State private var origin: CGPoint = .zero
+    @State private var mouseLocation: CGPoint = .zero
+    
+    private var binding: Binding<Bool> {
+        presentedBinding ?? $isPresented
+    }
     
     private var ctxMenuBG: some View {
         ZStack {
             VisualEffectView(blurRadius: 10)
             Color.black.opacity(0.3)
-        }
-    }
-    
-    var body: some View {
-        source.focusPresentation(
-            isPresented: $isPresented,
-            focus: {
-                Group {
-                    if type(of: presentedView) == EmptyView.self {
-                        source
-                    } else {
-                        presentedView
-                    }
-                }
-                .presentationBackground { ctxMenuBG }
-                .windowInteractionEffects([.parallax()])
-            },
-            accessory: { state in
-                MenuContainer{ content }
-                    .shadow(radius: 10, y: 5)
-                    .windowInteractionEffects([.scale(anchor: state.anchor)])
-                    .padding(.init(state.edge))
-            }
-        )
-        .onChangePolyfill(of: presentedBinding, initial: true){
-            guard presentedBinding != isPresented else { return }
-            isPresented = presentedBinding
-        }
-        .onChange(of: isPresented){
-            guard $0 != presentedBinding else { return }
-            presentedBinding = $0
         }
         .simultaneousLongPress { isPresented = true }
     }
@@ -68,7 +42,7 @@ public extension View {
     ///   - items: A View Builder of the context menu items to present.
     /// - Returns: A `ContextMenuPresenter` view.
     func contextCustomMenu<Menu: View>(
-        isPresented: Binding<Bool> = .constant(false),
+        isPresented: Binding<Bool>? = nil,
         @ViewBuilder items: @escaping () -> Menu
     ) -> some View {
         ContextMenuPresenter(
@@ -86,7 +60,7 @@ public extension View {
     ///   - items: A View Builder of the context menu items to present.
     /// - Returns: A `ContextMenuPresenter` view.
     func contextCustomMenu<Menu: View, Presented: View>(
-        isPresented: Binding<Bool> = .constant(false),
+        isPresented: Binding<Bool>? = nil,
         @ViewBuilder presented: @escaping () -> Presented,
         @ViewBuilder items: @escaping () -> Menu
     ) -> some View {
