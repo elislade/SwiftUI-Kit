@@ -46,6 +46,10 @@ public extension View {
         }
     }
     
+    func offset(_ point: CGPoint) -> some View {
+        offset(x: point.x, y: point.y)
+    }
+    
 }
 
 

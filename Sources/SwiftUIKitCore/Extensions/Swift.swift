@@ -179,3 +179,59 @@ extension FormatStyle where Self == FloatingPointFormatStyle<Double> {
     }
     
 }
+
+
+public func pow<T: BinaryInteger>(_ base: T, _ power: T) -> T {
+    
+    func expBySq(_ y: T, _ x: T, _ n: T) -> T {
+        precondition(n >= 0)
+        if n == 0 {
+            return y
+        } else if n == 1 {
+            return y * x
+        } else if n.isMultiple(of: 2) {
+            return expBySq(y, x * x, n / 2)
+        } else { // n is odd
+            return expBySq(y * x, x * x, (n - 1) / 2)
+        }
+    }
+
+    return expBySq(1, base, power)
+}
+
+
+public func formatFrequency(_ hertz: Int, compact: Bool = true) -> (value: String, postfix: String) {
+    let attributedString = Measurement(
+        value: Double(hertz),
+        unit: UnitFrequency.hertz
+    ).convertedToNearestWhole.formatted(.measurement(width: compact ? .narrow : .wide, usage: .asProvided).attributed)
+    
+    var value: [String] = []
+    for run in attributedString.runs {
+        let sub = attributedString.characters[run.range]
+        if !sub.allSatisfy(\.isWhitespace) {
+            value.append(String(sub))
+        }
+    }
+    
+    return (value[0], value[1])
+}
+
+public extension Measurement where UnitType == UnitFrequency {
+    
+    var convertedToNearestWhole: Self {
+        let divisions: [UnitType] = [.nanohertz, .microhertz, .millihertz, .hertz, .kilohertz, .megahertz, .gigahertz, .terahertz]
+        var index: Int = 0
+
+        while true {
+            let converted = converted(to: divisions[index])
+            
+            if converted.value.rounded() >= 1000 && divisions.indices.contains(index + 1) {
+                index += 1
+            } else {
+                return Self(value: converted.value.rounded(), unit: converted.unit)
+            }
+        }
+    }
+    
+}

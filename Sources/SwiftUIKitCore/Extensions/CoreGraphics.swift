@@ -42,6 +42,10 @@ public extension CGPoint {
         CGPoint(x: x.rounded(rule), y: y.rounded(rule))
     }
     
+    nonisolated func distance(to point: CGPoint) -> CGFloat {
+        hypot(x - point.x, y - point.y)
+    }
+    
     nonisolated func distance(from rect: CGRect) -> CGFloat {
         var vd: CGFloat = 0
         var hd: CGFloat = 0
@@ -61,6 +65,13 @@ public extension CGPoint {
         return max(vd, hd)
     }
     
+    func translate(by point: CGPoint) -> CGPoint {
+        .init(x: x + point.x, y: y + point.y)
+    }
+    
+    prefix static func -(point: CGPoint) -> CGPoint {
+        .init(x: -point.x, y: -point.y)
+    }
 }
 
 
@@ -101,6 +112,10 @@ public extension CGRect {
         case .horizontal: maxX
         case .vertical: maxY
         }
+    }
+    
+    func inset(_ insets: EdgeInsets) -> CGRect {
+        CGRect(x: 0, y: 0, width: 0, height: 0)
     }
     
 }
