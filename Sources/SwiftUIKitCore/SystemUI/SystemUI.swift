@@ -11,22 +11,17 @@ public struct SystemUIMask: OptionSet, Sendable {
     public static let visualEffect = SystemUIMask(rawValue: 1 << 0)
     public static let alert = SystemUIMask(rawValue: 1 << 1)
     public static let tabbar = SystemUIMask(rawValue: 1 << 2)
-    //static let menu = SystemUIMask(rawValue: 1 << 3)
+    
+    public static let sceneStatusbar = SystemUIMask(rawValue: 1 << 3)
+    public static let bottomToolbar = SystemUIMask(rawValue: 1 << 4)
+    public static let navigationTitlebar = SystemUIMask(rawValue: 3 << 5)
+
+    public static let bars: SystemUIMask = [.sceneStatusbar, .bottomToolbar, .navigationTitlebar, .tabbar]
     
 }
 
 
 #if canImport(UIKit) && !os(visionOS)
-
-public extension SystemUIMask {
-    
-    static let sceneStatusbar = SystemUIMask(rawValue: 1 << 3)
-    static let bottomToolbar = SystemUIMask(rawValue: 1 << 4)
-    static let navigationTitlebar = SystemUIMask(rawValue: 3 << 5)
-    
-    static let bars: SystemUIMask = [.sceneStatusbar, .bottomToolbar, .navigationTitlebar, .tabbar]
-    
-}
 
 
 public extension View {
