@@ -16,15 +16,12 @@ struct SimultaneousLongPressModifier: ViewModifier {
                     }
             )
         } else {
-            content.overlay {
-                #if canImport(UIKit)
-                SimultaneousLongPressRepresentation(
+            content
+                .modifier(LongPressWindowInteraction(
                     minimumDuration: minimumDuration,
                     maximumDistance: maximumDistance,
                     trigger: trigger
-                )
-                #endif
-            }
+                ))
         }
     }
     
