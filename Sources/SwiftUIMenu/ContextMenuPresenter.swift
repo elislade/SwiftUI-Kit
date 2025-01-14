@@ -22,7 +22,58 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
             VisualEffectView(blurRadius: 10)
             Color.black.opacity(0.3)
         }
-        .simultaneousLongPress { isPresented = true }
+    }
+    
+    var body: some View {
+        source
+#if os(macOS)
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin }){ origin = $0 }
+            .background{
+                Color.clear
+                    .frame(width: 1, height: 1)
+                    .autoAnchorOrthogonalToEdgePresentation(isPresented: binding, edge: .trailing){
+                        MenuContainer{ content }
+                    }
+                    .position(mouseLocation)
+            }
+//            .windowInteraction(hover: {
+//                mouseLocation = $0.applying(.init(translationX: -origin.x, y: -origin.y))
+//            })
+            .onMouseClick{ evt in
+                self.mouseLocation = (evt.location ?? .zero).applying(.init(translationX: -origin.x, y: -origin.y))
+                
+                if evt.button == .right && evt.phase == .up {
+                    binding.wrappedValue = true
+                } else {
+                    binding.wrappedValue = false
+                }
+            }
+#else
+            .focusPresentation(
+                isPresented: binding,
+                focus: {
+                    Group {
+                        if type(of: presentedView) == EmptyView.self {
+                            source
+                        } else {
+                            presentedView
+                        }
+                    }
+                    .presentationBackground { ctxMenuBG }
+                    .windowInteractionEffects([.parallax()])
+                },
+                accessory: { state in
+                    MenuContainer{ content }
+                        .shadow(radius: 10, y: 5)
+                        .windowInteractionEffects([.scale(anchor: state.anchor)])
+                        .padding(.init(state.edge))
+                }
+            )
+            .simultaneousLongPress {
+                print("Open")
+                binding.wrappedValue = true
+            }
+#endif
     }
     
     
