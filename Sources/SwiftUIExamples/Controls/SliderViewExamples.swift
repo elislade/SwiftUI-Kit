@@ -76,27 +76,21 @@ public struct SliderViewExamples : View {
                     .font(.exampleParameterValue)
                     .foregroundColor(.secondary)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.LayoutDirection(value: $direction)
-           
-            Divider()
             
             Toggle(isOn: $hitTestHandle){
                 Text("Hit Test Handle")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $useStepping){
                 Text("Use Stepping")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
             .syncValue(_useStepping.map{ $0 ? 1 : nil }, $x.step)
             .syncValue(_useStepping.map{ $0 ? 3 : nil }, $y.step)
         }
@@ -163,12 +157,11 @@ struct SliderViewEqualizerExample: View {
                     .padding(.bottom, footerSize)
                     .lineLimit(1)
                     
-                    ForEach(frequencies){ f in
-                        let i = frequencies.firstIndex(of: f)!
+                    ForEach($frequencies){ f in
                         VStack(spacing: 0) {
-                            Slider(value: $frequencies[i].gain)
+                            Slider(value: f.gain)
                             
-                            let formatted = formatFrequency(f.frequency)
+                            let formatted = formatFrequency(f.wrappedValue.frequency)
                             
                             Group {
                                 Text(formatted.value) + Text(formatted.postfix)
