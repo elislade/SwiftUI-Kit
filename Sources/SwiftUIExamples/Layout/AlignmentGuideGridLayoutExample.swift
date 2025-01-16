@@ -53,8 +53,7 @@ public struct AlignmentGuideGridLayoutExample : View {
     
     public var body: some View {
         ExampleView(title: "AlignmentGuide Grid Layout"){
-            grid
-                .animation(.bouncy, value: columns)
+            grid.animation(.bouncy, value: columns)
         } parameters: {
             HStack {
                 Text("Columns").font(.exampleParameterTitle)
@@ -64,9 +63,8 @@ public struct AlignmentGuideGridLayoutExample : View {
                 
                 Spacer()
                 Stepper(value: $columns, in: 1...5)
-            }.padding()
-            
-            Divider()
+            }
+            .exampleParameterCell()
             
             HStack {
                 Text("Count").font(.exampleParameterTitle)
@@ -81,9 +79,7 @@ public struct AlignmentGuideGridLayoutExample : View {
                     onDecrement: !colors.isEmpty ? { remove() } : nil
                 )
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack(spacing: 16) {
@@ -98,7 +94,7 @@ public struct AlignmentGuideGridLayoutExample : View {
                 
                 Slider(value: $spacing, in: 0...50, step: 1)
             }
-            .padding()
+            .exampleParameterCell()
         }
         .contentTransitionNumericText()
         .onAppear{

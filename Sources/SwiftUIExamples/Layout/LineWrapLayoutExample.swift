@@ -118,26 +118,20 @@ public struct LineWrapLayoutExample: View {
                 .symbolRenderingMode(.hierarchical)
                 .symbolVariant(.circle.fill)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+         
             Toggle(isOn: $showBorders){
                 Text("Show Borders")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
                 
             Toggle(isOn: $groupByWhitespace){
                 Text("Group By Whitespace")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             VStack {
                 HStack {
                     Text("Size")
@@ -151,9 +145,7 @@ public struct LineWrapLayoutExample: View {
                 
                 Slider(value: $size, in: 6...160, step: 4)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Alignment")
@@ -175,7 +167,7 @@ public struct LineWrapLayoutExample: View {
                 .frame(width: 130)
                 .controlRoundness(1)
             }
-            .padding()
+            .exampleParameterCell()
         }
         .animation(.bouncy, value: alignment)
     }

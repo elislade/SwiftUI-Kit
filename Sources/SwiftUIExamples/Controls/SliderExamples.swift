@@ -48,26 +48,18 @@ public struct SliderExamples: View {
                     }
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $disable){
                 Text("Disable")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
             
-            Divider()
-            
             ExampleCell.LayoutDirection(value: $direction)
-            
-            Divider()
-            
+
             ExampleCell.ControlRoundness(value: $controlRoundness)
         }
     }

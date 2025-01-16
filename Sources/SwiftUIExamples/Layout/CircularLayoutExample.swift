@@ -52,10 +52,8 @@ public struct CircularLayoutExample : View {
                     }
                 )
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             VStack {
                 HStack {
                     Text("Radius")
@@ -69,9 +67,7 @@ public struct CircularLayoutExample : View {
                 
                 Slider(value: $radius, in: 50...150, step: 1)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -86,9 +82,7 @@ public struct CircularLayoutExample : View {
                 
                 Slider(value: $offset.degrees, in: 0...360, step: 1)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -97,20 +91,11 @@ public struct CircularLayoutExample : View {
                     
                     Spacer()
                     
-//                    Text(rangeLower.degrees, format: .number)
-//                        .font(.exampleParameterValue)
-                    
                     Text(rangeUpper.degrees, format: .number)
                         .font(.exampleParameterValue)
                 }
                 
                 HStack {
-//                    Slider(
-//                        value: $rangeLower.degrees,
-//                        in: 0...179,
-//                        step: 1
-//                    )
-    
                     Slider(
                         value: $rangeUpper.degrees,
                         in: 0...360,
@@ -118,15 +103,13 @@ public struct CircularLayoutExample : View {
                     )
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $compensateForRotation){
                 Text("Compensate Rotation")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
 }

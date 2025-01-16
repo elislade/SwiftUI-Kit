@@ -53,9 +53,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         values.bottomRight = .random(in: radiusRange)
                     }
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack {
                     HStack {
@@ -70,9 +68,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     
                     Slider(value: $values.topLeft, in: radiusRange)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack {
                     HStack {
@@ -87,9 +83,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     
                     Slider(value: $values.topRight, in: radiusRange)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack {
                     HStack {
@@ -104,9 +98,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     
                     Slider(value: $values.bottomLeft, in: radiusRange)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack {
                     HStack {
@@ -121,9 +113,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     
                     Slider(value: $values.bottomRight, in: radiusRange)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
         }
         .animation(.interactiveSpring, value: values)

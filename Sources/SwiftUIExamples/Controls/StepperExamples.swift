@@ -50,24 +50,15 @@ public struct StepperExamples: View {
                 Text("Disable")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
-            
-            Divider()
             
             ExampleCell.LayoutDirection(value: $direction)
             
-            Divider() 
-            
             ExampleCell.ControlSize(value: $controlSize)
-            
-            Divider()
-            
+
             ExampleCell.ControlRoundness(value: $controlRoundness)
-            
         }
     }
     

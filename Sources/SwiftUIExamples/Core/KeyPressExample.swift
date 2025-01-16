@@ -106,23 +106,17 @@ public struct KeyPressExample: View {
                 Toggle(isOn: Binding($phase, contains: .up)) {
                     Text("Up").font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 Toggle(isOn: Binding($phase, contains: .down)) {
                     Text("Down").font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 Toggle(isOn: Binding($phase, contains: .repeat)) {
                     Text("Repeat").font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
             
             ExampleSection("Input Mask", isExpanded: true){
@@ -137,9 +131,7 @@ public struct KeyPressExample: View {
                         Text("Key Equivalence").tag(MaskType.equivalence)
                     }
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 switch mask {
                 case .none:
@@ -171,9 +163,7 @@ public struct KeyPressExample: View {
                     KeyEquivalentView(key: key)
                         .font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
         }
     }
@@ -195,9 +185,7 @@ public struct KeyPressExample: View {
                     Text(item.name)
                         .font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
         }
         

@@ -58,9 +58,7 @@ struct ConditionallyShowExample : View {
                 Text("Show")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -75,8 +73,7 @@ struct ConditionallyShowExample : View {
                 
                 Slider(value: $threshold)
             }
-            .padding()
-            
+            .exampleParameterCell()
         }
     }
     

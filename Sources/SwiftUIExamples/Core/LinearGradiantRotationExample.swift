@@ -14,12 +14,14 @@ public struct LinearGradiantRotationExample : View {
                     Gradient(colors: [.purple, .yellow]),
                     angle: .degrees(rotationDegrees)
                 ))
+                .padding()
             
             ExampleTitle("Gradient Rotation")
+            
             Slider(value: $rotationDegrees, in: 0...360)
+                .exampleParameterCell()
             
         }
-        .padding()
     }
     
 }

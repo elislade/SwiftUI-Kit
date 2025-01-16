@@ -43,10 +43,8 @@ public struct BasicExamples: View {
                 Text("Is Presented")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             HStack {
                 Text("Vertical Alignment")
                     .fixedSize(horizontal: true, vertical: false)
@@ -60,9 +58,7 @@ public struct BasicExamples: View {
                     Text("Bottom").tag(UnitPoint(x: anchor.x, y: 1))
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Horizontal Alignment")
@@ -77,11 +73,8 @@ public struct BasicExamples: View {
                     Text("Trailing").tag(UnitPoint(x: 1, y: anchor.y))
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
         }
-        //.presentationContext()
     }
     
     

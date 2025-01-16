@@ -74,29 +74,19 @@ public struct SegmentedPickerExamples : View {
                     set(index: selectionIndex + 1)
                 }
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+          
             Toggle(isOn: $disable){
                 Text("Disable")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.ControlRoundness(value: $controlRoundness)
             
-            Divider()
-            
             ExampleCell.ControlSize(value: $controlSize)
             
-            Divider()
-            
             ExampleCell.LayoutDirection(value: $layout)
-            
-            Divider()
             
             ExampleCell.LayoutDirectionSuggestion(value: $suggetion)
         }

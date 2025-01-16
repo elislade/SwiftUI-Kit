@@ -13,7 +13,7 @@ public struct NavBarExamples: View {
             Text("Show \(placement)")
                 .font(.exampleParameterTitle)
         }
-        .padding()
+        .exampleParameterCell()
     }
     
     public init() {}
@@ -75,27 +75,19 @@ public struct NavBarExamples: View {
                     Text("Hide")
                         .font(.exampleParameterTitle)
                 }
-                .padding()
-                
-                Divider()
-                
+                .exampleParameterCell()
+
                 Toggle(isOn: $showBackAction){
                     Text("Show Back Action")
                         .font(.exampleParameterTitle)
                 }
-                .padding()
+                .exampleParameterCell()
             }
             
-            Divider()
-            
             ExampleSection("Placements", isExpanded: true){
-                Divider()
                 toggle(for: .leading)
-                Divider()
                 toggle(for: .title)
-                Divider()
                 toggle(for: .trailing)
-                Divider()
                 toggle(for: .accessory)
             }
             .disabled(barHidden)

@@ -30,10 +30,8 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
                 Text("Show")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             VStack {
                 HStack{
                     Text("Speed")
@@ -47,9 +45,7 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
                 
                 Slider(value: $speed, in: (0.1)...(1.7))
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Provider { normal, inverse in
                 transition = normal

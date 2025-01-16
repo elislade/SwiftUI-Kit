@@ -33,10 +33,8 @@ public struct LoadingExamples: View {
                 Text("Indefinite")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+         
             VStack {
                 HStack {
                     Text("Progress")
@@ -50,15 +48,12 @@ public struct LoadingExamples: View {
                 
                 Slider(value: $loadingProgress)
             }
-            .padding()
+            .exampleParameterCell()
             .onChange(of: loadingProgress){ _ in
                 loadingIndefinite = false
             }
-            
-            Divider()
-            
+
             ExampleCell.LayoutDirection(value: $layoutDirection)
-            
         }
     }
     

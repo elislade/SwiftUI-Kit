@@ -56,11 +56,9 @@ public struct FlipTransitionExample: View {
                     Text("None").tag(Optional<HorizontalEdge>(nil))
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: horizontal){ update(transition, transitionInverse) }
             .onAppear { update(transition, transitionInverse) }
-            
-            Divider()
             
             HStack {
                 Text("Vertical")
@@ -76,7 +74,7 @@ public struct FlipTransitionExample: View {
                     Text("None").tag(Optional<VerticalEdge>(nil))
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: vertical){ update(transition, transitionInverse) }
         }
         

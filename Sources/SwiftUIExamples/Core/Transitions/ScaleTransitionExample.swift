@@ -50,7 +50,7 @@ public struct ScaleTransitionExample: View {
                     Slider(value: $scale.y, in : -1...3, step: 0.1)
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onAppear { update(transition, nil) }
             .onChangePolyfill(of: scale){ old, new in
                 if isLinked {
@@ -61,8 +61,6 @@ public struct ScaleTransitionExample: View {
                 }
                 update(transition, nil)
             }
-                
-            Divider()
             
             HStack(alignment: .top) {
                 Text("Anchor")
@@ -79,7 +77,7 @@ public struct ScaleTransitionExample: View {
                 ExampleControl.Anchor(value: $anchor)
                     .frame(width: 130, height: 130)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: anchor){ update(transition, nil) }
         }
     }

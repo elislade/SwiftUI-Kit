@@ -13,7 +13,8 @@ struct SystemUIOverrideExamples: View {
         Toggle(isOn: Binding($mask, contains: mask)){
             Text(label)
                 .font(.exampleParameterTitle)
-        }.padding()
+        }
+        .exampleParameterCell()
     }
     
     
@@ -55,22 +56,12 @@ struct SystemUIOverrideExamples: View {
             .overrideColorScheme(color, uiMask: mask)
         } parameters: {
             ExampleCell.ColorScheme(value: $color)
-            
-            Divider()
-            
+
             ExampleSection("UI Mask", isExpanded: true){
                 view("Status Bar", for: .sceneStatusbar)
-                Divider()
-                
                 view("Tab Bar", for: .tabbar)
-                Divider()
-                
                 view("Tool Bar", for: .bottomToolbar)
-                Divider()
-                
                 view("Navigation Bar", for: .navigationTitlebar)
-                Divider()
-                
                 view("Alert", for: .alert)
             }
         }

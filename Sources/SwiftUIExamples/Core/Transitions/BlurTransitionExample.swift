@@ -28,11 +28,9 @@ public struct BlurTransitionExample: View {
                 Text("Is Opaque")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: isOpaque){ update(transition, nil) }
             .onAppear { update(transition, nil) }
-            
-            Divider()
             
             VStack {
                 HStack {
@@ -49,7 +47,7 @@ public struct BlurTransitionExample: View {
         
                 Slider(value: $radius, in: 0...200, step: 1)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: radius){ update(transition, nil) }
         }
     }

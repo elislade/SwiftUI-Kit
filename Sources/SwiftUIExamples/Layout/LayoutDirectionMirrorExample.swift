@@ -33,7 +33,7 @@ public struct LayoutDirectionMirrorExample: View {
                 Text("Is Mirror Enabled")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     

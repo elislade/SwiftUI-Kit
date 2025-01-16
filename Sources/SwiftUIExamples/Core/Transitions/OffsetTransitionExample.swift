@@ -43,7 +43,7 @@ public struct OffsetTransitionExample: View {
                     Slider(value: $offset.y, in: -400...400)
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: offset){ update(transition, nil) }
             .onAppear { update(transition, nil) }
         }

@@ -25,9 +25,7 @@ struct SceneInsetExamples: View {
                 Text("Disable Inset Reading")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -48,9 +46,7 @@ struct SceneInsetExamples: View {
                     Slider(value: $insets.trailing, in: 0...80)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -71,9 +67,7 @@ struct SceneInsetExamples: View {
                     Slider(value: $insets.bottom, in: 0...80)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
         }
     }
     

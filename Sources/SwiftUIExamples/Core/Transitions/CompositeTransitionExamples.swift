@@ -93,9 +93,7 @@ public struct CompositeTransitionExamples: View {
                     }
                     .font(.body[.bold])
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
             .animation(.smooth, value: order)
         }

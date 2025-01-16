@@ -33,19 +33,18 @@ public struct VisualEffectViewExamples : View {
         } parameters: {
             ExampleSection("Disabling Filters", isExpanded: true){
                 ForEach(VisualEffectView.Filter.allCases) { filter in
-                    Toggle(isOn: Binding($filters, contains: filter)){
-                        Text("\(filter)".splitCamelCaseFormat)
-                            .font(.exampleParameterTitle)
+                    VStack {
+                        Toggle(isOn: Binding($filters, contains: filter)){
+                            Text("\(filter)".splitCamelCaseFormat)
+                                .font(.exampleParameterTitle)
+                        }
+
+                        if filter == .gaussianBlur {
+                            Slider(value: $blur, in: 0...60)
+                                .disabled(filters.contains(.gaussianBlur))
+                        }
                     }
-                    .padding()
-                    
-                    if filter == .gaussianBlur {
-                        Slider(value: $blur, in: 0...60)
-                            .padding([.horizontal, .bottom])
-                            .disabled(filters.contains(.gaussianBlur))
-                    }
-                    
-                    Divider()
+                    .exampleParameterCell()
                 }
             }
         }

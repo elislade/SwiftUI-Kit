@@ -43,9 +43,7 @@ public struct FontExamples: View {
                         Text("SwiftUI").tag(ResolverType.swiftUI)
                     }
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 HStack {
                     Text("Dynamic Type")
@@ -60,15 +58,12 @@ public struct FontExamples: View {
                         }
                     }
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 ParameterEditor(parameters: $parameters)
             }
             
             if fontResolverType == .coreText {
-                Divider()
                 Inspector()
             }
         }
@@ -193,10 +188,8 @@ public struct FontExamples: View {
                     
                     Slider(value: $parameters.size, in: 10...120, step: 1)
                 }
-                .padding()
-                
-                Divider()
-                
+                .exampleParameterCell()
+              
                 VStack(spacing: 5) {
                     HStack {
                         Text("Width")
@@ -218,9 +211,7 @@ public struct FontExamples: View {
                     
                     FontParameterSlider(value: $parameters.width)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack(spacing: 5) {
                     HStack {
@@ -237,10 +228,8 @@ public struct FontExamples: View {
                     
                     FontParameterSlider(value: $parameters.slant)
                 }
-                .padding()
-                
-                Divider()
-                
+                .exampleParameterCell()
+
                 VStack(spacing: 5) {
                     HStack {
                         Text("Weight")
@@ -258,7 +247,7 @@ public struct FontExamples: View {
                     
                     FontParameterSlider(value: $parameters.weight)
                 }
-                .padding()
+                .exampleParameterCell()
             }
         }
     }

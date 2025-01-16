@@ -41,18 +41,13 @@ public struct FlipExamplesView: View {
                 }
                 .font(.exampleParameterValue)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
             
             Toggle(isOn: $isFlipped){
                 Text("Is flipped")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Vertical Direction")
@@ -66,9 +61,7 @@ public struct FlipExamplesView: View {
                     Text("Bottom").tag(Optional(VerticalEdge.bottom))
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Horizontal Direction")
@@ -83,7 +76,7 @@ public struct FlipExamplesView: View {
                     Text("Trailing").tag(Optional(HorizontalEdge.trailing))
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     

@@ -30,9 +30,7 @@ public struct AxisStackExampleView : View {
                     Text("Vertical").tag(Axis.vertical)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -44,7 +42,7 @@ public struct AxisStackExampleView : View {
                 
                 Slider(value: $spacing, in: 0...30)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     

@@ -46,17 +46,13 @@ public struct NavViewExamples: View {
                 Text("Use Custom Transition")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $useNavBar){
                 Text("Use Nav Bar")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Reset Action")
@@ -67,9 +63,7 @@ public struct NavViewExamples: View {
                 Button("Trigger", action: { resetAction?() })
                     .disabled(resetAction == nil)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.LayoutDirection(value: $layout)
         }

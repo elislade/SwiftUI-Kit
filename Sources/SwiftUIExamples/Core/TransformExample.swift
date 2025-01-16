@@ -45,10 +45,8 @@ public struct TransformExample: View {
                 .font(.exampleParameterValue)
                 .disabled(transform == .identity)
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             VStack {
                 HStack {
                     Text("Translate")
@@ -68,9 +66,7 @@ public struct TransformExample: View {
                     Slider(value: $transform.translation.y, in: -100...100)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -91,9 +87,7 @@ public struct TransformExample: View {
                     Slider(value: $transform.shear.y, in: -0.5...0.5)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -123,7 +117,7 @@ public struct TransformExample: View {
                     Slider(value: $transform.scale.y, in: -1...1)
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: transform.scale.x){
                 if syncedScale {
                     transform.scale.y = transform.scale.x
@@ -134,8 +128,6 @@ public struct TransformExample: View {
                     transform.scale.x = transform.scale.y
                 }
             }
-            
-            Divider()
             
             VStack {
                 HStack {
@@ -151,9 +143,7 @@ public struct TransformExample: View {
                 
                 Slider(value: $transform.rotation.degrees, in: -80...80)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -218,7 +208,6 @@ public struct TransformExample: View {
                             .background(Color.secondary.opacity(0.1))
                         }
                         .buttonStyle(.plain)
-                    
                         
                         Divider()
                     }

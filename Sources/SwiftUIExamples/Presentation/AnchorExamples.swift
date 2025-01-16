@@ -75,17 +75,13 @@ public struct AnchorPresentationExample : View   {
                 Text("Is Presented")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $useAutoAnchored){
                 Text("Auto Anchor")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 AnchorView(title: Text("Source Anchor"), anchor: $sourceAnchor)
@@ -118,6 +114,8 @@ public struct AnchorPresentationExample : View   {
                     .font(.exampleParameterTitle)
                     .frame(maxWidth: 130, alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
                 
                 ExampleControl.Anchor(value: $anchor)
                     .frame(height: 110)

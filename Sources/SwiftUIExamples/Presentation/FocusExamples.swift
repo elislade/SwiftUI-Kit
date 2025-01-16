@@ -28,9 +28,6 @@ public struct FocusExamples : View {
                             Rectangle().fill(.tint)
                                 .colorInvert()
                                 .opacity(0.5)
-//                            Rectangle()
-//                                .fill(.black)
-//                                .blendMode(.saturation)
                         }
                         .focusPresentation(isPresented: Binding($presentedIndices, contains: i)){ state in
                             TipView(next: { presentedIndices = [i+1] })
@@ -53,25 +50,19 @@ public struct FocusExamples : View {
                 Text("Presented")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $useCustomFocusedView){
                 Text("Custom Focused View")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $useAccessory){
                 Text("Accessory")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
         }
     }
     

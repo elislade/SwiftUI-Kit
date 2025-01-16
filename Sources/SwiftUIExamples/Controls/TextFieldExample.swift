@@ -53,30 +53,22 @@ public struct TextFieldExample: View {
                     }
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: $isFocused){
                 Text("Focus")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
             .syncValue(_isFocused, _focusState)
-            
-            Divider()
-            
+
             Toggle(isOn: $showLeading){
                 Text("Show Leading")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.ControlRoundness(value: $roundness)
-            
-            Divider()
             
             ExampleCell.ControlSize(value: $size)
         }

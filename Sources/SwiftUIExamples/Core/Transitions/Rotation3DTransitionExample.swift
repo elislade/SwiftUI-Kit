@@ -100,10 +100,8 @@ public struct Rotation3DTransitionExample: View {
                 
                 Slider(value: $depth, in: -100...100, step: 1)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: depth){ update(transition, nil) }
-            
-            Divider()
             
             HStack(alignment: .top) {
                 Text("Anchor")
@@ -120,7 +118,7 @@ public struct Rotation3DTransitionExample: View {
                 ExampleControl.Anchor(value: $anchor)
                     .frame(width: 120, height: 120)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: anchor){ update(transition, nil) }
         }
     }

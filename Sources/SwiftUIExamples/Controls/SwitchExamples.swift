@@ -62,41 +62,27 @@ public struct SwitchExamples : View {
                 Text("Disable")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.ControlRoundness(value: $controlRoundness)
-            
-            Divider()
-  
+
             Toggle(isOn: $accessibleOnOffLabelsEnabled){
                 Text("Accessible Labels")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
 
             Toggle(isOn: $useCustomLabels){
                 Text("Use Custom Labels")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.ControlSize(value: $controlSize)
             
-            Divider()
-            
             ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
             
-            Divider()
-            
             ExampleCell.LayoutDirection(value: $direction)
-            
-            Divider()
         }
     }
     

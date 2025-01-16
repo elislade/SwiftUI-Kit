@@ -34,9 +34,7 @@ public struct PercentRoundedRectangleExample: View {
                 
                 Slider(value: $size, in: 20...700)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -51,9 +49,7 @@ public struct PercentRoundedRectangleExample: View {
                 
                 Slider(value: $percentage)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Axis")
@@ -66,7 +62,7 @@ public struct PercentRoundedRectangleExample: View {
                     Text("Vertical").tag(Axis.vertical)
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
 }

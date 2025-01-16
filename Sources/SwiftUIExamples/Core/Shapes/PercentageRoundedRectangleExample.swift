@@ -32,9 +32,7 @@ struct PercentageRoundedRectangleExample: View {
                 
                 Slider(value: $size, in: 20...700)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -49,9 +47,7 @@ struct PercentageRoundedRectangleExample: View {
                 
                 Slider(value: $percentage)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Axis")
@@ -64,11 +60,12 @@ struct PercentageRoundedRectangleExample: View {
                     Text("Vertical").tag(Axis.vertical)
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
 }
 
 #Preview("Percentage Rounded Rectangle") {
     PercentageRoundedRectangleExample()
+        .previewSize()
 }

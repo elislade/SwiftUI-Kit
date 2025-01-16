@@ -37,7 +37,7 @@ public struct OpacityTransitionExample: View {
         
                 Slider(value: $opcity, in: 0...1)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: opcity){ update(transition, nil) }
             .onAppear { update(transition, nil) }
         }

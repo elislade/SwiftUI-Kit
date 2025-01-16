@@ -37,11 +37,9 @@ public struct Rotation2DTransitionExample: View {
                 
                 Slider(value: $rot, in : -360...360, step: 1)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: rot){ update(transition, nil) }
             .onAppear { update(transition, nil) }
-            
-            Divider()
             
             HStack(alignment: .top) {
                 Text("Anchor").font(.exampleParameterTitle)
@@ -59,7 +57,7 @@ public struct Rotation2DTransitionExample: View {
                 ExampleControl.Anchor(value: $anchor)
                     .frame(width: 120, height: 120)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: anchor){ update(transition, nil) }
         }
     }

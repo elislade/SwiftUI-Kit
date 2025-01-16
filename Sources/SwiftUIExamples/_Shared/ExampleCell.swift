@@ -146,8 +146,6 @@ struct ExampleCell {
             .onChangePolyfill(of: horzOptionIndex){
                 value.horizontal = horizontalOptions[horzOptionIndex]
             }
-            
-            Divider()
            
             HStack {
                 Text("Vertical Alignment")

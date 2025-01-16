@@ -67,9 +67,7 @@ public struct LabelStyleExamples: View {
                     Slider(value: $size.height, in: 100...800)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Prefers")
@@ -83,9 +81,7 @@ public struct LabelStyleExamples: View {
                 .frame(width: 130)
                 .controlRoundness(1)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.LayoutDirectionSuggestion(value: $suggestion)
             

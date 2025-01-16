@@ -141,25 +141,17 @@ public struct EnvironmentOnChangeExample : View {
             }
             .textFieldStyle(.plain)
             .font(.exampleParameterTitle)
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.ColorScheme(value: $colorScheme)
-            
-            Divider()
             
             Toggle(isOn: $reduceMotion) {
                 Text("Reduce Motion")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             ExampleCell.LayoutDirection(value: $layout)
-            
-            Divider()
         }
     }
     

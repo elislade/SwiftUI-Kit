@@ -29,9 +29,7 @@ public struct ToolTipExamples: View {
                 Text("Presented")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Edge")
@@ -45,9 +43,7 @@ public struct ToolTipExamples: View {
                     }
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
         }
     }
     

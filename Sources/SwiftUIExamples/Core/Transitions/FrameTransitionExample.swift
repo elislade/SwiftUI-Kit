@@ -50,12 +50,10 @@ public struct FrameTransitionExample: View {
                 Slider(value: $width, in: 0...200, step: 1)
                     .disabled(widthIsNill)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: width){ update(transition, nil) }
             .onChangePolyfill(of: widthIsNill){ update(transition, nil) }
             .onAppear { update(transition, nil) }
-            
-            Divider()
             
             VStack {
                 HStack {
@@ -74,11 +72,9 @@ public struct FrameTransitionExample: View {
                 Slider(value: $height, in: 0...200, step: 1)
                     .disabled(heightIsNill)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: height){ update(transition, nil) }
             .onChangePolyfill(of: heightIsNill){ update(transition, nil) }
-            
-            Divider()
             
             ExampleCell.Alignment(value: $alignment)
                 .onChangePolyfill(of: alignment){ update(transition, nil) }

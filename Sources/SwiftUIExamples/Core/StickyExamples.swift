@@ -35,10 +35,8 @@ struct StickyExamples  {
                         Text("Vertical").tag(Optional<Axis>(.vertical))
                     }
                 }
-                .padding()
-                
-                Divider()
-                
+                .exampleParameterCell()
+
                 HStack {
                     Text("Grouping")
                         .font(.exampleParameterTitle)
@@ -51,9 +49,7 @@ struct StickyExamples  {
                         }
                     }
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
                 
                 VStack {
                     HStack {
@@ -68,9 +64,7 @@ struct StickyExamples  {
                     
                     Slider(value: $inset, in: 0...20)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
         }
     }

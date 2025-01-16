@@ -67,17 +67,13 @@ struct ReadableScrollViewExample : View {
                 Text("Horizontal Axis")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             Toggle(isOn: Binding($axis, contains: .vertical)){
                 Text("Vertical Axis")
                     .font(.exampleParameterTitle)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Reset Action")
@@ -88,9 +84,7 @@ struct ReadableScrollViewExample : View {
                 Button("Trigger", action: { resetAction?() })
                     .disabled(resetAction == nil)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack{
@@ -105,7 +99,7 @@ struct ReadableScrollViewExample : View {
                 
                 Slider(value: $size, in: 300...1300, step: 10)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     

@@ -28,9 +28,7 @@ public struct LineShapeExample: View {
                 Slider(value: $thickness, in: 0.5...30)
                     .font(.exampleParameterValue)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             HStack {
                 Text("Axis")
@@ -43,10 +41,8 @@ public struct LineShapeExample: View {
                     Text("Vertical").tag(Axis.vertical)
                 }
             }
-            .padding()
-            
-            Divider()
-            
+            .exampleParameterCell()
+
             if axis == .vertical {
                 VStack {
                     HStack {
@@ -61,9 +57,7 @@ public struct LineShapeExample: View {
                     
                     Slider(value: $anchor.x)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             } else {
                 VStack {
                     HStack {
@@ -78,9 +72,7 @@ public struct LineShapeExample: View {
                     
                     Slider(value: $anchor.y)
                 }
-                .padding()
-                
-                Divider()
+                .exampleParameterCell()
             }
         }
     }

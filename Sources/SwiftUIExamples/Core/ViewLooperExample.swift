@@ -52,9 +52,7 @@ public struct ViewLooperExample: View {
                     Text("Vertical").tag(Axis.vertical)
                 }
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -77,9 +75,7 @@ public struct ViewLooperExample: View {
                     in: durationSpan.isRelative ? 1...100 : 0.1...20
                 )
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -94,15 +90,13 @@ public struct ViewLooperExample: View {
                 
                 Slider(value: $wait, in: 0...10)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
           
             Toggle(isOn: $feather){
                 Text("Feather Edges")
                     .font(.exampleParameterTitle)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
 }
