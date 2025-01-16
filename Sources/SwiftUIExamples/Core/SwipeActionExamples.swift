@@ -3,110 +3,61 @@ import SwiftUIKit
 
 public struct SwipeActionExamples: View {
     
-    enum Action: String, CaseIterable {
+    enum Action: String, CaseIterable, Identifiable {
+        var id: RawValue { rawValue }
+        
         case delete
         case archive
         case share
         case pin
-        
-        var image: Image {
-            switch self {
-            case .delete: Image(systemName: "trash")
-            case .archive: Image(systemName: "archivebox.fill")
-            case .share: Image(systemName: "square.and.arrow.up")
-            case .pin: Image(systemName: "pin.fill")
-            }
-        }
-        
-        var color: Color {
-            switch self {
-            case .delete: .red
-            case .archive: .orange
-            case .share: .blue
-            case .pin: .yellow
-            }
-        }
     }
     
-    @State private var activeEdges: HorizontalEdge.Set = .leading
     @State private var layoutDirection: LayoutDirection = .leftToRight
     @State private var cellRadius: Double = 16
+    @State private var cells: [HorizontalEdge?] = Array(repeating: nil, count: 5)
     @State private var leadingActions: Set<Action> = [.pin]
     @State private var trailingActions: Set<Action> = [.archive, .delete]
     
     public init() {}
     
-    private func activeEdges(at index: Int) -> Binding<HorizontalEdge.Set> {
-        if index == 0 {
-            return $activeEdges
-        } else {
-            return .constant([])
-        }
-    }
-    
-    private func binding(for set: HorizontalEdge.Set) -> Binding<Bool> {
+    private func binding(for edge: HorizontalEdge) -> Binding<Bool> {
         .init(
-            get: { activeEdges == set },
-            set: {
-                if $0 {
-                    activeEdges = set
-                } else {
-                    activeEdges = []
-                }
-            }
-        )
-    }
-    
-    private func view(for action: Action) -> some View {
-        Button(action: {}){
-            Label{
-                Text(action.rawValue.capitalized)
-            } icon: {
-                action.image
-            }
-        }
-        .font(.title3[.semibold])
-        .tint(action.color)
+            get: { cells[0] == edge },
+            set: { cells[0] = $0 ? edge : nil }
+        ).transaction($cells.transaction)
     }
     
     public var body: some View {
         ExampleView(title: "Swipe Actions"){
             ScrollView {
                 VStack(spacing: cellRadius == 0 ? 0 : 16) {
-                    ForEach(0...2){ i in
-                        Cell()
-                            .swipeViews(activeEdge: activeEdges(at: i)) {
-                                let actions = Action.allCases.filter({ leadingActions.contains($0) })
-                                if !actions.isEmpty {
-                                    ForEach(actions, id: \.self){ action in
-                                        view(for: action)
-                                    }
-                                }
-                            } trailing: {
-                                let actions = Action.allCases.filter({ trailingActions.contains($0) })
-                                
-                                if !actions.isEmpty {
-                                    ForEach(actions, id: \.self){
-                                        view(for: $0)
-                                    }
-                                }
+                    ForEach(cells.indices, id: \.self){ i in
+                        let selectedIndex = cells.firstIndex(where: { $0 != nil })
+                        let isFaded = selectedIndex != nil && selectedIndex != i
+                        Cell(
+                            activeEdge: $cells[i],
+                            radius: cellRadius,
+                            leadingActions: leadingActions,
+                            trailingActions: trailingActions
+                        )
+                        .opacity(isFaded ? 0.5 : 1)
+                        .animation(.smooth, value: isFaded)
+                        .overlay(alignment: .bottom){
+                            if cellRadius == 0 {
+                                Divider()
+                                    .transition(
+                                        .asymmetric(
+                                            insertion: .offset([400,0]).animation(.smooth.delay(Double(i) / 8)),
+                                            removal: .identity
+                                        )
+                                    )
                             }
-                            .clipShape(ContainerRelativeShape())
-                            .background {
-                                ContainerRelativeShape()
-                                    .fill(.background)
-                                    .shadow(color: .black.opacity(0.15), radius: cellRadius, y: cellRadius / 2)
-                                    .opacity(cellRadius == 0 ? 0 : 1)
-                            }
-                            .containerShape(RoundedRectangle(cornerRadius: cellRadius))
-                        
-                        if cellRadius == 0 {
-                            Divider()
                         }
                     }
                 }
                 .padding(cellRadius == 0 ? 0 : 16)
                 .labelStyle(.iconOnly)
+                .animation(.bouncy, value: cellRadius == 0)
             }
             .environment(\.layoutDirection, layoutDirection)
         } parameters: {
@@ -125,17 +76,11 @@ public struct SwipeActionExamples: View {
                         
                         Slider(value: $cellRadius, in: 0...50)
                     }
-                    .padding()
-                    
-                    Divider()
+                    .exampleParameterCell()
                     
                     ExampleCell.LayoutDirection(value: $layoutDirection)
-                    
-                    Divider()
                 }
             }
-            
-            Divider()
             
             ExampleSection("Leading Views", isExpanded: true){
                 VStack(spacing: 0){
@@ -143,22 +88,16 @@ public struct SwipeActionExamples: View {
                        Text("First Active")
                             .font(.exampleParameterTitle)
                     }
-                    .padding()
-                    
-                    Divider()
+                    .exampleParameterCell()
                     
                     ForEach(Action.allCases, id: \.self){ action in
                         Toggle(isOn: Binding($leadingActions, contains: action)){
-                            view(for: action)
+                            CellButton(action: action)
                         }
-                        .padding()
-                        
-                        Divider()
+                        .exampleParameterCell()
                     }
                 }
             }
-            
-            Divider()
             
             ExampleSection("Trailing Views", isExpanded: true){
                 VStack(spacing: 0){
@@ -166,17 +105,13 @@ public struct SwipeActionExamples: View {
                        Text("First Active")
                             .font(.exampleParameterTitle)
                     }
-                    .padding()
-                    
-                    Divider()
+                    .exampleParameterCell()
                     
                     ForEach(Action.allCases, id: \.self){ action in
                         Toggle(isOn: Binding($trailingActions, contains: action)){
-                            view(for: action)
+                            CellButton(action: action)
                         }
-                        .padding()
-                        
-                        Divider()
+                        .exampleParameterCell()
                     }
                 }
             }
@@ -184,14 +119,60 @@ public struct SwipeActionExamples: View {
     }
     
     
-    struct Cell: View {
+    struct CellButton: View {
+        let action: Action
+        
+        var tint: Color {
+            switch action {
+            case .delete: .red
+            case .archive: .orange
+            case .share: .blue
+            case .pin: .yellow
+            }
+        }
         
         var body: some View {
-            Button(action: {}){
+            Button(action: { print(action.rawValue) }){
+                Label{ Text(action.rawValue.capitalized) } icon: {
+                    switch action {
+                    case .delete: Image(systemName: "trash")
+                    case .archive: Image(systemName: "archivebox.fill")
+                    case .share: Image(systemName: "square.and.arrow.up")
+                    case .pin: Image(systemName: "pin.fill")
+                    }
+                }
+            }
+            .font(.title3[.semibold])
+            .tint(tint)
+        }
+    }
+    
+    
+    struct Cell: View {
+        
+        @Binding var activeEdge: HorizontalEdge?
+        var radius: CGFloat = 16
+        var leadingActions: Set<Action> = [.pin]
+        var trailingActions: Set<Action> = [.archive, .delete]
+        
+        @State private var tileColor = Color(hue: .random(in: 0...1), saturation: 0.8, brightness: 1)
+        
+        @ViewBuilder private func list(_ actions: Set<Action>) -> some View {
+            let actions = Action.allCases.filter({ actions.contains($0) })
+            
+            if !actions.isEmpty {
+                ForEach(actions, id: \.self){ action in
+                    CellButton(action: action)
+                }
+            }
+        }
+        
+        var body: some View {
+            Button(action: { print("Tap Cell") }){
                 HStack(spacing: 12) {
                     ContainerRelativeShape()
-                        .fill(Color.random)
-                        .frame(width: 60, height: 60)
+                        .fill(tileColor)
+                        .frame(width: 50, height: 50)
                     
                     VStack(alignment: .leading) {
                         Text("Title")
@@ -213,6 +194,20 @@ public struct SwipeActionExamples: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .containerShape(RoundedRectangle(cornerRadius: radius))
+            .swipeViews(activeEdge: $activeEdge.animation(.smooth)) {
+                list(leadingActions)
+            } trailing: {
+                list(trailingActions)
+            }
+            .clipShape(ContainerRelativeShape())
+            .background {
+                ContainerRelativeShape()
+                    .fill(.background)
+                    .shadow(color: .black.opacity(0.15), radius: radius, y: radius / 2)
+                    .opacity(radius == 0 ? 0 : 1)
+            }
+            .containerShape(RoundedRectangle(cornerRadius: radius))
         }
     }
     

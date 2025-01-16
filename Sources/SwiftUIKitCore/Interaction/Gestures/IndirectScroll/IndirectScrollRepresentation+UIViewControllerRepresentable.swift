@@ -42,8 +42,7 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
             if g.state == .ended || g.state == .cancelled || g.state == .failed {
                 gesture?.callEnded(with: .init(
                     time: start.timeIntervalSinceNow,
-                    deltaX: 0,
-                    deltaY: 0
+                    delta: .zero
                 ))
                 previous = .zero
             } else {
@@ -53,8 +52,7 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
                 let t = g.translation(in: nil)
                 gesture?.callChanged(with: .init(
                     time: start.timeIntervalSinceNow,
-                    deltaX: t.x - previous.x,
-                    deltaY: t.y - previous.y
+                    delta: [t.x - previous.x, t.y - previous.y]
                 ))
                 
                 previous = t

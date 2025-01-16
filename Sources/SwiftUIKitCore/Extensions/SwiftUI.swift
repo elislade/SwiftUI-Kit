@@ -87,6 +87,21 @@ public extension SetAlgebra {
 }
 
 
+public extension Binding {
+    
+    init<V: Sendable & Equatable>(_ base: Binding<Bool>, onValue: V) where Value == V? {
+        self.init(
+            get: { base.wrappedValue ? onValue : nil },
+            set: { v, transaction in
+                withTransaction(transaction){
+                    base.wrappedValue = v == onValue
+                }
+            }
+        )
+    }
+    
+}
+
 public extension Binding where Value == Bool {
     
     init<Set : SetAlgebra & Sendable>(_ binding: Binding<Set>, contains element: Set.Element) where Set.Element : Sendable {

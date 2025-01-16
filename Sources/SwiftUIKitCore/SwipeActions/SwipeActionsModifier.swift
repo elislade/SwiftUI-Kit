@@ -6,23 +6,34 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     @Environment(\.layoutDirection) private var direction
     @StateObject private var sharedState = SwipeActionsState.shared
     
-    @State private var scroll: Double = 0
-    @State private var contentYActivated: CGFloat = 0
     @State private var id = UUID()
+    @State private var scroll: Double = 0
     @State private var gestureOffset: Double?
-    @State private var contentRect: CGRect = .zero
-    @State private var leadingSize: CGFloat = .zero
-    @State private var trailingSize: CGFloat = .zero
-    @State private var activeEdge: HorizontalEdge?
+    @State private var lastOpenOffset: CGFloat = 0
+    @State private var contentY: CGFloat = 0
+    @State private var contentYActivated: CGFloat = 0
+    @State private var leadingSize: CGFloat = 0
+    @State private var trailingSize: CGFloat = 0
+    @State private var minDistanceFactor: CGFloat?
     
-    @Binding private var activeEdges: HorizontalEdge.Set
+    @State private var internalActiveEdge: HorizontalEdge?
+    private let externalActiveEdge: Binding<HorizontalEdge?>?
     
+    private var activeEdgeBinding: Binding<HorizontalEdge?> {
+        externalActiveEdge ?? $internalActiveEdge
+    }
+    
+    private var activeEdge: HorizontalEdge? {
+        activeEdgeBinding.wrappedValue
+    }
+    
+    private let gestureMinMovement: CGFloat = 20
     private let leading: Leading
     private let trailing: Trailing
     private let availableEdges: HorizontalEdge.Set
     
     init(
-        activeEdge: Binding<HorizontalEdge.Set> = .constant([]),
+        activeEdge: Binding<HorizontalEdge?>? = nil,
         @ViewBuilder leading: @MainActor @escaping () -> Leading,
         @ViewBuilder trailing: @MainActor @escaping () -> Trailing
     ) {
@@ -39,7 +50,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             set.insert(.trailing)
         }
         
-        self._activeEdges = activeEdge
+        self.externalActiveEdge = activeEdge
         self.availableEdges = set
     }
     
@@ -56,141 +67,149 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         }
     }
     
-    private var edgeFactor: Double {
-        guard let activeEdge else { return 1 }
-        switch activeEdge {
-        case .leading: return 1
-        case .trailing: return -1
-        }
-    }
-    
     private var layoutFactor: Double { direction == .leftToRight ? 1 : -1 }
     
     private func close() {
-        guard activeEdge != nil && contentRect != .zero else {
+        guard activeEdge != nil && contentY != .zero else {
              return
         }
-        
-        activeEdge = nil
-        gestureOffset = nil
+
+        withAnimation(.fastSpringInterpolating){
+            activeEdgeBinding.wrappedValue = nil
+            gestureOffset = nil
+            minDistanceFactor = nil
+        }
     }
     
-    private func updateInteraction(offset: Double){
+    private func updateInteraction(offset: Double, layoutFactor: Double){
+        let offset = (offset * layoutFactor) + lastOpenOffset
+        
         if let activeEdge {
             guard availableEdges.contains(.init(activeEdge)) else { return }
             
-            gestureOffset = offset * layoutFactor
+            let edgeSize = activeEdge == .leading ? leadingSize : trailingSize
+            let edgeFactor = activeEdge == .leading ? 1.0 : -1.0
+            let diff = edgeSize - (offset * edgeFactor)
+            let isOverShooting = diff < 0
+            let isUnderShooting = activeEdge == .leading ? offset < 0 : offset > 0
             
-            let value = offset * layoutFactor
-
-            if activeEdge == .leading {
-                let diff = leadingSize - (offset * layoutFactor)
-               
-                if diff < 0 {
-                    // If gesture is overshooting direction, scale the gesture translation with resistance.
-                    gestureOffset = leadingSize + powRetainSign(diff, 0.7) * -1
-                } else if offset * layoutFactor < 0 {
-                    // If gesture is undershooting in wrong direction, scale the gesture translation with resistance.
-                    gestureOffset = powRetainSign(value, 0.75)
-                }
-            } else if activeEdge == .trailing {
-                let diff = trailingSize - (offset * -1 * layoutFactor)
-                
-                if diff < 0 {
-                    // If gesture is overshooting direction, scale the gesture translation with resistance.
-                    gestureOffset = -trailingSize + powRetainSign(diff, 0.7)
-                } else if offset * layoutFactor > 0 {
-                    // If gesture is undershooting in wrong direction, scale the gesture translation with resistance.
-                    gestureOffset = powRetainSign(value, 0.75)
-                }
+            if isOverShooting {
+                gestureOffset = (edgeSize * edgeFactor) - powRetainSign(diff * edgeFactor, 0.7)
+            } else if isUnderShooting {
+                gestureOffset = powRetainSign(offset, 0.75)
+            } else {
+                gestureOffset = offset
             }
         } else {
-            // Set active edge based on gesture direction
-            if offset * layoutFactor < -1 * layoutFactor && availableEdges.contains(.trailing) {
-                gestureOffset = offset * layoutFactor
-                activeEdge = .trailing
-            } else if offset * layoutFactor > 1 * layoutFactor && availableEdges.contains(.leading) {
-                gestureOffset = offset * layoutFactor
-                activeEdge = .leading
+            // Set active edge based on direction
+            if offset < 0 && availableEdges.contains(.trailing) {
+                gestureOffset = offset
+                activeEdgeBinding.wrappedValue = .trailing
+            } else if offset > 0 && availableEdges.contains(.leading) {
+                gestureOffset = offset
+                activeEdgeBinding.wrappedValue = .leading
             }
         }
     }
     
     private func endInteraction(projectedOffset: Double){
-        self.gestureOffset = nil
-        
         let projectedOffset = projectedOffset * layoutFactor
+        lastOpenOffset = activeEdge == .leading ? leadingSize : trailingSize * -1
         
-        if let activeEdge {
-            switch activeEdge {
-            case .leading:
-                if projectedOffset < 50 {
-                    self.activeEdge = nil
-                }
-            case .trailing:
-                if projectedOffset > -50 {
-                    self.activeEdge = nil
+        withAnimation(.fastSpringInterpolating){
+            self.gestureOffset = nil
+            
+            if let activeEdge {
+                switch activeEdge {
+                case .leading:
+                    if projectedOffset < 50 {
+                        activeEdgeBinding.wrappedValue = nil
+                    }
+                case .trailing:
+                    if projectedOffset > -50 {
+                        activeEdgeBinding.wrappedValue = nil
+                    }
                 }
             }
         }
     }
     
-    
     private var contentGesture: some Gesture {
-        DragGesture(minimumDistance: 20, coordinateSpace: .global)
-            .onChanged{ g in
-                updateInteraction(offset: g.translation.width)
+        DragGesture(minimumDistance: gestureMinMovement, coordinateSpace: .global)
+            .onChanged { g in
+                if minDistanceFactor == nil {
+                    minDistanceFactor = activeEdge == nil ? g.translation.width < 0 ? -1.0 : 1 : 0
+                }
+                // Gesture translation starts from `minimumDistance` and not `zero`.
+                // This is to compensate for that to have as smooth start as possible
+                let offsetTravelledWhileDecidingToRecognize = gestureMinMovement * minDistanceFactor!
+                updateInteraction(offset: g.translation.width - offsetTravelledWhileDecidingToRecognize, layoutFactor: layoutFactor)
             }
             .onEnded { g in
                 endInteraction(projectedOffset: g.predictedEndTranslation.width)
+                minDistanceFactor = nil
             }
     }
-    
     
     func body(content: Content) -> some View {
         content
             .offset(x: totalOffset)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded(close))
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ contentRect = $0 }
             .highPriorityGesture(contentGesture)
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y }){ contentY = $0 }
             .overlay {
                 HStack(spacing: 0) {
                     if let activeEdge, activeEdge == .leading {
                         HStack(spacing: 1, content: { leading })
-                            .onGeometryChangePolyfill(of: { $0.size.width }){ leadingSize = $0 }
+                            .onGeometryChangePolyfill(of: { $0.size.width }){
+                                leadingSize = $0
+                                
+                                if gestureOffset == nil {
+                                    lastOpenOffset = $0
+                                }
+                            }
                             .clipShape(
                                 Rectangle()
                                     .offset(x: min(-leadingSize + totalOffset, 0) * layoutFactor)
                             )
-                            .transitions(.move(edge: .leading).animation(.smooth))
+                            .transitions(.asymmetric(
+                                insertion: .identity,
+                                removal: .move(edge: .leading).animation(.smooth)
+                            ))
                     }
                     
                     Spacer(minLength: 0)
                     
                     if let activeEdge, activeEdge == .trailing {
                         HStack(spacing: 1, content: { trailing })
-                            .onGeometryChangePolyfill(of: { $0.size.width }){ trailingSize = $0 }
+                            .onGeometryChangePolyfill(of: { $0.size.width }){
+                                trailingSize = $0
+                                
+                                if gestureOffset == nil {
+                                    lastOpenOffset = $0 * -1
+                                }
+                            }
                             .clipShape(
                                 Rectangle()
                                     .offset(x: max(trailingSize + totalOffset, 0) * layoutFactor)
                             )
-                            .transitions(.move(edge: .trailing).animation(.smooth))
+                            .transitions(.asymmetric(
+                                insertion: .identity,
+                                removal: .move(edge: .trailing).animation(.smooth)
+                            ))
                     }
                 }
                 .buttonStyle(ButtonStyle(didCallAction: close))
             }
-            .animation(.smooth, value: totalOffset == 0)
-            .animation(.smooth, value: gestureOffset == nil)
-            .animation(.smooth, value: activeEdge)
-            //.animation(gestureOffset == nil ? .fastSpringInterpolating : .fastSpringInteractive, value: totalOffset)
+            .animation(.fastSpringInterpolating, value: activeEdge)
             .indirectGesture(
-                IndirectScrollGesture(useMomentum: false)
-                    .onChanged{ v in
-                        scroll += v.deltaX
-                        updateInteraction(offset: scroll)
+                IndirectScrollGesture(useMomentum: false, mask: .horizontal)
+                    .onChanged{ value in
+                        scroll += value.delta.x
+                        updateInteraction(offset: scroll, layoutFactor: 1)
                     }
-                    .onEnded{ v in
+                    .onEnded{ _ in
                         endInteraction(projectedOffset: scroll)
                         scroll = 0
                     }
@@ -200,37 +219,17 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                     close()
                 }
             }
-            .onChangePolyfill(of: abs(contentRect.origin.y - contentYActivated) > 10){
+            .onChangePolyfill(of: abs(contentY - contentYActivated) > 10){
                 close()
             }
             .onChangePolyfill(of: activeEdge){
-                if let activeEdge {
-                    activeEdges = .init(activeEdge)
-                    contentYActivated = contentRect.origin.y
+                if activeEdge != nil {
+                    contentYActivated = contentY
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
                         sharedState.latestSwipeActionID = id
                     }
                 } else {
-                    activeEdges = []
-                }
-            }
-            .onChangePolyfill(of: activeEdges, initial: true){      
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                    if activeEdges == .leading {
-                        if availableEdges.contains(.leading) {
-                            activeEdge = .leading
-                        } else {
-                            activeEdges = []
-                        }
-                    } else if activeEdges == .trailing {
-                        if availableEdges.contains(.trailing) {
-                            activeEdge = .trailing
-                        } else {
-                            activeEdges = []
-                        }
-                    } else {
-                        activeEdge = nil
-                    }
+                    lastOpenOffset = 0
                 }
             }
             .accessibilityRepresentation{
@@ -249,14 +248,14 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
 extension SwipeActionsModifier where Leading == EmptyView {
     
     init(
-        isActive: Binding<Bool> = .constant(false),
+        isActive: Binding<Bool>? = nil,
         @ViewBuilder trailing: @MainActor @escaping () -> Trailing
     ){
-        self._activeEdges = .init(get: {
-            isActive.wrappedValue ? .trailing : []
-        }, set: {
-            isActive.wrappedValue = $0.contains(.trailing)
-        })
+        if let isActive {
+            self.externalActiveEdge = Binding(isActive, onValue: .trailing).transaction(isActive.transaction)
+        } else {
+            self.externalActiveEdge = nil
+        }
         
         self.leading = EmptyView()
         self.trailing = trailing()
@@ -269,14 +268,15 @@ extension SwipeActionsModifier where Leading == EmptyView {
 extension SwipeActionsModifier where Trailing == EmptyView {
     
     init(
-        isActive: Binding<Bool> = .constant(false),
+        isActive: Binding<Bool>? = nil,
         @ViewBuilder leading: @MainActor @escaping() -> Leading
     ){
-        self._activeEdges = .init(get: {
-            isActive.wrappedValue ? .leading : []
-        }, set: {
-            isActive.wrappedValue = $0.contains(.leading)
-        })
+        if let isActive {
+            self.externalActiveEdge = Binding(isActive, onValue: .leading).transaction(isActive.transaction)
+        } else {
+            self.externalActiveEdge = nil
+        }
+        
         self.leading = leading()
         self.trailing = EmptyView()
         self.availableEdges = .leading

@@ -20,7 +20,7 @@ struct ExampleCell {
                     Text("Right to Left").tag(SwiftUI.LayoutDirection.rightToLeft)
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     
@@ -42,7 +42,7 @@ struct ExampleCell {
                     Text("Bottom to Top").tag(SwiftUIKit.LayoutDirectionSuggestion.useBottomToTop)
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     
@@ -68,7 +68,7 @@ struct ExampleCell {
                 .frame(width: 120)
                 .controlRoundness(1)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     
@@ -90,7 +90,7 @@ struct ExampleCell {
                     }
                 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     
@@ -113,7 +113,7 @@ struct ExampleCell {
                 
                 Slider(value: $value, in: 0...1)
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     
@@ -142,7 +142,7 @@ struct ExampleCell {
                     Text("Trailing").tag(2)
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: horzOptionIndex){
                 value.horizontal = horizontalOptions[horzOptionIndex]
             }
@@ -161,12 +161,30 @@ struct ExampleCell {
                     Text("Bottom").tag(2)
                 }
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: vertOptionIndex){
                 value.vertical = verticalOptions[vertOptionIndex]
             }
         }
     }
     
+    
+}
+
+
+extension View {
+    
+    func exampleParameterCell() -> some View {
+        Group {
+        #if os(macOS)
+            padding(.horizontal).padding(.vertical, 10)
+        #else
+            padding()
+        #endif
+        }
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
+    }
     
 }
