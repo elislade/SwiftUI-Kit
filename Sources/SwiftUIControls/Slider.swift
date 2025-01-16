@@ -45,7 +45,7 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
     }
     
     private var handleSize: Double {
-        40 - (26 * interactionGranularity)
+        max(50 - (44 * interactionGranularity), 18)
     }
     
     public var body: some View {
@@ -67,8 +67,8 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
                     )
             }
             .frame(
-                width: layoutVertical ? handleSize / 6 : nil,
-                height: layoutVertical ? nil : handleSize / 6
+                width: layoutVertical ? handleSize / 5 : nil,
+                height: layoutVertical ? nil : handleSize / 5
             )
             .clipShape(Capsule())
         }
