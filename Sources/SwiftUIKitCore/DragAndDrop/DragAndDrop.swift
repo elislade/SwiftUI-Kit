@@ -1,98 +1,61 @@
 import SwiftUI
-import UniformTypeIdentifiers
-
-
-public protocol DraggablePayload: Codable, Sendable {
-    static var type: UTType { get }
-}
-
-
-public extension DraggablePayload {
-    static var type: UTType { .data }
-}
 
 
 public extension View {
     
-    @inlinable nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
-        onDrag({
-            let item = NSItemProvider()
-            
-            item.registerDataRepresentation(
-                forTypeIdentifier: Payload.type.identifier,
-                visibility: .ownProcess
-            ){ callback in
-                do {
-                    let data = try JSONEncoder().encode(payload)
-                    callback(data, nil)
-                } catch {
-                    callback(nil, error)
-                }
-                return nil
-            }
-
-            #if os(iOS)
-                if let preferredSize {
-                   item.preferredPresentationSize = preferredSize
-                }
-            #endif
-            
-            return item
-        })
+    func dragSession<Value: Hashable & Sendable>(_ type: Value.Type) -> some View {
+        modifier(DragAndDropSession<Value, DefaultDraggingLayout>())
     }
     
-    
-    @inlinable nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
-        onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
-            var items: [Payload] = []
-            let group = DispatchGroup()
-            
-            for provider in providers {
-                group.enter()
-                provider.loadDataRepresentation(forTypeIdentifier: Payload.type.identifier){ data, err in
-                    if let data, let item = try? JSONDecoder().decode(Payload.self, from: data) {
-                        DispatchQueue.main.sync {
-                            items.append(item)
-                        }
-                    }
-                    group.leave()
-                }
-            }
-            
-            group.notify(queue: .main){
-                callback(items, location)
-            }
-    
-            return true
-        }
+    func dragSession<Value: Hashable & Sendable, Layout: DragSessionStackLayout>(_ type: Value.Type, layout: Layout.Type) -> some View {
+        modifier(DragAndDropSession<Value, Layout>())
     }
     
-}
-
-
-public extension DynamicViewContent {
+    func dropArea<Value: Hashable>(
+        _ type: Value.Type = Value.self,
+        shouldTarget: ((_ loc: CGPoint, _ area: CGRect) -> Bool)?,
+        isTargeted: @escaping (Bool) -> Void = { _ in },
+        didChange: @escaping @MainActor (DropGroup<Value>) -> Void,
+        didComplete: @escaping @MainActor (Bool) -> Void,
+        didCancel: @escaping @MainActor () -> Void
+    ) -> some View {
+        modifier(DropAreaModifier(
+            shouldTarget: shouldTarget,
+            isTargeted: isTargeted,
+            didChange: didChange,
+            didComplete: didComplete,
+            didCancel: didCancel
+        ))
+    }
     
-    @inlinable nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
-        onInsert(of: [ Payload.type ]){ i, providers in
-            var items: [Payload] = []
-            let group = DispatchGroup()
-            
-            for provider in providers {
-                group.enter()
-                provider.loadDataRepresentation(forTypeIdentifier: Payload.type.identifier){ data, err in
-                    if let data, let item = try? JSONDecoder().decode(Payload.self, from: data) {
-                        DispatchQueue.main.sync {
-                            items.append(item)
-                        }
-                    }
-                    group.leave()
-                }
-            }
-            
-            group.notify(queue: .main){
-                callback(i, items)
-            }
-        }
+    func dropArea<Value: Hashable>(
+        _ type: Value.Type = Value.self,
+        isTargeted: @escaping (Bool) -> Void = { _ in },
+        didChange: @escaping @MainActor (DropGroup<Value>) -> Void,
+        didComplete: @escaping @MainActor (Bool) -> Void,
+        didCancel: @escaping @MainActor () -> Void
+    ) -> some View {
+        modifier(DropAreaModifier(
+            isTargeted: isTargeted,
+            didChange: didChange,
+            didComplete: didComplete,
+            didCancel: didCancel
+        ))
+    }
+    
+    func dragItem<Value: Hashable>(
+        _ value: Value,
+        didChangeDragging: @escaping (Bool) -> Void = { _ in }
+    ) -> some View {
+        modifier(DragItemModifier(
+            value: value,
+            didChangeDragging: didChangeDragging,
+            view: { self }
+        ))
+    }
+    
+    func dragItem<Value: Hashable, Preview: View>(_ value: Value, @ViewBuilder preview: @escaping () -> Preview) -> some View {
+        modifier(DragItemModifier(value: value, view: preview))
     }
     
 }

@@ -1,67 +1,129 @@
 import SwiftUIKit
 
 
-struct DragAndDropExamples: View {
+public struct DragDropExample: View {
     
-    @State private var from = ["A", "B", "C"]
-    @State private var to: [String] = []
+    @Namespace private var ns
+    @State private var dropItemsA: [Int] = []
+    @State private var dropItemsB: [Int] = []
+    @State private var dragItems: [Int] = [1, 2, 3, 4, 5, 6, 7]
     
-    var body: some View {
-        HStack(spacing: 0){
-            StringList(items: $from)
-                .frame(maxWidth: 200)
-            
-            Divider().ignoresSafeArea()
-            
-            StringList(items: $to)
-                .frame(maxWidth: 200)
-        }
+    private var filteredDragItems: [Int] {
+        dragItems.filter({ !(dropItemsA.contains($0) || dropItemsB.contains($0)) })
     }
     
+    public init() {}
     
-    private struct StringList: View {
-        
-        @Binding var items: [String]
-        @State private var dropLocation: CGPoint?
-        
-        var body: some View {
-            //ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(items){
-                        Text($0)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Capsule().fill(.red))
-                            .onDrag($0)
-                            .transitions(.scale(0.8), .opacity)
+    public var body: some View {
+        ZStack(alignment: .bottom) {
+            Color.clear
+            
+            VStack(spacing: 5) {
+                Spacer()
+                
+                Text("Horizontal Drop Stack").opacity(0.6)
+                
+                DropStack(
+                    axis: .horizontal,
+                    data: $dropItemsA
+                ){ item in
+                    Button(action: { dropItemsA.removeAll(where: { $0 == item }) }){
+                        ExampleTile(item)
                     }
-                    
-                    Color.clear
+                    .buttonStyle(.plain)
+                    .transitions(.scale(1))
+                    .matchedGeometryEffect(id: item, in: ns)
+                    .frame(maxWidth: 80, maxHeight: 80)
+                } cursor: {
+                    RoundedRectangle(cornerRadius: 20)
+                        .opacity(0.2)
+                        .frame(maxWidth: 80, maxHeight: 80)
                 }
-                .padding()
-            //}
-            .overlay{
-                if let dropLocation {
-                    Circle()
-                        .fill(Color.red)
-                        .frame(width: 30, height: 30)
-                        .position(dropLocation)
-                    Text(dropLocation.debugDescription)
+                .frame(height: 80)
+                .padding(10)
+                .background{
+                    RoundedRectangle(cornerRadius: 26)
+                        .fill(.secondary)
+                        .opacity(0.3)
                 }
+                
+                Spacer()
+                
+                Text("Vertical Drop Stack").opacity(0.6)
+                
+                DropStack(
+                    axis: .vertical,
+                    alignment: .top,
+                    data: $dropItemsB,
+                    removeOnCancel: true
+                ){ item in
+                    Button(action: { dropItemsB.removeAll(where: { $0 == item }) }){
+                        ExampleTile(item)
+                    }
+                    .buttonStyle(.plain)
+                    .transitions(.scale(1))
+                    .matchedGeometryEffect(id: item, in: ns)
+                    .frame(maxHeight: 80)
+                } cursor: {
+                    RoundedRectangle(cornerRadius: 20)
+                        .opacity(0.2)
+                        .frame(maxWidth: .infinity, maxHeight: 80)
+                }
+                .padding(10)
+                .frame(minHeight: 200)
+                .background{
+                    RoundedRectangle(cornerRadius: 26)
+                        .fill(.secondary)
+                        .opacity(0.3)
+                }
+                
+                Spacer()
+                
+                Text("Drag Stack").opacity(0.6)
+                
+                HStack {
+                    ForEach(filteredDragItems){ value in
+                        Button(action: {
+                            if Bool.random() {
+                                dropItemsA.append(value)
+                            } else {
+                                dropItemsB.append(value)
+                            }
+                        }){
+                            ExampleTile(value)
+                        }
+                        .buttonStyle(.plain)
+                        .transitions(.scale(1))
+                        .matchedGeometryEffect(id: value, in: ns)
+                        .frame(maxWidth: 80, maxHeight: 80)
+                        .dragItem(value)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 80)
+                .padding(10)
+                .background{
+                    RoundedRectangle(cornerRadius: 26)
+                        .fill(.secondary)
+                        .opacity(0.3)
+                }
+                
+                Spacer()
+                
+                ExampleTitle("Drag & Drop")
             }
-            .animation(.fastSpring, value: items)
-            .onDrop{ results, location in
-                dropLocation = location
-                items.append(contentsOf: results)
-            }
+            .padding()
+            .dragSession(Int.self)
         }
+        .animation(.bouncy, value: dropItemsA)
+        .animation(.bouncy, value: dropItemsB)
+        .animation(.bouncy, value: filteredDragItems)
     }
+    
 }
 
 
-extension String: @retroactive DraggablePayload { }
-
-
-#Preview("Drag & Drop") {
-    DragAndDropExamples()
+#Preview("Drag & Drop"){
+    DragDropExample()
+        .previewSize()
 }
