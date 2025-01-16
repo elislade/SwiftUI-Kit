@@ -23,11 +23,7 @@ public final class SwiftUIWindow: NSWindow {
         
         self.collectionBehavior = [.managed, .fullScreenNone, .participatesInCycle]
         self.setContentBorderThickness(0, for: .maxX)
-        let ctrl = NSHostingController(rootView: contentView)
-        if #available(macOS 13.0, *) {
-            ctrl.sizingOptions = .preferredContentSize
-        }
-        self.contentViewController = ctrl
+        self.contentViewController = NSHostingController(rootView: contentView)
         //self.contentView?.layer?.borderWidth = 0.2
         //self.contentView?.layer?.borderColor = CGColor(red: 0, green: 0, blue: 0, alpha: 0.2)
         self.backgroundColor = .clear
