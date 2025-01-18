@@ -34,7 +34,7 @@ public extension View {
         ))
     }
     
-    @inlinable func onKeyPressPolyfill(
+    func onKeyPressPolyfill(
         _ key: KeyEquivalent,
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result

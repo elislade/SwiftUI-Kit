@@ -41,7 +41,7 @@ public extension View {
     /// Disables ``LayoutDirectionSuggestion`` for this view.
     /// - Parameter disabled: A Bool indicating whether its disabled or not.
     /// - Returns: A view that can disable ``LayoutDirectionSuggestion``
-    @inlinable nonisolated func disableLayoutSuggestion(_ disabled: Bool = true) -> some View {
+    nonisolated func disableLayoutSuggestion(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.layoutDirectionSuggestion) { value in
             if disabled {
                 value = .useSystemDefault
@@ -52,7 +52,7 @@ public extension View {
     /// LayoutDirectionSuggestions are just a suggestion for views to utilize over the default LayoutDirection.  It does not mean every view will or should use this to layout, it's only a suggestion that some subview may use it for layout if desired. For example it can be used to tell Sliders to layout vertically if set but will **NOT** force an `HStack` to layout vertically or change the direction of a normal `VStack`.
     /// - Parameter suggestion: A ``LayoutDirectionSuggestion`` for this view.
     /// - Returns: A view with ``LayoutDirectionSuggestion`` set as an `EnvironmentValue.
-    @inlinable nonisolated func layoutDirectionSuggestion(_ suggestion: LayoutDirectionSuggestion) -> some View {
+    nonisolated func layoutDirectionSuggestion(_ suggestion: LayoutDirectionSuggestion) -> some View {
         environment(\.layoutDirectionSuggestion, suggestion)
     }
     

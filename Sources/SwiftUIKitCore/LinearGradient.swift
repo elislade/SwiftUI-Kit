@@ -46,7 +46,7 @@ public extension Color {
 public extension UnitPoint {
     
     /// Computes the inverse of a `UnitPoint`.
-    @inlinable var inverse: UnitPoint {
+    var inverse: UnitPoint {
         UnitPoint(x: 1 - x, y: 1 - y)
     }
     

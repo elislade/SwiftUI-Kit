@@ -3,14 +3,14 @@ import SwiftUI
 
 public extension Alignment {
     
-    @inlinable var inverse: Alignment {
+    var inverse: Alignment {
         .init(
             horizontal: horizontal.inverse,
             vertical: vertical.inverse
         )
     }
     
-    @inlinable init(_ point: UnitPoint){
+    init(_ point: UnitPoint){
         self.init(
             horizontal: point.x == 0 ? .leading : point.x == 1 ? .trailing : .center,
             vertical: point.y == 0 ? .top : point.y == 1 ? .bottom : .center
@@ -26,7 +26,7 @@ public extension Alignment {
         }
     }
     
-    @inlinable func invert(_ axis: Axis) -> Alignment {
+    func invert(_ axis: Axis) -> Alignment {
         switch axis {
         case .horizontal: .init(horizontal: horizontal.inverse, vertical: vertical)
         case .vertical: .init(horizontal: horizontal, vertical: vertical.inverse)
@@ -67,7 +67,7 @@ public extension VerticalAlignment {
 
 public extension UnitPoint {
     
-    @inlinable init(_ alignment: Alignment) {
+    init(_ alignment: Alignment) {
         self.init(
             x: alignment.horizontal == .leading ? 0 : alignment.horizontal == .center ? 0.5 : 1,
             y: alignment.vertical == .top ? 0 : alignment.vertical == .center ? 0.5 : 1

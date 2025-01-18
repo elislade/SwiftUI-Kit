@@ -51,7 +51,7 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
 
 public extension SunkenControlMaterial where Shape == Rectangle {
     
-    @inlinable init(isTinted: Bool = false){
+    init(isTinted: Bool = false){
         self.init(Rectangle(), isTinted: isTinted)
     }
     

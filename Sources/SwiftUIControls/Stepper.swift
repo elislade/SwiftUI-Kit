@@ -34,7 +34,7 @@ public struct Stepper: View {
     /// - Parameters:
     ///   - value: A binding to a value that conforms to `Strideable`.
     ///   - step: The `Stride` of the `Strideable` value that you want to increment and decrement by. Defaults to 1.
-    @inlinable public init<V: Strideable>(value: Binding<V>, step: V.Stride = 1) {
+    public init<V: Strideable>(value: Binding<V>, step: V.Stride = 1) {
         self.init(
             onIncrement: {
                 value.wrappedValue = value.wrappedValue.advanced(by: step)
@@ -50,7 +50,7 @@ public struct Stepper: View {
     ///   - value: A binding to a value that conforms to `Strideable`.
     ///   - bounds: The valid bounds the stepper can step in.
     ///   - step: The `Stride` of the `Strideable` value that you want to increment and decrement by. Defaults to 1.
-    @inlinable public init<V: Strideable>(value: Binding<V>, in bounds: ClosedRange<V>, step: V.Stride = 1) {
+    public init<V: Strideable>(value: Binding<V>, in bounds: ClosedRange<V>, step: V.Stride = 1) {
         self.init(
             onIncrement: bounds.upperBound >= value.wrappedValue.advanced(by: step) ? {
                 value.wrappedValue = value.wrappedValue.advanced(by: step)

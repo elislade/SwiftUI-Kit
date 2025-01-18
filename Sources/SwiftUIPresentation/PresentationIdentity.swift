@@ -51,7 +51,7 @@ extension EnvironmentValues {
 
 public extension View {
     
-    @inlinable nonisolated func presentationIdentityBehaviour(_ presentationIdentityBehaviour: PresentationIdentityBehaviour) -> some View {
+    nonisolated func presentationIdentityBehaviour(_ presentationIdentityBehaviour: PresentationIdentityBehaviour) -> some View {
         environment(\.presentationIdentityBehaviour, presentationIdentityBehaviour)
     }
     

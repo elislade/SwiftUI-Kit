@@ -96,7 +96,7 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    @inlinable nonisolated func isHighlighted(_ highlighted: Bool = true) -> some View {
+    nonisolated func isHighlighted(_ highlighted: Bool = true) -> some View {
         environment(\.isHighlighted, highlighted)
     }
     

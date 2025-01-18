@@ -98,7 +98,7 @@ struct PresentationTraitsPreferenceKey: PreferenceKey {
 
 public extension View {
     
-    @inlinable nonisolated func addPresentationTraits(_ traits: PresentationTraits) -> some View {
+    nonisolated func addPresentationTraits(_ traits: PresentationTraits) -> some View {
         transformEnvironment(\.presentationTraits){
             $0.formUnion(traits)
         }

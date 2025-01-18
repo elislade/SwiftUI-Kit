@@ -3,16 +3,16 @@ import SwiftUI
 
 extension FontParameters {
     
-    @inlinable public nonisolated subscript(weight: Font.Weight) -> Self {
+    public nonisolated subscript(weight: Font.Weight) -> Self {
         copy(replacing: \.weight, with: weight.value)
     }
     
-    @inlinable public nonisolated subscript(style: Font.TextStyle) -> Self {
+    public nonisolated subscript(style: Font.TextStyle) -> Self {
         copy(replacing: \.size, with: style.baseSize)
     }
     
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    @inlinable public nonisolated subscript(width: Font.Width) -> Self {
+    public nonisolated subscript(width: Font.Width) -> Self {
         copy(replacing: \.width, with: width.value)
     }
     

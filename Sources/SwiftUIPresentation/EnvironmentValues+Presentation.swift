@@ -47,7 +47,7 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    @inlinable func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
+    func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
         InlineState(UUID()){ id in
             InlineEnvironmentReader(\.isBeingPresentedOn){ isBeingPresentedOn in
                 self.transformEnvironment(\.dismissPresentation) { value in

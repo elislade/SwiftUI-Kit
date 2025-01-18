@@ -4,7 +4,7 @@ public extension View {
     
     /// Sets the presentation context for ToolTips.
     /// - Returns: A view that will show tool tip presentations.
-    @inlinable nonisolated func toolTipContext() -> some View {
+    nonisolated func toolTipContext() -> some View {
         anchorPresentationContext()
     }
     

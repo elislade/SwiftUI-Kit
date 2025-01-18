@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension Color {
     
-    @inlinable static var random: Color {
+    static var random: Color {
         Color(
             hue: .random(in: 0...1),
             saturation: .random(in: 0...1),

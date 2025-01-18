@@ -125,7 +125,7 @@ public extension View {
     /// 
     /// - Parameter disabled: Bool indicating whether it's disabled or not.
     /// - Returns: A view with the `insetReadingDisabled` environment value set.
-    @inlinable nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
+    nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
         environment(\.insetReadingDisabled, disabled)
     }
     

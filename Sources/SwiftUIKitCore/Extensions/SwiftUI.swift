@@ -4,11 +4,11 @@ import SwiftUI
 public extension Image {
     
 #if canImport(UIKit)
-    @inlinable init(osImage: UIImage){
+    init(osImage: UIImage){
         self.init(uiImage: osImage)
     }
 #elseif canImport(AppKit)
-    @inlinable init(osImage: NSImage){
+    init(osImage: NSImage){
         self.init(nsImage: osImage)
     }
 #endif

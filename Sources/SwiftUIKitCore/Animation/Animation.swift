@@ -16,7 +16,7 @@ public extension Animation {
         initialVelocity: 0.5
     )
     
-    @inlinable static func interpolating(velocity: CGFloat) -> Animation {
+    static func interpolating(velocity: CGFloat) -> Animation {
         .interpolatingSpring(
             mass: 0.2,
             stiffness: 90,
@@ -30,7 +30,7 @@ public extension Animation {
 
 public extension View {
     
-    @inlinable func delayAnimation(_ delay: Double) -> some View {
+    func delayAnimation(_ delay: Double) -> some View {
         transaction{
             $0.animation = $0.animation?.delay(delay)
         }

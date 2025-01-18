@@ -41,7 +41,7 @@ public struct RaisedControlMaterial<Shape: InsettableShape> : View {
 
 public extension RaisedControlMaterial where Shape == Rectangle {
     
-    @inlinable init(isPressed: Bool = false){
+    init(isPressed: Bool = false){
         self.init(Rectangle(), isPressed: isPressed)
     }
     

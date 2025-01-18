@@ -21,7 +21,7 @@ public extension View {
     /// Sets `reduceMotion` value. If false it will inherit its parent reduce motion value. To override parent value use `environment(\.reduceMotion)` modifier.
     /// - Parameter enabled: A Bool indicating whether reduce motion value is set or not.
     /// - Returns: A view that transforms reduce motion value.
-    @inlinable func reduceMotion(_ enabled: Bool = true) -> some View {
+    func reduceMotion(_ enabled: Bool = true) -> some View {
         transformEnvironment(\.reduceMotion) { value in
             if enabled {
                 value = true

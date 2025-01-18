@@ -130,7 +130,7 @@ public extension SliderView where Handle == EmptyView {
     /// - Parameters:
     ///   - x: A ``SliderState`` representing the value on the x-axis.
     ///   - y: A ``SliderState`` representing the value on the y-axis.
-    @inlinable init(x: SliderState<Value>? = nil, y: SliderState<Value>? = nil) {
+    init(x: SliderState<Value>? = nil, y: SliderState<Value>? = nil) {
         self.init(x: x, y: y, hitTestHandle: false){ EmptyView() }
     }
     
@@ -138,7 +138,7 @@ public extension SliderView where Handle == EmptyView {
     ///
     /// - Parameters:
     ///   - horizontal: A horizontal ``SliderState`` representing the value on the x-axis.
-    @inlinable init(_ horizontal: SliderState<Value>) {
+    init(_ horizontal: SliderState<Value>) {
         self.init(x: horizontal, hitTestHandle: false){ EmptyView() }
     }
     
@@ -147,7 +147,7 @@ public extension SliderView where Handle == EmptyView {
     ///
     /// - Parameters:
     ///   - vertical: A vertical ``SliderState`` representing the value on the y-axis.
-    @inlinable init(vertical: SliderState<Value>) {
+    init(vertical: SliderState<Value>) {
         self.init(y: vertical, hitTestHandle: false){ EmptyView() }
     }
     

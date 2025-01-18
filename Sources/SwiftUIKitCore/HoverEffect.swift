@@ -19,15 +19,15 @@ public extension View {
     
 #else
     
-    @inlinable func hoverEffectPolyfill() -> some View {
+    func hoverEffectPolyfill() -> some View {
         hoverEffect()
     }
     
-    @inlinable func hoverEffectLift() -> some View {
+    func hoverEffectLift() -> some View {
         hoverEffect(.lift)
     }
     
-    @inlinable func hoverEffectHighlight() -> some View {
+    func hoverEffectHighlight() -> some View {
         hoverEffect(.highlight)
     }
     

@@ -14,14 +14,14 @@ public extension DraggablePayload {
 
 public extension View {
     
-    @inlinable nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
+    nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
         onDrag({
             NSItemProvider(encoding: payload, with: preferredSize)
         })
     }
     
     
-    @inlinable nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
+    nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
         onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
             providers.decode<Payload>{ callback($0, location) }
             return true
@@ -33,7 +33,7 @@ public extension View {
 
 public extension DynamicViewContent {
     
-    @inlinable nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
+    nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
         onInsert(of: [ Payload.type ]){ i, providers in
             providers.decode<Payload>{ callback(i, $0) }
         }

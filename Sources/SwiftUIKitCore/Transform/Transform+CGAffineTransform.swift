@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension Transform {
     
-    @inlinable nonisolated var cgAffine: CGAffineTransform {
+    nonisolated var cgAffine: CGAffineTransform {
         self[Component.allCases]
     }
     
@@ -16,7 +16,7 @@ public extension Transform {
         }
     }
     
-    @inlinable nonisolated subscript(components: Component...) -> CGAffineTransform {
+    nonisolated subscript(components: Component...) -> CGAffineTransform {
         self[components]
     }
     
@@ -33,7 +33,7 @@ public extension Transform {
 
 public extension CGAffineTransform {
     
-    @inlinable nonisolated init(shearX: Double, shearY: Double){
+    nonisolated init(shearX: Double, shearY: Double){
         self.init(
             1, tan(shearX),
             tan(shearY), 1,
