@@ -17,11 +17,15 @@ struct SimultaneousLongPressModifier: ViewModifier {
             )
         } else {
             content
-                .modifier(LongPressWindowInteraction(
-                    minimumDuration: minimumDuration,
-                    maximumDistance: maximumDistance,
-                    trigger: trigger
-                ))
+                .overlay{
+                    #if os(iOS)
+                    SimultaneousLongPressRepresentation(
+                        minimumDuration: minimumDuration,
+                        maximumDistance: maximumDistance,
+                        trigger: trigger
+                    )
+                    #endif
+                }
         }
     }
     

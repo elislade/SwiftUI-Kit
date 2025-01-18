@@ -43,7 +43,7 @@ struct SimultaneousLongPressRepresentation : UIViewRepresentable {
         }()
         
         @objc private func longAction(_ g: UILongPressGestureRecognizer) {
-            if g.state == .changed {
+            if g.state == .began {
                 trigger()
             }
         }
