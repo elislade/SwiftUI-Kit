@@ -94,20 +94,29 @@ public struct TextField<Leading: View>: View {
                         .padding(padding)
                 }
             }
-            .safeAreaInset(edge: .trailing, spacing: padding){
+            .safeAreaInset(edge: .trailing, spacing: 0){
                 if showClearButton {
-                    Button("Clear", systemImage: "xmark.circle.fill"){ text = "" }
-                        .buttonStyle(.tintStyle)
-                        .imageScale(.large)
-                        .symbolRenderingMode(.hierarchical)
-                        .labelStyle(.iconOnly)
-                        .transitions(.move(edge: .trailing), .opacity)
+                    Button(action: { text = "" }){
+                        Label { Text("Clear Field") } icon : {
+                            ZStack {
+                                Color.clear
+                                Image(systemName: "xmark.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(4)
+                                    .frame(maxWidth: 30, maxHeight: 30)
+                            }
+                            .aspectRatio(1, contentMode: .fit)
+                        }
+                    }
+                    .buttonStyle(.tintStyle)
+                    .symbolRenderingMode(.hierarchical)
+                    .labelStyle(.iconOnly)
+                    .transitions(.scale, .opacity)
                 }
             }
             .padding(.leading, radius / 4)
-            .padding(.trailing, padding)
             .padding(.leading, showLeading ? 0 : padding)
-            .padding(.trailing, showClearButton ? 0 : padding)
             .frame(height: height)
             .foregroundColor(focusState ? .black : colorScheme == .dark ? .white : .black)
             .background{
@@ -130,7 +139,7 @@ public struct TextField<Leading: View>: View {
 
 public extension TextField where Leading == EmptyView {
     
-    @inlinable init(
+    init(
         _ titleKey: LocalizedStringKey,
         text: Binding<String>,
         clearButtonVisibility: TextFieldElementVisibility = .whileEditing
