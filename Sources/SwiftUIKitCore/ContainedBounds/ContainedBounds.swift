@@ -16,7 +16,7 @@ public extension View {
     ///   - context: A hashable value identifying what context to use.
     ///   - action: A closure that passes the `ContainedBoundsState` into.
     /// - Returns: A modified view.
-    func didChangeContainedBounds<V: Hashable>(in context: V, action: @escaping (ContainedBoundsState) -> Void) -> some View {
+    func onContainedBoundsChange<V: Hashable>(in context: V, action: @escaping (ContainedBoundsState) -> Void) -> some View {
         modifier(DidChangeContainedBounds(context: context, action: action))
     }
     

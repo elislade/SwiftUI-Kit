@@ -15,9 +15,9 @@ struct DidChangeContainedBounds: ViewModifier {
                     id: id,
                     context: context,
                     anchor: $0,
-                    didChangeVisibility: { isVisible in
+                    didChangeVisibility: { state in
                         DispatchQueue.main.async{
-                            action(isVisible)
+                            action(state)
                         }
                     }
                 )]
@@ -27,15 +27,13 @@ struct DidChangeContainedBounds: ViewModifier {
 }
 
 
-public enum ContainedBoundsState: Hashable, Sendable {
-    case partiallyContained(edges: Edge.Set = [])
-    case fullyContained
-    case notContained
-    
-    public var hasContainment: Bool {
-        if case .partiallyContained = self {
-            return true
-        }
-        return self == .fullyContained
+public struct ContainedBoundsState: Hashable, Sendable, BitwiseCopyable  {
+    public enum Containment: Hashable, Sendable, BitwiseCopyable {
+        case partially
+        case fully
+        case none
     }
+    
+    public let edges: Edge.Set
+    public let containment: Containment
 }

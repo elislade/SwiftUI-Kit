@@ -38,15 +38,16 @@ public struct ContainedBoundsExample: View {
     
     struct Cell: View {
         
-        @State private var state: ContainedBoundsState = .notContained
+        @State private var state: ContainedBoundsState?
         
         let i: Int
         
         private var opacity: Double {
-            switch state {
-            case .partiallyContained: 0.5
-            case .fullyContained: 1
-            case .notContained: 0.15
+            guard let state else { return 0 }
+            switch state.containment {
+            case .partially: return 0.5
+            case .fully: return 1
+            case .none:return 0.15
             }
         }
         
@@ -55,7 +56,7 @@ public struct ContainedBoundsExample: View {
                 .opacity(opacity)
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
-                .didChangeContainedBounds(in: "Test"){ state = $0 }
+                .onContainedBoundsChange(in: "Test"){ state = $0 }
                 .animation(.fastSpringInterpolating, value: state)
         }
         
