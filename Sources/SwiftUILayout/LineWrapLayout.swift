@@ -29,7 +29,7 @@ public struct LineWrapLayout: Layout {
         // Make Groups
         let groups = subviews.indices.reduce(into: GroupReducerState()){ state, idx in
             let view = subviews[idx]
-            let isSparator = view[SeparatorKey.self]
+            let isSeparator = view[SeparatorKey.self]
             let numberOfNewlines = view[NewlineKey.self]
             
             if numberOfNewlines == 0 {
@@ -44,9 +44,9 @@ public struct LineWrapLayout: Layout {
                 state.separatorLast = state.groups.count
             }
             
-            if isSparator || (idx == subviews.indices.last && state.hasSeparated) {
+            if isSeparator || (idx == subviews.indices.last && state.hasSeparated) {
                 let range = state.separatorLast..<state.groups.endIndex
-                let groups = state.groups[range].splitMerge(where: { $0.items.isEmpty })
+                let groups = state.groups[range].splitMerge(where: \.items.isEmpty)
                 state.groups.remove(atOffsets: IndexSet(range))
                 state.groups.append(contentsOf: groups)
                 state.separatorLast = state.groups.count
@@ -249,7 +249,7 @@ public struct LayoutSeparator: View {
     public init(){}
     
     public var body: some View {
-        Color.clear.layoutSaparator()
+        Color.clear.layoutSeparator()
     }
 }
 
@@ -280,7 +280,7 @@ public extension View {
         layoutValue(key: LineWrapLayout.NewlineKey.self, value: max(lines, 0))
     }
     
-    func layoutSaparator(_ enabled: Bool = true) -> some View {
+    func layoutSeparator(_ enabled: Bool = true) -> some View {
         layoutValue(key: LineWrapLayout.SeparatorKey.self, value: enabled)
     }
     

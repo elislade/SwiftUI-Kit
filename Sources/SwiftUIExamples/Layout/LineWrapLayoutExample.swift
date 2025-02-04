@@ -66,7 +66,7 @@ public struct LineWrapLayoutExample: View {
                                 LayoutNewLine()
                             } else {
                                 Text("\(char)")
-                                    .layoutSaparator(groupByWhitespace && (char.isWhitespace || char == "-"))
+                                    .layoutSeparator(groupByWhitespace && (char.isWhitespace || char == "-"))
                                     .border(showBorders ? Color.blue : .clear, width: 0.333)
                                     .transition(
                                         .merge(.scale(0), .opacity)
