@@ -34,7 +34,8 @@ struct OnContinuousHoverPolyfill: ViewModifier {
                     $0.frame(in: coordinateSpace)
                 )
             }){ rects = $0 }
-            .windowHover{ point in
+            .onWindowHover{ evt in
+                let point = evt.location
                 if coordinateSpace.isLocal {
                     if rects.source.contains(point) {
                         phase = .active(point.translate(by: -rects.source.origin))

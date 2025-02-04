@@ -78,22 +78,18 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
             .onPreferenceChange(DropAreaPreference<Value>.self){
                 _dropAreas.wrappedValue = $0
             }
-            .windowDrag{ points in
-                if let location = points.first {
+            .onWindowDrag { evt in
+                if evt.phase == .ended {
+                    self.end()
+                    return
+                }
+                
+                if let location = evt.locations.first {
                     //layout.location = location
                     let l = location.applying(.init(translationX: 0, y: -eventOffset))
                     self.location = l
                     handle(location: l)
                 }
-            } changed: { points in
-                if let location = points.first {
-                    //layout.location = location
-                    let l = location.applying(.init(translationX: 0, y: -eventOffset))
-                    self.location = l
-                    handle(location: l)
-                }
-            } ended: { points in
-                self.end()
             }
             .onChangePolyfill(of: scenePhase){
                 self.end()

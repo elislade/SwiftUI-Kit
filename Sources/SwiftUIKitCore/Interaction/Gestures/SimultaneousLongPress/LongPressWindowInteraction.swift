@@ -25,24 +25,27 @@ struct LongPressWindowInteraction: ViewModifier {
                     trigger()
                 }
             }
-            .windowDrag{ p in
-                if let point = p.first, rect.contains(point) {
-                    start = point
-                    last = point
-                    timer = .scheduledTimer(withTimeInterval: minimumDuration, repeats: false){ _ in
-                        _shouldTrigger.wrappedValue = true
+            .onWindowDrag{ evt in
+                switch evt.phase {
+                case .began:
+                    if let point = evt.locations.first, rect.contains(point) {
+                        start = point
+                        last = point
+                        timer = .scheduledTimer(withTimeInterval: minimumDuration, repeats: false){ _ in
+                            _shouldTrigger.wrappedValue = true
+                        }
                     }
-                }
-            } changed: {
-                last = $0.first ?? .zero
-                if !withinDistance {
+                case .changed:
+                    last = evt.locations.first ?? .zero
+                    if !withinDistance {
+                        timer?.invalidate()
+                        shouldTrigger = false
+                    }
+                case .ended:
                     timer?.invalidate()
+                    timer = nil
                     shouldTrigger = false
                 }
-            } ended: { p in
-                timer?.invalidate()
-                timer = nil
-                shouldTrigger = false
             }
     }
     

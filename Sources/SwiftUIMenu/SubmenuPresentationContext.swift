@@ -20,7 +20,7 @@ struct SubmenuPresentationContext: ViewModifier {
                     .environment(\.presentationDepth, presentedStack.count)
 //                    .frame(maxHeight: !presentedStack.isEmpty ? 50 : nil)
                     .scaleEffect(1 - (Double(presentedStack.count) / 15), anchor: .init(alignment))
-                    .disableWindowEvents(!stack.isEmpty)
+                    .disableWindowDrag(!stack.isEmpty)
             }
             .overlay {
                 GeometryReader { proxy in
@@ -56,7 +56,7 @@ struct SubmenuPresentationContext: ViewModifier {
                                     1 - (Double(releventStack.count - i - 1) / 15) ,
                                     anchor: .init(alignment)
                                 )
-                                .disableWindowEvents(i != stack.indices.last)
+                                .disableWindowDrag(i != stack.indices.last)
                         }
                     }
                 }

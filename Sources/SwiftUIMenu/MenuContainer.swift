@@ -60,38 +60,37 @@ public struct MenuContainer<Content: View>: View {
             .onChangePolyfill(of: selectionIndexBinding?.wrappedValue, initial: true){ _, new in
                 selectedIndex = new
             }
-            .windowDrag{ points in
-                if let new = points.last {
-                    selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
-                } else {
-                    self.selectedIndex = nil
-                }
-            } changed: { points in
-                if let new = points.last {
-                    selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
-                } else {
-                    self.selectedIndex = nil
-                }
-            } ended: { points in
-                if let selectedIndex, buttons.indices.contains(selectedIndex) {
-                    if buttons[selectedIndex].dismissOnAction {
-                        if buttons[selectedIndex].actionBehaviour == .immediate {
-                            buttons[selectedIndex].action()
-                            callSelectedOnDissappear = false
-                            self.selectedIndex = nil
+            .onWindowDrag { evt in
+                if evt.phase == .ended {
+                    if let selectedIndex, buttons.indices.contains(selectedIndex) {
+                        if buttons[selectedIndex].dismissOnAction {
+                            if buttons[selectedIndex].actionBehaviour == .immediate {
+                                buttons[selectedIndex].action()
+                                callSelectedOnDissappear = false
+                                self.selectedIndex = nil
+                            } else {
+                                callSelectedOnDissappear = true
+                            }
+                            
+                            dismissPresentation()
                         } else {
                             callSelectedOnDissappear = true
+                            buttons[selectedIndex].action()
+                            self.selectedIndex = nil
                         }
-                        
-                        dismissPresentation()
-                    } else {
-                        callSelectedOnDissappear = true
-                        buttons[selectedIndex].action()
-                        self.selectedIndex = nil
                     }
+                    
+                    return
+                }
+                
+                if let new = evt.locations.last {
+                    selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(new) })
+                } else {
+                    self.selectedIndex = nil
                 }
             }
-            .windowHover{ point in
+            .onWindowHover { evt in
+                let point = evt.location
                 selectedIndex = buttons.firstIndex(where: { $0.globalRect.contains(point) })
             }
             .onDisappear{

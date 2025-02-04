@@ -1,61 +1,52 @@
 import SwiftUI
-import Combine
-import OSLog
 
-#if canImport(UIKit)
 
-enum WindowEvents {
-    
-    @MainActor static var swizzledReferenceCount: UInt8 = 0
-    @MainActor static var isSwizzled: Bool { swizzledReferenceCount > 0 }
-    @MainActor static let passthrough = PassthroughSubject<UIEvent, Never>()
-    
-}
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-extension UIWindow {
+struct WindowDragModifier: ViewModifier {
     
-    static func enterSwizzleSendEvents() {
-        if WindowEvents.isSwizzled == false {
-            toggleSwizzleSendEvent()
-        }
-        
-        WindowEvents.swizzledReferenceCount += 1
-    }
+    @Environment(\.windowDragEnabled) private var isEnabled
+    @State private var windowRef: NSWindow?
     
-    static func exitSwizzleSendEvents() {
-        WindowEvents.swizzledReferenceCount -= 1
-        
-        if WindowEvents.isSwizzled == false {
-            toggleSwizzleSendEvent()
-        }
-    }
-    
-    static func toggleSwizzleSendEvent() {
-        let ogMethod = class_getInstanceMethod(self, #selector(sendEvent))!
-        let swizzleMethod = class_getInstanceMethod(self, #selector(swizzle__sendEvent))!
-        
-        method_exchangeImplementations(ogMethod, swizzleMethod)
-    }
-    
-    @objc func swizzle__sendEvent(_ event: UIEvent) {
-        swizzle__sendEvent(event)
-        WindowEvents.passthrough.send(event)
-    }
-    
-}
-
-struct WindowEventsModifier : ViewModifier {
-    
-    @Environment(\._disableWindowEvents) private var isDisabled
-    @State private var hasStarted: Bool = false
-    
-    var started: @MainActor ([CGPoint]) -> Void
-    var changed: @MainActor ([CGPoint]) -> Void
-    var ended: @MainActor ([CGPoint]) -> Void
+    var action: (WindowDragEvent) -> Void
     
     func body(content: Content) -> some View {
         content.overlay {
-            if !isDisabled {
+            if isEnabled {
+                Color.clear
+                    .onAppear{ NSWindow.enterSwizzleSendEvents() }
+                    .onDisappear{ NSWindow.exitSwizzleSendEvents() }
+                    .windowReference{ windowRef = $0 }
+                    .onReceive(WindowEvents.passthrough){ event in
+                        guard let window = event.window, window == windowRef else { return }
+                        let location = event.flippedYLocationInWindow
+                        
+                        if event.type.isMouseDown {
+                            action(.init(phase: .began, locations: [location]))
+                        } else if event.type.isMouseUp {
+                            action(.init(phase: .ended, locations: [location]))
+                        } else if event.type.isMouseDrag {
+                            action(.init(phase: .changed, locations: [location]))
+                        }
+                    }
+            }
+        }
+    }
+    
+}
+
+#else
+
+struct WindowDragModifier : ViewModifier {
+    
+    @Environment(\.windowDragEnabled) private var isEnabled
+    @State private var hasStarted: Bool = false
+    
+    var action: (WindowDragEvent) -> Void
+    
+    func body(content: Content) -> some View {
+        content.overlay {
+            if isEnabled {
                 Color.clear
                     .onAppear{ UIWindow.enterSwizzleSendEvents() }
                     .onDisappear{ UIWindow.exitSwizzleSendEvents() }
@@ -94,17 +85,15 @@ struct WindowEventsModifier : ViewModifier {
                         let locations = touches.map{ $0.location(in: nil) }
                     
                         if allStarted {
-                            //print("Started")
-                            started(locations)
+                            action(.init(phase: .began, locations: locations))
                         }
                         
                         if !allStarted && !allEnded {
-                            changed(locations)
+                            action(.init(phase: .changed, locations: locations))
                         }
                         
                         if allEnded {
-                            //print("Ended")
-                            ended(locations)
+                            action(.init(phase: .ended, locations: locations))
                         }
                     }
                     .hidden()
@@ -115,31 +104,4 @@ struct WindowEventsModifier : ViewModifier {
 }
 
 
-struct WindowHoverModifier: ViewModifier {
-    
-    @Environment(\._disableWindowEvents) private var isDisabled
-    
-    var hover: @MainActor (CGPoint) -> Void
-    
-    func body(content: Content) -> some View {
-        content.overlay {
-            if !isDisabled {
-                Color.clear
-                    .onAppear{ UIWindow.enterSwizzleSendEvents() }
-                    .onDisappear{ UIWindow.exitSwizzleSendEvents() }
-                    .onReceive(WindowEvents.passthrough){ event in
-                        guard
-                            event.type == .hover,
-                            let touch = event.allTouches?.first(where: { $0.type != .direct })
-                        else { return }
-                        
-                        hover(touch.location(in: nil))
-                    }
-            }
-        }
-    }
-    
-}
-
 #endif
-

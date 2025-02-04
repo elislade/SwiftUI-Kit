@@ -19,8 +19,14 @@ struct WindowInteractionEffects: ViewModifier {
             .scaleEffect(scale, anchor:  scaleAnchor)
             .offset(offset)
             .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ rect = $0 }
-            .windowDrag(started: { _ in }){ points in
-                guard !effects.isEmpty, let location = points.last else {
+            .onWindowDrag { evt in
+                guard !effects.isEmpty, let location = evt.locations.last else {
+                    return
+                }
+                
+                if evt.phase == .ended {
+                    self.offset = .zero
+                    self.scale = 1
                     return
                 }
                 
@@ -46,11 +52,8 @@ struct WindowInteractionEffects: ViewModifier {
                         )
                     }
                 }
-            } ended: { _ in
-                self.offset = .zero
-                self.scale = 1
             }
-            .disableWindowEvents(effects.isEmpty)
+            .disableWindowDrag(effects.isEmpty)
             .animation(.bouncy, value: scale)
             .animation(.bouncy, value: offset)
     }
