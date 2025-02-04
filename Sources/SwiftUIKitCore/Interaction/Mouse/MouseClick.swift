@@ -9,21 +9,23 @@ public extension View {
     
 }
 
-public struct MouseClickEvent: Hashable, Sendable {
+public struct MouseClickEvent: Hashable, Sendable, Codable, Identifiable {
     
-    public enum Button: Hashable, Sendable {
+    public enum Button: Hashable, Sendable, Codable, BitwiseCopyable {
         case left
         case right
+        case middle
         case other
     }
 
-    public enum Phase: Hashable, Sendable {
+    public enum Phase: Hashable, Sendable, Codable, BitwiseCopyable {
         case down
         case up
     }
     
+    public let id: String
     public let button: Button
     public let phase: Phase
-    public let location: CGPoint?
+    public let location: SIMD2<Double>?
     
 }

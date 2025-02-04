@@ -37,9 +37,13 @@ import Combine
         }
     }
     
-    private func location(for listener: Listener) -> CGPoint? {
+    private func location(for listener: Listener) -> SIMD2<Double>? {
         #if canImport(AppKit) && !targetEnvironment(macCatalyst)
-        return listener.window?.currentEvent?.flippedYLocationInWindow
+        if let point = listener.window?.currentEvent?.flippedYLocationInWindow {
+            return [point.x, point.y]
+        } else {
+            return nil
+        }
         #else
         return nil
         #endif
@@ -48,6 +52,7 @@ import Combine
     private func handle(button: MouseClickEvent.Button, pressed: Bool) {
         if let listener = listenerQueue.first {
             listener.handler(MouseClickEvent(
+                id: UUID().uuidString,
                 button: button,
                 phase: pressed ? .down : .up,
                 location: location(for: listener)
@@ -69,7 +74,13 @@ import Combine
         }
         
         input.middleButton?.pressedChangedHandler = { [unowned self] _, _, pressed in
-            handle(button: .other, pressed: pressed)
+            handle(button: .middle, pressed: pressed)
+        }
+        
+        for auxiliaryButton in input.auxiliaryButtons ?? [] {
+            auxiliaryButton.pressedChangedHandler = { [unowned self] _, _, pressed in
+                handle(button: .other, pressed: pressed)
+            }
         }
     }
     
