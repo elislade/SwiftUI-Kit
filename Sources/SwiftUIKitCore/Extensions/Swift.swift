@@ -235,3 +235,37 @@ public extension Measurement where UnitType == UnitFrequency {
     }
     
 }
+
+
+public extension SetAlgebra {
+    
+    func intersects(with other: Self) -> Bool {
+        !intersection(other).isEmpty
+    }
+    
+}
+
+
+public extension Set {
+    
+    mutating func toggle(_ member: Element) {
+        if contains(member) {
+            remove(member)
+        } else {
+            insert(member)
+        }
+    }
+    
+}
+
+public extension SetAlgebra {
+    
+    mutating func toggle(_ member: Element, included: Bool) {
+        if included {
+            insert(member)
+        } else {
+            remove(member)
+        }
+    }
+    
+}

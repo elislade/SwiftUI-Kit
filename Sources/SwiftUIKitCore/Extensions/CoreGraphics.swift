@@ -120,6 +120,30 @@ public extension CGRect {
     
 }
 
+
+extension CGRect: @retroactive CustomStringConvertible {
+    
+    public var description: String {
+        "\(origin.x),\(origin.y),\(size.width),\(size.height)"
+    }
+    
+}
+
+extension CGRect: @retroactive LosslessStringConvertible {
+    
+    public init?(_ description: String) {
+        let comps = description.split(separator: ",").compactMap{
+            $0.trimmingCharacters(in: .whitespaces)
+        }.compactMap{
+            Double(String($0))
+        }
+        
+        guard comps.count == 4 else { return nil }
+        self.init(x: comps[0], y: comps[1], width: comps[2], height: comps[3])
+    }
+    
+}
+
 extension CGAffineTransform: StaticIdentityConformance { }
 
 extension CGFloat : ReplaceWhenFloatKeyIsTrueConformance {}
