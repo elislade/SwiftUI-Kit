@@ -93,7 +93,8 @@ struct FocusPresentationContext: ViewModifier {
                                     .shadow(color: .black.opacity(0.2), radius: 30, y: 5)
                             } else {
                                 value
-                                    .metadata.sourceView
+                                    .metadata
+                                    .sourceView()
                                     .environment(\.reduceMotion, true)
                                     .zIndex(2)
                                     .frame(width: bounds.width, height: bounds.height)

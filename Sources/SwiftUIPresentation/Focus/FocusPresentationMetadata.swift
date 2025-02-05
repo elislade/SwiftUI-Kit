@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct FocusPresentationMetadata: Equatable, @unchecked Sendable {
+struct FocusPresentationMetadata: Equatable, Sendable {
     
     /// Stubbed true Equatable conformance will never update PresentationContext state on PreferenceKey Metadata changes
     /// This is to get around a Swift limitations discussed below.
@@ -9,11 +9,11 @@ struct FocusPresentationMetadata: Equatable, @unchecked Sendable {
     ///2.   No Negative Constraints: Swift doesn’t support a way to say “Metadata is not Equatable” (negative conformance), which further complicates things when you’re trying to handle the non-Equatable case explicitly.
     ///3.   Runtime Type-Checking Limitations: While a runtime check like as? any Equatable seems like a possible solution, it fails because Swift doesn’t allow direct comparison of two values that conform to Equatable via type erasure.
     
-    static func == (lhs: FocusPresentationMetadata, rhs: FocusPresentationMetadata) -> Bool {
+    static func ==(lhs: FocusPresentationMetadata, rhs: FocusPresentationMetadata) -> Bool {
         true
     }
     
-    let sourceView: AnyView
+    let sourceView: @MainActor () -> AnyView
     let accessory: @MainActor (AutoAnchorState) -> AnyView?
     
 }

@@ -28,7 +28,7 @@ struct FocusPresenter<Content: View>: View {
             .presentationValue(
                 isPresented: $isPresented,
                 metadata: FocusPresentationMetadata(
-                    sourceView: AnyView(content()),
+                    sourceView: { AnyView(content()) },
                     accessory: accessory
                 )
             ){
@@ -66,7 +66,7 @@ struct FocusOptionalPresenter<Value : Sendable, Content: View>: View {
             .presentationValue(
                 value: $value,
                 metadata: FocusPresentationMetadata(
-                    sourceView: AnyView(content()),
+                    sourceView: { AnyView(content()) },
                     accessory: accessory
                 )
             ){
