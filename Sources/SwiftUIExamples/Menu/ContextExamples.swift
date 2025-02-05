@@ -18,7 +18,7 @@ public struct ContextMenuExamples: View  {
                             .opacity(0.1 + Double(i) / 15)
                             .background(.background)
                             .aspectRatio(1, contentMode: .fit)
-                            .contextCustomMenu(isPresented: Binding($presentedIndices, contains:  i)) {
+                            .customContextMenu(isPresented: Binding($presentedIndices, contains:  i)) {
                                 Button(action: {}){
                                     Text("Item A")
                                         .equalInsetItem()
