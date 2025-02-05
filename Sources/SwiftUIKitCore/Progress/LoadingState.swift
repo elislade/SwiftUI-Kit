@@ -14,7 +14,7 @@ public enum LoadingState: Hashable, Sendable, Codable {
     /// - Parameter value: An optional Double for the progress. If `nil` it will be `indefinite`.
     public init(_ value: Double?){
         if let value {
-            self = .progress(value)
+            self = .progress(max(min(value, 1), 0))
         } else {
             self = .indefinite
         }
@@ -22,7 +22,7 @@ public enum LoadingState: Hashable, Sendable, Codable {
     
     public var fractionComplete: Double? {
         switch self {
-        case .progress(let double): double
+        case .progress(let double): max(min(double, 1), 0)
         case .indefinite: nil
         }
     }

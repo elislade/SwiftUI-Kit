@@ -36,6 +36,7 @@ public struct CompositeTransitionExamples: View {
                 }
                 
                 LoadingLine(state: .progress(show ? 1 : 0))
+                    .frame(height: 4)
             }
             .animation(.smooth, value: show)
             .overlay(alignment: .bottom){

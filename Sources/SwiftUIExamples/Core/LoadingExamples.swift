@@ -24,6 +24,7 @@ public struct LoadingExamples: View {
                     .frame(width: 60)
                 
                 LoadingLine(state: loadingState)
+                    .frame(height: 12)
             }
             .padding()
             .environment(\.layoutDirection, layoutDirection)
