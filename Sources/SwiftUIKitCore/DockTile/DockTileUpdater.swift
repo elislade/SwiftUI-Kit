@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(macOS)
 
 @MainActor final class DockTileUpdater {
     
@@ -22,7 +23,7 @@ import SwiftUI
             }
         } else if let preference, previousPreference == nil {
             DispatchQueue.main.async { [dockTile] in
-                dockTile.contentView = DockTileHostingView(rootView: preference.view)
+                dockTile.contentView = NSHostingView(rootView: preference.view)
             }
         } else if let preference, let previousPreference {
             DispatchQueue.main.async { [dockTile] in
@@ -37,3 +38,5 @@ import SwiftUI
     }
     
 }
+
+#endif
