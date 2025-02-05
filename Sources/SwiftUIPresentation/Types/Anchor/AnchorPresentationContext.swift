@@ -7,6 +7,7 @@ struct AnchorPresentationContext: ViewModifier {
     typealias Metadata = AnchorPresentationMetadata
     typealias Presentation = PresentationValue<Metadata>
     
+    @Environment(\.presentationEnvironmentBehaviour) private var envBehaviour
     @Environment(\.layoutDirection) private var envLayoutDirection
     
     @State private var bgInteraction: PresentationBackgroundInteraction?
@@ -15,11 +16,7 @@ struct AnchorPresentationContext: ViewModifier {
 
     private var bgView: AnyView? { bg?.view() }
     
-    let environmentBehaviour: PresentationEnvironmentBehaviour
-    
-    nonisolated init(environmentBehaviour: PresentationEnvironmentBehaviour = .useContext) {
-        self.environmentBehaviour = environmentBehaviour
-    }
+    nonisolated init() { }
     
     private var layoutDirection: LayoutDirection {
         guard let presentedValue else { return envLayoutDirection }
@@ -27,7 +24,7 @@ struct AnchorPresentationContext: ViewModifier {
     }
     
     private func layoutDirection(for presentation: Presentation) -> LayoutDirection {
-        switch environmentBehaviour {
+        switch envBehaviour {
         case .usePresentation: presentation.layoutDirection
         case .useContext: envLayoutDirection
         }

@@ -123,7 +123,7 @@ public extension View {
     ) -> some View {
         modifier(EnvironmentModifierWrap { environment in
             PresentationValuePresenter(
-                environment: environment,
+                environmentRef: ClosureKeyPath(environment),
                 isPresented: isPresented,
                 tag: tag,
                 presentationRespondsToBoundsChange: respondsToBoundsChange,
@@ -143,8 +143,7 @@ public extension View {
     ) -> some View {
         modifier(EnvironmentModifierWrap{ environment in
             PresentationOptionalValuePresenter(
-                environment: environment,
-                behaviour: behaviour,
+                environmentRef: ClosureKeyPath(environment),
                 value: value,
                 tag: tag,
                 presentationRespondsToBoundsChange: respondsToBoundsChange,
@@ -163,16 +162,5 @@ public struct PresentationKey<Metadata: Equatable & Sendable>: PreferenceKey {
     public static func reduce(value: inout [PresentationValue<Metadata>], nextValue: () -> [PresentationValue<Metadata>]) {
         value.append(contentsOf: nextValue())
     }
-    
-}
-
-
-public enum PresentationEnvironmentBehaviour: Sendable {
-    
-    /// uses the environment of the presentation
-    case usePresentation
-    
-    /// uses the environment of the  context
-    case useContext
     
 }

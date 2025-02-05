@@ -6,10 +6,9 @@ public extension View {
     
     
     /// Defines an anchor presentation context for children to present in.
-    /// - Parameter environmentBehaviour: The ``PresentationEnvironmentBehaviour`` to use when presenting views. Defaults to `.useContext`.
     /// - Returns: Modified content that handles child anchor presentations.
-    nonisolated func anchorPresentationContext(environmentBehaviour: PresentationEnvironmentBehaviour = .useContext) -> some View {
-        modifier(AnchorPresentationContext(environmentBehaviour: environmentBehaviour))
+    nonisolated func anchorPresentationContext() -> some View {
+        modifier(AnchorPresentationContext())
     }
     
     

@@ -25,7 +25,6 @@ public struct AnchorPresentationExample : View   {
                 .frame(width: 60, height: 60)
         }
         .buttonStyle(.plain)
-        .environment(\.layoutDirection, direction)
     }
     
     public var body: some View {
@@ -55,7 +54,8 @@ public struct AnchorPresentationExample : View   {
                     .offset(sourceLocation)
                 }
             }
-            .anchorPresentationContext(environmentBehaviour: .usePresentation)
+            .anchorPresentationContext()
+            .presentationEnvironmentBehaviour(.usePresentation)
             .simultaneousGesture(
                 DragGesture().onChanged{ g in
                     if sourceLocation == .zero {
@@ -70,6 +70,7 @@ public struct AnchorPresentationExample : View   {
                     sourceLocationLast = sourceLocation
                 }
             )
+            .environment(\.layoutDirection, direction)
         } parameters: {
             Toggle(isOn: $isPresented){
                 Text("Is Presented")
