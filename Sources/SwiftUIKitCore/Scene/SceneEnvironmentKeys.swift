@@ -1,10 +1,8 @@
 import SwiftUI
 
 
-// MARK: - SceneInsets
-
-struct SceneProxyKey: EnvironmentKey {
-    static var defaultValue: GeometryProxy? { nil }
+struct SceneSizeKey: EnvironmentKey {
+    static var defaultValue: CGSize { .zero }
 }
 
 struct SceneInsetsKey: EnvironmentKey {
@@ -16,11 +14,6 @@ public extension EnvironmentValues {
     var sceneInsets: EdgeInsets {
         get { self[SceneInsetsKey.self] }
         set { self[SceneInsetsKey.self] = newValue }
-    }
-    
-    var sceneProxy: GeometryProxy? {
-        get { self[SceneProxyKey.self] }
-        set { self[SceneProxyKey.self] = newValue }
     }
     
 }
@@ -58,11 +51,11 @@ public extension CGFloat {
     static let defaultSceneInsetPadding: CGFloat = 16
 }
 
-
-// MARK: - SceneSize
-
 public extension EnvironmentValues {
+    
     var sceneSize: CGSize {
-        sceneProxy?.size ?? .zero
+        get { self[SceneSizeKey.self] }
+        set { self[SceneSizeKey.self] = newValue }
     }
+    
 }

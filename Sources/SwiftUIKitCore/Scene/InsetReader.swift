@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct InsetReader<Content: View>: View {
     
+    @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.insetReadingDisabled) private var disabled
     @Environment(\.sceneInsets) private var sceneInsets
     @Environment(\.sceneSize) private var sceneSize
@@ -16,11 +17,13 @@ public struct InsetReader<Content: View>: View {
     }
     
     private func calculate() -> EdgeInsets {
-        EdgeInsets(
+        let overlapsLeading = layoutDirection == .leftToRight ? frame.minX <= sceneInsets.leading : frame.maxX >= sceneSize.width - sceneInsets.leading
+        let overlapsTrailing = layoutDirection == .leftToRight ? frame.maxX >= sceneSize.width - sceneInsets.trailing : frame.minX <= sceneInsets.trailing
+        return EdgeInsets(
             top: frame.minY <= sceneInsets.top ? sceneInsets.top : 0,
-            leading: frame.minX <= sceneInsets.leading ? sceneInsets.leading : 0,
+            leading: overlapsLeading ? sceneInsets.leading : 0,
             bottom: frame.maxY >= sceneSize.height ? sceneInsets.bottom : 0,
-            trailing: frame.maxX >= sceneSize.width - sceneInsets.trailing ? sceneInsets.trailing : 0
+            trailing: overlapsTrailing ? sceneInsets.trailing : 0
         )
     }
     
@@ -46,6 +49,7 @@ public extension View {
                 .padding(.top, edges.contains(.top) ? -inset.top : 0)
                 .padding(.trailing, edges.contains(.trailing) ? -inset.trailing : 0)
                 .padding(.bottom, edges.contains(.bottom) ? -inset.bottom : 0)
+                .animation(.fastSpringInterpolating, value: inset)
         }
     }
     
@@ -121,8 +125,8 @@ public extension View {
     /// While disabled, all inset reading will use last inset values before disabling.
     /// Upon re-enabling of reading, values will update to new values.
     /// 
-    /// - Note: You can use this to temporarly disable inset reading while animating or dragging a view across inset bounds to stop sudden jumps to the UI as insets change.
-    /// 
+    /// - Note: You can use this to temporarily disable inset reading while animating or dragging a view across inset bounds to stop sudden jumps to the UI as insets change.
+    ///
     /// - Parameter disabled: Bool indicating whether it's disabled or not.
     /// - Returns: A view with the `insetReadingDisabled` environment value set.
     nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
