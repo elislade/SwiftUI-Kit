@@ -1,18 +1,14 @@
 import SwiftUI
-import Combine
-
-public enum ScrollOffset {
-    
-    @MainActor public static let passthrough = PassthroughSubject<CGPoint, Never>()
-    
-}
 
 
 /// A SwiftUI ScrollView that you can read its content offset and content size
 public struct ReadableScrollView<Content: View>: View {
     
+    @Environment(\.scrollOffsetPassthrough) private var offsetPassthrough
+    
     @State private var handlesReset: Bool = false
     @State private var isResetting = false
+    @State private var scrollOrigin: CGPoint = .zero
     
     let axis: Axis.Set
     let showsIndicators: Bool
@@ -49,7 +45,23 @@ public struct ReadableScrollView<Content: View>: View {
             ScrollView(axis, showsIndicators: showsIndicators) {
                 content
                     .id("ScrollContent")
-                    .bounds(tag: "ScrollContent")
+                    .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.rounded(.towardZero) }){
+                        let origin = $0
+                        let offset = CGPoint(x: origin.x - scrollOrigin.x, y: origin.y - scrollOrigin.y)
+                        offsetPassthrough?.send(offset)
+                        contentOffset(offset)
+                        handlesReset = {
+                            let xPass = axis.contains(.horizontal) ? offset.x < -resetScrollThreshold : false
+                            let yPass = axis.contains(.vertical) ? offset.y < -resetScrollThreshold : false
+                            return yPass || xPass
+                        }()
+                    }
+                    .onGeometryChangePolyfill(of: { $0.size.rounded(.towardZero) }){
+                        contentSize($0)
+                    }
+            }
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.rounded(.towardZero) }){
+                scrollOrigin = $0
             }
             .resetAction(active: handlesReset && !isResetting){
                 isResetting = true
@@ -62,25 +74,7 @@ public struct ReadableScrollView<Content: View>: View {
                 }
             }
         }
-        .childBoundsOverlay(tag: "ScrollContent"){ value in
-            if let value = value.last {
-                let offset = value.origin
-                Color.clear
-                    .onChange(of: value.size, perform: contentSize)
-                    .onChange(of: offset) { offset in
-                        contentOffset(offset)
-                        
-                        ScrollOffset.passthrough.send(offset)
-                        
-                        // only expose reset action if the view has scrolled more than 300 points
-                        handlesReset = {
-                            let xPass = axis.contains(.horizontal) ? offset.x < -resetScrollThreshold : false
-                            let yPass = axis.contains(.vertical) ? offset.y < -resetScrollThreshold : false
-                            return yPass || xPass
-                        }()
-                    }
-            }
-        }
         .stickyContext()
     }
+    
 }
