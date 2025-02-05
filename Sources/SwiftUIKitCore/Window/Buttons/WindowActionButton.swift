@@ -15,7 +15,8 @@ public struct WindowActionButton: View {
         case .minimize: WindowButtonMinimize()
         case .fullscreen: WindowButtonZoom()
         case .zoom: WindowButtonZoom()
-        case .translate: EmptyView()
+        case .startMove: EmptyView()
+        case .setFrame: EmptyView()
         }
     }
     

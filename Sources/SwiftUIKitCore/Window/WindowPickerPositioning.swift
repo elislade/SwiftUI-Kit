@@ -37,7 +37,7 @@ public enum WindowPickerPositioning: Int, Hashable, CaseIterable, Codable, Senda
 }
 
 
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
 extension NSWindow {
     

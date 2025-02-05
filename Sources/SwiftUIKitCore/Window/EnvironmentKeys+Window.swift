@@ -8,7 +8,8 @@ public enum WindowAction: Sendable {
     case minimize
     case fullscreen
     case zoom
-    case translate(CGSize)
+    case startMove
+    case setFrame(_ frame: CGRect, duration: TimeInterval = 0.2)
     
     static var close: Self { .close() }
 }

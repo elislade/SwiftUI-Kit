@@ -1,23 +1,31 @@
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-import AppKit
+import SwiftUI
 
 @MainActor final class WindowState: NSObject, ObservableObject {
     
-    private unowned let window: NSWindow
+    private let dockTileUpdater = DockTileUpdater()
+    private unowned let window: SwiftUIWindow
     private var previousWindowRadius: CGFloat?
     private var overrideRadius: CGFloat?
+    private var windowFrameDebounceTimer: Timer?
+    private var persistanceFrameKey: String {
+        let id = window.restoreIdentifier ?? "default"
+        return"\(id)_windowFrame"
+    }
     
+    @Published private(set) var phase: ScenePhase = .background
     @Published private(set) var isKey = false
     @Published private(set) var wantsFullscreen = false
-    @Published private(set) var anchor: CGRect = .zero
+    private(set) var anchor: CGRect = .zero
     
-    init(_ window: NSWindow) {
+    init(_ window: SwiftUIWindow) {
         self.window = window
         self.window.isReleasedWhenClosed = false
         super.init()
         self.window.delegate = self
+        self.dockTileUpdater.dockTile = window.dockTile
     }
     
     func perform(action: WindowAction) {
@@ -29,11 +37,43 @@ import AppKit
             }
         case .minimize: window.miniaturize(nil)
         case .fullscreen: window.toggleFullScreen(nil)
-        case .translate(let translation):
-            let newFrame = window.frame.offsetBy(dx: translation.width, dy: -(translation.height / 2))
-            window.setFrame(newFrame, display: true)
+        case .startMove:
+            window.trackEvents(
+                matching: [.leftMouseDragged, .leftMouseUp],
+                timeout: 0.2,
+                mode: .eventTracking
+            ){ evt, stop in
+                if let evt {
+                    if evt.type == .leftMouseUp {
+                        stop.pointee = true
+                    } else {
+                        evt.window?.performDrag(with: evt)
+                    }
+                }
+            }
         case .zoom: window.zoom(nil)
+        case let .setFrame(frame, duration):
+            if duration > 0 {
+                let previousTime = window.animationResizeTime
+                window.animationResizeTime = duration
+                window.setFrame(frame, display: false, animate: true)
+                window.animationResizeTime = previousTime
+            } else {
+                window.setFrame(frame, display: false, animate: false)
+            }
         }
+    }
+    
+    func set(dockTile: DockTilePreference?){
+        dockTileUpdater.update(with: dockTile)
+    }
+    
+    func set(positioning: WindowPickerPositioning){
+        window.updatePickerPositioning(positioning)
+    }
+    
+    func set(index: WindowZIndex){
+        window.level = .init(index)
     }
     
     func setTitle(_ title: String) {
@@ -59,7 +99,14 @@ import AppKit
         }
     }
     
-    func onappear() {
+    func restore() {
+        if
+            let string = UserDefaults.standard.string(forKey: persistanceFrameKey),
+            let frame = CGRect(string)
+        {
+            window.setFrame(frame, display: true)
+        }
+        
         window.invalidateShadow()
     }
     
@@ -70,16 +117,42 @@ extension WindowState : NSWindowDelegate {
     
     public func windowDidBecomeKey(_ notification: Notification) {
         isKey = true
+        phase = .active
     }
     
     public func windowDidResignKey(_ notification: Notification) {
         isKey = false
     }
     
-    func windowWillClose(_ notification: Notification) {}
+    func windowWillClose(_ notification: Notification) {
+        phase = .inactive
+        phase = .background
+    }
+    
+    func windowWillMiniaturize(_ notification: Notification) {
+        phase = .inactive
+    }
+    
+    func windowDidMiniaturize(_ notification: Notification) {
+        phase = .background
+    }
     
     public func windowDidResize(_ notification: Notification) {
-
+        windowFrameDebounceTimer?.invalidate()
+        windowFrameDebounceTimer = .scheduledTimer(withTimeInterval: 2, repeats: false){ [window] _ in
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
+            }
+        }
+    }
+    
+    func windowDidMove(_ notification: Notification) {
+        windowFrameDebounceTimer?.invalidate()
+        windowFrameDebounceTimer = .scheduledTimer(withTimeInterval: 2, repeats: false){ [window]  _ in
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
+            }
+        }
     }
     
     public func windowDidEnterFullScreen(_ notification: Notification) {
