@@ -38,15 +38,12 @@ public struct AnchorHelper {
         }
     }
     
-    public static func sourceAnchorX(for rect: CGRect, in size: CGSize) -> Double {
+    public static func sourceAnchorX(for rect: CGRect, in size: CGSize, shouldInvert: Bool = false) -> Double {
         let midX = size.width / 2
         let h: Double = rect.midX > midX ? 1 : rect.midX < midX ? 0 : 0.5
         
-        if size.height < size.width {
-            return 1 - h
-        } else {
-            return h
-        }
+        let result = size.height < size.width ? 1 - h : h
+        return shouldInvert ? 1 - result : result
     }
     
     public static func sourceAnchorY(for rect: CGRect, in size: CGSize) -> Double {
@@ -77,9 +74,10 @@ public struct AnchorHelper {
         }
     }
     
-    public static func presentationAnchorX(for rect: CGRect, in size: CGSize) -> Double {
+    public static func presentationAnchorX(for rect: CGRect, in size: CGSize, shouldInvert: Bool = false) -> Double {
         let midX = size.width / 2
-        return rect.midX > midX ? 1 : rect.midX < midX ? 0 : 0.5
+        let result = rect.midX > midX ? 1 : rect.midX < midX ? 0 : 0.5
+        return shouldInvert ? 1 - result : result
     }
     
     public static func presentationAnchorY(for rect: CGRect, in size: CGSize) -> Double {

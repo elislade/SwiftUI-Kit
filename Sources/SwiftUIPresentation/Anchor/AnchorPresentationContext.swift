@@ -39,16 +39,24 @@ struct AnchorPresentationContext: ViewModifier {
         let dir = layoutDirection(for: value)
         
         let source = UnitPoint(
-            x: alignment.source.x.fraction ?? AnchorHelper.sourceAnchorX(for: rect, in: proxy.size),
+            x: alignment.source.x.fraction ?? AnchorHelper.sourceAnchorX(
+                for: rect,
+                in: proxy.size,
+                shouldInvert: dir == .rightToLeft
+            ),
             y: alignment.source.y.fraction ?? AnchorHelper.sourceAnchorY(for: rect, in: proxy.size)
         )
         
         let presentation = UnitPoint(
-            x: alignment.presentation.x.fraction ?? AnchorHelper.presentationAnchorX(for: rect, in: proxy.size),
+            x: alignment.presentation.x.fraction ?? AnchorHelper.presentationAnchorX(
+                for: rect,
+                in: proxy.size,
+                shouldInvert: dir == .rightToLeft
+            ),
             y: alignment.presentation.y.fraction ?? AnchorHelper.presentationAnchorY(for: rect, in: proxy.size)
         )
        
-        return dir == .leftToRight ? (source, presentation) : (source.invert(.horizontal), presentation.invert(.horizontal))
+        return (source, presentation)
     }
     
     private func dismiss() {
