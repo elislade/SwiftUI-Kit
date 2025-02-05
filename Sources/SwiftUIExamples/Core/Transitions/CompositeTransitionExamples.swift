@@ -49,7 +49,7 @@ public struct CompositeTransitionExamples: View {
                     Spacer()
                     
                     Button("Clear", systemImage: "trash", role: .destructive){
-                        transitions = []
+                        transitions = Array(repeating: nil, count: 8)
                     }
                 }
                 .disabled(orderedTransitions.isEmpty)
@@ -138,15 +138,14 @@ public struct CompositeTransitionExamples: View {
                     transition = t
                     add = false
                 }
-                .paddingAddingSafeArea()
+                .paddingAddingSafeArea(.bottom)
                 .background{
-                    Rectangle()
+                    AsymmetricRoundedRectangle(values: .init(top: 20))
                         .fill(.bar)
-                        .ignoresSafeArea()
                 }
                 .transitions(
                     (.opacity + .blur(radius: 10) + .offset([0, 500]))
-                        .animation(.bouncy)
+                        .animation(.fastSpringInterpolating)
                 )
             }
         }

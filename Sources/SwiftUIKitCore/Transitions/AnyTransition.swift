@@ -74,3 +74,8 @@ public func +(lhs: AnyTransition, rhs: AnyTransition) -> AnyTransition {
     lhs.combined(with: rhs)
 }
 
+
+@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+@MainActor public func +<L: Transition, R: Transition>(lhs: L, rhs: R) -> some Transition {
+    lhs.combined(with: rhs)
+}
