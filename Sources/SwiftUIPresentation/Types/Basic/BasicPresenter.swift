@@ -29,3 +29,34 @@ struct BasicPresenter<Presentation: View>: ViewModifier {
     }
     
 }
+
+
+struct BasicPresenterOptional<Presentation: View, Value>: ViewModifier {
+    
+    @Environment(\.colorScheme) private var colorScheme
+    @Binding var value: Value?
+    
+    let alignment: Alignment
+    @ViewBuilder let presentation: @MainActor (Value) -> Presentation
+    
+    init(
+        value: Binding<Value?>,
+        alignment: Alignment = .bottom,
+        @ViewBuilder presentation: @MainActor @escaping (Value) -> Presentation
+    ) {
+        self._value = value
+        self.alignment = alignment
+        self.presentation = presentation
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .presentationValue(
+                value: $value,
+                metadata: BasicPresentationMetadata(alignment: alignment)
+            ) {
+                presentation($0)
+            }
+    }
+    
+}

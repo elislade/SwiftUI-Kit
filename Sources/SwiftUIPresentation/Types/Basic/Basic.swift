@@ -14,19 +14,32 @@ public extension View {
     ///
     /// - Parameters:
     ///   - isPresented: A binded Bool to programatically present or dismiss presentation.
-    ///   - alignment: Alignment that view will be placed to if smaller then the presentation context bounds. If presented views size is not smaller in the given dimension for the alignment no difference will be noticed. Eg. If you set the alignment to leading but the presented view is not smaller then the contexts width then it will have no effect on the presentation location. Alignment will have no effect on the views transition. To control the presentation transition just use the SwiftUI `transition` modifier on the presented view. Defaults to bottom alignment to replicate a modal placement at bottom of screen.
-    ///   - presentation: A View Builder of the view you want to present.
+    ///   - alignment: Alignment that view will be placed to if smaller then the presentation context bounds.  Defaults to bottom.
+    ///   - content: A View Builder of the content you want to present.
+    ///
+    /// - Note: If presented views size is not smaller in the given dimension for the alignment no difference will be noticed. Eg. If you set the alignment to leading but the presented view is not smaller then the contexts width then it will have no effect on the presentation location. Alignment will have no effect on the views transition. To control the presentation transition just use the SwiftUI `transition` modifier on the presented view.
     nonisolated func presentation<Content: View>(
         isPresented: Binding<Bool>,
         alignment: Alignment = .bottom,
-        @ViewBuilder presentation: @MainActor @escaping () -> Content
+        @ViewBuilder content: @MainActor @escaping () -> Content
     ) -> some View {
         modifier(BasicPresenter(
             isPresented: isPresented,
             alignment: alignment,
-            presentation: presentation
+            presentation: content
         ))
     }
     
+    func presentation<Content: View, Value>(
+        value: Binding<Value?>,
+        alignment: Alignment = .bottom,
+        @ViewBuilder content: @MainActor @escaping (Value) -> Content
+    ) -> some View {
+        modifier(BasicPresenterOptional(
+            value: value,
+            alignment: alignment,
+            presentation: content
+        ))
+    }
     
 }
