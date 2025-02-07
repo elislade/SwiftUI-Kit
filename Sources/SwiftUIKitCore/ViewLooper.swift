@@ -108,7 +108,7 @@ public struct ViewLooper<Content: View>: View {
                     scrollToCopy = true
                 }
             }
-            .onReceive(Timer.every(timerDuration).autoconnect()){ _ in
+            .onReceive(Timer.every(timerDuration)){ _ in
                 scrollToCopy = false
                 timerDuration = duration(in: size) + wait
                 withAnimation(.easeInOut(duration: duration(in: size))){

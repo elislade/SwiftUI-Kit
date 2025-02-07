@@ -83,7 +83,7 @@ public struct LoadingLine: View {
         }
         .layoutDirectionMirror()
         .drawingGroup()
-        .onReceive(Timer.every(1.3).autoconnect()){ _ in
+        .onReceive(Timer.every(1.3)){ _ in
             toggle()
         }
         .onAppear { toggle() }

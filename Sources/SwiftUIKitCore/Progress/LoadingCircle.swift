@@ -79,7 +79,7 @@ public struct LoadingCircle: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .drawingGroup()
-        .onReceive(Timer.every(1.3).autoconnect()){ _ in
+        .onReceive(Timer.every(1.3)){ _ in
             if state == .indefinite {
                 toggle()
             }

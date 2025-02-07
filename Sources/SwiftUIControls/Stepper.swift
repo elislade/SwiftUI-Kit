@@ -154,7 +154,7 @@ public struct Stepper: View {
             }
             .background{
                 if let actionTimerInterval {
-                    Color.clear.onReceive(Timer.every(actionTimerInterval).autoconnect()){ _ in
+                    Color.clear.onReceive(Timer.every(actionTimerInterval)){ _ in
                         if actionTimerCount == 5 || actionTimerCount == 20 || actionTimerCount == 80 {
                             self.actionTimerInterval = actionTimerInterval / 3
                         }
