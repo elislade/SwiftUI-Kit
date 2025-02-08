@@ -27,7 +27,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         activeEdgeBinding.wrappedValue
     }
     
-    private let gestureMinMovement: CGFloat = 20
+    private let gestureMinMovement: CGFloat = 25
     private let leading: Leading
     private let trailing: Trailing
     private let availableEdges: HorizontalEdge.Set
@@ -157,7 +157,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded(close))
             .highPriorityGesture(contentGesture)
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y }){ contentY = $0 }
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ contentY = $0 }
             .overlay {
                 HStack(spacing: 0) {
                     if let activeEdge, activeEdge == .leading {
@@ -183,7 +183,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                     
                     if let activeEdge, activeEdge == .trailing {
                         HStack(spacing: 1, content: { trailing })
-                            .onGeometryChangePolyfill(of: { $0.size.width }){
+                            .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){
                                 trailingSize = $0
                                 
                                 if gestureOffset == nil {
@@ -203,17 +203,17 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                 .buttonStyle(ButtonStyle(didCallAction: close))
             }
             .animation(.fastSpringInterpolating, value: activeEdge)
-            .indirectGesture(
-                IndirectScrollGesture(useMomentum: false, mask: .horizontal)
-                    .onChanged{ value in
-                        scroll += value.delta.x
-                        updateInteraction(offset: scroll, layoutFactor: 1)
-                    }
-                    .onEnded{ _ in
-                        endInteraction(projectedOffset: scroll)
-                        scroll = 0
-                    }
-            )
+//            .indirectGesture(
+//                IndirectScrollGesture(useMomentum: false, mask: .horizontal)
+//                    .onChanged{ value in
+//                        scroll += value.delta.x
+//                        updateInteraction(offset: scroll, layoutFactor: 1)
+//                    }
+//                    .onEnded{ _ in
+//                        endInteraction(projectedOffset: scroll)
+//                        scroll = 0
+//                    }
+//            )
             .onChangePolyfill(of: sharedState.latestSwipeActionID){
                 if sharedState.latestSwipeActionID != id {
                     close()
