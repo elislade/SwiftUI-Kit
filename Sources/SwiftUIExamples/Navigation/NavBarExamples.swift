@@ -5,70 +5,52 @@ public struct NavBarExamples: View {
     
     @State private var barHidden = false
     @State private var showBackAction = false
-    @State private var visiblePlacements = Set(NavBarItemMetadata.Placement.allCases)
-    @State private var accessorySelection = "A"
-    
-    private func toggle(for placement: NavBarItemMetadata.Placement) -> some View {
-        Toggle(isOn: Binding($visiblePlacements, contains: placement)){
-            Text("Show \(placement)")
-                .font(.exampleParameterTitle)
-        }
-        .exampleParameterCell()
-    }
+    @State private var placements = Set(NavBarItemMetadata.Placement.allCases)
+    @State private var selection = "A"
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "NavBar"){
             NavBarContainer(backAction: .init(visible: showBackAction, action: {
-                DispatchQueue.main.async{
-                    showBackAction = false
-                }
+                showBackAction = false
             })){
                 ScrollView {
-                    LinearGradient(
-                        colors: [.clear, .accentColor.opacity(0.6)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 1000)
-                }
-                .navBar(.trailing) {
-                    if visiblePlacements.contains(.trailing) {
-                        TrailingView()
-                    }
-                }
-                .navBar(.leading) {
-                    if visiblePlacements.contains(.leading) {
-                        Button("Leading \(accessorySelection)", action: {})
-                    }
-                }
-                .navBar(.title) {
-                    if visiblePlacements.contains(.title) {
-                        Text("Title")
-                            .font(.title2[.bold])
-                            .lineLimit(1)
-                    }
-                }
-                .navBar(.accessory){
-                    if visiblePlacements.contains(.accessory) {
-                        SegmentedPicker(
-                            selection: $accessorySelection.animation(.smooth),
-                            items: ["A", "B", "X"]
-                        ){
-                            Text($0)
+                    Rectangle()
+                        .fill(.tint)
+                        .mask {
+                            LinearGradient(
+                                colors: [.clear, .black.opacity(0.6)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         }
-                        .controlRoundness(0.6)
-                        .transitions(.move(edge: .top).animation(.bouncy), .blur(radius: 10), .opacity)
-                    }
+                        .frame(height: 1000)
+                }
+                .ignoresSafeArea(edges: [.horizontal, .bottom])
+                .navBar(placements.contains(.trailing) ? .trailing : .none) {
+                    TrailingView()
+                }
+                .navBar(placements.contains(.leading) ? .leading : .none) {
+                    LeadingView(selection: $selection.animation(.bouncy))
+                }
+                .navBar(placements.contains(.title) ? .title : .none) {
+                    Text("Title")
+                        .font(.title2[.bold])
+                        .lineLimit(1)
+                }
+                .navBar(placements.contains(.accessory) ? .accessory : .none){
+                    AccessoryView(selection: $selection)
+                        .transition(
+                            (.scale(y: 0, anchor: .top) + .opacity)
+                            .animation(.fastSpringInterpolating)
+                        )
                 }
                 .navBarHidden(barHidden)
-                .navBarMaterial{
-                    Color.primary.opacity(0.05)
+                .navBarMaterial {
+                    Rectangle().fill(.background)
                 }
             }
-            .animation(.smooth, value: visiblePlacements)
-            .presentationIdentityBehaviour(.changeOnUpdate)
         } parameters: {
             ExampleSection("Bar", isExpanded: true){
                 Toggle(isOn: $barHidden){
@@ -76,7 +58,7 @@ public struct NavBarExamples: View {
                         .font(.exampleParameterTitle)
                 }
                 .exampleParameterCell()
-
+                
                 Toggle(isOn: $showBackAction){
                     Text("Show Back Action")
                         .font(.exampleParameterTitle)
@@ -85,12 +67,28 @@ public struct NavBarExamples: View {
             }
             
             ExampleSection("Placements", isExpanded: true){
-                toggle(for: .leading)
-                toggle(for: .title)
-                toggle(for: .trailing)
-                toggle(for: .accessory)
+                ForEach(NavBarItemMetadata.Placement.allCases, id: \.rawValue){ placement in
+                    if placement != .none {
+                        Toggle(isOn: Binding($placements, contains: placement)){
+                            Text("Show \(placement)")
+                                .font(.exampleParameterTitle)
+                        }
+                        .exampleParameterCell()
+                    }
+                }
             }
             .disabled(barHidden)
+        }
+    }
+    
+    
+    struct LeadingView: View {
+        
+        @Binding var selection: String
+        
+        var body: some View {
+            Button("Leading \(selection)", action: { selection = "A" })
+                .contentTransitionNumericText()
         }
     }
     
@@ -101,17 +99,29 @@ public struct NavBarExamples: View {
         
         var body: some View {
             Toggle(isOn: $arbitraryState.animation(.bouncy)){
-                if arbitraryState {
-                    Text("Unselect")
-                        .transition(.scale)
-                } else {
-                    Text("Select")
-                        .transition(.scale)
-                }
+                Text(arbitraryState ? "Unselect" : "Select")
+                    .contentTransitionNumericText()
             }
         }
         
     }
+    
+    
+    struct AccessoryView: View {
+        
+        @Binding var selection: String
+        
+        var body: some View {
+            SegmentedPicker(
+                selection: $selection.animation(.smooth),
+                items: ["A", "B", "C"]
+            ){
+                Text($0)
+            }
+            .controlRoundness(0.8)
+        }
+    }
+    
 }
 
 

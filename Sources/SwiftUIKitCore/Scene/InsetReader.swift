@@ -74,28 +74,33 @@ public extension View {
     /// - Parameter edges: The edges to apply the insets on. Defaults to all.
     /// - Returns: A view will applied `safeAreaInsets`
     func safeAreaFromSceneInset(_ edges: Edge.Set = .all) -> some View {
-        InsetReader{ inset in
-            safeAreaInset(edge: .top, spacing: 0){
-                if edges.contains(.top) {
-                    Color.clear.frame(height: inset.top)
-                }
+        InsetReader { inset in
+            safeAreaInsets(inset, including: edges)
+                .animation(.fastSpringInterpolating, value: inset)
+        }
+    }
+    
+    
+    func safeAreaInsets(_ inset: EdgeInsets, including edges: Edge.Set = .all) -> some View {
+        safeAreaInset(edge: .top, spacing: 0){
+            if edges.contains(.top) {
+                Color.clear.frame(height: inset.top)
             }
-            .safeAreaInset(edge: .bottom, spacing: 0){
-                if edges.contains(.bottom) {
-                    Color.clear.frame(height: inset.bottom)
-                }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0){
+            if edges.contains(.bottom) {
+                Color.clear.frame(height: inset.bottom)
             }
-            .safeAreaInset(edge: .trailing, spacing: 0){
-                if edges.contains(.trailing) {
-                    Color.clear.frame(width: inset.trailing)
-                }
+        }
+        .safeAreaInset(edge: .trailing, spacing: 0){
+            if edges.contains(.trailing) {
+                Color.clear.frame(width: inset.trailing)
             }
-            .safeAreaInset(edge: .leading, spacing: 0){
-                if edges.contains(.leading) {
-                    Color.clear.frame(width: inset.leading)
-                }
+        }
+        .safeAreaInset(edge: .leading, spacing: 0){
+            if edges.contains(.leading) {
+                Color.clear.frame(width: inset.leading)
             }
-            .animation(.fastSpringInterpolating, value: inset)
         }
     }
     

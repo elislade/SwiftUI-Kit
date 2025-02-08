@@ -2,28 +2,31 @@ import SwiftUI
 import SwiftUIKitCore
 import SwiftUIPresentation
 
-struct NavViewPresentingStackModifier<Element: Identifiable, Destination: View>: ViewModifier {
+struct NavViewPresentingStackModifier<Element, Destination: View>: ViewModifier {
 
     @Binding var data: Array<Element>
-    @MainActor @ViewBuilder let destination: (Element) -> Destination
+    @ViewBuilder let destination: @MainActor (Element) -> Destination
     
-    private func binding(for element: Element) -> Binding<Bool> {
-        .init(get: { data.contains{ $0.id == element.id } }, set: {
-            if $0  == false {
-                self.data.removeAll(where: { $0.id == element.id })
+    private func binding(for index: Int) -> Binding<Bool> {
+        Binding(
+            get: { data.indices.contains(index) },
+            set: {
+                if $0 == false {
+                    self.data.remove(at: index)
+                }
             }
-        })
+        )
     }
     
     func body(content: Content) -> some View {
         content
             .overlay {
-                ForEach(data){ element in
+                ForEach(data.indices, id: \.self){ idx in
                     Color.clear.presentationValue(
-                        isPresented: binding(for: element),
+                        isPresented: binding(for: idx),
                         metadata: NavViewElementMetadata(associatedValueID: nil)
                     ) {
-                        destination(element)
+                        destination(data[idx])
                     }
                 }
             }
@@ -54,26 +57,15 @@ struct NavViewPresentingOptionalModifier<Value: Hashable, Destination: View>: Vi
     
     @State private var id = UUID()
     @Binding var value: Value?
-    @MainActor @ViewBuilder let destination: (Value) -> Destination
-    @State private var isPresented = false
+    @ViewBuilder let destination: @MainActor (Value) -> Destination
     
     func body(content: Content) -> some View {
         content
             .presentationValue(
-                isPresented: $isPresented,
+                value: $value,
                 metadata: NavViewElementMetadata(associatedValueID: nil)
-            ) {
-                if let value {
-                    destination(value)
-                }
-            }
-            .onChangePolyfill(of: value, initial: true){
-                isPresented = value != nil
-            }
-            .onChangePolyfill(of: isPresented) {
-                if isPresented == false {
-                    value = nil
-                }
+            ) { v in
+                destination(v)
             }
     }
     

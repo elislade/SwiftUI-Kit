@@ -63,12 +63,12 @@ struct DefaultNavTransitionModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .overlay{
+            .offset(x: reduceMotion ? 0 : state.value * -120)
+            .overlay {
                 Color.black
                     .opacity(state.value / 2)
                     .ignoresSafeArea()
             }
-            .offset(x: reduceMotion ? 0 : state.value * -120)
     }
     
 }

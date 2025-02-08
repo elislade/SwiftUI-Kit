@@ -2,30 +2,31 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationWillDismissAction: Equatable, Sendable {
+public struct PresentationWillDismissAction: Equatable, Sendable {
     
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
     }
     
     let id: String
     let action: @MainActor () -> Void
     
-    @MainActor func callAsFunction() -> Void {
+    @MainActor public func callAsFunction() -> Void {
         action()
     }
+    
 }
 
 
-struct PresentationWillDismissPreferenceKey: PreferenceKey {
+public struct PresentationWillDismissPreferenceKey: PreferenceKey {
     
-    typealias Value = [PresentationWillDismissAction]
+    public typealias Value = [PresentationWillDismissAction]
     
-    static func reduce(value: inout Value, nextValue: () -> Value) {
+    public static func reduce(value: inout Value, nextValue: () -> Value) {
         value.append(contentsOf: nextValue())
     }
     
-    static var defaultValue: Value { [] }
+    public static var defaultValue: Value { [] }
     
 }
 

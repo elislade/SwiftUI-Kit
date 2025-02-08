@@ -1,12 +1,13 @@
 import Foundation
 
-public struct NavBarItemMetadata: Equatable, Sendable {
+public struct NavBarItemMetadata: Equatable, Sendable, BitwiseCopyable {
     
-    public enum Placement: UInt8, Equatable, CaseIterable, Sendable, CustomStringConvertible {
+    public enum Placement: UInt8, Equatable, CaseIterable, CustomStringConvertible, Sendable, BitwiseCopyable {
         case leading
         case trailing
         case title
         case accessory
+        case none
         
         public var description: String {
             switch self {
@@ -14,6 +15,7 @@ public struct NavBarItemMetadata: Equatable, Sendable {
             case .trailing: "Trailing"
             case .title: "Title"
             case .accessory: "Accessory"
+            case .none: "None"
             }
         }
     }

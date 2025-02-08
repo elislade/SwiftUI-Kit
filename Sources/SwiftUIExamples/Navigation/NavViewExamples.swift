@@ -14,6 +14,8 @@ public struct NavViewExamples: View {
             Color.clear
                 .ignoresSafeArea()
             
+            Circle()
+            
             Button("Next"){
                 valueToPresent = .random
             }
@@ -77,6 +79,8 @@ public struct NavViewExamples: View {
         var body: some View {
             ZStack {
                 color.ignoresSafeArea()
+                
+                Circle()
                 
                 Button("Next"){
                     valueToPresent = .random

@@ -8,14 +8,14 @@ import SwiftUIPresentation
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.reduceMotion) private var reduceMotion
     
-    @State private var leadingSize: CGSize = .zero
-    @State private var trailingSize: CGSize = .zero
-    @State private var totalSize: CGSize = .zero
+    @State private var leadingWidth: CGFloat = .zero
+    @State private var trailingWidth: CGFloat = .zero
+    @State private var totalWidth: CGFloat = .zero
     
     private var titleWidth: CGFloat {
-        let width = [leadingSize.width, trailingSize.width].sorted().last ?? 0
+        let width = [leadingWidth, trailingWidth].sorted().last ?? 0
         let widthAndPad = width == 0 ? 0.0 : width + 12
-        return totalSize.width - (widthAndPad * 2)
+        return totalWidth - (widthAndPad * 2)
     }
     
     @State private var barIsHidden = false
@@ -38,7 +38,7 @@ import SwiftUIPresentation
     }
     
     private var actionsTransition: AnyTransition {
-        reduceMotion ? .opacity : .merge(.scale(0.8, anchor: .top), .opacity)
+        reduceMotion ? .opacity : .scale(0.8, anchor: .top) + .opacity
     }
     
     /// Initializes instance
@@ -58,31 +58,49 @@ import SwiftUIPresentation
                         HStack(spacing: 10) {
                             if backAction.visible {
                                 Button(action: backAction.action) {
-                                    Image(systemName: "arrow.left")
-                                        .layoutDirectionMirror()
-                                        .accessibility(label: Text("Go Back"))
+                                    Label { Text("Go Back") } icon: {
+                                        Image(systemName: "arrow.left")
+                                            .layoutDirectionMirror()
+                                    }
                                 }
+                                .keyboardShortcut(.escape, modifiers: [])
+                                .labelStyle(.iconOnly)
                                 .transitions(.move(edge: .leading), .opacity)
                             }
                             
-                            items.filter({ $0.metadata.placement == .leading }).last?.view()
-                                .transition(actionsTransition)
+                            if let leading = items.filter({ $0.metadata.placement == .leading }).last {
+                                leading
+                                    .view()
+                                    .transition(actionsTransition.animation(.bouncy))
+                                    .id(leading.id)
+                            }
                         }
-                        .onGeometryChangePolyfill(of: { $0.size }){ leadingSize = $0 }
+                        .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){ leadingWidth = $0 }
                         
                         Spacer(minLength: 44)
                         
                         HStack(spacing: 10) {
-                            items.filter({ $0.metadata.placement == .trailing }).last?.view()
-                               .transition(actionsTransition)
+                            if let trailing = items.filter({ $0.metadata.placement == .trailing }).last {
+                                trailing
+                                    .view()
+                                    .transition(actionsTransition.animation(.bouncy))
+                                    .id(trailing.id)
+                            }
                         }
-                        .onGeometryChangePolyfill(of: { $0.size }){ trailingSize = $0 }
+                        .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){ trailingWidth = $0 }
                     }
-                    .onGeometryChangePolyfill(of: { $0.size }){ totalSize = $0 }
+                    .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){ totalWidth = $0 }
                     
-                    items.filter({ $0.metadata.placement == .title }).last?.view()
-                        .frame(maxWidth: titleWidth)
-                        .transition(.merge(.scale, .opacity).animation(.bouncy))
+                    if let title = items.filter({ $0.metadata.placement == .title }).last {
+                        title
+                            .view()
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, max(leadingWidth, trailingWidth))
+                            .transition(
+                                (.scale(0.4) + .opacity).animation(.bouncy)
+                            )
+                            .id(title.id)
+                    }
                 }
                 #if canImport(AppKit)
                 .frame(minHeight: 34)
@@ -91,7 +109,8 @@ import SwiftUIPresentation
                 #endif
             }
             
-            items.filter({ $0.metadata.placement == .accessory }).last?.view()
+            items.filter({ $0.metadata.placement == .accessory }).last?
+                .view()
                 .transition(actionsTransition)
         }
         .buttonStyle(.navBarStyle)
@@ -99,6 +118,7 @@ import SwiftUIPresentation
         .labelStyle(.titleIfFits)
         .padding(padding)
         .frame(maxWidth: .infinity, minHeight: minHeight)
+        .paddingAddingSafeArea(.horizontal)
         .background {
             if bgMaterial.isEmpty {
                 NavBarDefaultMaterial().ignoresSafeArea()
@@ -109,6 +129,7 @@ import SwiftUIPresentation
         .accessibility(addTraits: .isHeader)
         .environment(\.isInNavBar, true)
         .animation(.fastSpringInterpolating, value: !backAction.visible)
+        .geometryGroupPolyfill()
         .windowDraggable()
         #if canImport(AppKit)
         .controlSize(.small)
@@ -116,31 +137,33 @@ import SwiftUIPresentation
     }
     
     public var body: some View {
-        content().safeAreaInset(edge: .top, spacing: 0){
-            if barIsHidden == false {
-                barView()
-                    .transitions(.move(edge: .top), .offset(y: -120))
+        content()
+            .safeAreaInset(edge: .top, spacing: 0){
+                if barIsHidden == false {
+                    barView()
+                        .transitions(.move(edge: .top), .offset(y: -120))
+                }
             }
-        }
-        .animation(.fastSpringInterpolating, value: barIsHidden)
-        .onPreferenceChange(NavBarMaterialKey.self){ _bgMaterial.wrappedValue = $0 }
-        .onPreferenceChange(PresentationKey.self){ _items.wrappedValue = $0 }
-        .onPreferenceChange(NavBarHiddenKey.self){ _barIsHidden.wrappedValue = $0 }
+            .animation(.fastSpringInterpolating, value: barIsHidden)
+            .onPreferenceChange(NavBarMaterialKey.self){ _bgMaterial.wrappedValue = $0 }
+            .onPreferenceChange(PresentationKey.self){ _items.wrappedValue = $0 }
+            .onPreferenceChange(NavBarHiddenKey.self){ _barIsHidden.wrappedValue = $0 }
     }
+    
 }
 
 
-public struct BackAction {
+public struct BackAction: Sendable {
     
     public var visible: Bool
-    public let action: () -> Void
+    public var action: @MainActor () -> Void
     
-    public init(visible: Bool = true, action: @escaping () -> Void) {
+    public init(visible: Bool = true, action: @escaping @MainActor () -> Void) {
         self.visible = visible
         self.action = action
     }
     
-    public func callAsFunction() {
+    @MainActor public func callAsFunction() {
         action()
     }
     
