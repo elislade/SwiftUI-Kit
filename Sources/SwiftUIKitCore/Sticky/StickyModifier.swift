@@ -41,12 +41,10 @@ struct StickyModifier: ViewModifier {
                     grouping: behaviour,
                     anchor: anchor,
                     update: { offset, state in
-                        //DispatchQueue.main.async {
-                            if self.offset != offset {
-                                self.offset = offset
-                            }
-                            onChange(state)
-                        //}
+                        if self.offset != offset {
+                            self.offset = offset
+                        }
+                        onChange(state)
                     }
                 )] : []
              }
