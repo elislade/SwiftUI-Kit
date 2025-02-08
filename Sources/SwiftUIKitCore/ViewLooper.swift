@@ -9,10 +9,11 @@ public enum TimeSpan {
 ///  Scrolls view along its desired axis at a looped wait time interval.
 public struct ViewLooper<Content: View>: View {
     
-    @State private var isStarted = false
     @State private var scrollToCopy = false
     @State private var size: CGSize = .zero
     @State private var timerDuration: TimeInterval = 100
+    @State private var count: Int = 0
+    @State private var workItems: [DispatchWorkItem] = []
     
     private let axis: Axis
     private let duration: TimeSpan
@@ -90,29 +91,38 @@ public struct ViewLooper<Content: View>: View {
                     content
                     content
                 }
-                .fixedSize()
+                .fixedSize(horizontal: axis == .horizontal, vertical: axis == .vertical)
                 .onGeometryChangePolyfill(of: { $0.size }){ size = $0 }
                 .offset(
                     x: axis == .horizontal && scrollToCopy ? -(size.width / 2) : 0,
                     y: axis == .vertical && scrollToCopy ? -(size.height / 2) : 0
                 )
+                .animation(.easeInOut(duration: duration(in: size)), value: scrollToCopy)
+                .onAppear {
+                    workItems = []
+                    
+                    let taskB = DispatchWorkItem {
+                        count += 1
+                        scrollToCopy = false
+                    }
+                    
+                    let taskA = DispatchWorkItem {
+                        scrollToCopy = true
+                        workItems.append(taskB)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + duration(in: size), execute: taskB)
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + wait, execute: taskA)
+                    workItems.append(taskA)
+                }
+                .id(count)
             }
             .clipped()
             .mask(maskContent)
-            .onChangePolyfill(of: size, initial: true){
-                guard size != .zero, !isStarted else { return }
-                isStarted = true
-                let d = duration(in: size)
-                timerDuration = d + wait + wait
-                withAnimation(.easeInOut(duration: d).delay(wait)){
-                    scrollToCopy = true
-                }
-            }
-            .onReceive(Timer.every(timerDuration)){ _ in
-                scrollToCopy = false
-                timerDuration = duration(in: size) + wait
-                withAnimation(.easeInOut(duration: duration(in: size))){
-                    scrollToCopy = true
+            .onDisappear {
+                // prevent any ongoing async task from firing after the view disappears.
+                for item in workItems {
+                    item.cancel()
                 }
             }
     }
