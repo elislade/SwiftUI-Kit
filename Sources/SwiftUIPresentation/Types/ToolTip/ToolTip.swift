@@ -9,15 +9,27 @@ public extension View {
     }
     
     
-    /// 
     /// - Parameters:
     ///   - edge: The Edge that you want to tooltip to show on relative to this view.
-    ///   - isPresented: A binded bool indicating whether the view is presented or not. Defaults to nil. Set to a non-nil binding if you want programatic access to its presentation.
     ///   - content: A view build of the content you want to show in the tool tip.
-    /// - Returns: A
+    /// - Returns: A ToolTipPresenter
+    nonisolated func toolTip<Tip: View>(edge: Edge, @ViewBuilder content: @MainActor @escaping () -> Tip) -> some View {
+        modifier(ToolTipPresenter(
+            edge: edge,
+            isPresented: nil,
+            content: content
+        ))
+    }
+    
+    
+    /// - Parameters:
+    ///   - edge: The Edge that you want to tooltip to show on relative to this view.
+    ///   - isPresented: A binded bool indicating whether the content is presented or not.
+    ///   - content: A view build of the content you want to show in the tool tip.
+    /// - Returns: A ToolTipPresenter
     nonisolated func toolTip<Tip: View>(
         edge: Edge,
-        isPresented: Binding<Bool>? = nil,
+        isPresented: Binding<Bool>,
         @ViewBuilder content: @MainActor @escaping () -> Tip
     ) -> some View {
         modifier(ToolTipPresenter(

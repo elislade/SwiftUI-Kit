@@ -3,9 +3,13 @@ import SwiftUIKitCore
 
 struct ToolTipPresenter<Tip: View>: ViewModifier {
     
-    @State private var isShowing = false
+    @State private var internalIsPresented = false
     @State private var showingTask: DispatchWorkItem?
-    @Binding private var isPresented: Bool
+    private var externalIsPresented: Binding<Bool>?
+    
+    private var isPresented: Binding<Bool> {
+        externalIsPresented ?? $internalIsPresented
+    }
     
     let edge: Edge
     let tip: @MainActor () -> Tip
@@ -19,7 +23,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
         isPresented: Binding<Bool>? = nil,
         content: @MainActor @escaping () -> Tip
     ) {
-        self._isPresented = isPresented ?? .constant(false)
+        self.externalIsPresented = isPresented
         self.edge = edge
         self.tip = content
     }
@@ -29,37 +33,39 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
             .contentShape(Rectangle())
             .onHover{ hovering in
                 showingTask?.cancel()
-                let item = DispatchWorkItem{ isShowing = hovering }
+                let item = DispatchWorkItem{ isPresented.wrappedValue = hovering }
                 showingTask = item
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: item)
             }
             .onDisappear{ showingTask?.cancel() }
-            .onChange(of: isPresented){ isShowing = $0 }
-            .onChange(of: isShowing){
-                guard isPresented != $0 else { return }
-                isPresented = $0
-            }
-            .onAppear{ isShowing = isPresented }
-            .autoAnchorOrthogonalToEdgePresentation(isPresented: $isShowing, edge: edge){
+            .autoAnchorOrthogonalToEdgePresentation(isPresented: isPresented, edge: edge){
                 tip()
-                    .presentationBackground(.disabled){ Color.clear }
-                    .onTapGesture { isShowing = false }
-                    .font(.caption.weight(.semibold))
-                    .padding(3)
-                    .padding(.horizontal, 3)
-                    .background{
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(.background)
-                            .shadow(color: .black.opacity(0.15), radius: 5, y: 3)
-                        
-                        RoundedRectangle(cornerRadius: 6)
-                            .inset(by: -1)
-                            .strokeBorder()
-                            .opacity(0.1)
-                    }
-                    .padding(2)
-                    .transition((.scale(0.8) + .opacity).animation(.bouncy))
-                    
+                    .onTapGesture { isPresented.wrappedValue = false }
+                    .toolTipPresentationStyle()
             }
     }
+    
+}
+
+extension View {
+    
+    func toolTipPresentationStyle() -> some View {
+        presentationBackground(.disabled){ Color.clear }
+        .font(.caption.weight(.semibold))
+        .padding(3)
+        .padding(.horizontal, 3)
+        .background{
+            RoundedRectangle(cornerRadius: 6)
+                .fill(.background)
+                .shadow(color: .black.opacity(0.15), radius: 5, y: 3)
+            
+            RoundedRectangle(cornerRadius: 6)
+                .inset(by: -1)
+                .strokeBorder()
+                .opacity(0.1)
+        }
+        .padding(2)
+        .transition((.scale(0.8) + .opacity).animation(.bouncy))
+    }
+    
 }
