@@ -35,6 +35,12 @@ public struct MenuExamples: View {
         Button(action: { print("Four") }){
             Label("Item 4", systemImage: "4.circle.fill")
         }
+        
+        MenuGroupDivider()
+
+        MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
+            Text($0)
+        }
     }
     
     public var body: some View {
@@ -48,26 +54,14 @@ public struct MenuExamples: View {
                             ExampleCard(title: "SwiftUI"){
                                 SwiftUI.Menu{
                                     menuContent
-                                    
-                                    MenuGroupDivider()
-                                    
-                                    MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                                        Text($0)
-                                    }
                                 } label: {
                                     Text("Menu")
                                 }
                             }
                             
                             ExampleCard(title: "SwiftUI Kit"){
-                                Menu{
+                                Menu {
                                     menuContent
-                                    
-                                    MenuGroupDivider()
-                                    
-                                    MenuPicker(selection: $selection, data: ["Option A", "Option B", "Option C"]){
-                                        Text($0)
-                                    }
                                 } label: {
                                     Text("Menu")
                                 }
