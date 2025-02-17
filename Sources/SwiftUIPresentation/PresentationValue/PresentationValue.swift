@@ -122,7 +122,7 @@ public extension View {
         @ViewBuilder content: @MainActor @escaping () -> Content
     ) -> some View {
         modifier(EnvironmentModifierWrap { environment in
-            PresentationValuePresenter(
+            PresentationValueBoolPresenter(
                 environmentRef: ClosureKeyPath(environment),
                 isPresented: isPresented,
                 tag: tag,
@@ -134,7 +134,6 @@ public extension View {
     }
     
     func presentationValue<Value, Metadata: Equatable & Sendable, Content: View>(
-        behaviour: PresentationIdentityBehaviour = .stable,
         value: Binding<Value?>,
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
@@ -142,7 +141,7 @@ public extension View {
         @ViewBuilder content: @MainActor @escaping (Value) -> Content
     ) -> some View {
         modifier(EnvironmentModifierWrap{ environment in
-            PresentationOptionalValuePresenter(
+            PresentationValueOptionalPresenter(
                 environmentRef: ClosureKeyPath(environment),
                 value: value,
                 tag: tag,
