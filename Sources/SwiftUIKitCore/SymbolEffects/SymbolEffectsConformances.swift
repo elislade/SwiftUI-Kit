@@ -34,7 +34,7 @@ extension SymbolSucessiveVariableBehaviourConformance {
     
 }
 
-public enum SymbolEffectInacitveLayerBehaviour {
+public enum SymbolEffectInactiveLayerBehaviour {
     case dim
     case hide
 }
@@ -49,14 +49,14 @@ public enum SymbolEffectGrouping {
     case whole
 }
 
-protocol SymbolInacitveLayerBehaviourConformance {
+protocol SymbolInactiveLayerBehaviourConformance {
     var hideInactiveLayers: Self { get }
     var dimInactiveLayers: Self { get }
 }
 
-extension SymbolInacitveLayerBehaviourConformance  {
+extension SymbolInactiveLayerBehaviourConformance  {
     
-    subscript(_ behaviour: SymbolEffectInacitveLayerBehaviour) -> Self {
+    subscript(_ behaviour: SymbolEffectInactiveLayerBehaviour) -> Self {
         switch behaviour {
         case .dim: dimInactiveLayers
         case .hide: hideInactiveLayers
@@ -118,4 +118,4 @@ extension PulseSymbolEffect: SymbolGroupingConformance {}
 extension ScaleSymbolEffect: SymbolGroupingConformance, SymbolDirectionConformance {}
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-extension VariableColorSymbolEffect: SymbolInacitveLayerBehaviourConformance, SymbolSucessiveVariableBehaviourConformance {}
+extension VariableColorSymbolEffect: SymbolInactiveLayerBehaviourConformance, SymbolSucessiveVariableBehaviourConformance {}

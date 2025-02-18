@@ -21,7 +21,7 @@ public extension View {
     
     @ViewBuilder func symbolEffectVariableColor(
         value: Bool,
-        inactiveBehaviour: SymbolEffectInacitveLayerBehaviour = .hide,
+        inactiveBehaviour: SymbolEffectInactiveLayerBehaviour = .hide,
         successiveBehaviour: SymbolEffectSucessiveVariableBehaviour = .cumulative
     ) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
