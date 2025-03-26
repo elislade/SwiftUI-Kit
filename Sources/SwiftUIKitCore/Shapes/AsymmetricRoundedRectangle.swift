@@ -103,7 +103,6 @@ public struct RadiusValues: Hashable, Animatable, Sendable {
     
 }
 
-
 extension RadiusValues: LosslessStringConvertible {
     
     public init?(_ description: String) {
@@ -125,13 +124,35 @@ extension RadiusValues: LosslessStringConvertible {
     
 }
 
+extension RadiusValues : ExpressibleByFloatLiteral {
+    
+    public init(floatLiteral value: Double) {
+        self.topLeft = value
+        self.topRight = value
+        self.bottomRight = value
+        self.bottomLeft = value
+    }
+    
+}
+
+extension RadiusValues : ExpressibleByIntegerLiteral {
+    
+    public init(integerLiteral value: Int) {
+        let value = Double(value)
+        self.topLeft = value
+        self.topRight = value
+        self.bottomRight = value
+        self.bottomLeft = value
+    }
+    
+}
+
 
 /// A rectangular shape with rounded corners, aligned inside the frame of the
 /// view containing it.
 public struct AsymmetricRoundedRectangle: Shape {
     
     
-    /// A touple of the asymmetric radius. Clockwise starting from topLeft.
     public var radius: RadiusValues
     
     private var insetRadius: RadiusValues { radius - inset }
@@ -152,7 +173,7 @@ public struct AsymmetricRoundedRectangle: Shape {
     ///
     /// - Parameter size: The available size of the shape.
     ///
-    /// - Returns: A tuple of the asymmetric safe radius. Clockwise starting from topLeft.
+    /// - Returns: Safe `RadiusValues`.
     private func safeRadius(in size: CGSize) -> RadiusValues {
         let sides: [Edge] = [.top, .trailing, .bottom, .leading]
         let safeSides = sides.map { edge in
