@@ -30,17 +30,21 @@ public struct NavBarExamples: View {
                 .ignoresSafeArea(edges: [.horizontal, .bottom])
                 .navBar(placements.contains(.trailing) ? .trailing : .none) {
                     TrailingView()
+                        .minimumScaleFactor(0.5)
                 }
                 .navBar(placements.contains(.leading) ? .leading : .none) {
                     LeadingView(selection: $selection.animation(.bouncy))
+                        .minimumScaleFactor(0.5)
                 }
                 .navBar(placements.contains(.title) ? .title : .none) {
                     Text("Title")
                         .font(.title2[.bold])
                         .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
                 .navBar(placements.contains(.accessory) ? .accessory : .none){
                     AccessoryView(selection: $selection)
+                        .minimumScaleFactor(0.5)
                         .transition(
                             (.scale(y: 0, anchor: .top) + .opacity)
                             .animation(.fastSpringInterpolating)

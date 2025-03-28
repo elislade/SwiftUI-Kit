@@ -17,9 +17,11 @@ public struct SliderExamples: View {
     public var body: some View {
         ExampleView(title: "Slider"){
             AxisStack(directionSuggestion.useVertical ? .horizontal : .vertical) {
+                #if !os(tvOS) && !os(watchOS)
                 ExampleCard(title: "SwiftUI Slider") {
                     SwiftUI.Slider(value: $value)
                 }
+                #endif
                 
                 ExampleCard(title: "SwiftUIKit Slider") {
                     Slider(value: $value.animation(animation))

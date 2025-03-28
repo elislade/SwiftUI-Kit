@@ -58,7 +58,7 @@ public struct BoundsExamples: View {
                     }
                 }
             }
-            .background(.bar)
+            .background(.regularMaterial)
             
             Divider().ignoresSafeArea()
             
@@ -99,6 +99,7 @@ public struct BoundsExamples: View {
                 .bounds(tag: "Child", active: tagged)
                 .offset(x: location.x, y: location.y)
                 .animation(translation == nil ? .fastSpringInterpolating : .fastSpringInteractive, value: location)
+                #if !os(tvOS)
                 .gesture(
                     DragGesture(coordinateSpace: .global).onChanged{ g in
                         translation = g.translation
@@ -112,6 +113,7 @@ public struct BoundsExamples: View {
                         offset.y += t.height + y
                     }
                 )
+                #endif
         }
         
     }

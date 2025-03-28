@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import Foundation
 
 struct KeyPressRepresentation {
@@ -17,3 +19,6 @@ struct KeyPressRepresentation {
     }
     
 }
+
+
+#endif

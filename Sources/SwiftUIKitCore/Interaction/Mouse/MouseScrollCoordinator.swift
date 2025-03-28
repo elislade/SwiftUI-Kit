@@ -1,3 +1,5 @@
+#if canImport(GameController)
+
 import GameController
 
 
@@ -49,3 +51,5 @@ import GameController
     }
     
 }
+
+#endif

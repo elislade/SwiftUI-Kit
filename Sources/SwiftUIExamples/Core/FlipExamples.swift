@@ -88,7 +88,13 @@ public struct FlipExamplesView: View {
         var body: some View {
             SunkenControlMaterial(RoundedRectangle(cornerRadius: 20), isTinted: true)
                 .tint(.random)
-                .overlay(Text(name).foregroundStyle(.white).blendMode(.exclusion))
+                .overlay{
+                    Text(name)
+                        .foregroundStyle(.white)
+                        .blendMode(.exclusion)
+                        .padding(10)
+                }
+                .minimumScaleFactor(0.1)
                 .aspectRatio(aspect, contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .font(.title.bold())

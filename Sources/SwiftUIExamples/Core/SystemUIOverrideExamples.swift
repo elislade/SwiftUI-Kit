@@ -1,7 +1,7 @@
 import SwiftUIKit
 
 
-#if canImport(UIKit) && !os(visionOS)
+#if canImport(UIKit) && !os(visionOS) && !os(tvOS)
 
 struct SystemUIOverrideExamples: View {
     

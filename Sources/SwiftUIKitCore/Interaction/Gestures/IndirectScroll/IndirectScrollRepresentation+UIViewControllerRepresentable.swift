@@ -1,5 +1,5 @@
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 import SwiftUI
 
@@ -7,7 +7,7 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
         let ctrl = UIHostingController(rootView: content())
-        if #available(iOS 16.0, *) {
+        if #available(iOS 16.0, tvOS 16.0, *) {
             ctrl.sizingOptions = .preferredContentSize
         }
         ctrl.view.backgroundColor = .clear
@@ -32,7 +32,9 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
         
         lazy var pan: UIPanGestureRecognizer = {
             let g = UIPanGestureRecognizer(target: self, action: #selector(panAction))
+            #if !os(tvOS)
             g.allowedScrollTypesMask = .continuous
+            #endif
             g.delegate = self
             g.allowedTouchTypes = []
             return g

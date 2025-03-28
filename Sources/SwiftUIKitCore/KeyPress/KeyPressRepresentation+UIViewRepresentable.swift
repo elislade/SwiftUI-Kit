@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SwiftUI
 
 #if canImport(UIKit)
@@ -266,3 +268,4 @@ extension EventModifiers {
 
 #endif
 
+#endif

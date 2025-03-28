@@ -71,8 +71,6 @@ public extension View {
 }
 
 
-
-
 public struct KeyPress : Sendable {
 
     /// The phase of the key-press event (`.down`, `.repeat`, or `.up`).
@@ -126,8 +124,9 @@ public struct KeyPress : Sendable {
 extension KeyPress {
     
     @available(iOS 17.0, macOS 14.0, tvOS 17.0, *)
-    init(_ press: SwiftUI.KeyPress) {
-        self.key = press.key
+    @available(watchOS, unavailable)
+    nonisolated init(_ press: SwiftUI.KeyPress) {
+        self.key = .init(press.key.character)
         self.characters = press.characters
         self.modifiers = press.modifiers
         self.phase = .init(press.phase)
@@ -138,6 +137,7 @@ extension KeyPress {
 extension KeyPress.Phases {
     
     @available(iOS 17.0, macOS 14.0, tvOS 17.0, *)
+    @available(watchOS, unavailable)
     init(_ phases: SwiftUI.KeyPress.Phases){
         self.init(rawValue: phases.rawValue)
     }
@@ -145,6 +145,7 @@ extension KeyPress.Phases {
 }
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, *)
+@available(watchOS, unavailable)
 extension SwiftUI.KeyPress.Phases {
     
     init(_ phases: KeyPress.Phases){
@@ -155,6 +156,7 @@ extension SwiftUI.KeyPress.Phases {
 
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, *)
+@available(watchOS, unavailable)
 extension SwiftUI.KeyPress.Result {
     
     init(_ result: KeyPress.Result) {
@@ -167,21 +169,3 @@ extension SwiftUI.KeyPress.Result {
 }
 
 
-extension KeyEquivalent: @retroactive Hashable {
-
-    public var hashValue: Int { character.hashValue }
-    
-    public func hash(into hasher: inout Hasher){
-        character.hash(into: &hasher)
-    }
-    
-}
-
-
-extension KeyEquivalent: @retroactive Equatable {
-
-    public static func == (lhs: KeyEquivalent, rhs: KeyEquivalent) -> Bool {
-        lhs.character == rhs.character
-    }
-    
-}

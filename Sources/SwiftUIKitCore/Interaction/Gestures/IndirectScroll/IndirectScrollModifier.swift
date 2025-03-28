@@ -67,9 +67,13 @@ struct IndirectScrollModifier: ViewModifier {
     var gesture: IndirectScrollGesture
     
     func body(content: Content) -> some View {
+        #if os(watchOS)
+        content
+        #else
         IndirectScrollRepresentation(gesture: gesture){
             content
         }
+        #endif
     }
     
 }

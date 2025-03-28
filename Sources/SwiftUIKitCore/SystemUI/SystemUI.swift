@@ -21,7 +21,7 @@ public struct SystemUIMask: OptionSet, Sendable {
 }
 
 
-#if canImport(UIKit) && !os(visionOS)
+#if os(iOS)
 
 
 public extension View {

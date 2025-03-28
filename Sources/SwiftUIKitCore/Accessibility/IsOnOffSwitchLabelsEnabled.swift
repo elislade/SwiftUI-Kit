@@ -16,7 +16,7 @@ struct AccessibilityIsOnOffSwitchLabelsModifier: ViewModifier {
                     value = isEnabled
                 }
             }
-        #if canImport(UIKit)
+        #if canImport(UIKit) && !os(watchOS)
             .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.onOffSwitchLabelsDidChangeNotification)){ _ in
                 isEnabled = UIAccessibility.isOnOffSwitchLabelsEnabled
             }

@@ -1,10 +1,10 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "SwiftUIKit",
-    platforms: [.iOS(.v15), .macCatalyst(.v15), .macOS(.v12), .tvOS(.v12), .watchOS(.v6)],
+    platforms: [.macOS(.v12), .iOS(.v15), .macCatalyst(.v15), .tvOS(.v15), .watchOS(.v10)],
     products: [
         .library(name: "SwiftUIKit", targets: ["SwiftUIKit"]),
         .library(name: "SwiftUIKitCore", targets: ["SwiftUIKitCore"]),

@@ -14,7 +14,7 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
     @State private var location: CGPoint?
     @State private var itemsAreInDropArea: Bool = false
     
-    #if os(iOS)
+    #if os(iOS) || os(watchOS)
     private let eventOffset: Double = 50
     #else
     private let eventOffset: Double = 0

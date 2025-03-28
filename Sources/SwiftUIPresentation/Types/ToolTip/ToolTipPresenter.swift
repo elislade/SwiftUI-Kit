@@ -3,8 +3,12 @@ import SwiftUIKitCore
 
 struct ToolTipPresenter<Tip: View>: ViewModifier {
     
+    @FocusState private var isFocused: Bool
+    @State private var isHovering = false
+    
+    private var shouldPresent: Bool { isFocused || isHovering }
+    
     @State private var internalIsPresented = false
-    @State private var showingTask: DispatchWorkItem?
     private var externalIsPresented: Binding<Bool>?
     
     private var isPresented: Binding<Bool> {
@@ -31,16 +35,18 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .contentShape(Rectangle())
-            .onHover{ hovering in
-                showingTask?.cancel()
-                let item = DispatchWorkItem{ isPresented.wrappedValue = hovering }
-                showingTask = item
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: item)
+            .focused($isFocused)
+            .onHoverPolyfill{ isHovering = $0 }
+            .task(id: shouldPresent) {
+                if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC) {
+                    isPresented.wrappedValue = shouldPresent
+                }
             }
-            .onDisappear{ showingTask?.cancel() }
             .autoAnchorOrthogonalToEdgePresentation(isPresented: isPresented, edge: edge){
                 tip()
+                    #if !os(tvOS)
                     .onTapGesture { isPresented.wrappedValue = false }
+                    #endif
                     .toolTipPresentationStyle()
             }
     }
@@ -50,7 +56,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
 extension View {
     
     func toolTipPresentationStyle() -> some View {
-        presentationBackground(.disabled){ Color.clear }
+        presentationBackdrop(.disabled){ Color.clear }
         .font(.caption.weight(.semibold))
         .padding(3)
         .padding(.horizontal, 3)

@@ -7,13 +7,15 @@ struct PercentageRoundedRectangleExample: View {
     @State private var percentage: Double = 0.5
     @State private var axis: Axis = .horizontal
     
+    public init() {}
+    
     var body: some View {
         ExampleView(title: "Percentage Rounded Rectangle"){
             PercentageRoundedRectangle(axis, percentage: percentage)
                 .fill(.tint)
                 .frame(
-                    width: axis == .horizontal ? size : nil,
-                    height: axis == .vertical ? size : nil
+                    maxWidth: axis == .horizontal ? size : nil,
+                    maxHeight: axis == .vertical ? size : nil
                 )
                 .animation(.smooth, value: size)
                 .animation(.smooth, value: axis)
@@ -26,7 +28,7 @@ struct PercentageRoundedRectangleExample: View {
                     
                     Spacer()
                     
-                    Text(percentage, format: .number.rounded(increment: 0.01))
+                    Text(size, format: .increment(0.01))
                         .font(.exampleParameterValue)
                 }
                 
@@ -41,7 +43,7 @@ struct PercentageRoundedRectangleExample: View {
                     
                     Spacer()
                     
-                    Text(percentage, format: .number.rounded(increment: 0.01))
+                    Text(percentage, format: .increment(0.01))
                         .font(.exampleParameterValue)
                 }
                 
@@ -55,10 +57,10 @@ struct PercentageRoundedRectangleExample: View {
                 
                 Spacer()
                 
-                Picker("", selection: $axis){
-                    Text("Horizontal").tag(Axis.horizontal)
-                    Text("Vertical").tag(Axis.vertical)
+                SegmentedPicker(selection: $axis.animation(.bouncy), items: Axis.allCases){
+                    Text("\($0)".capitalized)
                 }
+                .frame(maxWidth: 200)
             }
             .exampleParameterCell()
         }

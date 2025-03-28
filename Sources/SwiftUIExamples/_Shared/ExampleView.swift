@@ -18,6 +18,7 @@ struct ExampleView<E: View, P: View>: View {
     var body: some View {
         GeometryReader { proxy in
             HStack(spacing: 0){
+                #if !os(watchOS)
                 if proxy.size.width > proxy.size.height {
                     ZStack {
                         Color.clear
@@ -30,14 +31,25 @@ struct ExampleView<E: View, P: View>: View {
                     .mask {
                         Rectangle().ignoresSafeArea()
                     }
-                    .background(.bar)
+                    .background(.regularMaterial)
                     .ignoresSafeArea(edges: .bottom)
 
                     Divider().ignoresSafeArea()
                 }
+                #endif
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
+                        #if os(watchOS)
+                        Rectangle()
+                            .fill(.background)
+                            .aspectRatio(1.5, contentMode: .fit)
+                            .overlay { example }
+                            .overlay(alignment: .bottom) { Divider() }
+                            .clipped()
+                            .sticky(edges: .top)
+                        #endif
+                        
                         ExampleTitle(title)
                             .padding(.vertical, 8)
                         
@@ -50,7 +62,11 @@ struct ExampleView<E: View, P: View>: View {
                 //.sceneInset(proxy.safeAreaInsets)
                 //.environment(\.sceneProxy, proxy)
                 .stickyContext()
+                #if os(watchOS)
+                .ignoresSafeArea(edges: [.top, .horizontal])
+                #endif
             }
+            #if !os(watchOS)
             .safeAreaInset(edge: .top, spacing: 0){
                 if proxy.size.width < proxy.size.height {
                     ZStack {
@@ -59,10 +75,11 @@ struct ExampleView<E: View, P: View>: View {
                     }
                     .frame(width: proxy.size.width, height: maxSize.height)
                     .paddingAddingSafeArea()
-                    .background(.bar)
+                    .background(.regularMaterial)
                     .overlay(alignment: .bottom) { Divider().ignoresSafeArea() }
                 }
             }
+            #endif
         }
         .presentationContext()
         .toolTipContext()
@@ -98,8 +115,18 @@ extension View {
         frame(width: 340, height: 600)
     }
 #else
-    func previewSize() -> Self {
-        self
+    func previewSize() -> some View {
+        InlineEnvironmentReader(\.colorScheme){ sch in
+            self
+                .background{
+                    switch sch {
+                    case .light: Color.white
+                    case .dark: Color.black
+                    @unknown default: Color.clear
+                    }
+                }
+        }
+        
     }
 #endif
     

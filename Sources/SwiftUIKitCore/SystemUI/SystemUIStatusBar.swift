@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-#if canImport(UIKit) && !os(visionOS)
+#if canImport(UIKit) && !os(visionOS) && !os(watchOS) && !os(tvOS)
 
 
 struct StatusBarRepresentable<Source: View>: UIViewControllerRepresentable {

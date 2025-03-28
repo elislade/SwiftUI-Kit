@@ -3,8 +3,8 @@ import SwiftUIKitCore
 
 struct BasicPresentationContext: ViewModifier {
 
-    @State private var bgInteractionPreferences: [PresentationBackgroundInteraction] = []
-    @State private var bgPreferences: [PresentationBackgroundKeyValue] = []
+    @State private var bgInteractionPreferences: [PresentationBackdropInteraction] = []
+    @State private var bgPreferences: [PresentationBackdropKeyValue] = []
     @State private var willDismiss: [PresentationWillDismissAction] = []
     @State private var values: [PresentationValue<BasicPresentationMetadata>] = []
     
@@ -59,10 +59,10 @@ struct BasicPresentationContext: ViewModifier {
                         
                     }
                 }
-                .onPreferenceChange(PresentationBackgroundKey.self){
+                .onPreferenceChange(PresentationBackdropKey.self){
                     _bgPreferences.wrappedValue = $0
                 }
-                .onPreferenceChange(PresentationBackgroundInteractionKey.self){
+                .onPreferenceChange(PresentationBackdropInteractionKey.self){
                     _bgInteractionPreferences.wrappedValue = $0
                 }
                 .animation(.smooth, value: values)

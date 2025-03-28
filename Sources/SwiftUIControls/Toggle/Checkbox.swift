@@ -6,7 +6,7 @@ public struct Checkbox: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.controlRoundness) private var controlRoundness
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     
     @Binding var isOn: Bool
     

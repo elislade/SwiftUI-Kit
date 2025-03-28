@@ -6,7 +6,7 @@ public struct ContainedBoundsExample: View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: nil) {
             RoundedRectangle(cornerRadius: 30)
                 .fill(.secondary.opacity(0.2))
                 .overlay {
@@ -33,6 +33,7 @@ public struct ContainedBoundsExample: View {
             ExampleTitle("Contained Bounds")
         }
         .padding()
+        .ignoresSafeArea(edges: .top)
     }
     
     

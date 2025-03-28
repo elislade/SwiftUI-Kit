@@ -47,11 +47,9 @@ public struct Rotation3DTransitionExample: View {
                 
                 Slider(value: $rot.x, in : -1...1, step: 1/360)
             }
-            .padding()
+            .exampleParameterCell()
             .onChangePolyfill(of: rot){ update(transition, nil) }
             .onAppear { update(transition, nil) }
-            
-            Divider()
             
             VStack {
                 HStack {
@@ -66,9 +64,7 @@ public struct Rotation3DTransitionExample: View {
                 
                 Slider(value: $rot.y, in : -1...1, step: 1/360)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -83,9 +79,7 @@ public struct Rotation3DTransitionExample: View {
                 
                 Slider(value: $rot.z, in : -1...1, step: 1/360)
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack {
@@ -104,16 +98,19 @@ public struct Rotation3DTransitionExample: View {
             .onChangePolyfill(of: depth){ update(transition, nil) }
             
             HStack(alignment: .top) {
-                Text("Anchor")
-                    .font(.exampleParameterTitle)
+                VStack(alignment: .leading) {
+                    Text("Anchor")
+                        .font(.exampleParameterTitle)
+                    
+                    Group {
+                        Text("X: ") + Text(anchor.x, format: .increment(0.1))
+                        Text("Y: ") + Text(anchor.y, format: .increment(0.1))
+                    }
+                    .font(.exampleParameterValue)
+                    .opacity(0.5)
+                }
                 
                 Spacer()
-                
-                Text(anchor.x, format: .increment(0.1))
-                    .font(.exampleParameterValue)
-                
-                Text(anchor.y, format: .increment(0.1))
-                    .font(.exampleParameterValue)
                 
                 ExampleControl.Anchor(value: $anchor)
                     .frame(width: 120, height: 120)

@@ -10,13 +10,11 @@ public struct NavBarDefaultMaterial : View {
     }
     
     public var body: some View {
-        if showDivider {
-            ZStack(alignment: .bottom) {
-                VisualEffectView()
+        ZStack(alignment: .bottom) {
+            VisualEffectView()
+            if showDivider {
                 Divider().ignoresSafeArea()
             }
-        } else {
-            Rectangle().fill(.bar)
         }
     }
     

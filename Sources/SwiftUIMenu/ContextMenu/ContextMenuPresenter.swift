@@ -38,7 +38,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
                     .frame(width: 1, height: 1)
                     .autoAnchorOrthogonalToEdgePresentation(isPresented: binding, edge: .trailing){
                         MenuContainer{ content }
-                            .presentationBackground{ Color.clear }
+                            .presentationBackdrop{ Color.clear }
                     }
                     .position(mouseLocation)
             }
@@ -62,7 +62,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
                             presentedView
                         }
                     }
-                    .presentationBackground { ctxMenuBG }
+                    .presentationBackdrop { ctxMenuBG }
                     .windowInteractionEffects([.parallax()])
                 },
                 accessory: { state in

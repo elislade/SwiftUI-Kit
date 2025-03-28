@@ -91,7 +91,7 @@ import SwiftUIPresentation
                                                 .layoutDirectionMirror()
                                         }
                                     }
-                                    .keyboardShortcut(.escape, modifiers: [])
+                                    .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
                                     .labelStyle(.iconOnly)
                                     .transitions(.move(edge: .leading), .opacity)
                                 }

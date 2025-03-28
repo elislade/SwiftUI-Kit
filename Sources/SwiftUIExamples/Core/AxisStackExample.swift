@@ -19,25 +19,20 @@ public struct AxisStackExampleView : View {
             }
             .animation(.smooth, value: axis)
         } parameters: {
-            HStack {
-                Text("Axis")
-                    .font(.title3[.semibold])
-                
-                Spacer()
-                
-                Picker("", selection: $axis){
-                    Text("Horizontal").tag(Axis.horizontal)
-                    Text("Vertical").tag(Axis.vertical)
-                }
+            SegmentedPicker(selection: $axis.animation(.smooth), items: Axis.allCases){
+                Text("\($0)".capitalized)
             }
             .exampleParameterCell()
             
             VStack {
                 HStack {
                     Text("Spacing")
-                        .font(.title3[.semibold])
+                        .font(.exampleParameterTitle)
                     
                     Spacer()
+                    
+                    Text(spacing, format: .increment(0.1))
+                        .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $spacing, in: 0...30)

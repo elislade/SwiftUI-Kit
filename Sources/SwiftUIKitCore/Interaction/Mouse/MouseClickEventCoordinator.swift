@@ -1,3 +1,6 @@
+
+#if canImport(GameController)
+
 import GameController
 import Combine
 
@@ -85,3 +88,5 @@ import Combine
     }
     
 }
+
+#endif

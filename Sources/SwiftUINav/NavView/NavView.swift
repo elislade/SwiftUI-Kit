@@ -36,6 +36,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
         self.root = content()
     }
     
+    #if !os(tvOS)
     private func edgeDrag() -> some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged({ g in
@@ -46,6 +47,7 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                 commitTransition(at: g.predictedEndTranslation.width * directionFactor)
             })
     }
+    #endif
     
     private func popElement() {
         guard let last = elements.last else { return }
@@ -207,7 +209,9 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                         .paddingAddingSafeArea(.leading)
                         .contentShape(Rectangle())
                         .zIndex(Double(elements.count + 3))
+                        #if !os(tvOS)
                         .highPriorityGesture(edgeDrag(), including: .gesture)
+                        #endif
                         .allowsHitTesting(elements.isEmpty == false)
                         .defersSystemGesturesPolyfill(on: .leading)
                 }

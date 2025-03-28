@@ -15,109 +15,114 @@ public struct DragDropExample: View {
     public init() {}
     
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.clear
+        VStack(spacing: 0) {
+            Spacer(minLength: 5)
             
-            VStack(spacing: 5) {
-                Spacer()
-                
-                Text("Horizontal Drop Stack").opacity(0.6)
-                
-                DropStack(
-                    axis: .horizontal,
-                    data: $dropItemsA
-                ){ item in
-                    Button(action: { dropItemsA.removeAll(where: { $0 == item }) }){
-                        ExampleTile(item)
-                    }
-                    .buttonStyle(.plain)
-                    .transitions(.scale(1))
-                    .matchedGeometryEffect(id: item, in: ns)
-                    .frame(maxWidth: 80, maxHeight: 80)
-                } cursor: {
-                    RoundedRectangle(cornerRadius: 20)
-                        .opacity(0.2)
-                        .frame(maxWidth: 80, maxHeight: 80)
+            DropStack(axis: .horizontal, data: $dropItemsA){ item in
+                Button {
+                    dropItemsA.removeAll(where: { $0 == item })
+                } label: {
+                    ExampleTile(item)
                 }
-                .frame(height: 80)
-                .padding(10)
-                .background{
-                    RoundedRectangle(cornerRadius: 26)
-                        .fill(.secondary)
-                        .opacity(0.3)
-                }
-                
-                Spacer()
-                
-                Text("Vertical Drop Stack").opacity(0.6)
-                
-                DropStack(
-                    axis: .vertical,
-                    alignment: .top,
-                    data: $dropItemsB,
-                    removeOnCancel: true
-                ){ item in
-                    Button(action: { dropItemsB.removeAll(where: { $0 == item }) }){
-                        ExampleTile(item)
-                    }
-                    .buttonStyle(.plain)
-                    .transitions(.scale(1))
-                    .matchedGeometryEffect(id: item, in: ns)
-                    .frame(maxHeight: 80)
-                } cursor: {
-                    RoundedRectangle(cornerRadius: 20)
-                        .opacity(0.2)
-                        .frame(maxWidth: .infinity, maxHeight: 80)
-                }
-                .padding(10)
-                .frame(minHeight: 200)
-                .background{
-                    RoundedRectangle(cornerRadius: 26)
-                        .fill(.secondary)
-                        .opacity(0.3)
-                }
-                
-                Spacer()
-                
-                Text("Drag Stack").opacity(0.6)
-                
-                HStack {
-                    ForEach(filteredDragItems){ value in
-                        Button(action: {
-                            if Bool.random() {
-                                dropItemsA.append(value)
-                            } else {
-                                dropItemsB.append(value)
-                            }
-                        }){
-                            ExampleTile(value)
-                        }
-                        .buttonStyle(.plain)
-                        .transitions(.scale(1))
-                        .matchedGeometryEffect(id: value, in: ns)
-                        .frame(maxWidth: 80, maxHeight: 80)
-                        .dragItem(value)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 80)
-                .padding(10)
-                .background{
-                    RoundedRectangle(cornerRadius: 26)
-                        .fill(.secondary)
-                        .opacity(0.3)
-                }
-                
-                Spacer()
-                
-                ExampleTitle("Drag & Drop")
+                .buttonStyle(.plain)
+                .transitions(.scale(1))
+                .matchedGeometryEffect(id: item, in: ns)
+                .frame(maxWidth: 50, maxHeight: 50)
+            } cursor: {
+                RoundedRectangle(cornerRadius: 20)
+                    .opacity(0.2)
+                    .frame(maxWidth: 50, maxHeight: 50)
             }
+            .frame(maxHeight: 50)
             .padding()
-            .dragSession(Int.self)
+            .background{
+                RoundedRectangle(cornerRadius: 26)
+                    .fill(.secondary)
+                    .opacity(0.3)
+                
+                Text("Horizontal Drop Stack")
+                    .opacity(dropItemsA.isEmpty ? 0.6 : 0)
+            }
+            
+            Spacer(minLength: 5)
+            
+            DropStack(
+                axis: .vertical,
+                alignment: .top,
+                data: $dropItemsB,
+                removeOnCancel: true
+            ){ item in
+                Button {
+                    dropItemsB.removeAll(where: { $0 == item })
+                } label: {
+                    ExampleTile(item)
+                }
+                .buttonStyle(.plain)
+                .transitions(.scale(1))
+                .matchedGeometryEffect(id: item, in: ns)
+                .frame(minHeight: 20, maxHeight: 50)
+            } cursor: {
+                RoundedRectangle(cornerRadius: 20)
+                    .opacity(0.2)
+                    .frame(maxWidth: .infinity, maxHeight: 50)
+            }
+            .frame(maxWidth: .infinity, minHeight: 40)
+            .padding()
+            .background{
+                RoundedRectangle(cornerRadius: 26)
+                    .fill(.secondary)
+                    .opacity(0.3)
+                
+                Text("Vertical Drop Stack")
+                    .opacity(dropItemsB.isEmpty ? 0.6 : 0)
+            }
+
+            Spacer(minLength: 5)
+            
+            HStack {
+                ForEach(filteredDragItems){ value in
+                    Button {
+                        if Bool.random() {
+                            dropItemsA.append(value)
+                        } else {
+                            dropItemsB.append(value)
+                        }
+                    } label: {
+                        ExampleTile(value)
+                    }
+                    .buttonStyle(.plain)
+                    .transitions(.scale(1))
+                    .matchedGeometryEffect(id: value, in: ns)
+                    .frame(maxWidth: 50, maxHeight: 50)
+                    .dragItem(value)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 40)
+            .padding()
+            .background{
+                RoundedRectangle(cornerRadius: 26)
+                    .fill(.secondary)
+                    .opacity(0.3)
+                
+                Text("Drag Stack")
+                    .opacity(filteredDragItems.isEmpty ? 0.6 : 0)
+            }
+            
+            Spacer(minLength: 0)
         }
+        .dragSession(Int.self)
         .animation(.bouncy, value: dropItemsA)
         .animation(.bouncy, value: dropItemsB)
         .animation(.bouncy, value: filteredDragItems)
+        .safeAreaInset(edge: .bottom, spacing: 0){
+            ExampleTitle("Drag & Drop")
+                .padding(.horizontal, 12)
+        }
+        #if os(watchOS)
+        .ignoresSafeArea()
+        #else
+        .padding()
+        #endif
     }
     
 }

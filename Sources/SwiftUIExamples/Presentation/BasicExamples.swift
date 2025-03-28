@@ -87,8 +87,10 @@ public struct BasicExamples: View {
                 HStack{
                     Text("Presented View")
                         .font(.title2.bold())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                     
-                    Spacer()
+                    Spacer(minLength: 12)
                     
                     Button(action: { dismissPresentation() }){
                         Image(systemName: "xmark.circle.fill")

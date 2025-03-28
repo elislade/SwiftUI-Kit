@@ -144,6 +144,7 @@ public struct SwipeActionExamples: View {
             }
             .font(.title3[.semibold])
             .tint(tint)
+            .accentColor(tint)
         }
     }
     
@@ -172,7 +173,7 @@ public struct SwipeActionExamples: View {
                 HStack(spacing: 12) {
                     ContainerRelativeShape()
                         .fill(tileColor)
-                        .frame(width: 50, height: 50)
+                        .frame(maxWidth: 50, maxHeight: 50)
                     
                     VStack(alignment: .leading) {
                         Text("Title")
@@ -190,6 +191,8 @@ public struct SwipeActionExamples: View {
                         .opacity(0.6)
                         .layoutDirectionMirror()
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .padding(12)
                 .contentShape(Rectangle())
             }

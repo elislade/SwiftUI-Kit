@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SwiftUI
 import Combine
 
@@ -55,5 +57,8 @@ public extension View {
     }
     
 }
+
+#endif
+
 
 #endif

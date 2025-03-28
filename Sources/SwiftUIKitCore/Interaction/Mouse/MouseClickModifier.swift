@@ -1,3 +1,5 @@
+#if canImport(GameController)
+
 import SwiftUI
 
 
@@ -11,7 +13,7 @@ struct MouseClickModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .windowReference{ windowRef = $0 }
-            .onHover {
+            .onHoverPolyfill {
                 if $0 {
                     MouseClickEventCoordinator.shared.registerListener(key: id, action, in: windowRef)
                 } else {
@@ -21,3 +23,6 @@ struct MouseClickModifier: ViewModifier {
     }
 
 }
+
+
+#endif

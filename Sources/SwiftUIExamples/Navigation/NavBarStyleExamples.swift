@@ -12,37 +12,40 @@ public struct NavBarStyleExamples : View {
     
     public var body: some View {
         ExampleView(title: "NavBar Styles") {
-            HStack {
-                Button("Item A", action: {})
-                
-                Button(action: {}){
-                    Label{ Text("Back") } icon: {
-                        Color.clear
-                            .aspectRatio(1, contentMode: .fit)
-                            .overlay {
-                                Image(systemName: "play.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .offset(x: 2)
-                            }
-                    }
-                    .labelStyle(.iconOnly)
-                }
-                
-                InlineBinding(true){ b in
-                    Toggle(isOn: b){
-                        Text(b.wrappedValue ? "ON" : "OFF")
-                            .contentTransitionNumericText()
+            VStack {
+                HStack {
+                    Button("Item A"){}
+                    
+                    Button(action: {}){
+                        Label{ Text("Back") } icon: {
+                            Color.clear
+                                .aspectRatio(1, contentMode: .fit)
+                                .overlay {
+                                    Image(systemName: "play.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .offset(x: 2)
+                                }
+                        }
+                        .labelStyle(.iconOnly)
                     }
                 }
                 
-                InlineBinding(false){
-                    Toggle(isOn: $0){
-                        Label("Alpha", systemImage: "a.circle")
-                        //.labelStyle(.titleOnly)
+                HStack {
+                    InlineBinding(true){ b in
+                        Toggle(isOn: b){
+                            Text(b.wrappedValue ? "ON" : "OFF")
+                                .contentTransitionNumericText()
+                        }
+                    }
+                    
+                    InlineBinding(false){
+                        Toggle(isOn: $0){
+                            Label("Alpha", systemImage: "a.circle")
+                            //.labelStyle(.titleOnly)
+                        }
                     }
                 }
-                
             }
             .buttonStyle(.navBarStyle)
             .toggleStyle(.navBarStyle)

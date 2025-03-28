@@ -6,15 +6,16 @@ struct ExampleCard<C: View>: View {
     @ViewBuilder let content: C
     
     var body: some View {
-        VStack(spacing: 20){
+        VStack(spacing: nil){
             Text(title)
                 .font(.title3[.semibold])
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
+                .minimumScaleFactor(0.4)
             
             content
         }
-        .padding(18)
+        .padding()
         .background{
             RoundedRectangle(cornerRadius: 30)
                 .strokeBorder()

@@ -3,9 +3,9 @@ import SwiftUI
 
 extension Transform : Animatable {
     
-    public typealias Scale = AnimatablePair<Double, Double>
-    public typealias Translate = AnimatablePair<Double, Double>
-    public typealias Shear = AnimatablePair<Double, Double>
+    public typealias Scale = SIMD2<Double>.AnimatableData
+    public typealias Translate = SIMD2<Double>.AnimatableData
+    public typealias Shear = SIMD2<Double>.AnimatableData
     public typealias RotShear = AnimatablePair<Double, Shear>
     public typealias ScaleTranslate = AnimatablePair<Scale, Translate>
     
@@ -15,18 +15,16 @@ extension Transform : Animatable {
         get {
             AnimatableData(
                 ScaleTranslate(
-                    Scale(scale.x, scale.y), Translate(translation.x, translation.y)
+                    scale.animatableData, translation.animatableData
                 ),
-                RotShear(rotation.radians, Shear(shear.x, shear.y))
+                RotShear(rotation.radians, shear.animatableData)
             )
         }
         set {
-            let scale = newValue.first.first, translate = newValue.first.second
-            self.scale = .init(scale.first, scale.second)
-            self.translation  = .init(translate.first, translate.second)
-            
+            self.scale.animatableData = newValue.first.first
+            self.translation.animatableData  = newValue.first.second
             self.rotation.radians = newValue.second.first
-            self.shear = .init(newValue.second.second.first, newValue.second.second.second)
+            self.shear.animatableData = newValue.second.second
         }
     }
     

@@ -16,9 +16,10 @@ public struct TrafficLightsView: View {
             WindowButtonMinimize()
             WindowButtonZoom()
         }
-        .onHover{ hovering = $0 }
+        .onHoverPolyfill{ hovering = $0 }
         .isHighlighted(hovering)
     }
+    
 }
 
 

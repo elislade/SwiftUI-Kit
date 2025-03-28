@@ -16,3 +16,21 @@ public typealias Menu = SwiftUIMenu.Menu
 public typealias Slider = SwiftUIControls.Slider
 public typealias TextField = SwiftUIControls.TextField
 public typealias KeyPress = SwiftUIKitCore.KeyPress
+public typealias KeyEquivalent = SwiftUIKitCore.KeyEquivalent
+
+
+public typealias ShapeStyle = SwiftUI.ShapeStyle
+
+
+#if canImport(Spatial)
+
+public typealias Axis3D = SwiftUIKitCore.Axis3D
+
+#endif
+
+
+#if os(tvOS)
+
+public typealias ControlSize = SwiftUIKitCore.ControlSize
+
+#endif

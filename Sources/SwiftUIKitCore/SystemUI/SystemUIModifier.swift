@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if canImport(UIKit) && !os(visionOS)
+#if os(iOS)
 
 struct SystemUIOverrideModifier: ViewModifier {
     

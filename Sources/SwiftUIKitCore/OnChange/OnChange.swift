@@ -3,6 +3,19 @@ import SwiftUI
 
 public extension View {
     
+    #if os(visionOS)
+    
+    func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping (_ oldValue: V, _ newValue: V) -> Void) -> some View {
+        onChange(of: value, initial: initial, action)
+    }
+    
+    func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping () -> Void) -> some View {
+        onChange(of: value, initial: initial, action)
+    }
+    
+    #else
+    
+    
     /// - Parameters:
     ///   - value: The value to check against when determining whether
     ///     to run the closure.
@@ -43,5 +56,6 @@ public extension View {
         }
     }
     
+    #endif
     
 }

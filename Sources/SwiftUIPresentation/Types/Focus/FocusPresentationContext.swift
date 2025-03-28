@@ -5,8 +5,8 @@ struct FocusPresentationContext: ViewModifier {
     @Environment(\.layoutDirection) private var layoutDirection
     @Namespace private var ns
     
-    @State private var bgInteraction: PresentationBackgroundInteraction?
-    @State private var bg: PresentationBackgroundKeyValue?
+    @State private var bgInteraction: PresentationBackdropInteraction?
+    @State private var bg: PresentationBackdropKeyValue?
     
     private var bgView: AnyView? { bg?.view() }
     
@@ -77,16 +77,16 @@ struct FocusPresentationContext: ViewModifier {
                                     .environment(\._isBeingPresented, true)
                                     .matchedGeometryEffect(id: "View", in: ns)
                                     .zIndex(2)
-                                    .onPreferenceChange(PresentationBackgroundKey.self){
+                                    .onPreferenceChange(PresentationBackdropKey.self){
                                         _bg.wrappedValue = $0.last
                                     }
-                                    .onPreferenceChange(PresentationBackgroundInteractionKey.self){
+                                    .onPreferenceChange(PresentationBackdropInteractionKey.self){
                                         _bgInteraction.wrappedValue = $0.last
                                     }
                                     .autoAnchorPresentation(isPresented: $accessoryIsPresented){ state in
                                         value
                                             .metadata.accessory(state)
-                                            .presentationBackground(.disabled){ EmptyView() }
+                                            .presentationBackdrop(.disabled){ EmptyView() }
                                     }
                                     .frame(width: safeSize.width, height: safeSize.height)
                                     .offset(safeOffsets(for: bounds, in: proxy.size))
@@ -108,8 +108,8 @@ struct FocusPresentationContext: ViewModifier {
                         .animation(.bouncy.speed(1.3), value: focusedView == nil)
                         .animation(.bouncy.speed(1.3), value: accessoryIsPresented)
                         .anchorPresentationContext()
-                        .onChange(of: accessoryIsPresented){ pres in
-                            if pres == false {
+                        .onChangePolyfill(of: accessoryIsPresented){
+                            if !accessoryIsPresented {
                                 dismiss(value)
                             }
                         }

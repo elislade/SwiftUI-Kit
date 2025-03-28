@@ -20,8 +20,8 @@ public struct InlineBindingExample: View {
                         Text("\(scheme)".capitalized)
                             .font(.title3[.bold])
                     }
-                    .frame(width: 200)
-                    .controlSize(.large)
+                    .frame(maxWidth: 200)
+                    .controlSize(ControlSize.large)
                     .controlRoundness(1)
                 }
                 .environment(\.colorScheme, binding.wrappedValue)

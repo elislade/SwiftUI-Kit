@@ -50,7 +50,7 @@ public struct LoadingExamples: View {
                 Slider(value: $loadingProgress)
             }
             .exampleParameterCell()
-            .onChange(of: loadingProgress){ _ in
+            .onChangePolyfill(of: loadingProgress){
                 loadingIndefinite = false
             }
 

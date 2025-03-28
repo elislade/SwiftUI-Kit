@@ -7,7 +7,7 @@ import SwiftUIKitCore
 public struct NavBarButtonStyle: SwiftUI.ButtonStyle {
     
     @Environment(\.isInNavBar) private var isInNavBar
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.controlRoundness) private var controlRoundness
     @State private var isHovering = false
     

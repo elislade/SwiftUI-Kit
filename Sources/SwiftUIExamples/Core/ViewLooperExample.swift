@@ -6,26 +6,26 @@ public struct ViewLooperExample: View {
     @State private var axis: Axis = .horizontal
     @State private var feather = true
     @State private var durationSpan: TimeSpanMode = .relative
-    @State private var duration: TimeInterval = 30
-    @State private var wait: TimeInterval = 3
+    @State private var duration: Double = 5
+    @State private var wait: Double = 3
     
-    enum TimeSpanMode {
+    enum TimeSpanMode: Sendable {
         case relative
         case absolute
         
-        var isRelative: Bool {
+        nonisolated var isRelative: Bool {
             self == .relative
         }
     }
     
     private var durationEnum: TimeSpan {
         switch durationSpan {
-        case .relative: .relative(duration)
-        case .absolute: .absolute(duration)
+        case .relative: .millisecondsPerPoint(duration)
+        case .absolute: .seconds(duration)
         }
     }
     
-    public init() {}
+    public nonisolated init() {}
     
     public var body: some View {
         ExampleView(title: "View Looper"){
@@ -35,7 +35,7 @@ public struct ViewLooperExample: View {
                 wait: wait,
                 featherMask: feather
             ) {
-                Text("Supercalifragilisticexpialidocious".capitalized)
+                Text("Supercalifragilisticexpialidocious")
                     .font(.system(size: 18, design: .serif).bold().italic())
                     .lineLimit(1)
                     .padding(.horizontal)
@@ -47,33 +47,30 @@ public struct ViewLooperExample: View {
                 
                 Spacer()
                 
-                Picker("", selection: $axis){
-                    Text("Horizontal").tag(Axis.horizontal)
-                    Text("Vertical").tag(Axis.vertical)
+                SegmentedPicker(selection: $axis.animation(.smooth), items: Axis.allCases){
+                    Text("\($0)".capitalized)
                 }
+                .frame(maxWidth: 200)
             }
             .exampleParameterCell()
             
             VStack {
-                HStack {
+                HStack(spacing: 0) {
                     Text("Duration")
                         .font(.exampleParameterTitle)
+
+                    Spacer(minLength: 10)
                     
-                    Text(duration, format: .number.rounded(increment: 0.1))
+                    Text(duration, format: .increment(0.01))
                         .font(.exampleParameterValue)
                     
-                    Spacer()
-                    
                     Picker("", selection: $durationSpan){
-                        Text("Relative").tag(TimeSpanMode.relative)
-                        Text("Absolute").tag(TimeSpanMode.absolute)
+                        Text("Milliseconds/Point").tag(TimeSpanMode.relative)
+                        Text("Seconds").tag(TimeSpanMode.absolute)
                     }
                 }
                 
-                Slider(
-                    value: $duration,
-                    in: durationSpan.isRelative ? 1...100 : 0.1...20
-                )
+                Slider(value: $duration, in: 0.1...20)
             }
             .exampleParameterCell()
             
@@ -84,8 +81,10 @@ public struct ViewLooperExample: View {
                     
                     Spacer()
                     
-                    Text(wait, format: .number.rounded(increment: 0.1))
-                        .monospacedDigit()
+                    Group {
+                        Text(wait, format: .increment(0.1)) + Text(" Seconds")
+                    }
+                    .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $wait, in: 0...10)

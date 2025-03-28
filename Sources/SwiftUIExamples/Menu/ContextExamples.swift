@@ -41,7 +41,7 @@ public struct ContextMenuExamples: View  {
                 .padding()
             }
             .focusPresentationContext()
-            .background(.bar)
+            .background(.regularMaterial)
             
             Divider().ignoresSafeArea()
             

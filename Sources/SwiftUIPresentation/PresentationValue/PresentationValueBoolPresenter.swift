@@ -44,8 +44,8 @@ struct PresentationValueBoolPresenter<Metadata: Equatable & Sendable, Presentati
                 )] : []
             }
         }
-        .onChange(of: behaviour.customHashable){
-            customID = $0 == nil ? nil : .init()
+        .onChangePolyfill(of: behaviour.customHashable){
+            customID = behaviour.customHashable == nil ? nil : .init()
         }
     }
     

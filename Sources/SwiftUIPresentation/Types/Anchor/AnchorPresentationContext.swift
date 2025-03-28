@@ -10,8 +10,8 @@ struct AnchorPresentationContext: ViewModifier {
     @Environment(\.presentationEnvironmentBehaviour) private var envBehaviour
     @Environment(\.layoutDirection) private var envLayoutDirection
     
-    @State private var bgInteraction: PresentationBackgroundInteraction?
-    @State private var bg: PresentationBackgroundKeyValue?
+    @State private var bgInteraction: PresentationBackdropInteraction?
+    @State private var bg: PresentationBackdropKeyValue?
     @State private var presentedValue: Presentation?
 
     private var bgView: AnyView? { bg?.view() }
@@ -89,10 +89,10 @@ struct AnchorPresentationContext: ViewModifier {
                                         .animation(.bouncy.speed(1.6))
                                 )
                                 .environment(\.dismissPresentation, .init(id: presentedValue.id, closure: dismiss))
-                                .onPreferenceChange(PresentationBackgroundKey.self){
+                                .onPreferenceChange(PresentationBackdropKey.self){
                                     _bg.wrappedValue = $0.last
                                 }
-                                .onPreferenceChange(PresentationBackgroundInteractionKey.self){
+                                .onPreferenceChange(PresentationBackdropInteractionKey.self){
                                     _bgInteraction.wrappedValue = $0.last
                                 }
                                 .alignmentGuide(.leading){ dimension in

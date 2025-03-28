@@ -15,11 +15,13 @@ public struct StepperExamples: View {
     public var body: some View {
         ExampleView(title: "Stepper"){
             VStack(spacing: 10){
-                Text(value, format: .number.rounded(increment: 1))
+                Text(value, format: .increment(1))
                     .font(.largeTitle.bold().monospacedDigit())
                     .contentTransitionNumericText()
+                    .minimumScaleFactor(0.5)
                 
                 HStack {
+                    #if !os(tvOS) && !os(watchOS)
                     ExampleCard(title: "SwiftUI") {
                         VStack {
                             SwiftUI.Stepper("", value: $value, in: -1...4)
@@ -27,7 +29,8 @@ public struct StepperExamples: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-
+                    #endif
+                    
                     ExampleCard(title: "SwiftUIKit"){
                         VStack {
                             Stepper(value: $value, in: -1...4)

@@ -10,10 +10,7 @@ extension CGFloat : EmptyInitalizable {}
 public extension CGSize {
     
     func dimension(for axis: Axis) -> CGFloat {
-        switch axis {
-        case .horizontal: width
-        case .vertical: height
-        }
+       self[axis]
     }
     
     /// Calls rounded on both `width` and `height` of the size.
@@ -30,7 +27,37 @@ public extension CGSize {
     func round(to place: CGFloat) -> CGSize {
         CGSizeMake(width.round(to: place), height.round(to: place))
     }
+        
+    init(_ simd: SIMD2<Float>) {
+        self.init(width: Double(simd.x), height: Double(simd.y))
+    }
     
+    init(_ point: CGPoint) {
+        self.init(width: point.x, height: point.y)
+    }
+    
+    var smallestAxis: Axis {
+        width < height ? .horizontal : .vertical
+    }
+    
+    var largestAxis: Axis {
+        width > height ? .horizontal : .vertical
+    }
+    
+    subscript(_ axis: Axis) -> CGFloat {
+        get {
+            switch axis {
+            case .horizontal: width
+            case .vertical: height
+            }
+        } set {
+            switch axis {
+            case .horizontal: width = newValue
+            case .vertical: height = newValue
+            }
+        }
+    }
+        
 }
 
 public extension CGPoint {

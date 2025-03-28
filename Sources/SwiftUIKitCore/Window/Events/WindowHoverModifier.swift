@@ -32,7 +32,7 @@ struct WindowHoverModifier: ViewModifier {
     
 }
 
-#else
+#elseif os(iOS)
 
 struct WindowHoverModifier: ViewModifier {
     

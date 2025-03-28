@@ -24,7 +24,7 @@ public struct FocusExamples : View {
                                 .scaleEffect(presentedIndices.contains(i) ? 1.1 : 1)
                         }
                         .buttonStyle(.plain)
-                        .presentationBackground {
+                        .presentationBackdrop {
                             Rectangle().fill(.tint)
                                 .colorInvert()
                                 .opacity(0.5)
@@ -83,14 +83,13 @@ public struct FocusExamples : View {
                 
                 if let next {
                     Button("Next Tip", action: next)
-                        .buttonStyle(.macOSBasic)
                 }
             }
             .padding()
             .frame(maxWidth: 250)
             .background{
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(.bar)
+                    .fill(.regularMaterial)
                     .shadow(radius: 8, y: 5)
             }
         }

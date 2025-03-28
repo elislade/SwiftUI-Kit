@@ -42,17 +42,18 @@ public struct Rotation2DTransitionExample: View {
             .onAppear { update(transition, nil) }
             
             HStack(alignment: .top) {
-                Text("Anchor").font(.exampleParameterTitle)
+                VStack(alignment: .leading) {
+                    Text("Anchor").font(.exampleParameterTitle)
+                    
+                    Group {
+                        Text("X: ") + Text(anchor.x, format: .increment(0.01))
+                        Text("Y: ") + Text(anchor.y, format: .increment(0.01))
+                    }
+                    .font(.exampleParameterValue)
+                    .foregroundStyle(.secondary)
+                }
                 
                 Spacer()
-                
-                Text(anchor.x, format: .increment(0.01))
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                
-                Text(anchor.y, format: .increment(0.01))
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
                 
                 ExampleControl.Anchor(value: $anchor)
                     .frame(width: 120, height: 120)

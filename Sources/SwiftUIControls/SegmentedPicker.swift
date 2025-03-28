@@ -7,7 +7,7 @@ import SwiftUIKitCore
 public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View where Data.Element: Hashable, Data.Index == Int {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.controlRoundness) private var controlRoundness
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
@@ -62,8 +62,9 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
         self.content = content
     }
     
+    #if !os(tvOS)
     private func gesture(viewSize: CGSize) -> some Gesture {
-        DragGesture(minimumDistance: 5, coordinateSpace: .named("Control"))
+        DragGesture(minimumDistance: 5)
             .onChanged{ g in
                 let xLocation = layoutDirection == .rightToLeft ? viewSize.width - g.location.x : g.location.x
                 let step = layoutVertical ? g.location.y / viewSize.height : (xLocation / viewSize.width)
@@ -82,6 +83,7 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
                 }
             }
     }
+    #endif
     
     private func opacity(for idx: Data.Index) -> Double {
         guard pendingIndex != nil, !pendingStartIsSelection else { return 1 }
@@ -104,29 +106,27 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
             AxisStack(layoutVertical ? .vertical : .horizontal, spacing: 0){
                 ForEach(items.indices, id: \.self){ idx in
                     let item = items[idx]
-                    Color.clear
-                        .overlay{
-                            content(item)
-                                .padding(dimension / 8)
-                        }
-                        .minimumScaleFactor(0.1)
-                        .opacity(opacity(for: idx))
-                        .foregroundStyle(pendingIndex ?? selectionIndex == idx ? .black : .primary)
-                        .scaleEffect(pendingStartIsSelection && pendingIndex == idx ? 0.95 : 1)
-                        .padding(layoutVertical ? dimension / 8 : 0)
-                        .contentShape(ContainerRelativeShape())
-                        .accessibilityAddTraits(selectionIndex == idx ? .isSelected : [])
-                        .accessibilityAction { selection = item }
-                        .hoverEffectPolyfill()
-                        .accessibilityAddTraits(.isButton)
-                        .gesture(
-                            TapGesture()
-                                .onEnded{ selection = item }
-                                .exclusively(before: gesture(viewSize: proxy.size))
-                        )
+                    Button { selection = item } label : {
+                        Color.clear
+                            .overlay{
+                                content(item)
+                                    .padding(dimension / 8)
+                            }
+                            .minimumScaleFactor(0.1)
+                            .opacity(opacity(for: idx))
+                            .foregroundStyle(pendingIndex ?? selectionIndex == idx ? .black : .primary)
+                            .scaleEffect(pendingStartIsSelection && pendingIndex == idx ? 0.95 : 1)
+                            .padding(layoutVertical ? dimension / 8 : 0)
+                            .contentShape(ContainerRelativeShape())
+                    }
+                    .accessibilityAddTraits(selectionIndex == idx ? .isSelected : [])
+                    .hoverEffectPolyfill()
+                    .buttonStyle(.plain)
                 }
             }
-            .coordinateSpace(name: "Control")
+            #if !os(tvOS)
+            .highPriorityGesture(gesture(viewSize: proxy.size))
+            #endif
             .background{
                 let shape = RoundedRectangle(cornerRadius: (dimension / 2) * (controlRoundness ?? 0.4))
                 let width = proxy.size.width / Double(items.count)

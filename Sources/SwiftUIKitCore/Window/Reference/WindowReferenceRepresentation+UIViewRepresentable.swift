@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 extension WindowReferenceRepresentation: UIViewRepresentable {
     

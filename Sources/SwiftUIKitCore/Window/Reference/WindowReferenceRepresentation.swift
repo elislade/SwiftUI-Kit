@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SwiftUI
 
 struct WindowReferenceRepresentation {
@@ -5,3 +7,5 @@ struct WindowReferenceRepresentation {
     let reference: (OSWindow) -> Void
     
 }
+
+#endif

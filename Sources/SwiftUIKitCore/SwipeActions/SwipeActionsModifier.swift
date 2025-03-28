@@ -134,6 +134,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         }
     }
     
+    #if !os(tvOS)
     private var contentGesture: some Gesture {
         DragGesture(minimumDistance: gestureMinMovement, coordinateSpace: .global)
             .onChanged { g in
@@ -150,13 +151,16 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                 minDistanceFactor = nil
             }
     }
+    #endif
     
     func body(content: Content) -> some View {
         content
             .offset(x: totalOffset)
             .contentShape(Rectangle())
+            #if !os(tvOS)
             .simultaneousGesture(TapGesture().onEnded(close))
             .highPriorityGesture(contentGesture)
+            #endif
             .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ contentY = $0 }
             .overlay {
                 HStack(spacing: 0) {

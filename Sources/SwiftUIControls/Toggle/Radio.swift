@@ -5,7 +5,7 @@ import SwiftUIKitCore
 public struct Radio: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Binding var isOn: Bool
     
     private var size: Double {

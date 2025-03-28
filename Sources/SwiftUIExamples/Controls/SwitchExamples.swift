@@ -31,12 +31,15 @@ public struct SwitchExamples : View {
     public var body: some View {
         ExampleView(title: "Switch"){
             HStack {
+                
+                #if !os(tvOS)
                 ExampleCard(title: "SwiftUI") {
                     Toggle("", isOn: $isOn)
                         .toggleStyle(.switch)
                         .labelsHidden()
                 }
                 .frame(maxWidth: .infinity)
+                #endif
                 
                 ExampleCard(title: "SwiftUIKit") {
                     if useCustomLabels {

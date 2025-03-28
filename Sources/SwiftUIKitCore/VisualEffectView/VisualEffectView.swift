@@ -48,3 +48,16 @@ import SwiftUI
     }
     
 }
+
+
+#if os(watchOS)
+
+extension VisualEffectView: View {
+    
+    public var body: some View {
+        Rectangle().fill(.regularMaterial)
+    }
+    
+}
+
+#endif

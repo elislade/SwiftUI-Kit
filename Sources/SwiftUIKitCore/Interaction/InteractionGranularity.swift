@@ -7,6 +7,8 @@ struct InteractionGranularityKey: EnvironmentKey {
     static var defaultValue: Double { 1 }
     #elseif os(iOS)
     static var defaultValue: Double { 0.5 }
+    #elseif os(watchOS)
+    static var defaultValue: Double { 0.4 }
     #elseif os(tvOS)
     static var defaultValue: Double { 0 }
     #elseif os(visionOS)

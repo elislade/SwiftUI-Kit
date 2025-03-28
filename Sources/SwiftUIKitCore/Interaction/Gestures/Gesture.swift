@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 struct PanGestureRepresentable<V: View>: UIViewControllerRepresentable {
     

@@ -17,17 +17,19 @@ public struct TransformExample: View {
                     
                 RoundedRectangle(cornerRadius: 20)
                     .fill(.tint)
-                    .frame(width: 160, height: 160)
+                    .frame(maxWidth: 160, maxHeight: 160)
+                    .padding()
                     .transform(transform, orderMask: orderMask.filter({ !disableMask.contains($0) }))
             }
         } parameters: {
             HStack {
                 Text("Actions")
                     .font(.exampleParameterTitle)
+                    .fixedSize()
                 
                 Spacer()
                 
-                Button("Random"){
+                Button("Random", systemImage: "dice"){
                     withAnimation(.smooth){
                         transform.shear = .random(in: -1...1)
                         transform.scale = .random(in: -1...1)
@@ -37,7 +39,7 @@ public struct TransformExample: View {
                 }
                 .font(.exampleParameterValue)
                 
-                Button("Reset"){
+                Button("Reset", systemImage: "arrow.clockwise"){
                     withAnimation(.smooth){
                         transform = .identity
                     }
@@ -46,6 +48,7 @@ public struct TransformExample: View {
                 .disabled(transform == .identity)
             }
             .exampleParameterCell()
+            .labelStyle(.titleIfFits)
 
             VStack {
                 HStack {
@@ -55,8 +58,8 @@ public struct TransformExample: View {
                     Spacer()
                     
                     Group {
-                        Text(transform.translation.x, format: .number.rounded(increment: 0.1)) + Text(",")
-                        Text(transform.translation.y, format: .number.rounded(increment: 0.1))
+                        Text(transform.translation.x, format: .increment(0.1)) + Text(",")
+                        Text(transform.translation.y, format: .increment(0.1))
                     }
                     .font(.exampleParameterValue)
                 }
@@ -76,8 +79,8 @@ public struct TransformExample: View {
                     Spacer()
 
                     Group {
-                        Text(transform.shear.x, format: .number.rounded(increment: 0.1)) + Text(",")
-                        Text(transform.shear.y, format: .number.rounded(increment: 0.1))
+                        Text(transform.shear.x, format: .increment(0.1)) + Text(",")
+                        Text(transform.shear.y, format: .increment(0.1))
                     }
                     .font(.exampleParameterValue)
                 }
@@ -106,8 +109,8 @@ public struct TransformExample: View {
                     Spacer()
                     
                     Group {
-                        Text(transform.scale.x, format: .number.rounded(increment: 0.1)) + Text(",")
-                        Text(transform.scale.y, format: .number.rounded(increment: 0.1))
+                        Text(transform.scale.x, format: .increment(0.1)) + Text(",")
+                        Text(transform.scale.y, format: .increment(0.1))
                     }
                     .font(.exampleParameterValue)
                 }
@@ -135,9 +138,10 @@ public struct TransformExample: View {
                         .font(.exampleParameterTitle)
                     Spacer()
                     
-                    Group {
-                        Text(transform.rotation.degrees, format: .number.rounded(increment: 0.1)) + Text("º")
-                    }
+                    Text(
+                        Measurement(value: transform.rotation.degrees, unit: UnitAngle.degrees),
+                        format: .measurement(width: .narrow, numberFormatStyle: .increment(0.1))
+                    )
                     .font(.exampleParameterValue)
                 }
                 
@@ -149,15 +153,17 @@ public struct TransformExample: View {
                 HStack {
                     Text("Order Mask")
                         .font(.exampleParameterTitle)
+                        .fixedSize()
                     
-                    Spacer()
+                    Spacer(minLength: 10)
                     
-                    Button("Reset"){
+                    Button("Reset", systemImage: "arrow.clockwise"){
                         orderMask = Transform.Component.allCases
                         disableMask = []
                     }
                     .font(.exampleParameterValue)
                     .disabled(orderMask == Transform.Component.allCases)
+                    .labelStyle(.titleIfFits)
                 }
                 
                 VStack(spacing: 0) {
@@ -181,7 +187,7 @@ public struct TransformExample: View {
                                 
                                 Spacer()
                                 
-                                VStack(spacing: 6) {
+                                VStack(spacing: 4) {
                                     Button("Move Up", systemImage: "chevron.up"){
                                         if idx == 0 {
                                             orderMask.swapAt(idx, orderMask.count - 1)
@@ -198,9 +204,13 @@ public struct TransformExample: View {
                                         }
                                     }
                                 }
-                                .font(.exampleParameterValue[.heavy])
+                                #if os(watchOS)
+                                .buttonStyle(.plain)
+                                #endif
+                                .controlSize(ControlSize.mini)
                                 .labelStyle(.iconOnly)
                             }
+                            .lineLimit(1)
                             .opacity(disableMask.contains(mask) ? 0.5 : 1)
                             .disabled(disableMask.contains(mask))
                             .padding(.horizontal, 12)

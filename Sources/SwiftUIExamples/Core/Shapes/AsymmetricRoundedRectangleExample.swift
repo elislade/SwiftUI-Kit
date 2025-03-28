@@ -30,7 +30,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     
                     Spacer()
                     
-                    Text(inset, format: .number.rounded(increment: 0.1))
+                    Text(inset, format: .increment(0.1))
                         .font(.exampleParameterValue)
                 }
                 Slider(value: $inset, in: 0...50)
@@ -47,10 +47,12 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     Spacer()
                     
                     Button("Animate"){
-                        values.topLeft = .random(in: radiusRange)
-                        values.topRight = .random(in: radiusRange)
-                        values.bottomLeft = .random(in: radiusRange)
-                        values.bottomRight = .random(in: radiusRange)
+                        withAnimation(.smooth){
+                            values.topLeft = .random(in: radiusRange)
+                            values.topRight = .random(in: radiusRange)
+                            values.bottomLeft = .random(in: radiusRange)
+                            values.bottomRight = .random(in: radiusRange)
+                        }
                     }
                 }
                 .exampleParameterCell()
@@ -62,7 +64,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         
                         Spacer()
                         
-                        Text(values.topLeft, format: .number.rounded(increment: 0.1))
+                        Text(values.topLeft, format: .increment(0.1))
                             .font(.exampleParameterValue)
                     }
                     
@@ -77,7 +79,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         
                         Spacer()
                         
-                        Text(values.topRight, format: .number.rounded(increment: 0.1))
+                        Text(values.topRight, format: .increment(0.1))
                             .font(.exampleParameterValue)
                     }
                     
@@ -92,7 +94,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         
                         Spacer()
                         
-                        Text(values.bottomLeft, format: .number.rounded(increment: 0.1))
+                        Text(values.bottomLeft, format: .increment(0.1))
                             .font(.exampleParameterValue)
                     }
                     
@@ -107,7 +109,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         
                         Spacer()
                         
-                        Text(values.bottomRight, format: .number.rounded(increment: 0.1))
+                        Text(values.bottomRight, format: .increment(0.1))
                             .font(.exampleParameterValue)
                     }
                     
@@ -116,7 +118,6 @@ public struct AsymmetricRoundedRectangleExamples: View {
                 .exampleParameterCell()
             }
         }
-        .animation(.interactiveSpring, value: values)
     }
     
 }

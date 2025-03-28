@@ -85,7 +85,7 @@ struct StickyExamples  {
                         .transitions(.scale, .opacity)
                 }
             }
-            .padding(20)
+            .padding()
             .font(.title2)
             .background{
                 if isSticky {
@@ -140,10 +140,10 @@ struct StickyExamples  {
                     }
                     .lineLimit(1)
                 }
-                .onChange(of: stickyItems.last){ item in
+                .onChangePolyfill(of: stickyItems.last){
                     isSticking = []
                     withAnimation(.fastSpring){
-                        proxy.scrollTo(item, anchor: .center)
+                        proxy.scrollTo(stickyItems.last, anchor: .center)
                     }
                 }
             }
@@ -194,10 +194,10 @@ struct StickyExamples  {
                         }
                     }
                 }
-                .onChange(of: stickyItems.last){ item in
+                .onChangePolyfill(of: stickyItems.last){
                     isSticking = []
                     withAnimation(.fastSpring){
-                        proxy.scrollTo(item, anchor: .center)
+                        proxy.scrollTo(stickyItems.last, anchor: .center)
                     }
                 }
             }

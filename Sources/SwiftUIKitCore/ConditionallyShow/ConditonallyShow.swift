@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    /// Will conditonally show view depending on current animation Transaction relative to threshold.
+    /// Will conditionally show view depending on current animation Transaction relative to threshold.
     /// If no animation is associated with the current transaction, the visibility will change instantaneously.
     ///
     /// - Parameters:

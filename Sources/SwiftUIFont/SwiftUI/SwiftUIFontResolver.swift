@@ -51,7 +51,7 @@ extension EnvironmentValues {
     }
     
     public var resolvedFont: ResolvedFont {
-        #if canImport(UIKit)
+        #if canImport(UIKit) && !os(watchOS)
         let content = UIContentSizeCategory(sizeCategory)
         let trait = UITraitCollection(preferredContentSizeCategory: content)
         let dynamicSize = UIFontMetrics.default.scaledValue(for: fontParameters.size, compatibleWith: trait)

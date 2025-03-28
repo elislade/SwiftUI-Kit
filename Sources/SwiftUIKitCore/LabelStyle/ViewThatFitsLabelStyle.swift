@@ -4,7 +4,7 @@ public struct ViewThatFitsLabelStyle: LabelStyle {
     
     let prefersTitle: Bool
     
-    public init(prefersTitle: Bool = false) {
+    public nonisolated init(prefersTitle: Bool = false) {
         self.prefersTitle = prefersTitle
     }
     
@@ -32,7 +32,11 @@ public struct ViewThatFitsLabelStyle: LabelStyle {
 
 public extension LabelStyle where Self == ViewThatFitsLabelStyle {
     
-    static var titleIfFits: ViewThatFitsLabelStyle { .init() }
-    static var iconIfFits: ViewThatFitsLabelStyle { .init(prefersTitle: true) }
+    static nonisolated var titleIfFits: ViewThatFitsLabelStyle { .init() }
+    static nonisolated var iconIfFits: ViewThatFitsLabelStyle { .init(prefersTitle: true) }
+    
+    static nonisolated func viewThatFits(prefersTitle: Bool) -> ViewThatFitsLabelStyle {
+        .init(prefersTitle: prefersTitle)
+    }
     
 }

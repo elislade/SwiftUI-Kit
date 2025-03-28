@@ -49,7 +49,7 @@ public struct InlineEnvironmentReaderExample: View {
                     Text("Display Scale ").foregroundColor(.gray) + Text(scale, format: .number)
                 }
                 .font(.title.bold())
-                .background(.bar)
+                .background(.regularMaterial)
                 
                 Divider().ignoresSafeArea()
                 

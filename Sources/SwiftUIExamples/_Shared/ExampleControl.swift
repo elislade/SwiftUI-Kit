@@ -30,9 +30,9 @@ struct ExampleControl {
                     .blendMode(.hardLight)
             }
             .aspectRatio(1, contentMode: .fit)
-            .onChange(of: unit){
-                if $0 != value {
-                    value = $0
+            .onChangePolyfill(of: unit){
+                if unit != value {
+                    value = unit
                 }
             }
             .onChangePolyfill(of: value, initial: true){

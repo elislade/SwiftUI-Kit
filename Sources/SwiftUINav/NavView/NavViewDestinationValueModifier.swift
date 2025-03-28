@@ -14,14 +14,10 @@ struct NavViewDestinationValueModifier<Value: Hashable, Destination: View>: View
     func body(content: Content) -> some View {
         content.overlay{
             Color.clear
-//                .preference(
-//                    key: NavViewElementPreferenceKey.self,
-//                    value: matches
-//                )
                 .anchorPreference(key: PresentationKey<NavViewElementMetadata>.self, value: .bounds){ anchor in
                     []
                 }
-                .onChange(of: value){ newValue in
+                .onChangePolyfill(of: value){
                     guard
                         let u = value,
                         let v = u.value as? Value, !matches.contains(where: { $0.id == u.id })

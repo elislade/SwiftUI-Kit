@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SwiftUI
 
 struct KeyPressPolyfill: ViewModifier {
@@ -32,3 +34,6 @@ struct KeyPressPolyfill: ViewModifier {
     }
     
 }
+
+
+#endif

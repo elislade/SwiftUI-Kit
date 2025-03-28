@@ -80,6 +80,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
         return CGSize(width: _x, height: _y)
     }
     
+    #if !os(tvOS)
     @State private var space = UUID()
     
     private func gesture(in size: CGSize) -> some Gesture {
@@ -96,6 +97,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
             }
         })
     }
+    #endif
     
     public var body: some View {
         Color.clear.overlay{
@@ -105,20 +107,26 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
                         .hoverEffectPolyfill()
                         .onGeometryChangePolyfill(of: { $0.size }){ handleSize = $0 }
                         .offset(handleOffset(in: proxy.size))
+                        #if !os(tvOS)
                         .gesture(hitTestHandle ? gesture(in: proxy.size) : nil)
+                        #endif
                     
                     if hitTestHandle == false {
                         Color.clear
                             .contentShape(Rectangle())
+                            #if !os(tvOS)
                             .gesture(
                                 LongPressGesture(minimumDuration: 0.08, maximumDistance: 6)
                                     .sequenced(before: gesture(in: proxy.size))
                             )
+                            #endif
                     }
                 }
             }
         }
+        #if !os(tvOS)
         .coordinateSpace(name: space)
+        #endif
     }
 }
 

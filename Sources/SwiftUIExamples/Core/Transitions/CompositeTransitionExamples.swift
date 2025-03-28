@@ -114,11 +114,13 @@ public struct CompositeTransitionExamples: View {
         }
         
         var body: some View {
-            HStack {
+            HStack(spacing: 0) {
                 Text(Provider.name)
                     .font(.exampleParameterTitle)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 
-                Spacer()
+                Spacer(minLength: 10)
                 
                 if transition != nil {
                     Button("Clear", systemImage: "trash", role: .destructive){
@@ -141,7 +143,7 @@ public struct CompositeTransitionExamples: View {
                 .paddingAddingSafeArea(.bottom)
                 .background{
                     AsymmetricRoundedRectangle(values: .init(top: 20))
-                        .fill(.bar)
+                        .fill(.regularMaterial)
                 }
                 .transitions(
                     (.opacity + .blur(radius: 10) + .offset([0, 500]))
@@ -159,11 +161,13 @@ public struct CompositeTransitionExamples: View {
         
         var body: some View {
             VStack(spacing: 0) {
-                HStack {
+                HStack(spacing: 0) {
                     Text(Provider.name)
                         .font(.exampleSectionTitle)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                     
-                    Spacer()
+                    Spacer(minLength: 10)
                     
                     Button("Add", systemImage: "plus.circle.fill"){
                         if let transition {
@@ -177,7 +181,11 @@ public struct CompositeTransitionExamples: View {
                 
                 Divider()
                 
-                Provider{ t, u in transition = t }
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Provider{ t, u in transition = t }
+                    }
+                }
             }
         }
         

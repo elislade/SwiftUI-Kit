@@ -9,7 +9,7 @@ public struct Stepper: View {
     @Environment(\.controlRoundness) private var controlRoundness
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.isEnabled) private var isEnabled
     
     @State private var activeDirection: AccessibilityAdjustmentDirection?
@@ -107,12 +107,10 @@ public struct Stepper: View {
     }
     
     private func button(for direction: AccessibilityAdjustmentDirection, _ shape: some InsettableShape) -> some View {
-        Button(
-            shape: shape,
-            direction: direction,
-            isSelected: activeDirection == direction
-        )
-        .accessibilityAction { performAction(direction) }
+        Button{ performAction(direction) } label: {
+            DirectionLabel(direction)
+        }
+        .environment(\.isHighlighted, activeDirection == direction)
         .disabled(!canPerformAction(direction))
     }
     
@@ -126,9 +124,9 @@ public struct Stepper: View {
             
             button(for: isVertical ? .decrement: .increment, shape)
         }
-        .background {
-            SunkenControlMaterial(shape)
-        }
+        .buttonStyle(ButtonStyle())
+        .background { SunkenControlMaterial(shape) }
+        .containerShape(shape)
     }
     
     public var body: some View {
@@ -163,6 +161,7 @@ public struct Stepper: View {
                     }
                 }
             }
+            #if !os(tvOS)
             .overlay{
                 GeometryReader { proxy in
                     Color.clear
@@ -199,6 +198,7 @@ public struct Stepper: View {
                         )
                 }
             }
+            #endif
             .animation(.smooth.speed(2), value: activeDirection)
             .compositingGroup()
             .opacity(isEnabled ? 1 : 0.5)
@@ -206,24 +206,43 @@ public struct Stepper: View {
     }
     
     
-    struct Button<Shape: InsettableShape>: View {
+    struct DirectionLabel: View {
         
-        @Environment(\.isEnabled) private var isEnabled
-        @Environment(\.interactionGranularity) private var interactionGranularity
-        @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
-        @Environment(\.controlSize) private var controlSize
-        
-        let shape: Shape
         let direction: AccessibilityAdjustmentDirection
-        let isSelected: Bool
         
-        private var imageName: String {
+        init(_ direction: AccessibilityAdjustmentDirection) {
+            self.direction = direction
+        }
+        
+        var body: some View {
             switch direction {
-            case .increment: "plus"
-            case .decrement: "minus"
-            @unknown default: ""
+            case .decrement:
+                Label { Text("Decrement") } icon: {
+                    Image(systemName: "minus")
+                        .resizable()
+                        .scaledToFit()
+                }
+            case .increment:
+                Label { Text("Increment") } icon: {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .scaledToFit()
+                }
+            @unknown default:
+                EmptyView()
             }
         }
+    }
+    
+    
+    struct ButtonStyle: SwiftUI.ButtonStyle {
+        
+        @Environment(\.isHighlighted) private var isSelected
+        @Environment(\.isEnabled) private var isEnabled
+        @Environment(\.interactionGranularity) private var interactionGranularity
+        @Environment(\.controlSize) private var controlSize: ControlSize
+        
+        let shape = ContainerRelativeShape()
         
         private var transition: AnyTransition {
             .asymmetric(
@@ -257,14 +276,12 @@ public struct Stepper: View {
             (12 - (8 * interactionGranularity)) * controlFactor
         }
         
-        var body: some View {
+        func makeBody(configuration: Configuration) -> some View {
             Color.clear
                 .overlay{
                     ZStack {
                         Color.clear
-                        Image(systemName: imageName)
-                            .resizable()
-                            .scaledToFit()
+                        configuration.label
                             .foregroundStyle(isSelected ? .black : .primary)
                     }
                     .padding(padding)
@@ -279,7 +296,9 @@ public struct Stepper: View {
                 }
                 .contentShape(shape)
                 .opacity(isEnabled ? 1 : 0.5)
-                .accessibilityAddTraits(.isButton)
+                .labelStyle(.iconOnly)
         }
+        
     }
+    
 }

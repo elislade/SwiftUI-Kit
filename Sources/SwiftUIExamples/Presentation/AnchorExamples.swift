@@ -56,6 +56,7 @@ public struct AnchorPresentationExample : View   {
             }
             .anchorPresentationContext()
             .presentationEnvironmentBehaviour(.usePresentation)
+            #if !os(tvOS)
             .simultaneousGesture(
                 DragGesture().onChanged{ g in
                     if sourceLocation == .zero {
@@ -70,7 +71,9 @@ public struct AnchorPresentationExample : View   {
                     sourceLocationLast = sourceLocation
                 }
             )
+            #endif
             .environment(\.layoutDirection, direction)
+            .clipped()
         } parameters: {
             Toggle(isOn: $isPresented){
                 Text("Is Presented")

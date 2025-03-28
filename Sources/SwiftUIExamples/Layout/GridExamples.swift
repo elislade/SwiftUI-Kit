@@ -74,32 +74,32 @@ struct GridViewExample : View {
         } parameters: {
             HStack {
                 Text("Columns").font(.exampleParameterTitle)
+                
+                Spacer()
+                
                 Text("\(columns)")
                     .font(.exampleParameterValue)
                     .foregroundStyle(.secondary)
                 
-                Spacer()
                 Stepper(value: $columns, in: 1...5)
-            }.padding()
-            
-            Divider()
+            }
+            .exampleParameterCell()
             
             HStack {
                 Text("Count").font(.exampleParameterTitle)
+            
+                Spacer()
+                
                 Text("\(colors.count)")
                     .font(.exampleParameterValue)
                     .foregroundStyle(.secondary)
-                
-                Spacer()
                 
                 Stepper(
                     onIncrement: add,
                     onDecrement: !colors.isEmpty ? { remove() } : nil
                 )
             }
-            .padding()
-            
-            Divider()
+            .exampleParameterCell()
             
             VStack {
                 HStack(spacing: 16) {
@@ -114,7 +114,7 @@ struct GridViewExample : View {
                 
                 Slider(value: $spacing, in: 0...50, step: 1)
             }
-            .padding()
+            .exampleParameterCell()
         }
         .contentTransitionNumericText()
         .onAppear{
@@ -131,4 +131,5 @@ struct GridViewExample : View {
 
 #Preview("Grid View") {
     GridViewExample()
+        .previewSize()
 }

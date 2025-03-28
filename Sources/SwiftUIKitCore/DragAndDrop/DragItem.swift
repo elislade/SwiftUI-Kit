@@ -90,6 +90,7 @@ struct DragItemModifier<Value: Hashable, DragView: View>: ViewModifier {
         .onChangePolyfill(of: active){
             didChangeDragging(active)
         }
+        #if !os(tvOS)
         .simultaneousGesture(
             LongPressGesture(minimumDuration: 0.15, maximumDistance: 200)
                 .onEnded{ g in
@@ -97,6 +98,7 @@ struct DragItemModifier<Value: Hashable, DragView: View>: ViewModifier {
                     dragItemAction?(dragItem)
                 }
         )
+        #endif
     }
     
 }

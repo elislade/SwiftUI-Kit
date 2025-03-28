@@ -9,6 +9,13 @@ struct ExampleTitle: View {
     }
     
     var body: some View {
+        #if os(watchOS)
+        Text(title)
+            .font(.exampleTitle)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        #else
         HStack(alignment: .lastTextBaseline, spacing: nil) {
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)
@@ -42,6 +49,8 @@ struct ExampleTitle: View {
                 }
                 .shearHorizontal(.degrees(-20))
         }
+        
+        #endif
     }
     
 }

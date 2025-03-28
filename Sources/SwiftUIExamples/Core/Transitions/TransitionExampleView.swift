@@ -23,7 +23,7 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
                         .transition(inverse)
                 }
             }
-            .padding(50)
+            .padding()
             .animation(.smooth.speed(speed), value: show)
         } parameters: {
             Toggle(isOn: $show){

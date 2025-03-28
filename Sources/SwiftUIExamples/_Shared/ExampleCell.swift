@@ -183,6 +183,10 @@ extension View {
         .overlay(alignment: .bottom) {
             Divider()
         }
+        .geometryGroupPolyfill()
+        .lineLimit(2)
+        .minimumScaleFactor(0.5)
+        .controlRoundness(1)
     }
     
 }

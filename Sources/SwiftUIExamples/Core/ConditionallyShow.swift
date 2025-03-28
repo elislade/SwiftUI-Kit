@@ -49,7 +49,7 @@ struct ConditionallyShowExample : View {
                     .foregroundStyle(.tint)
                     .animation(.smooth.delay(duration * threshold), value: show)
             }
-            .padding(50)
+            .padding()
             .drawingGroup()
             .aspectRatio(1, contentMode: .fit)
             .animation(.linear(duration: duration), value: show)
@@ -82,4 +82,5 @@ struct ConditionallyShowExample : View {
 
 #Preview("Conditionally Show") {
     ConditionallyShowExample()
+        .previewSize()
 }

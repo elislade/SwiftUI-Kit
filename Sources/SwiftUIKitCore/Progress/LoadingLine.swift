@@ -87,8 +87,8 @@ public struct LoadingLine: View {
             toggle()
         }
         .onAppear { toggle() }
-        .onChange(of: state){
-            if $0 == .indefinite {
+        .onChangePolyfill(of: state){
+            if state == .indefinite {
                 toggle()
             }
         }

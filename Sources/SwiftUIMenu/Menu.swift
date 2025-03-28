@@ -49,7 +49,7 @@ public struct Menu<Label: View, Content: View>: View {
                 .padding(.init(state.edge))
                 .shadow(color: .black.opacity(0.1), radius: 30, y: 20)
                 .windowInteractionEffects([.scale(anchor: state.anchor)])
-                .presentationBackground(.touchEndedDismiss){ Color.clear }
+                .presentationBackdrop(.touchEndedDismiss){ Color.clear }
                 .modifier(SubmenuPresentationContext())
                 .environment(\.menuBackground, menuBackground)
             }

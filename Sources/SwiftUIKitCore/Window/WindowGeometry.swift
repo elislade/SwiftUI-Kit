@@ -1,3 +1,6 @@
+
+#if !os(watchOS)
+
 import SwiftUI
 import Combine
 
@@ -39,3 +42,5 @@ struct WindowGeometryModifier<V: Equatable>: ViewModifier {
     }
     
 }
+
+#endif

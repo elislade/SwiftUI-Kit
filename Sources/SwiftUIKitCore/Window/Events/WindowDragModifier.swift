@@ -35,7 +35,7 @@ struct WindowDragModifier: ViewModifier {
     
 }
 
-#else
+#elseif os(iOS) || os(visionOS) || os(tvOS)
 
 struct WindowDragModifier : ViewModifier {
     

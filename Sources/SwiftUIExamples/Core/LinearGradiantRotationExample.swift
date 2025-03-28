@@ -8,7 +8,7 @@ public struct LinearGradiantRotationExample : View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: nil) {
             RoundedRectangle(cornerRadius: 30)
                 .fill(LinearGradient.rotated(
                     Gradient(colors: [.purple, .yellow]),
@@ -22,6 +22,9 @@ public struct LinearGradiantRotationExample : View {
                 .exampleParameterCell()
             
         }
+        #if os(watchOS)
+        .ignoresSafeArea()
+        #endif
     }
     
 }

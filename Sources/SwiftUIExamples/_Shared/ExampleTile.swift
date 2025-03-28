@@ -18,13 +18,12 @@ struct ExampleTile: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(lineWidth: 1)
-                    .foregroundColor(.white)
-                    .blendMode(.difference)
+                    .colorInvert()
                 
                 Text(string)
-                    .font(.system(.title, design: .rounded).weight(.black))
-                    .foregroundColor(.white)
-                    .blendMode(.difference)
+                    .font(.system(.title, design: .rounded)[.black][.monospacedDigit])
+                    .colorInvert()
+                    .padding(5)
             }
             .drawingGroup()
             .lineLimit(1)

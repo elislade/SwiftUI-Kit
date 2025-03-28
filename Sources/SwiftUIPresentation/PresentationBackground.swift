@@ -4,12 +4,12 @@ import SwiftUIKitCore
 public struct PresentationBackground: View {
     
     private let bgView: AnyView?
-    private let bgInteraction: PresentationBackgroundInteraction?
+    private let bgInteraction: PresentationBackdropInteraction?
     private let dismiss: () -> Void
     
     public init(
         bgView: AnyView? = nil,
-        bgInteraction: PresentationBackgroundInteraction? = nil,
+        bgInteraction: PresentationBackdropInteraction? = nil,
         dismiss: @escaping () -> Void
     ) {
         self.bgView = bgView
@@ -42,7 +42,8 @@ public struct PresentationBackground: View {
                         .accessibilityLabel(Text("Dismiss Presentation"))
                 }
                 .buttonStyle(PresentationBGButtonStyle())
-                .keyboardShortcut(.escape, modifiers: [])
+                .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
+                #if !os(tvOS)
                 .simultaneousGesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged{ _ in
@@ -51,6 +52,7 @@ public struct PresentationBackground: View {
                             }
                         }
                 )
+                #endif
             } else {
                 presentationBG.allowsHitTesting(false)
             }

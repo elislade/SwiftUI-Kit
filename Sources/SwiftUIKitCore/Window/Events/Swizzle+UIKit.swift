@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 import OSLog
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 enum WindowEvents {
     

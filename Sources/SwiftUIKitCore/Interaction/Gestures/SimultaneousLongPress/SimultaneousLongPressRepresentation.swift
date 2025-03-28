@@ -1,3 +1,5 @@
+#if !os(watchOS)
+
 import SwiftUI
 
 
@@ -64,5 +66,7 @@ struct SimultaneousLongPressRepresentation : UIViewRepresentable {
     
 }
 
+
+#endif
 
 #endif

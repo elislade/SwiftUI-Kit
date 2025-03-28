@@ -44,7 +44,7 @@ public struct FrameTransitionExample: View {
                         .font(.exampleParameterValue)
                     
                     Switch(isOn: !$widthIsNill)
-                        .controlSize(.mini)
+                        .controlSize(ControlSize.mini)
                 }
 
                 Slider(value: $width, in: 0...200, step: 1)
@@ -66,7 +66,7 @@ public struct FrameTransitionExample: View {
                         .font(.exampleParameterValue)
                     
                     Switch(isOn: !$heightIsNill)
-                        .controlSize(.mini)
+                        .controlSize(ControlSize.mini)
                 }
         
                 Slider(value: $height, in: 0...200, step: 1)

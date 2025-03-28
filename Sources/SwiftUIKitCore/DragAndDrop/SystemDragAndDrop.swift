@@ -14,12 +14,23 @@ public extension DraggablePayload {
 
 public extension View {
     
+    #if os(watchOS) || os(tvOS)
+    
+    nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> Self {
+        self
+    }
+    
+    nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> Self {
+        self
+    }
+    
+    #else
+    
     nonisolated func onDrag<Payload: DraggablePayload>(_ payload: Payload, preferredSize: CGSize? = nil) -> some View {
         onDrag({
             NSItemProvider(encoding: payload, with: preferredSize)
         })
     }
-    
     
     nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
         onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
@@ -27,6 +38,8 @@ public extension View {
             return true
         }
     }
+    
+    #endif
     
 }
 

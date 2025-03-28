@@ -1,8 +1,8 @@
-import SwiftUI
+//import SwiftUI
+import Symbols
 
 
-
-public enum SymbolEffectSucessiveVariableBehaviour {
+public enum SymbolEffectSucessiveVariableBehaviour: Sendable {
     
     /// Animation applies its Cumulative variant, where each sucessive
     /// variable layer is enabled and stays enabled until the end of
@@ -34,17 +34,17 @@ extension SymbolSucessiveVariableBehaviourConformance {
     
 }
 
-public enum SymbolEffectInactiveLayerBehaviour {
+public enum SymbolEffectInactiveLayerBehaviour: Sendable {
     case dim
     case hide
 }
 
-public enum SymbolEffectDirection {
+public enum SymbolEffectDirection: Sendable {
     case up
     case down
 }
 
-public enum SymbolEffectGrouping {
+public enum SymbolEffectGrouping: Sendable {
     case byLayer
     case whole
 }
@@ -98,6 +98,7 @@ extension SymbolGroupingConformance {
     
 }
 
+//#if !os(watchOS)
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
 extension BounceSymbolEffect: SymbolGroupingConformance, SymbolDirectionConformance {}
@@ -119,3 +120,5 @@ extension ScaleSymbolEffect: SymbolGroupingConformance, SymbolDirectionConforman
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
 extension VariableColorSymbolEffect: SymbolInactiveLayerBehaviourConformance, SymbolSucessiveVariableBehaviourConformance {}
+
+//#endif

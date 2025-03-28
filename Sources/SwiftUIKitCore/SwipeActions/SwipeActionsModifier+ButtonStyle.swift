@@ -6,8 +6,6 @@ extension SwipeActionsModifier {
     
     struct ButtonStyle: PrimitiveButtonStyle {
         
-        @Environment(\.font) private var font
-        @State private var id = UUID()
         @State private var isPressed = false
         
         private let didCallAction: () -> Void
@@ -23,7 +21,7 @@ extension SwipeActionsModifier {
                 .foregroundStyle(Color.white)
                 .padding()
                 .frame(maxHeight: .infinity)
-                .background{
+                .background {
                     if let role = configuration.role, role == .destructive {
                         Rectangle().fill(.red).zIndex(1)
                     } else {
@@ -44,14 +42,17 @@ extension SwipeActionsModifier {
                         .opacity(isPressed ? 0.3 : 0)
                         .zIndex(3)
                 }
-                .simultaneousGesture(DragGesture(minimumDistance: 0)
-                    .onChanged({ _ in isPressed = true })
-                    .onEnded({ g  in
-                        isPressed = false
-                        didCallAction()
-                        configuration.trigger()
-                    })
+                #if !os(tvOS)
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { _ in isPressed = true }
+                        .onEnded { g  in
+                            isPressed = false
+                            didCallAction()
+                            configuration.trigger()
+                        }
                 )
+                #endif
                 .animation(.fastSpringInterpolating, value: isPressed)
                 .sensoryFeedbackPolyfill(value: isPressed)
         }

@@ -99,6 +99,7 @@ struct DraggingZStack<Value: Hashable, Layout: RelativeCollectionLayoutModifier>
                 )
                 .animation(.bouncy, value: expanded.wrappedValue)
                 .contentShape(.interaction, Rectangle())
+                #if !os(tvOS)
                 .gesture(
                     DragGesture()
                         .onChanged{
@@ -106,6 +107,7 @@ struct DraggingZStack<Value: Hashable, Layout: RelativeCollectionLayoutModifier>
                         }
                         .onEnded{ _ in expanded.wrappedValue.toggle() }
                 )
+                #endif
             }
         }
     }

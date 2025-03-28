@@ -13,7 +13,7 @@ public struct PanGestureState: Hashable, Sendable, BitwiseCopyable {
     public let translation: SIMD2<Double>
 }
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 extension PanGestureState.Phase {
     init?(_ state: UIGestureRecognizer.State) {
@@ -39,16 +39,20 @@ struct PanGestureRepresentation : UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let v = UIView()
         context.coordinator.update = update
+        #if !os(tvOS)
         context.coordinator.gesture.minimumNumberOfTouches = minimumNumberOfTouches
         context.coordinator.gesture.maximumNumberOfTouches = maximumNumberOfTouches
+        #endif
         v.addGestureRecognizer(context.coordinator.gesture)
         return v
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
         context.coordinator.update = update
+        #if !os(tvOS)
         context.coordinator.gesture.minimumNumberOfTouches = minimumNumberOfTouches
         context.coordinator.gesture.maximumNumberOfTouches = maximumNumberOfTouches
+        #endif
     }
     
     func makeCoordinator() -> Coordinator {

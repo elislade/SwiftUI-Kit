@@ -12,7 +12,7 @@ struct ResetActionExamples: View {
         VStack(spacing: 0) {
             ZStack {
                 Color.clear
-                VStack(spacing: 20) {
+                VStack(spacing: nil) {
                     ChildView()
                     
                     ChildView()
@@ -34,7 +34,7 @@ struct ResetActionExamples: View {
                     }
                 }
             }
-            .background(.bar)
+            .background(.regularMaterial)
             
             Divider().ignoresSafeArea()
 
@@ -43,11 +43,6 @@ struct ResetActionExamples: View {
                     .padding(.vertical)
                 
                 HStack {
-                    Text("Actions")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
                     Button("Reset"){ resetAction?() }
                         .disabled(resetAction == nil)
                     
@@ -57,6 +52,7 @@ struct ResetActionExamples: View {
                     }
                     .disabled(resetAction == nil)
                 }
+                .lineLimit(1)
                 .padding()
             }
         }

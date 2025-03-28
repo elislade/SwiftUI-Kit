@@ -29,6 +29,8 @@ public struct SegmentedPickerExamples : View {
                 suggetion.useVertical ? .horizontal : .vertical,
                 spacing: 10
             ) {
+                
+                #if !os(watchOS)
                 ExampleCard(title: "SwiftUI") {
                     Picker("", selection: $selection){
                         ForEach(options){
@@ -40,6 +42,7 @@ public struct SegmentedPickerExamples : View {
                     }
                     .pickerStyle(.segmented)
                 }
+                #endif
                 
                 ExampleCard(title: "SwiftUIKit") {
                     SegmentedPicker(

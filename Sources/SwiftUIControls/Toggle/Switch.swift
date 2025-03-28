@@ -16,7 +16,7 @@ public struct Switch<OnLabel: View, OffLabel: View>: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.controlRoundness) private var controlRoundness
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
     @Environment(\.isOnOffSwitchLabelsEnabled) private var isOnOffSwitchLabelsEnabled
     @Environment(\.isEnabled) private var isEnabled
@@ -106,17 +106,6 @@ public struct Switch<OnLabel: View, OffLabel: View>: View {
         }
     }
     
-//    private var handleStyle: some ShapeStyle {
-//        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-//            AnyShapeStyle(
-//                .linearGradient(colors: [Color(white: 0.9), .white], startPoint: .top, endPoint: .bottom)
-//                .shadow(.inner(color: .white, radius: 0, y: 1))
-//            )
-//        } else {
-//            AnyShapeStyle(.linearGradient(colors: [.white.opacity(0.9), .white], startPoint: .top, endPoint: .bottom))
-//        }
-//    }
-    
     private func content(for shape: some InsettableShape) -> some View {
         ZStack(alignment: alignment){
             SunkenControlMaterial(shape, isTinted: isOn)
@@ -137,24 +126,29 @@ public struct Switch<OnLabel: View, OffLabel: View>: View {
             RaisedControlMaterial(shape.inset(by: 2))
                 .blendMode(.hardLight)
                 .aspectRatio(pressing ? layoutVertical ? 0.85 : 1.3 : 1, contentMode: .fit)
+            
         }
         .aspectRatio(layoutVertical ? 0.59 : 1.7, contentMode: .fit)
         .contentShape(shape)
     }
     
     public var body: some View {
-        content(
-            for: RoundedRectangle(
-                cornerRadius: (fixedSize / 2.0) * (controlRoundness ?? 1)
+        Button{ isOn.toggle() } label : {
+            content(
+                for: RoundedRectangle(
+                    cornerRadius: (fixedSize / 2.0) * (controlRoundness ?? 1)
+                )
             )
-        )
+        }
+        .buttonStyle(.plain)
         .frame(
             width: layoutVertical ? fixedSize : nil,
             height: layoutVertical ? nil : fixedSize
         )
         .fixedSize()
         .animation(.smooth.speed(1.5), value: pressing)
-        .gesture(
+        #if !os(tvOS)
+        .highPriorityGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged{ _ in
                     pressing = true
@@ -164,9 +158,8 @@ public struct Switch<OnLabel: View, OffLabel: View>: View {
                     isOn.toggle()
                 }
         )
+        #endif
         .opacity(isEnabled ? 1 : 0.5)
-        .accessibilityAddTraits(.isTogglePolyfill)
-        .accessibilityAction { isOn.toggle() }
         .sensoryFeedbackPolyfill(.impact(), value: isOn)
     }
     

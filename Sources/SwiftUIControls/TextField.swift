@@ -19,7 +19,7 @@ public struct TextField<Leading: View>: View {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var focusState
-    @Environment(\.controlSize) private var controlSize
+    @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.controlRoundness) private var controlRoundness
     @Environment(\.interactionGranularity) private var interactionGranularity
     
@@ -128,7 +128,9 @@ public struct TextField<Leading: View>: View {
                 .opacity(focusState ? 1 : 0)
             }
             .contentShape(RoundedRectangle(cornerRadius: radius))
+            #if !os(tvOS)
             .onTapGesture { focusState = true }
+            #endif
             .opacity(isEnabled ? 1 : 0.5)
             .animation(.fastSpringInterpolating, value: focusState)
             .animation(.bouncy, value: showClearButton)

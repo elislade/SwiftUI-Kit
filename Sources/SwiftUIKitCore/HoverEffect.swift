@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-#if os(macOS)
+#if os(macOS) || os(watchOS)
     
     func hoverEffectPolyfill() -> Self {
         self
@@ -19,16 +19,28 @@ public extension View {
     
 #else
     
-    func hoverEffectPolyfill() -> some View {
-        hoverEffect()
+    @ViewBuilder func hoverEffectPolyfill() -> some View {
+        if #available(iOS 13.4, tvOS 16.0, visionOS 1.0, *) {
+            hoverEffect()
+        } else {
+            self
+        }
     }
     
-    func hoverEffectLift() -> some View {
-        hoverEffect(.lift)
+    @ViewBuilder func hoverEffectLift() -> some View {
+        if #available(iOS 13.4, tvOS 16.0, visionOS 1.0, *) {
+            hoverEffect(.lift)
+        } else {
+            self
+        }
     }
     
-    func hoverEffectHighlight() -> some View {
-        hoverEffect(.highlight)
+    @ViewBuilder func hoverEffectHighlight() -> some View {
+        if #available(tvOS 17.0, *) {
+            hoverEffect(.highlight)
+        } else {
+            self
+        }
     }
     
 #endif

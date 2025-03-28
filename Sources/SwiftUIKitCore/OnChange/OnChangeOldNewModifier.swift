@@ -1,3 +1,4 @@
+#if !os(visionOS)
 import SwiftUI
 
 
@@ -30,3 +31,5 @@ struct OnChangeOldNewModifier<Value: Equatable>: ViewModifier {
     }
  
 }
+
+#endif

@@ -29,9 +29,11 @@ public struct CircularLayoutExample : View {
                     .frame(width: 60, height: 60)
                     .drawingGroup()
                     .transitions(.scale)
+                    #if !os(tvOS)
                     .onTapGesture {
                         items.removeAll(where: { $0 == color })
                     }
+                    #endif
             }
             .animation(.fastSpring, value: compensateForRotation)
             .animation(.bouncy, value: items)
@@ -40,10 +42,10 @@ public struct CircularLayoutExample : View {
                 Text("Number of Items")
                     .font(.exampleParameterTitle)
                 
+                Spacer()
+                
                 Text(items.count, format: .number)
                     .font(.exampleParameterValue)
-                
-                Spacer()
                 
                 Stepper(
                     onIncrement: { items.append(.random) },

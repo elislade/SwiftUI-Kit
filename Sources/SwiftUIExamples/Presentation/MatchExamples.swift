@@ -22,6 +22,8 @@ public struct MatchExampleView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .contentShape(Rectangle())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                     }
                     .buttonStyle(.plain)
                     .frame(maxHeight: 100)
@@ -44,13 +46,14 @@ public struct MatchExampleView: View {
                 }
                 .containerShape(RoundedRectangle(cornerRadius: 30))
                 .frame(maxWidth: 640)
-                //.presentationMatch(value)
+                .presentationMatch(value)
                 .padding(8)
                 .transition(
                     .offset([0, 590]).animation(.bouncy)
                 )
         }
         .presentationContext()
+        .ignoresSafeArea(edges: [.top, .horizontal])
     }
     
     
@@ -84,7 +87,7 @@ public struct MatchExampleView: View {
                                     FocalView(value: value)
                                         .presentationMatch("value")
                                         .padding(.horizontal)
-                                        .presentationBackground {
+                                        .presentationBackdrop {
                                             Rectangle().fill(.background)
                                         }
                                         .transition(.opacity.animation(.smooth))
@@ -94,7 +97,7 @@ public struct MatchExampleView: View {
                                 .buttonStyle(.plain)
                         }
                         .presentationMatch("value")
-                        .presentationMatch(value)
+                        //.presentationMatch(value)
                     
                     ForEach(0..<4){ _ in
                         RoundedRectangle(cornerRadius: 15)
@@ -109,10 +112,12 @@ public struct MatchExampleView: View {
             .safeAreaInset(edge: .top, spacing: 0) {
                 Text("Element \(value + 1)")
                     .font(.title.bold())
-                    .padding(10)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding()
                     .frame(maxWidth: .infinity)
                     .background{
-                        Rectangle().fill(.bar)
+                        Rectangle().fill(.regularMaterial)
                     }
                     .overlay(alignment: .bottom){
                         Divider()

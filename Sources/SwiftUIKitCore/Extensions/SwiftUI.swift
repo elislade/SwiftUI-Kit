@@ -236,6 +236,18 @@ public extension Axis {
 }
 
 
+public extension Angle {
+    
+    init(rise: Float, run: Float) {
+        self.init(radians: Double(atan2(rise, run)))
+    }
+    
+    init(_ vector: SIMD2<Float>) {
+        self.init(rise: vector.y, run: vector.x)
+    }
+    
+}
+
 
 extension View {
     
@@ -258,6 +270,90 @@ extension LayoutDirection {
             ]
             return rtl.contains(code) ? .rightToLeft : .leftToRight
         }()
+    }
+    
+}
+
+
+// MARK: Control Size
+
+
+#if os(tvOS)
+
+public enum ControlSize: Hashable, CaseIterable, Sendable, BitwiseCopyable {
+    
+    /// A control version that is minimally sized.
+    case mini
+    
+    /// A control version that is proportionally smaller size for space-constrained views.
+    case small
+    
+    /// A control version that is the default size.
+    case regular
+    
+    /// A control version that is prominently sized.
+    case large
+    
+    /// A control version that is substantially sized. The largest control size.
+    case extraLarge
+}
+
+public extension EnvironmentValues {
+
+    @Entry var controlSize: ControlSize = .regular
+    
+}
+
+
+public extension View {
+    
+    func controlSize(_ size: ControlSize) -> some View {
+        environment(\.controlSize, size)
+    }
+    
+}
+
+#endif
+
+
+// MARK: SIMD Animatable
+
+
+extension SIMD2: @retroactive Animatable where Scalar: VectorArithmetic {
+    
+    public var animatableData: AnimatablePair<Scalar, Scalar> {
+        get { AnimatablePair(x, y) }
+        set {
+            x = newValue.first
+            y = newValue.second
+        }
+    }
+    
+}
+
+
+extension SIMD3: @retroactive Animatable where Scalar: VectorArithmetic {
+    
+    public var animatableData: AnimatablePair<Scalar, AnimatablePair<Scalar, Scalar>> {
+        get { AnimatablePair(x, AnimatablePair(y, z)) }
+        set {
+            self = [newValue.first, newValue.second.first, newValue.second.second]
+        }
+    }
+    
+}
+
+
+extension SIMD4: @retroactive Animatable where Scalar: VectorArithmetic {
+    
+    public var animatableData: AnimatablePair<AnimatablePair<Scalar, Scalar>, AnimatablePair<Scalar, Scalar>> {
+        get { AnimatablePair(AnimatablePair(x, y), AnimatablePair(z, w)) }
+        set {
+            self = [
+                newValue.first.first, newValue.first.second,
+                newValue.second.first, newValue.second.second
+            ]
+        }
     }
     
 }

@@ -57,22 +57,23 @@ public struct AlignmentGuideGridLayoutExample : View {
         } parameters: {
             HStack {
                 Text("Columns").font(.exampleParameterTitle)
+                Spacer()
                 Text("\(columns)")
                     .font(.exampleParameterValue)
                     .foregroundStyle(.secondary)
                 
-                Spacer()
                 Stepper(value: $columns, in: 1...5)
             }
             .exampleParameterCell()
             
             HStack {
                 Text("Count").font(.exampleParameterTitle)
+                
+                Spacer()
+                
                 Text("\(colors.count)")
                     .font(.exampleParameterValue)
                     .foregroundStyle(.secondary)
-                
-                Spacer()
                 
                 Stepper(
                     onIncrement: add,

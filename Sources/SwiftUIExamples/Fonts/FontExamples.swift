@@ -587,7 +587,7 @@ public struct FontExamples: View {
                                 .padding()
                                 .opacity(0.2)
                         }
-                        .keyboardShortcut(.escape)
+                        .keyboardShortcut(KeyEquivalent.escape, modifiers: [])
                         .transition(
                             .move(edge: .leading).animation(.easeInOut.delay(0.5))
                         )

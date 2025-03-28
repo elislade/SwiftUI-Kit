@@ -41,7 +41,7 @@ struct StickyContext : ViewModifier {
                 
                 let normalizedFactor: CGFloat = edge == .bottom || edge == .trailing ? -1 : 1
                 let dimension = itemFrame.normalizedDimension(for: edge, in: proxy.size)
-                let itemSize = itemFrame.size.dimension(for: Axis(orthogonalTo: edge))
+                let itemSize = itemFrame.size[Axis(orthogonalTo: edge)]
                 
                 if itemGrouping == .displaced {
                     if itemInset > dimension {

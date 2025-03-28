@@ -3,9 +3,19 @@ import SwiftUI
 
 public extension View {
     
+    #if canImport(GameController)
+    
     func onMouseClick(action: @escaping (MouseClickEvent) -> Void) -> some View {
         modifier(MouseClickModifier(action: action))
     }
+    
+    #else
+    
+    func onMouseClick(action: @escaping (MouseClickEvent) -> Void) -> Self {
+        self
+    }
+    
+    #endif
     
 }
 

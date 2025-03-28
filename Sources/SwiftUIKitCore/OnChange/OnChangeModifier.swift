@@ -1,3 +1,5 @@
+#if !os(visionOS)
+
 import SwiftUI
 
 
@@ -29,3 +31,5 @@ struct OnChangeModifier<Value: Equatable>: ViewModifier, Sendable {
     }
  
 }
+
+#endif

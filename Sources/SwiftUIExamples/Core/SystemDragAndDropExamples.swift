@@ -1,3 +1,5 @@
+#if !os(tvOS) && !os(watchOS)
+
 import SwiftUIKit
 
 
@@ -88,7 +90,7 @@ struct SystemDragAndDropExamples: View {
 }
 
 
-extension String: @retroactive DraggablePayload { }
+extension String: DraggablePayload { }
 
 extension SystemDragAndDropExamples.StringList: DropDelegate {
     
@@ -124,3 +126,6 @@ extension SystemDragAndDropExamples.StringList: DropDelegate {
     SystemDragAndDropExamples()
         .previewSize()
 }
+
+
+#endif

@@ -1,13 +1,14 @@
 import SwiftUI
 
-extension View {
+public extension View {
     
-    public func onPanGesture(
+    #if canImport(UIKit) && !os(watchOS)
+    
+    func onPanGesture(
         minNumberOfInputs: Int = 1,
         maxNumberOfInputs: Int = 2,
         perform action: @escaping (PanGestureState) -> Void
     ) -> some View {
-        #if canImport(UIKit)
         overlay{
             PanGestureRepresentation(
                 minimumNumberOfTouches: minNumberOfInputs,
@@ -15,9 +16,18 @@ extension View {
                 update: action
             )
         }
-        #else
-        self
-        #endif
     }
+    
+    #else
+    
+    func onPanGesture(
+        minNumberOfInputs: Int = 1,
+        maxNumberOfInputs: Int = 2,
+        perform action: @escaping (PanGestureState) -> Void
+    ) -> Self {
+        self
+    }
+    
+    #endif
     
 }

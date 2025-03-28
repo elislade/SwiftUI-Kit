@@ -1,6 +1,6 @@
 import SwiftUI
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 
 extension VisualEffectView : UIViewRepresentable {
     
@@ -15,7 +15,11 @@ extension VisualEffectView : UIViewRepresentable {
     }
     
     public func makeUIView(context: Context) -> CustomVisualEffectView {
+        #if os(tvOS)
+        let v = CustomVisualEffectView(effect: UIBlurEffect(style: .regular))
+        #else
         let v = CustomVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+        #endif
         sync(v)
         return v
     }

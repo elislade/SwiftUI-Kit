@@ -2,11 +2,11 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-// MARK: - Background
+// MARK: - Backdrop
 
-struct PresentationBackgroundKeyValue: Equatable, Sendable {
+struct PresentationBackdropKeyValue: Equatable, Sendable {
     
-    static func == (lhs: PresentationBackgroundKeyValue, rhs: PresentationBackgroundKeyValue) -> Bool {
+    static func == (lhs: PresentationBackdropKeyValue, rhs: PresentationBackdropKeyValue) -> Bool {
         lhs.id == rhs.id
     }
     
@@ -15,27 +15,27 @@ struct PresentationBackgroundKeyValue: Equatable, Sendable {
     
 }
 
-struct PresentationBackgroundInteractionKey: PreferenceKey {
+struct PresentationBackdropInteractionKey: PreferenceKey {
     
-    static var defaultValue: [PresentationBackgroundInteraction] { [] }
+    static var defaultValue: [PresentationBackdropInteraction] { [] }
     
-    static func reduce(value: inout [PresentationBackgroundInteraction], nextValue: () -> [PresentationBackgroundInteraction]) {
+    static func reduce(value: inout [PresentationBackdropInteraction], nextValue: () -> [PresentationBackdropInteraction]) {
         value.append(contentsOf: nextValue())
     }
     
 }
 
-struct PresentationBackgroundKey: PreferenceKey {
+struct PresentationBackdropKey: PreferenceKey {
     
-    static var defaultValue: [PresentationBackgroundKeyValue] { [] }
+    static var defaultValue: [PresentationBackdropKeyValue] { [] }
     
-    static func reduce(value: inout [PresentationBackgroundKeyValue], nextValue: () -> [PresentationBackgroundKeyValue]) {
+    static func reduce(value: inout [PresentationBackdropKeyValue], nextValue: () -> [PresentationBackdropKeyValue]) {
         value.append(contentsOf: nextValue())
     }
     
 }
 
-struct PresentationBackgroundModifier<BG: View>: ViewModifier {
+struct PresentationBackdropModifier<BG: View>: ViewModifier {
     
     @State private var id = UUID()
     
@@ -43,7 +43,7 @@ struct PresentationBackgroundModifier<BG: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         content.preference(
-            key: PresentationBackgroundKey.self,
+            key: PresentationBackdropKey.self,
             value: [ .init(id: id, view: { AnyView(ZStack{ background }) }) ]
         )
     }
@@ -52,23 +52,23 @@ struct PresentationBackgroundModifier<BG: View>: ViewModifier {
 
 public extension View {
     
-    func presentationBackground<C: View>(
-        _ interaction: PresentationBackgroundInteraction = .touchEndedDismiss,
+    func presentationBackdrop<C: View>(
+        _ interaction: PresentationBackdropInteraction = .touchEndedDismiss,
         @ViewBuilder content: @escaping () -> C)
     -> some View {
-        modifier(PresentationBackgroundModifier(
+        modifier(PresentationBackdropModifier(
             background: content()
         ))
         .preference(
-            key: PresentationBackgroundInteractionKey.self,
+            key: PresentationBackdropInteractionKey.self,
             value: [ interaction ]
         )
     }
     
     
-    func presentationBackground(_ interaction: PresentationBackgroundInteraction) -> some View {
+    func presentationBackdrop(_ interaction: PresentationBackdropInteraction) -> some View {
         preference(
-            key: PresentationBackgroundInteractionKey.self,
+            key: PresentationBackdropInteractionKey.self,
             value: [ interaction ]
         )
     }
@@ -76,7 +76,7 @@ public extension View {
 }
 
 
-public enum PresentationBackgroundInteraction: Sendable {
+public enum PresentationBackdropInteraction: Sendable {
     case touchEndedDismiss
     case touchChangeDismiss
     case disabled

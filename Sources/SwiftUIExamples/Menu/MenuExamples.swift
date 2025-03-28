@@ -51,6 +51,7 @@ public struct MenuExamples: View {
                         HStack {
                             Spacer()
                             
+                            #if !os(tvOS) && !os(watchOS)
                             ExampleCard(title: "SwiftUI"){
                                 SwiftUI.Menu{
                                     menuContent
@@ -58,6 +59,7 @@ public struct MenuExamples: View {
                                     Text("Menu")
                                 }
                             }
+                            #endif
                             
                             ExampleCard(title: "SwiftUI Kit"){
                                 Menu {

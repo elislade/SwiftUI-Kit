@@ -180,6 +180,13 @@ extension FormatStyle where Self == FloatingPointFormatStyle<Double> {
     
 }
 
+extension FormatStyle where Self == FloatingPointFormatStyle<Float> {
+    
+    public static func increment(_ increment: Double) -> FloatingPointFormatStyle<Float> {
+        .number.rounded(increment: increment)
+    }
+    
+}
 
 public func pow<T: BinaryInteger>(_ base: T, _ power: T) -> T {
     
@@ -269,3 +276,4 @@ public extension SetAlgebra {
     }
     
 }
+

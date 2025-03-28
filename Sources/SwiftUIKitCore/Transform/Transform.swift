@@ -18,7 +18,7 @@ public struct Transform: Hashable, Sendable {
     public var scale: SIMD2<Double>
     public var shear: SIMD2<Radian>
     
-    public init(
+    public nonisolated init(
         rotation: Angle = .zero,
         translation: SIMD2<Double> = .zero,
         scale: SIMD2<Double> = .init(1, 1),

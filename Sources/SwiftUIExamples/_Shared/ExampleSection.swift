@@ -21,11 +21,13 @@ struct ExampleSection<C: View> : View {
     
     var body: some View {
         Button(action: toggle){
-            HStack {
+            HStack(spacing: 0) {
                 Text(title)
                     .font(.exampleSectionTitle)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                 
-                Spacer()
+                Spacer(minLength: 14)
                 
                 Image(systemName: "chevron.right")
                     .rotationEffect(.degrees(isExpanded ? 90 : 0))
@@ -40,7 +42,8 @@ struct ExampleSection<C: View> : View {
         .background{
             VStack(spacing: 0) {
                 Rectangle()
-                    .fill(.bar)
+                    .fill(.regularMaterial)
+                
                 Divider().ignoresSafeArea()
             }
             .paddingSubtractingSafeArea()

@@ -33,7 +33,7 @@ public struct WindowMainButtonStyle: ButtonStyle {
                     .fill(Color.black)
                     .opacity(configuration.isPressed ? 0.3 : 0)
             }
-            .onHover{ hovering = $0 }
+            .onHoverPolyfill{ hovering = $0 }
             .overlay {
                 Circle()
                     .strokeBorder(Color.primary, lineWidth: 0.5)
