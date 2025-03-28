@@ -13,7 +13,7 @@ public struct KeyPressExample: View {
     @State private var presses: [KeyPress] = []
     @State private var keys: Set<KeyEquivalent> = [.return, .space]
     @State private var characters: CharacterSet = .alphanumerics
-    @State private var phase: KeyPress.Phases = [.down]
+    @State private var phase: KeyPress.Phases = [.down, .up]
     @State private var mask: MaskType = .none
     
     @State private var string = ""

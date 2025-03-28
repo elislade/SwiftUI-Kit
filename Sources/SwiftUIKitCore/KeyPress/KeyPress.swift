@@ -27,7 +27,7 @@ public extension View {
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result
     ) -> some View {
-        modifier(KeyPressPolyfill(
+        modifier(KeyPressViewModifier(
             mask: nil,
             phases: phases,
             action: action
@@ -47,7 +47,7 @@ public extension View {
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping  (KeyPress) -> KeyPress.Result
     ) -> some View {
-        modifier(KeyPressPolyfill(
+        modifier(KeyPressViewModifier(
             mask: .equivalentSet(keys),
             phases: phases,
             action: action
@@ -59,7 +59,7 @@ public extension View {
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result
     ) -> some View {
-        modifier(KeyPressPolyfill(
+        modifier(KeyPressViewModifier(
             mask: .charSet(characters),
             phases: phases,
             action: action

@@ -4,12 +4,12 @@ import Foundation
 
 struct KeyPressRepresentation {
     
-    let mask: KeyPressPolyfill.MaskType?
+    let mask: KeyPressViewModifier.MaskType?
     let phases: KeyPress.Phases
     let captured: (KeyPress) -> KeyPress.Result
     
     init(
-        mask: KeyPressPolyfill.MaskType?,
+        mask: KeyPressViewModifier.MaskType?,
         phases: KeyPress.Phases,
         captured: @escaping (KeyPress) -> KeyPress.Result
     ) {

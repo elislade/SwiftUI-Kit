@@ -7,7 +7,7 @@ import SwiftUI
 extension KeyPressRepresentation: UIViewRepresentable {
     
     func makeUIView(context: Context) -> KeyCaptureView {
-        let view = KeyCaptureView()
+        let view = KeyCaptureView(frame: .zero)
         view.keymask = mask
         view.phases = phases
         view.captured = captured
@@ -28,30 +28,18 @@ final class KeyCaptureView: UIView {
 
     override var canBecomeFirstResponder: Bool { true }
     
-    var keymask: KeyPressPolyfill.MaskType? = nil {
-        didSet { pressRecognizer?.mask = keymask }
-    }
+    var keymask: KeyPressViewModifier.MaskType? = nil
+    var phases: KeyPress.Phases = [.down, .up]
+    var captured: (KeyPress) -> KeyPress.Result = { _ in .ignored }
     
-    var phases: KeyPress.Phases = [.down, .repeat] {
-        didSet { pressRecognizer?.phases = phases }
-    }
-    
-    var captured: (KeyPress) -> KeyPress.Result = { _ in .ignored } {
-        didSet { pressRecognizer?.captured = captured }
-    }
-    
-    weak var pressRecognizer: KeyPressGestureRecognizer?
+    private var repeatDelay: TimeInterval = 0.5
+    private var repeatInterval: TimeInterval = 0.1
+    private var repeatStartWorkItem: DispatchWorkItem?
+    private var repeatTimer: Timer?
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        let recognizer = KeyPressGestureRecognizer()
-        recognizer.mask = keymask
-        recognizer.phases = phases
-        recognizer.captured = captured
-        addGestureRecognizer(recognizer)
-        pressRecognizer = recognizer
     }
-    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -60,65 +48,32 @@ final class KeyCaptureView: UIView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         self.becomeFirstResponder()
-    
     }
     
-    
-    private func checkForUpPress(_ presses: Set<UIPress>, with event: UIPressesEvent) {
+    private func checkForUpPress(_ presses: Set<UIPress>) {
         guard phases.contains(.up) else { return }
         
-        if let press = KeyPress(event: event) {
-            if let keymask, !keymask(press) {
-                return
+        for uipress in presses {
+            if let press = KeyPress(press: uipress) {
+                if let keymask, !keymask(press) {
+                    return
+                }
+                
+                _ = captured(press)
             }
-            
-            _ = captured(press)
         }
     }
     
-    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
-        if let event {
-            checkForUpPress(presses, with: event)
-        }
-    }
-    
-    override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
-        if let event {
-            checkForUpPress(presses, with: event)
-        }
-    }
-    
-}
-
-
-
-@MainActor final class KeyPressGestureRecognizer: UIGestureRecognizer {
-    
-    var mask: KeyPressPolyfill.MaskType? = nil
-    var phases: KeyPress.Phases = [.up, .down, .repeat]
-    var captured: (KeyPress) -> KeyPress.Result = { _ in
-        return .ignored
-    }
-    
-    var repeatDelay: TimeInterval = 0.5
-    var repeatInterval: TimeInterval = 0.1
-    
-    private var repeatStartWorkItem: DispatchWorkItem?
-    private var repeatTimer: Timer?
-    
-    override init(target: Any?, action: Selector?) {
-        super.init(target: target, action: action)
-    }
-    
-    override func shouldReceive(_ event: UIEvent) -> Bool {
-        guard let event = event as? UIPressesEvent else {
-            return false
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        guard let event else {
+            super.pressesBegan(presses, with: event)
+            return
         }
         
         if let press = KeyPress(event: event), phases.contains(.down) {
-            
-            if let mask, !mask(press) {
-                return false
+            if let keymask, !keymask(press) {
+                super.pressesBegan(presses, with: event)
+                return
             }
             
             self.repeatStartWorkItem?.cancel()
@@ -142,10 +97,20 @@ final class KeyCaptureView: UIView {
                 self.repeatStartWorkItem = repeatItem
             }
             
-            return captured(press) == .handled
+            if captured(press) == .ignored {
+                super.pressesBegan(presses, with: event)
+            }
         } else {
-            return false
+            super.pressesBegan(presses, with: event)
         }
+    }
+    
+    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        checkForUpPress(presses)
+    }
+    
+    override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        checkForUpPress(presses)
     }
     
 }
@@ -159,7 +124,33 @@ extension KeyPress {
             let key = keys.last(where: { !$0.charactersIgnoringModifiers.isEmpty }),
             let phase = event.allPresses.compactMap(\.phase).first,
             let keyChar = key.characters.first,
-            let mappedPhase: KeyPress.Phases = .init(phase: phase)
+            let mappedPhase = KeyPress.Phases(phase: phase)
+        else {
+            return nil
+        }
+
+        if repeated {
+            self.phase = mappedPhase.union(.repeat)
+        } else {
+            self.phase = mappedPhase
+        }
+        
+        self.modifiers = .init(flags: key.modifierFlags)
+
+        if let keyFromCode = KeyEquivalent(key.keyCode) {
+            self.characters = key.charactersIgnoringModifiers
+            self.key = keyFromCode
+        } else {
+            self.key = .init(keyChar)
+            self.characters = key.charactersIgnoringModifiers
+        }
+    }
+    
+    @MainActor init?(press: UIPress, repeated: Bool = false){
+        guard
+            let key = press.key,
+            let keyChar = key.characters.first,
+            let mappedPhase = KeyPress.Phases(phase: press.phase)
         else {
             return nil
         }
@@ -188,7 +179,6 @@ extension KeyEquivalent {
     
     init?(_ usage: UIKeyboardHIDUsage) {
         switch usage {
-        case .keyboardErrorUndefined: self = .delete
         case .keyboardReturnOrEnter: self = .return
         case .keyboardEscape: self = .escape
         case .keyboardDeleteOrBackspace: self = .delete

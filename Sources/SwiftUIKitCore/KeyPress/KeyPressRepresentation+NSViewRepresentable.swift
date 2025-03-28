@@ -24,7 +24,7 @@ extension KeyPressRepresentation: NSViewRepresentable {
 
 final class KeyCaptureView: NSView {
 
-    var mask: KeyPressPolyfill.MaskType? = nil
+    var mask: KeyPressViewModifier.MaskType? = nil
     var phases: KeyPress.Phases = [.down, .repeat]
     var captured: (KeyPress) -> KeyPress.Result = { _ in .ignored }
     
