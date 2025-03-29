@@ -3,37 +3,34 @@ import SwiftUIKit
 
 public struct ContainedBoundsExample: View {
     
+    @State private var layoutDirection: LayoutDirection = .leftToRight
+    
     public init() {}
     
     public var body: some View {
-        VStack(spacing: nil) {
-            RoundedRectangle(cornerRadius: 30)
-                .fill(.secondary.opacity(0.2))
-                .overlay {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        
-                        ScrollView {
-                            VStack(spacing: 1) {
-                                ForEach(0...100){ i in
-                                    Cell(i: i)
-                                }
+        ExampleView(title: "Contained Bounds"){
+            ScrollView([.horizontal, .vertical]) {
+                VStack(spacing: 16) {
+                    ForEach(0...2){ _ in
+                        HStack(spacing: 16) {
+                            ForEach(0...9){ i in
+                                Cell(i: i)
                             }
                         }
-                        .containedBoundsContext("Test")
-                        .scrollClipDisabledPolyfill()
-                        .border(.tint, width: 2)
-                        .aspectRatio(2, contentMode: .fit)
-                        
-                        Spacer()
+                        .frame(height: 110)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 30))
-
-            ExampleTitle("Contained Bounds")
+                .padding()
+            }
+            .containedBoundsContext("Test")
+            .scrollClipDisabledPolyfill()
+            .border(.tint, width: 2)
+            .padding(54)
+            .clipped()
+            .environment(\.layoutDirection, layoutDirection)
+        } parameters: {
+            ExampleCell.LayoutDirection(value: $layoutDirection)
         }
-        .padding()
-        .ignoresSafeArea(edges: .top)
     }
     
     
@@ -43,22 +40,53 @@ public struct ContainedBoundsExample: View {
         
         let i: Int
         
-        private var opacity: Double {
-            guard let state else { return 0 }
-            switch state.containment {
-            case .partially: return 0.5
-            case .fully: return 1
-            case .none:return 0.15
+        var body: some View {
+            VStack {
+                Text("Containment")
+                    .font(.headline)
+                    .fixedSize()
+
+                if let state {
+                    Text("\(state.containment)".capitalized)
+                        .id(state.containment)
+                    
+                    Spacer(minLength: 1)
+                    
+                    EdgeLables(edges: state.edges)
+                        .font(.footnote)
+                        .opacity(0.8)
+                }
+            }
+            .multilineTextAlignment(.center)
+            .padding()
+            .onContainedBoundsChange(in: "Test"){ state = $0 }
+            .background{
+                RoundedRectangle(cornerRadius: 22)
+                    .opacity(0.05)
             }
         }
         
-        var body: some View {
-            Color.primary
-                .opacity(opacity)
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .onContainedBoundsChange(in: "Test"){ state = $0 }
-                .animation(.fastSpringInterpolating, value: state)
+        
+        struct EdgeLables: View {
+            let edges: Edge.Set
+            
+            var body: some View {
+                if edges.contains(.leading) {
+                    Text("Leading")
+                }
+                if edges.contains(.trailing) {
+                    Text("Trailing")
+                }
+                if edges.contains(.top) {
+                    Text("Top")
+                }
+                if edges.contains(.bottom) {
+                    Text("Bottom")
+                }
+                if edges.isEmpty {
+                    Text("None")
+                }
+            }
         }
         
     }

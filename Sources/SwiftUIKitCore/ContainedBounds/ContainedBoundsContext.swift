@@ -3,6 +3,8 @@ import SwiftUI
 
 struct ContainedBoundsContext: ViewModifier {
     
+    @Environment(\.layoutDirection) private var layoutDirection
+    
     let id: AnyHashable
     
     func body(content: Content) -> some View {
@@ -22,8 +24,9 @@ struct ContainedBoundsContext: ViewModifier {
                             } else {
                                 var edges: Edge.Set = []
                                 
-                                if rect.maxX > frame.maxX { edges.insert(.trailing) }
-                                if rect.minX < frame.minX { edges.insert(.leading) }
+                                if rect.maxX > frame.maxX { edges.insert(layoutDirection == .rightToLeft ? .leading : .trailing) }
+                                if rect.minX < frame.minX { edges.insert(layoutDirection == .rightToLeft ? .trailing : .leading) }
+                                
                                 if rect.maxY > frame.maxY { edges.insert(.bottom) }
                                 if rect.minY < frame.minY { edges.insert(.top) }
                                 
