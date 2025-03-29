@@ -11,7 +11,7 @@ struct KeyPressViewModifier: ViewModifier {
         func callAsFunction(_ press: KeyPress) -> Bool {
             switch self {
             case let .charSet(maskSet):
-                let other = CharacterSet(charactersIn: press.characters)
+                let other = CharacterSet(charactersIn: "\(press.key.character)")
                 return maskSet.isSuperset(of: other)
             case let .equivalentSet(maskEquivalent):
                 return maskEquivalent.contains(press.key)
