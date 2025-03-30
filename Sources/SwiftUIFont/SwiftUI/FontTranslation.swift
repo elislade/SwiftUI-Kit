@@ -115,8 +115,9 @@ public extension Font.Weight {
     
     /// Value in relation to the -1 to +1 scale as defined in ``FontParameters``.
     var value: Double {
+        let codableValue = Self.allCases.firstIndex(of: self) ?? 0
         let all = Self.allCases
-        let placeOfReference = Self.medium.codableValue
+        let placeOfReference = Self.allCases.firstIndex(of: .medium)!
         
         func ratio(of value: Int, in count: Int) -> Double {
             Double(value) / Double(count - 1)

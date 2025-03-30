@@ -22,6 +22,9 @@ extension Font.Design {
     
 }
 
+extension Font.Design: @retroactive Identifiable {
+    public var id: Int { codableValue }
+}
 
 extension Font.Design : @retroactive Encodable {
     
@@ -76,6 +79,10 @@ extension Font.TextStyle {
     
 }
 
+extension Font.TextStyle: @retroactive Identifiable {
+    public var id: Int { codableValue }
+}
+
 extension Font.TextStyle : @retroactive Encodable {
     
     public func encode(to encoder: any Encoder) throws {
@@ -107,7 +114,7 @@ extension Font.TextStyle : @retroactive Decodable {
 
 extension Font.Weight {
     
-    static var allCases: [Font.Weight] {
+    public static var allCases: [Font.Weight] {
         [.ultraLight, .thin, .light, .regular, .medium, .semibold, .bold, .heavy, .black]
     }
     

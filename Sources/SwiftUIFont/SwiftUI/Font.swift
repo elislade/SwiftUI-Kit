@@ -1,34 +1,6 @@
 import SwiftUI
 import SwiftUIKitCore
 
-public extension Font {
-    
-    subscript(weight: Font.Weight) -> Font {
-        self.weight(weight)
-    }
-    
-    subscript(leading: Font.Leading) -> Font {
-        self.leading(leading)
-    }
-    
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-    subscript(width: Font.Width) -> Font {
-        self.width(width)
-    }
-    
-}
-
-
-extension Font.Design: @retroactive Identifiable {
-    public var id: Int { codableValue }
-}
-
-
-extension Font.TextStyle: @retroactive Identifiable {
-    public var id: Int { codableValue }
-}
-
-
 public extension View {
     
     func fontResource(_ resource: FontResource?) -> some View {
