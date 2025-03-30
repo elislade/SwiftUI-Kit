@@ -21,12 +21,17 @@ extension UIWindow {
 
 struct DeviceShakeViewModifier: ViewModifier {
     
-    let onChanged: () -> Void
+    @Environment(\.deviceShakeEnabled) private var isEnabled
+    
+    let action: () -> Void
 
     func body(content: Content) -> some View {
         content
-            .onAppear()
-            .onReceive(WindowShake.passthrough, perform: onChanged)
+            .overlay {
+                if isEnabled {
+                    Color.clear.onReceive(WindowShake.passthrough, perform: action)
+                }
+            }
     }
     
 }

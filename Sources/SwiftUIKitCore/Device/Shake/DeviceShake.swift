@@ -10,7 +10,7 @@ public extension View {
     /// 
     /// - Returns: A view that listens to device shakes.
     func onDeviceShake(perform action: @escaping () -> Void) -> some View {
-        modifier(DeviceShakeViewModifier(onChanged: action))
+        modifier(DeviceShakeViewModifier(action: action))
     }
 
     #else
@@ -24,5 +24,21 @@ public extension View {
     }
     
     #endif
+    
+    
+    func disableDeviceShake(_ disabled: Bool = true) -> some View {
+        transformEnvironment(\.deviceShakeEnabled){ isEnabled in
+            if disabled {
+                isEnabled = false
+            }
+        }
+    }
+    
+}
+
+
+public extension EnvironmentValues {
+    
+    @Entry var deviceShakeEnabled: Bool = true
     
 }
