@@ -3,6 +3,8 @@ import SwiftUI
 
 struct FlipModifier<FlipView: View>: ViewModifier {
     
+    @State private var show = false
+    
     let isFlipped: Bool
     let horizontalEdge: HorizontalEdge?
     let verticalEdge: VerticalEdge?
@@ -14,6 +16,7 @@ struct FlipModifier<FlipView: View>: ViewModifier {
         verticalEdge: VerticalEdge? = nil,
         content: @escaping () -> FlipView
     ) {
+        self.show = isFlipped
         self.isFlipped = isFlipped
         self.flippedContent = content
         self.horizontalEdge = horizontalEdge
@@ -45,14 +48,17 @@ struct FlipModifier<FlipView: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         ZStack {
-            content
-                .conditonallyShow(animatingCondition: !isFlipped)
-                .zIndex(1)
-            
-            flippedContent()
-                .rotation3DEffect(.degrees(180), axis: axis)
-                .conditonallyShow(animatingCondition: isFlipped)
-                .zIndex(2)
+            if !show {
+                content
+                    .zIndex(1)
+            } else {
+                flippedContent()
+                    .rotation3DEffect(.degrees(180), axis: axis)
+                    .zIndex(2)
+            }
+        }
+        .onAnimationThresholdChange(active: isFlipped){
+            show.toggle()
         }
         .rotation3DEffect(
             .degrees(isFlipped ? 180 : 0),

@@ -1,15 +1,18 @@
 import SwiftUIKit
 
 
-struct ConditionallyShowExample : View {
+public struct AnimationThresholdChangeExample : View {
     
+    @State private var animate = false
     @State private var show = false
     @State private var threshold: Double = 0.5
     
     let duration: TimeInterval = 2
     
-    var body: some View {
-        ExampleView(title: "Conditionally Show"){
+    public init() {}
+    
+    public var body: some View {
+        ExampleView(title: "Animation Threshold Change"){
             let shape = RoundedRectangle(cornerRadius: 30)
             ZStack {
                 shape
@@ -18,7 +21,7 @@ struct ConditionallyShowExample : View {
                 
                 shape
                     .inset(by: 5)
-                    .trim(from: 0, to: show ? 1 : 0)
+                    .trim(from: 0, to: animate ? 1 : 0)
                     .stroke(lineWidth: 10)
                     .foregroundStyle(
                         .conicGradient(colors: [.primary.opacity(0.2), .primary], center: .center)
@@ -30,13 +33,14 @@ struct ConditionallyShowExample : View {
                     .stroke(lineWidth: 10)
                     .foregroundStyle(.tint)
                 
-                shape
-                    .inset(by: 16)
-                    .transition(.scale.animation(.bouncy))
-                    .conditonallyShow(
-                        animatingCondition: show,
-                        threshold: threshold
-                    )
+                if show {
+                    shape
+                        .inset(by: 16)
+                        .transition(.scale.animation(.bouncy))
+                }
+            }
+            .onAnimationThresholdChange(threshold, active: animate){
+                show.toggle()
             }
             .overlay(alignment: .trailing){
                 Image(systemName: "arrow.down")
@@ -47,14 +51,14 @@ struct ConditionallyShowExample : View {
                     .frame(width: 10, height: 10)
                     .rotationEffect(.degrees(show ? 180 : 0))
                     .foregroundStyle(.tint)
-                    .animation(.smooth.delay(duration * threshold), value: show)
+                    .animation(.smooth, value: show)
             }
             .padding()
             .drawingGroup()
             .aspectRatio(1, contentMode: .fit)
-            .animation(.linear(duration: duration), value: show)
+            .animation(.linear(duration: duration), value: animate)
         } parameters: {
-            Toggle(isOn: $show){
+            Toggle(isOn: $animate){
                 Text("Show")
                     .font(.exampleParameterTitle)
             }
@@ -67,7 +71,7 @@ struct ConditionallyShowExample : View {
                     
                     Spacer()
                     
-                    Text(threshold, format: .number.rounded(increment: 0.1))
+                    Text(threshold, format: .increment(0.01))
                         .font(.exampleParameterValue)
                 }
                 
@@ -80,7 +84,7 @@ struct ConditionallyShowExample : View {
 }
 
 
-#Preview("Conditionally Show") {
-    ConditionallyShowExample()
+#Preview("Animation Threshold Change") {
+    AnimationThresholdChangeExample()
         .previewSize()
 }

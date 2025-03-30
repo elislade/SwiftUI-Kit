@@ -3,10 +3,10 @@ import SwiftUI
 
 public extension View {
     
-    func callAtAnimationThresholdChange(active: Bool, action: @escaping () -> Void) -> some View {
-        modifier(CallAtAnimationThresholdChangeModifier(
+    func onAnimationThresholdChange(_ threshold: Double = 0.5, active: Bool, perform action: @escaping () -> Void) -> some View {
+        modifier(AnimationThresholdChangeViewModifier(
             active: active,
-            threshold: 0.5,
+            threshold: threshold,
             action: action
         ))
     }
@@ -14,16 +14,15 @@ public extension View {
 }
 
 
-struct CallAtAnimationThresholdChangeModifier: ViewModifier & Animatable {
+struct AnimationThresholdChangeViewModifier: ViewModifier & Animatable {
     
-    @State private var changed: Bool
-    
-    let active: Bool
-    let threshold: Double
-    let action: () -> Void
+    private let active: Bool
+    private let threshold: Double
+    private let action: () -> Void
+    private var changed: Bool
     
     init(active: Bool, threshold: Double, action: @escaping () -> Void) {
-        self._changed = .init(initialValue: active)
+        self.changed = active
         self.active = active
         self.threshold = threshold
         self.action = action
@@ -32,7 +31,7 @@ struct CallAtAnimationThresholdChangeModifier: ViewModifier & Animatable {
     public nonisolated var animatableData: Double {
         get { active ? 1 : 0 }
         set {
-            _changed.wrappedValue = newValue > threshold
+            changed = newValue > threshold
         }
     }
     
