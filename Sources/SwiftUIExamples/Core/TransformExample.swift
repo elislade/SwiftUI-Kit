@@ -48,7 +48,7 @@ public struct TransformExample: View {
                 .disabled(transform == .identity)
             }
             .exampleParameterCell()
-            .labelStyle(.titleIfFits)
+            .labelStyle(.viewThatFits(preferring: \.title))
 
             VStack {
                 HStack {
@@ -163,7 +163,7 @@ public struct TransformExample: View {
                     }
                     .font(.exampleParameterValue)
                     .disabled(orderMask == Transform.Component.allCases)
-                    .labelStyle(.titleIfFits)
+                    .labelStyle(.viewThatFits(preferring: \.title))
                 }
                 
                 VStack(spacing: 0) {

@@ -150,7 +150,7 @@ import SwiftUIPresentation
             .animation(.fastSpringInterpolating, value: !backAction.visible)
             .buttonStyle(.navBarStyle)
             .toggleStyle(.navBarStyle)
-            .labelStyle(.titleIfFits)
+            .labelStyle(.viewThatFits(preferring: \.title))
             .environment(\.isInNavBar, true)
             .accessibility(addTraits: .isHeader)
             .geometryGroupPolyfill()

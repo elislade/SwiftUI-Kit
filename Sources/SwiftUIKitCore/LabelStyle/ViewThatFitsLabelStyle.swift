@@ -2,10 +2,10 @@ import SwiftUI
 
 public struct ViewThatFitsLabelStyle: LabelStyle {
     
-    let prefersTitle: Bool
+    private let prefersTitle: Bool
     
-    public nonisolated init(prefersTitle: Bool = false) {
-        self.prefersTitle = prefersTitle
+    public nonisolated init<V: View>(preferring view: KeyPath<Configuration, V>) {
+        self.prefersTitle = view == \.title
     }
     
     public func makeBody(configuration: Configuration) -> some View {
@@ -31,12 +31,13 @@ public struct ViewThatFitsLabelStyle: LabelStyle {
 
 
 public extension LabelStyle where Self == ViewThatFitsLabelStyle {
+   
+    static nonisolated var viewThatFits: ViewThatFitsLabelStyle {
+        .init(preferring: \.icon)
+    }
     
-    static nonisolated var titleIfFits: ViewThatFitsLabelStyle { .init() }
-    static nonisolated var iconIfFits: ViewThatFitsLabelStyle { .init(prefersTitle: true) }
-    
-    static nonisolated func viewThatFits(prefersTitle: Bool) -> ViewThatFitsLabelStyle {
-        .init(prefersTitle: prefersTitle)
+    static nonisolated func viewThatFits<V: View>(preferring view: KeyPath<LabelStyle.Configuration, V> = \.icon) -> ViewThatFitsLabelStyle {
+        .init(preferring: view)
     }
     
 }

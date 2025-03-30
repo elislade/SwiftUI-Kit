@@ -47,7 +47,9 @@ public struct LabelStyleExamples: View {
             }
             .padding()
             .environment(\.layoutDirectionSuggestion, suggestion)
-            .labelStyle(.viewThatFits(prefersTitle: prefersTitle))
+            .labelStyle(
+                prefersTitle ? .viewThatFits(preferring: \.title) : .viewThatFits(preferring: \.icon)
+            )
         } parameters: {
             VStack {
                 HStack {
