@@ -60,6 +60,14 @@ public extension CGSize {
         
 }
 
+public extension SIMD2 where Scalar == Float {
+    
+    @inlinable init(_ point: CGPoint) {
+        self.init(Float(point.x), Float(point.y))
+    }
+    
+}
+
 public extension CGPoint {
     
     /// Calls rounded on both `x` and `y` of the point.
@@ -99,6 +107,37 @@ public extension CGPoint {
     prefix static func -(point: CGPoint) -> CGPoint {
         .init(x: -point.x, y: -point.y)
     }
+    
+    @inlinable init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>){
+        self.init(x: Double(simd.x), y: Double(simd.y))
+    }
+    
+    init(_ size: CGSize) {
+        self.init(x: size.width, y: size.height)
+    }
+    
+    var smallestAxis: Axis {
+        x < y ? .horizontal : .vertical
+    }
+    
+    var largestAxis: Axis {
+        x > y ? .horizontal : .vertical
+    }
+    
+    subscript(_ axis: Axis) -> CGFloat {
+        get {
+            switch axis {
+            case .horizontal: x
+            case .vertical: y
+            }
+        } set {
+            switch axis {
+            case .horizontal: x = newValue
+            case .vertical: y = newValue
+            }
+        }
+    }
+    
 }
 
 

@@ -248,6 +248,14 @@ public extension Angle {
     
 }
 
+public extension SIMD2 where Scalar == Float {
+    
+    /// The orthogonal angle to the relative tangent of y and x.
+    var angle: Angle {
+        Angle(radians: Double(atan2(y, x)))
+    }
+    
+}
 
 extension View {
     
