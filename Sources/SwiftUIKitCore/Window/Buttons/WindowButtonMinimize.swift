@@ -8,7 +8,7 @@ public struct WindowButtonMinimize: View {
     public init() { }
     
     public var body: some View {
-        Button(action: { perform(.minimize) }){
+        Button{ perform(.minimize) } label: {
             Label{
                 Text("Minimize Window")
             } icon: {

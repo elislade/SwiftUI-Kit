@@ -17,7 +17,7 @@ struct WindowRootView<Content: View>: View {
     var body: some View {
         content
             .containerShape(RoundedRectangle(cornerRadius: radius))
-            .environment(\._windowIsKey, state.isKey)
+            .environment(\.windowIsKey, state.isKey)
             .onPreferenceChange(WindowCornerRadiusKey.self){ values in
                 _radius.wrappedValue = values.last ?? 16
             }
@@ -39,7 +39,7 @@ struct WindowRootView<Content: View>: View {
                     _dockTile.wrappedValue = values
                 }
             }
-            .environment(\._performWindowAction){ state.perform(action: $0) }
+            .environment(\.performWindowAction){ state.perform(action: $0) }
             .environment(\.scenePhase, state.phase)
             .onChangePolyfill(of: radius){
                 state.set(radius: radius)

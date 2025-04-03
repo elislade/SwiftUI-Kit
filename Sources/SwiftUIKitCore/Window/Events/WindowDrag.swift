@@ -24,9 +24,9 @@ public extension View {
     #endif
     
     func disableWindowDrag(_ disabled: Bool = true) -> some View {
-        transformEnvironment(\.windowDragEnabled){ val in
+        transformEnvironment(\.windowDragEnabled){ isEnabled in
             if disabled {
-                val = false
+                isEnabled = false
             }
         }
     }
@@ -34,9 +34,9 @@ public extension View {
 }
 
 
-public struct WindowDragEvent {
+public struct WindowDragEvent: Sendable {
     
-    public enum Phase {
+    public enum Phase: Sendable, BitwiseCopyable {
         case began
         case changed
         case ended
@@ -48,17 +48,8 @@ public struct WindowDragEvent {
 }
 
 
-struct WindowDragEnabledKey: EnvironmentKey {
+public extension EnvironmentValues {
     
-    static var defaultValue: Bool { true }
-    
-}
-
-extension EnvironmentValues {
-    
-    var windowDragEnabled: Bool {
-        get { self[WindowDragEnabledKey.self] }
-        set { self[WindowDragEnabledKey.self] = newValue }
-    }
+    @Entry var windowDragEnabled: Bool = true
     
 }

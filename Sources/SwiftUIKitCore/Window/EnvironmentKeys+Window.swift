@@ -11,29 +11,13 @@ public enum WindowAction: Sendable {
     case startMove
     case setFrame(_ frame: CGRect, duration: TimeInterval = 0.2)
     
-    static var close: Self { .close() }
+    static nonisolated var close: Self { .close() }
 }
 
-struct PerformWindowAction: EnvironmentKey {
-    
-    static var defaultValue: (WindowAction) -> Void { { _ in } }
-    
-}
-
-extension EnvironmentValues {
-    
-    // Internal Setter and Getter
-    internal var _performWindowAction: (WindowAction) -> Void {
-        get { self[PerformWindowAction.self] }
-        set { self[PerformWindowAction.self] = newValue }
-    }
-    
-}
 
 public extension EnvironmentValues {
-    
-    // Public Getter only through computed value
-    var performWindowAction: (WindowAction) -> Void { _performWindowAction }
+
+    @Entry internal(set) var performWindowAction: (WindowAction) -> Void = { _ in }
     
 }
 
@@ -41,23 +25,8 @@ public extension EnvironmentValues {
 // MARK: Window Key
 
 
-struct WindowIsKey: EnvironmentKey {
-    static var defaultValue: Bool { true }
-}
-
-extension EnvironmentValues {
-    
-    // Internal Setter and Getter
-    internal var _windowIsKey: Bool {
-        get { self[WindowIsKey.self] }
-        set { self[WindowIsKey.self] = newValue }
-    }
-    
-}
-
 public extension EnvironmentValues {
     
-    // Public Getter only through computed value
-    var windowIsKey: Bool { _windowIsKey }
+    @Entry internal(set) var windowIsKey: Bool = false
     
 }

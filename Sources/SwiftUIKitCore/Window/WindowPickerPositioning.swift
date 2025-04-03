@@ -55,7 +55,6 @@ extension NSWindow {
             collectionBehavior.insert(.transient)
             collectionBehavior.remove(.managed)
             collectionBehavior.remove(.stationary)
-            collectionBehavior.remove(.managed)
         }
     }
     

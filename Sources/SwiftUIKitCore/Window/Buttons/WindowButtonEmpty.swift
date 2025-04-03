@@ -5,7 +5,7 @@ public struct WindowButtonEmpty: View {
     public init(){}
     
     public var body: some View {
-        Button(action: {}){
+        Button{ } label: {
             Color.clear
         }
         .tint(.clear)

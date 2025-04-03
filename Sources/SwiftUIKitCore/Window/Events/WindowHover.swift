@@ -18,9 +18,9 @@ public extension View {
     #endif
     
     func disableWindowHover(_ disabled: Bool = true) -> some View {
-        transformEnvironment(\.windowHoverEnabled){ val in
+        transformEnvironment(\.windowHoverEnabled){ isEnabled in
             if disabled {
-                val = false
+                isEnabled = false
             }
         }
     }
@@ -28,24 +28,14 @@ public extension View {
 }
 
 
-public struct WindowHoverEvent {
+public struct WindowHoverEvent: Sendable {
     
     public let location: CGPoint
     
 }
 
-
-struct WindowHoverEnabledKey: EnvironmentKey {
+public extension EnvironmentValues {
     
-    static var defaultValue: Bool { true }
-    
-}
-
-extension EnvironmentValues {
-    
-    var windowHoverEnabled: Bool {
-        get { self[WindowHoverEnabledKey.self] }
-        set { self[WindowHoverEnabledKey.self] = newValue }
-    }
+    @Entry var windowHoverEnabled: Bool  = true
     
 }

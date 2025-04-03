@@ -8,7 +8,7 @@ public struct WindowButtonZoom: View {
     public init(){}
     
     public var body: some View {
-        Button(action: { perform(.zoom) }){
+        Button{ perform(.zoom) } label: {
             Label{
                 Text("Maximize Window")
             } icon: {
