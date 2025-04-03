@@ -12,9 +12,9 @@ struct KeyPressViewModifier: ViewModifier {
             switch self {
             case let .charSet(maskSet):
                 let other = CharacterSet(charactersIn: "\(press.key.character)")
-                return maskSet.isSuperset(of: other)
+                return maskSet.isSuperset(of: other) && press.modifiers.isEmpty
             case let .equivalentSet(maskEquivalent):
-                return maskEquivalent.contains(press.key)
+                return maskEquivalent.contains(press.key) && press.modifiers.isEmpty
             }
         }
     }

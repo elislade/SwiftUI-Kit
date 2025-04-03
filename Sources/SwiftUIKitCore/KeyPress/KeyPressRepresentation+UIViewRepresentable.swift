@@ -51,12 +51,10 @@ final class KeyCaptureView: UIView {
     }
     
     private func checkForUpPress(_ presses: Set<UIPress>) {
-        guard phases.contains(.up) else { return }
-        
         for uipress in presses {
             if let press = KeyPress(press: uipress) {
                 if let keymask, !keymask(press) {
-                    return
+                    continue
                 }
                 
                 _ = captured(press)
@@ -106,10 +104,20 @@ final class KeyCaptureView: UIView {
     }
     
     override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        guard phases.contains(.up) else {
+            super.pressesEnded(presses, with: event)
+            return
+        }
+        
         checkForUpPress(presses)
     }
     
     override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        guard phases.contains(.up) else {
+            super.pressesCancelled(presses, with: event)
+            return
+        }
+        
         checkForUpPress(presses)
     }
     
