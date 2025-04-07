@@ -20,8 +20,6 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
     private let eventOffset: Double = 0
     #endif
     
-   // private let layout = Layout(isExpanded: false)
-    
     private func handle(location: CGPoint) {
         guard !dragItems.isEmpty else { return }
         
@@ -79,13 +77,13 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
                 _dropAreas.wrappedValue = $0
             }
             .onWindowDrag { evt in
+                print(evt.locations)
                 if evt.phase == .ended {
                     self.end()
                     return
                 }
                 
                 if let location = evt.locations.first {
-                    //layout.location = location
                     let l = location.applying(.init(translationX: 0, y: -eventOffset))
                     self.location = l
                     handle(location: l)
@@ -114,6 +112,7 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
                 .ignoresSafeArea()
                 .animation(.bouncy, value: dragItems)
                 .animation(.interactiveSpring, value: location)
+                .environment(\.layoutDirection, .leftToRight)
             }
             .environment(\.dragSessionNamspace, dragAndDropSession)
             .environment(\.dragItemAction, .init(namespace: dragAndDropSession){

@@ -26,25 +26,30 @@ public extension View {
 
 struct ReorderingContext: ViewModifier {
   
+    @Environment(\.layoutDirection) private var layoutDirection
+    @State private var frame: CGRect = .zero
+    @State private var items: [ReorderingItem] = []
+    
     let axis: Axis
     var locationInWindow: CGPoint?
     var overrideHitTest: ((CGPoint, CGRect) -> Bool)?
     var didChangeIndex: (Int?) -> Void = { _ in }
     
-    @State private var frame: CGRect = .zero
-    @State private var items: [ReorderingItem] = []
-    
-    private func comp(_ frame: CGRect) -> Double {
+    private func greaterThan(_ point: CGPoint, in rect: CGRect, reversed: Bool = false) -> Bool {
         switch(axis){
-        case .horizontal: return frame.midX
-        case .vertical: return frame.midY
+        case .horizontal:
+            layoutDirection == .leftToRight ? point.x < rect.midX : point.x > rect.midX
+        case .vertical:
+            point.y < rect.midY
         }
     }
     
-    private func comp(_ point: CGPoint) -> Double {
+    private func lessThan(_ point: CGPoint, in rect: CGRect) -> Bool {
         switch(axis){
-        case .horizontal: return point.x
-        case .vertical: return point.y
+        case .horizontal:
+            layoutDirection == .leftToRight ? point.x > rect.midX : point.x < rect.midX
+        case .vertical:
+            point.y > rect.midY
         }
     }
     
@@ -57,9 +62,9 @@ struct ReorderingContext: ViewModifier {
 
         if items.isEmpty { return 0 }
         
-        if let pendingIndex = items.firstIndex(where: { comp($0.frameInWindow) > comp(loc) }){
+        if let pendingIndex = items.firstIndex(where: { greaterThan(loc, in: $0.frameInWindow) }){
             return pendingIndex
-        } else if comp(items.last?.frameInWindow ?? .zero) < comp(loc) {
+        } else if lessThan(loc, in: items.last?.frameInWindow ?? .zero) {
             return items.count
         }
 
