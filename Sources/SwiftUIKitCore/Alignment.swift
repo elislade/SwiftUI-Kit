@@ -85,11 +85,16 @@ public extension UnitPoint {
         self.init(x: x, y: y)
     }
     
+    func invert(_ axis: Axis.Set) -> UnitPoint {
+        guard !axis.isEmpty else { return self }
+        return .init(
+            x: axis.contains(.horizontal) ? inverse.x : x,
+            y: axis.contains(.vertical) ? inverse.y : y
+        )
+    }
+    
     func invert(_ axis: Axis) -> UnitPoint {
-        switch axis {
-        case .horizontal: .init(x: inverse.x, y: y)
-        case .vertical: .init(x: x, y: inverse.y)
-        }
+        invert(axis.asSet)
     }
     
 }

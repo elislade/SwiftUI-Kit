@@ -35,7 +35,7 @@ struct ReorderingContext: ViewModifier {
     var overrideHitTest: ((CGPoint, CGRect) -> Bool)?
     var didChangeIndex: (Int?) -> Void = { _ in }
     
-    private func greaterThan(_ point: CGPoint, in rect: CGRect, reversed: Bool = false) -> Bool {
+    private func greaterThan(_ point: CGPoint, in rect: CGRect) -> Bool {
         switch(axis){
         case .horizontal:
             layoutDirection == .leftToRight ? point.x < rect.midX : point.x > rect.midX

@@ -77,7 +77,6 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
                 _dropAreas.wrappedValue = $0
             }
             .onWindowDrag { evt in
-                print(evt.locations)
                 if evt.phase == .ended {
                     self.end()
                     return

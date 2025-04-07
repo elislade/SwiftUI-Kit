@@ -19,9 +19,6 @@ public typealias KeyPress = SwiftUIKitCore.KeyPress
 public typealias KeyEquivalent = SwiftUIKitCore.KeyEquivalent
 
 
-public typealias ShapeStyle = SwiftUI.ShapeStyle
-
-
 #if canImport(Spatial)
 
 public typealias Axis3D = SwiftUIKitCore.Axis3D
