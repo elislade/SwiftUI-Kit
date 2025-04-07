@@ -34,7 +34,7 @@ public extension View {
     
     nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
         onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
-            providers.decode<Payload>{ callback($0, location) }
+            providers.decode{ callback($0, location) }
             return true
         }
     }
@@ -48,7 +48,7 @@ public extension DynamicViewContent {
     
     nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
         onInsert(of: [ Payload.type ]){ i, providers in
-            providers.decode<Payload>{ callback(i, $0) }
+            providers.decode{ callback(i, $0) }
         }
     }
   
@@ -120,7 +120,7 @@ public extension Collection where Element == NSItemProvider {
     
     func decode<Payload: DraggablePayload>() async -> [Payload] {
         await withCheckedContinuation{ continuation in
-            decode<Payload>{
+            decode{
                 continuation.resume(returning: $0)
             }
         }
