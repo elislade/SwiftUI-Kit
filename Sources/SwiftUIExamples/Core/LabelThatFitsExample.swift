@@ -1,51 +1,49 @@
 import SwiftUIKit
 
 
-public struct LabelStyleExamples: View {
+public struct LabelThatFitsExample: View {
     
     @State private var suggestion: LayoutDirectionSuggestion = .useSystemDefault
-    @State private var size = CGSize(width: 40, height: 40)
+    
+    @SliderState private var height = 40
+    @SliderState private var width = 40
     @State private var prefersTitle: Bool = true
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Label That Fits"){
-            HStack {
-                Label{
-                    Text("Leading")
-                } icon: {
-                    Image(systemName: "apple.logo")
-                }
-                .frame(maxWidth: .infinity)
+            Color.clear.onGeometryChangePolyfill(of: \.size){ size in
+                _height.bounds = (size.height / 10)...size.height
+                _width.bounds = (size.width / 10)...size.width
+            }
+            .overlay {
+                Rectangle()
+                    .fill(.tint)
+                    .frame(width: width, height: height)
                 
-                VStack {
-                    Label{
-                        Text("Top")
-                    } icon: {
-                        Image(systemName: "apple.logo")
-                    }
-                    .frame(maxHeight: .infinity)
+                HStack {
+                    Label("Leading", systemImage: "apple.logo")
+                        .frame(maxWidth: .infinity)
                     
                     Rectangle()
-                        .frame(width: size.width, height: size.height)
+                        .frame(width: width, height: 0)
                     
-                    Label{
-                        Text("Bottom")
-                    } icon: {
-                        Image(systemName: "apple.logo")
-                    }
-                    .frame(maxHeight: .infinity)
+                    Label("Trailing", systemImage: "apple.logo")
+                        .frame(maxWidth: .infinity)
                 }
                 
-                Label{
-                    Text("Trailing")
-                } icon: {
-                    Image(systemName: "apple.logo")
+                VStack {
+                    Label("Top", systemImage: "apple.logo")
+                        .frame(maxHeight: .infinity)
+                    
+                    Rectangle()
+                        .frame(width: 0, height: height)
+                    
+                    Label("Bottom", systemImage: "apple.logo")
+                        .frame(maxHeight: .infinity)
                 }
-                .frame(maxWidth: .infinity)
             }
-            .padding()
             .environment(\.layoutDirectionSuggestion, suggestion)
             .labelStyle(
                 prefersTitle ? .viewThatFits(preferring: \.title) : .viewThatFits(preferring: \.icon)
@@ -59,14 +57,14 @@ public struct LabelStyleExamples: View {
                     Spacer(minLength: 0)
                     
                     Group {
-                        Text(size.width, format: .number.rounded(increment: 1)) + Text(" , ") + Text(size.height, format: .number.rounded(increment: 1))
+                        Text(width, format: .increment(1)) + Text(" , ") + Text(height, format: .increment(1))
                     }
                     .font(.exampleParameterValue)
                 }
                 
                 HStack {
-                    Slider(value: $size.width, in: 100...800)
-                    Slider(value: $size.height, in: 100...800)
+                    Slider(_width)
+                    Slider(_height)
                 }
             }
             .exampleParameterCell()
@@ -93,7 +91,7 @@ public struct LabelStyleExamples: View {
 }
 
 
-#Preview("Label Styles") {
-    LabelStyleExamples()
+#Preview("Label That Fits") {
+    LabelThatFitsExample()
         .previewSize()
 }
