@@ -19,7 +19,6 @@ import SwiftUIKitCore
     ///   - value: The current value that conforms to `BinaryFloatingPoint`.
     ///   - bounds: A `ClosedRange` indicating the lower and upper bounds of the value. Defaults to `0...1`.
     ///   - step: The distance between each valid value. Defaults to `nil`.
-    ///   - projection: What value to use for projection `$state`. Defaults Binding to `wrappedValue`.
     /// - Note: If a step does not fit evenly into the bounds, the value will be clipped to the most full step that fits in its bounds.
     public init(
         wrappedValue: Value = 0,
@@ -58,7 +57,11 @@ extension SliderState {
         private var _value: Value
         
         public var bounds: ClosedRange<Value> {
-            didSet { value = _value }
+            didSet {
+                if !bounds.contains(_value) {
+                    value = _value
+                }
+            }
         }
         
         public var step: Value.Stride? {
@@ -127,5 +130,37 @@ extension SliderState {
     
 }
 
+extension SliderState : Sendable where Value : Sendable, Value.Stride : Sendable { }
+extension SliderState.Projection : Sendable where Value : Sendable, Value.Stride : Sendable { }
 
 extension SliderState: PropertyWrapper {}
+
+
+public extension SwiftUI.Slider where Label == EmptyView, ValueLabel == EmptyView {
+    
+    nonisolated init<Value: BinaryFloatingPoint & Sendable>(
+        _ state: SliderState<Value>, onEditingChanged: @escaping (Bool) -> Void = { _ in }
+    ) where Value.Stride : BinaryFloatingPoint & Sendable {
+        if let step = state.step {
+            self.init(
+                value: .init(
+                    get: { state.value },
+                    set: { state.value = $0 }
+                ),
+                in: state.bounds,
+                step: step,
+                onEditingChanged: onEditingChanged
+            )
+        } else {
+            self.init(
+                value: .init(
+                    get: { state.value },
+                    set: { state.value = $0 }
+                ),
+                in: state.bounds,
+                onEditingChanged: onEditingChanged
+            )
+        }
+    }
+    
+}

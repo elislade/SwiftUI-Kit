@@ -54,23 +54,25 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
                 .frame(width: handleSize, height: handleSize)
                 .scaleEffect(y: layoutDirectionSuggestion == .useBottomToTop ? -1 : 1)
         }
-        .animation(.interactiveSpring, value: state)
         .background {
-            ZStack(alignment: alignment){
-                SunkenControlMaterial(Capsule())
+            GeometryReader { proxy in
+                let dimension = layoutVertical ? proxy.size.height : proxy.size.width
+                let trackLength = ((dimension -  handleSize) * Double(_state.percentComplete)) + (handleSize / 2)
                 
-                SunkenControlMaterial(Capsule(), isTinted: true)
-                    .scaleEffect(
-                        x: layoutVertical ? 1 : Double(_state.percentComplete),
-                        y: layoutVertical ? Double(_state.percentComplete) : 1,
-                        anchor: .init(alignment)
-                    )
+                ZStack(alignment: alignment){
+                    SunkenControlMaterial(Capsule())
+                    SunkenControlMaterial(Capsule(), isTinted: true)
+                        .frame(
+                            width: layoutVertical ? nil : trackLength,
+                            height: layoutVertical ? trackLength : nil,
+                            alignment: alignment
+                        )
+                }
             }
             .frame(
                 width: layoutVertical ? handleSize / 5 : nil,
                 height: layoutVertical ? nil : handleSize / 5
             )
-            .clipShape(Capsule())
         }
         .scaleEffect(y: layoutDirectionSuggestion == .useBottomToTop ? -1 : 1)
         .frame(
@@ -80,6 +82,7 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
         .compositingGroup()
         .opacity(isEnabled ? 1 : 0.5)
         .syncValue(_state, _value)
+        .geometryGroupPolyfill()
         .accessibilityAdjustableAction{ direction in
             switch direction {
             case .increment: _state.increment()
