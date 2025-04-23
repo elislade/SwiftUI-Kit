@@ -7,41 +7,32 @@ struct StickyContext : ViewModifier {
     let grouping: StickyGrouping
     
     private func calculateSticky(in proxy: GeometryProxy, for items: [StickyPreferenceValue]) {
-        var resolvedItems = items
-        
-        for i in resolvedItems.indices {
-            resolvedItems[i].resolvedFrame = proxy[resolvedItems[i].anchor]
+        var items = items.map{
+            var result = PendingUpdate(item: $0)
+            result.frame = proxy[$0.anchor]
+            return result
         }
         
-        var updates : [PendingUpdate] = []
-        
         defer {
-            for item in resolvedItems {
-                if let update = updates.first(where: { item.id == $0.item.id }) {
-                    update.finalize()
-                } else {
-                    item.update(.init(), .init())
-                }
-            }
+            items.forEach { $0.finalize() }
         }
         
         for edge in Edge.allCases {
-            let items = resolvedItems.sorted(startingFrom: edge)
+            let edgeItems = items.sorted(startingFrom: edge)
             var stackedSize = CGFloat()
             
-            for i in items.indices {
-                let item = items[i]
+            for i in edgeItems.indices {
+                let item = edgeItems[i]
                 guard let itemInset = item.insets[edge] else { continue }
                 
-                let itemFrame = item.resolvedFrame
                 let itemGrouping = item.grouping ?? grouping
                 
                 var offset = CGFloat()
                 var appliedGrouping: StickyGrouping = .none
                 
                 let normalizedFactor: CGFloat = edge == .bottom || edge == .trailing ? -1 : 1
-                let dimension = itemFrame.normalizedDimension(for: edge, in: proxy.size)
-                let itemSize = itemFrame.size[Axis(orthogonalTo: edge)]
+                let dimension = item.frame.normalizedDimension(for: edge, in: proxy.size)
+                let itemSize = item.frame.size[Axis(orthogonalTo: edge)]
                 
                 if itemGrouping == .displaced {
                     if itemInset > dimension {
@@ -62,17 +53,16 @@ struct StickyContext : ViewModifier {
                     } else { continue }
                 }
                 
-                if itemGrouping == .displaced && i != items.indices.last {
-                    for j in items.indices {
+                if itemGrouping == .displaced && i != edgeItems.indices.last {
+                    for j in edgeItems.indices {
                         guard j > i else { continue }
                         
-                        let candidate = items[j]
-                        let candidateFrame = candidate.resolvedFrame
+                        let candidate = edgeItems[j]
                         
                         guard candidate.categoryMask.intersects(with: item.categoryMask) || candidate.categoryMask == item.categoryMask else { continue }
                         guard let candidateInset = candidate.insets[edge] else { continue }
                         
-                        let candidateDimension = candidateFrame.normalizedDimension(for: edge, in: proxy.size)
+                        let candidateDimension = candidate.frame.normalizedDimension(for: edge, in: proxy.size)
                         let candidateDisplacement = candidateDimension - itemSize
                         if ((candidateDisplacement - candidateInset) - itemInset) < 0 {
                             if edge == .bottom || edge == .trailing {
@@ -85,16 +75,9 @@ struct StickyContext : ViewModifier {
                     }
                 }
                 
-                if let updateIdx = updates.firstIndex(where: { $0.item.id == item.id }) {
-                    updates[updateIdx].edges[edge] = offset
-                    updates[updateIdx].grouping[edge] = appliedGrouping
-                } else {
-                    updates.append(.init(
-                        item: item,
-                        grouping: [edge : appliedGrouping],
-                        edges: [edge: offset]
-                    ))
-                }
+                let updateIdx = items.firstIndex(where: { $0.id == item.id })!
+                items[updateIdx].pendingEdges[edge] = offset
+                items[updateIdx].pendingGrouping[edge] = appliedGrouping
             }
             
         }
@@ -114,27 +97,28 @@ struct StickyContext : ViewModifier {
     }
     
     
-    struct PendingUpdate {
+    @dynamicMemberLookup struct PendingUpdate {
         
         let item: StickyPreferenceValue
-        var grouping: [Edge: StickyGrouping] = [:]
-        var edges: [Edge: CGFloat] = [:]
+        var pendingGrouping: [Edge: StickyGrouping] = [:]
+        var pendingEdges: [Edge: CGFloat] = [:]
+        var frame: CGRect = .zero
         
         func finalize() {
-            let stickingEdges = edges.keys.reduce(into: Edge.Set()){ result, edge in
+            guard !pendingGrouping.isEmpty && !pendingEdges.isEmpty else { return }
+            
+            let stickingEdges = pendingEdges.keys.reduce(into: Edge.Set()){ result, edge in
                 result.formUnion(.init(edge))
             }
             
             let offset = CGPoint(
-                x: edges[.leading] ?? edges[.trailing] ?? 0,
-                y: edges[.top] ?? edges[.bottom] ?? 0
+                x: pendingEdges[.leading] ?? pendingEdges[.trailing] ?? 0,
+                y: pendingEdges[.top] ?? pendingEdges[.bottom] ?? 0
             )
             
-            let hg = grouping[.leading] == StickyGrouping.none ? grouping[.trailing] : grouping[.leading]
-            let vg = grouping[.top] ==  StickyGrouping.none ? grouping[.bottom] : grouping[.top]
-            
-            //print(hg, vg)
-            
+            let hg = pendingGrouping[.leading] == StickyGrouping.none ? pendingGrouping[.trailing] : pendingGrouping[.leading]
+            let vg = pendingGrouping[.top] ==  StickyGrouping.none ? pendingGrouping[.bottom] : pendingGrouping[.top]
+
             let state = StickingState(
                 stickingEdges: stickingEdges,
                 horizontalGrouping: hg ?? .none,
@@ -144,8 +128,11 @@ struct StickyContext : ViewModifier {
             item.update(offset, state)
         }
         
+        subscript<V>(dynamicMember path: KeyPath<StickyPreferenceValue, V>) -> V {
+            item[keyPath: path]
+        }
+        
     }
-    
     
 }
 
@@ -161,46 +148,17 @@ struct StickyPreferenceKey: PreferenceKey {
 }
 
 
-extension Collection where Element == StickyPreferenceValue {
+extension Collection where Element == StickyContext.PendingUpdate {
     
     func sorted(startingFrom edge: Edge) -> [Element] {
         sorted(by: {
             switch edge {
-            case .top: $0.resolvedFrame.origin.y < $1.resolvedFrame.origin.y
-            case .leading: $0.resolvedFrame.origin.x < $1.resolvedFrame.origin.x
-            case .bottom: $0.resolvedFrame.origin.y > $1.resolvedFrame.origin.y
-            case .trailing: $0.resolvedFrame.origin.x > $1.resolvedFrame.origin.x
+            case .top: $0.frame.origin.y < $1.frame.origin.y
+            case .leading: $0.frame.origin.x < $1.frame.origin.x
+            case .bottom: $0.frame.origin.y > $1.frame.origin.y
+            case .trailing: $0.frame.origin.x > $1.frame.origin.x
             }
         })
     }
     
 }
-
-
-extension CGRect {
-    
-    func isAfter(other rect: CGRect, startingFrom edge: Edge) -> Bool {
-        switch edge {
-        case .top: minY > rect.minY
-        case .leading: minX > rect.minX
-        case .bottom: maxY < rect.maxY
-        case .trailing: maxX < rect.maxX
-        }
-    }
-
-//    func overlaps(with other: CGRect, parallelTo axis: Axis) -> Bool {
-//        switch axis {
-//        case .horizontal: maxX < other.minX || minX > other.maxX
-//        case .vertical: maxY < other.minY //|| minY < other.maxY
-//        }
-//    }
-//    
-//    func overlaps(with other: CGRect, perpendicularTo axis: Axis) -> Bool {
-//        switch axis {
-//        case .horizontal: maxY < other.minY || minY > other.maxY || minY == other.minY
-//        case .vertical: maxX < other.minX || minX > other.maxX || minX == other.minX
-//        }
-//    }
-  
-}
-

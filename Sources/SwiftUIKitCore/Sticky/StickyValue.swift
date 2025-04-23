@@ -1,6 +1,6 @@
 import SwiftUI
 
-public enum StickyGrouping: UInt8, Hashable, CaseIterable, Codable, Sendable {
+public enum StickyGrouping: UInt8, Hashable, CaseIterable, Codable, Sendable, BitwiseCopyable {
     
     /// Sticky bounds will not take into account already sticked item[s] along same edge.
     case none
@@ -52,9 +52,10 @@ public struct StickingState: Equatable, Sendable {
 struct StickyPreferenceValue: Equatable {
     
     static func == (lhs: StickyPreferenceValue, rhs: StickyPreferenceValue) -> Bool {
-        let bh = lhs.grouping == rhs.grouping
-        let fb = lhs.anchor == rhs.anchor
-        return lhs.id == rhs.id && lhs.insets == rhs.insets && bh && fb
+        lhs.id == rhs.id &&
+        lhs.insets == rhs.insets &&
+        lhs.grouping == rhs.grouping &&
+        lhs.anchor == rhs.anchor
     }
     
     let id: UUID
@@ -64,9 +65,6 @@ struct StickyPreferenceValue: Equatable {
     let anchor: Anchor<CGRect>
     let update: (CGPoint, StickingState) -> Void
     
-    
-    /// A convienence property used by ``StickyContext`` to easily associate the resolved frame with this preferences anchor
-    var resolvedFrame: CGRect = .zero
 }
 
 

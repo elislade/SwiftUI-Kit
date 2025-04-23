@@ -4,6 +4,7 @@ import SwiftUI
 struct StickyModifier: ViewModifier {
 
     @State private var id = UUID()
+    @State private var state: StickingState = .init()
     @State private var offset: CGPoint = .zero
     
     let stickyInsets: OptionalEdgeInsets
