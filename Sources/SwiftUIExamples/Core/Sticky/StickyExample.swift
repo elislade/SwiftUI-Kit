@@ -185,7 +185,6 @@ public struct StickyExample: View  {
                             .buttonStyle(.tintStyle)
                             .id(i)
                             .sticky(edges: stickyItems.contains(i) ? .init(axis) : [], inset: inset){ state in
-                                print("update", state)
                                 if state.isSticking {
                                     self.isSticking.insert(i)
                                 } else {

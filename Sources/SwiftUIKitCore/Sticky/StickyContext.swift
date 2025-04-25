@@ -105,8 +105,6 @@ struct StickyContext : ViewModifier {
         var frame: CGRect = .zero
         
         func finalize() {
-            guard !pendingGrouping.isEmpty && !pendingEdges.isEmpty else { return }
-            
             let stickingEdges = pendingEdges.keys.reduce(into: Edge.Set()){ result, edge in
                 result.formUnion(.init(edge))
             }

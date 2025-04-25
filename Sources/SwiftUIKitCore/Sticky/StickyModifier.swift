@@ -45,7 +45,10 @@ struct StickyModifier: ViewModifier {
                         if self.offset != offset {
                             self.offset = offset
                         }
-                        onChange(state)
+                        
+                        if state != self.state {
+                            self.state = state
+                        }
                     }
                 )] : []
              }
@@ -54,6 +57,9 @@ struct StickyModifier: ViewModifier {
                      onChange(.init())
                      offset = .zero
                  }
+             }
+             .onChangePolyfill(of: state){
+                 onChange(state)
              }
     }
     
