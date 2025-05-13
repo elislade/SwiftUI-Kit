@@ -126,7 +126,7 @@ struct AnchorPresentationContext: ViewModifier {
                             bgInteraction: bgInteraction,
                             dismiss: dismiss
                         )
-                        .transitions(.opacity.animation(.smooth))
+                        .transition((.opacity + .noHitTesting).animation(.smooth))
                     }
                 }
             }

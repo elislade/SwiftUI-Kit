@@ -33,7 +33,7 @@ struct AnchorPresenter<PresentationView: View>: ViewModifier {
         content
             .presentationValue(
                 isPresented: $isPresented,
-                respondsToBoundsChange: anchor == .auto,
+                respondsToBoundsChange: true,
                 metadata: AnchorPresentationMetadata(
                     anchorAlignment: anchor,
                     view: { AnyView(presentation($0)) }
