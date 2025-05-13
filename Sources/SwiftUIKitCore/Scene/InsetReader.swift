@@ -4,7 +4,7 @@ import SwiftUI
 public struct InsetReader<Content: View>: View {
     
     @Environment(\.layoutDirection) private var layoutDirection
-    @Environment(\.insetReadingDisabled) private var disabled
+    @Environment(\.insetReadingEnabled) private var enabled
     @Environment(\.sceneInsets) private var sceneInsets
     @Environment(\.sceneSize) private var sceneSize
     @State private var frame = CGRect()
@@ -30,8 +30,8 @@ public struct InsetReader<Content: View>: View {
     public var body: some View {
         content(disabledInsets ?? calculate())
             .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ frame = $0 }
-            .onChangePolyfill(of: disabled, initial: true){
-                disabledInsets = disabled ? calculate() : nil
+            .onChangePolyfill(of: enabled, initial: true){
+                disabledInsets = !enabled ? calculate() : nil
             }
     }
     
@@ -63,7 +63,7 @@ public extension View {
                 .padding(.top, edges.contains(.top) ? inset.top : 0)
                 .padding(.trailing, edges.contains(.trailing) ? inset.trailing : 0)
                 .padding(.bottom, edges.contains(.bottom) ? inset.bottom : 0)
-                .animation(.fastSpringInterpolating, value: inset)
+                //.animation(.fastSpringInterpolating, value: inset)
         }
     }
     
@@ -116,10 +116,7 @@ struct DisableInsetReaderKey: EnvironmentKey {
 
 public extension EnvironmentValues {
     
-    var insetReadingDisabled: Bool {
-        get { self[DisableInsetReaderKey.self] }
-        set { self[DisableInsetReaderKey.self] = newValue }
-    }
+   @Entry var insetReadingEnabled: Bool = true
     
 }
 
@@ -127,15 +124,19 @@ public extension EnvironmentValues {
 public extension View {
     
     /// Disables inset reading to all decendent views.
-    /// While disabled, all inset reading will use last inset values before disabling.
-    /// Upon re-enabling of reading, values will update to new values.
+    /// While disabled, all inset reading will use last inset values before being disabled.
+    /// Upon re-enabling, values will update to new values.
     /// 
     /// - Note: You can use this to temporarily disable inset reading while animating or dragging a view across inset bounds to stop sudden jumps to the UI as insets change.
     ///
     /// - Parameter disabled: Bool indicating whether it's disabled or not.
-    /// - Returns: A view with the `insetReadingDisabled` environment value set.
+    /// - Returns: A view with the `insetReadingEnabled` environment value set to false.
     nonisolated func disableInsetReading(_ disabled: Bool = true) -> some View {
-        environment(\.insetReadingDisabled, disabled)
+        transformEnvironment(\.insetReadingEnabled){ enabled in
+            if disabled {
+                enabled = false
+            }
+        }
     }
     
 }
