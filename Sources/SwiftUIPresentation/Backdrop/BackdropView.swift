@@ -1,43 +1,30 @@
 import SwiftUI
 import SwiftUIKitCore
 
-public struct PresentationBackground: View {
+
+struct BackdropView: View {
     
-    private let bgView: AnyView?
-    private let bgInteraction: PresentationBackdropInteraction?
-    private let dismiss: () -> Void
-    
-    public init(
-        bgView: AnyView? = nil,
-        bgInteraction: PresentationBackdropInteraction? = nil,
-        dismiss: @escaping () -> Void
-    ) {
-        self.bgView = bgView
-        self.bgInteraction = bgInteraction
-        self.dismiss = dismiss
-    }
+    let preference: BackdropPreference?
+    let dismiss: () -> Void
     
     private var useBGInteraction: Bool {
-        if let bgInteraction {
-            bgInteraction != .disabled
-        } else {
-            true
-        }
+        guard let preference else { return true }
+        return preference.interaction != .disabled
     }
     
-    @ViewBuilder private var presentationBG: some View {
-        if let bgView {
-            bgView
+    @ViewBuilder private var content: some View {
+        if let view = preference?.view(){
+            view
         } else {
             Color.black.opacity(0.4)
         }
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             if useBGInteraction {
                 Button(action: dismiss){
-                    presentationBG
+                    content
                         .contentShape(Rectangle())
                         .accessibilityLabel(Text("Dismiss Presentation"))
                 }
@@ -47,14 +34,14 @@ public struct PresentationBackground: View {
                 .simultaneousGesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged{ _ in
-                            if bgInteraction == .touchChangeDismiss {
+                            if preference?.interaction == .touchChangeDismiss {
                                 dismiss()
                             }
                         }
                 )
                 #endif
             } else {
-                presentationBG.allowsHitTesting(false)
+                content.allowsHitTesting(false)
             }
         }
         .ignoresSafeArea()

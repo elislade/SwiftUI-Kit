@@ -5,11 +5,7 @@ struct FocusPresentationContext: ViewModifier {
     @Environment(\.layoutDirection) private var layoutDirection
     @Namespace private var ns
     
-    @State private var bgInteraction: PresentationBackdropInteraction?
-    @State private var bg: PresentationBackdropKeyValue?
-    
-    private var bgView: AnyView? { bg?.view() }
-    
+    @State private var backdropPreference: BackdropPreference?
     @State private var focusedView: AnyView?
     @State private var accessoryIsPresented = false
     
@@ -55,17 +51,14 @@ struct FocusPresentationContext: ViewModifier {
                 GeometryReader { proxy in
                     if let value = value.last {
                         ZStack(alignment: .topLeading) {
-                            PresentationBackground(
-                                bgView: bgView,
-                                bgInteraction: bgInteraction,
-                                dismiss: {
-                                    if accessoryIsPresented {
-                                        accessoryIsPresented = false
-                                    } else {
-                                        dismiss(value)
-                                    }
+                            BackdropView(preference: backdropPreference, dismiss: {
+                                if accessoryIsPresented {
+                                    accessoryIsPresented = false
+                                } else {
+                                    dismiss(value)
                                 }
-                            )
+                            })
+                            .zIndex(1)
                             .opacity(focusedView != nil ? 1 : 0)
                             
                             let bounds = proxy[value.anchor]
@@ -77,12 +70,7 @@ struct FocusPresentationContext: ViewModifier {
                                     .environment(\._isBeingPresented, true)
                                     .matchedGeometryEffect(id: "View", in: ns)
                                     .zIndex(2)
-                                    .onPreferenceChange(PresentationBackdropKey.self){
-                                        _bg.wrappedValue = $0.last
-                                    }
-                                    .onPreferenceChange(PresentationBackdropInteractionKey.self){
-                                        _bgInteraction.wrappedValue = $0.last
-                                    }
+                                    .onBackdropPreferenceChange{ backdropPreference = $0 }
                                     .autoAnchorPresentation(isPresented: $accessoryIsPresented){ state in
                                         value
                                             .metadata.accessory(state)

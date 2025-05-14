@@ -10,12 +10,9 @@ struct AnchorPresentationContext: ViewModifier {
     @Environment(\.presentationEnvironmentBehaviour) private var envBehaviour
     @Environment(\.layoutDirection) private var envLayoutDirection
     
-    @State private var bgInteraction: PresentationBackdropInteraction?
-    @State private var bg: PresentationBackdropKeyValue?
+    @State private var backdropPreference: BackdropPreference?
     @State private var presentedValue: Presentation?
 
-    private var bgView: AnyView? { bg?.view() }
-    
     nonisolated init() { }
     
     private var layoutDirection: LayoutDirection {
@@ -89,12 +86,7 @@ struct AnchorPresentationContext: ViewModifier {
                                         .animation(.bouncy.speed(1.6))
                                 )
                                 .environment(\.dismissPresentation, .init(id: presentedValue.id, closure: dismiss))
-                                .onPreferenceChange(PresentationBackdropKey.self){
-                                    _bg.wrappedValue = $0.last
-                                }
-                                .onPreferenceChange(PresentationBackdropInteractionKey.self){
-                                    _bgInteraction.wrappedValue = $0.last
-                                }
+                                .onBackdropPreferenceChange{ backdropPreference = $0 }
                                 .alignmentGuide(.leading){ dimension in
                                     let selfOffset = dimension.width * anchors.presentation.x
                                     
@@ -121,11 +113,7 @@ struct AnchorPresentationContext: ViewModifier {
                 .environment(\.layoutDirection, layoutDirection)
                 .background {
                     if presentedValue != nil {
-                        PresentationBackground(
-                            bgView: bgView,
-                            bgInteraction: bgInteraction,
-                            dismiss: dismiss
-                        )
+                        BackdropView(preference: backdropPreference, dismiss: dismiss)
                         .transition((.opacity + .noHitTesting).animation(.smooth))
                     }
                 }
