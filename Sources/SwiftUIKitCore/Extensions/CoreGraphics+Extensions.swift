@@ -28,7 +28,7 @@ public extension CGSize {
         CGSizeMake(width.round(to: place), height.round(to: place))
     }
         
-    init(_ simd: SIMD2<Float>) {
+    init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>) {
         self.init(width: Double(simd.x), height: Double(simd.y))
     }
     
@@ -57,8 +57,38 @@ public extension CGSize {
             }
         }
     }
+    
+    func scaleFitting(_ other: Self) -> Double {
+        scaleOfFitting(self, in: other)
+    }
+    
+    func rectByFitting(in other: CGSize) -> CGRect {
+        let scale = scaleFitting(other)
         
+        let scaledSize: SIMD2<Double> = [
+            other.width * scale,
+            other.height * scale
+        ]
+        
+        let offset: SIMD2<Double> = [
+            width - scaledSize.x,
+            height - scaledSize.y
+        ] / 2.0
+        
+        return CGRect(
+            origin: .init(offset),
+            size: .init(scaledSize)
+        )
+    }
+    
 }
+
+public func scaleOfFitting(_ size: CGSize, in other: CGSize) -> Double {
+    let widthRatio = size.width / other.width
+    let heightRatio = size.height / other.height
+    return min(widthRatio, heightRatio)
+}
+
 
 public extension SIMD2 where Scalar == Float {
     

@@ -98,3 +98,28 @@ public extension UnitPoint {
     }
     
 }
+
+
+public extension Edge {
+    
+    init?(_ alignment: HorizontalAlignment) {
+        if alignment == .leading {
+            self = .leading
+        } else if alignment == .trailing {
+            self = .trailing
+        } else {
+            return nil
+        }
+    }
+    
+    init?(_ alignment: VerticalAlignment) {
+        if alignment == .top {
+            self = .top
+        } else if alignment == .bottom {
+            self = .bottom
+        } else {
+            return nil
+        }
+    }
+    
+}

@@ -31,10 +31,12 @@ public extension LinearGradient {
 
 public extension Color {
     
-    var asGradient: some View {
+    func linearGradientView(startPoint: UnitPoint = .top, endPoint: UnitPoint = .bottom) -> some View {
         overlay{
-            LinearGradient.topToBottom(
-                Gradient(colors: [Color.white.opacity(0.2), Color.black.opacity(0.2)])
+            LinearGradient(
+                colors: [Color.white.opacity(0.2), Color.black.opacity(0.2)],
+                startPoint: startPoint,
+                endPoint: endPoint
             )
             .blendMode(.overlay)
         }
