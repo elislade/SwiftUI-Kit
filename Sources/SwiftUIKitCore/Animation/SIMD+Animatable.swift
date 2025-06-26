@@ -3,8 +3,8 @@ import SwiftUI
 
 extension SIMD2: @retroactive Animatable where Scalar: VectorArithmetic {
     
-    public var animatableData: AnimatablePair<Scalar, Scalar> {
-        get { AnimatablePair(x, y) }
+    public var animatableData: AnimatableTwin<Scalar> {
+        get { .init(x, y) }
         set {
             x = newValue.first
             y = newValue.second
@@ -16,10 +16,12 @@ extension SIMD2: @retroactive Animatable where Scalar: VectorArithmetic {
 
 extension SIMD3: @retroactive Animatable where Scalar: VectorArithmetic {
     
-    public var animatableData: AnimatablePair<Scalar, AnimatablePair<Scalar, Scalar>> {
-        get { AnimatablePair(x, AnimatablePair(y, z)) }
+    public var animatableData: AnimatableTriplet<Scalar> {
+        get { .init(AnimatablePair(y, z), x) }
         set {
-            self = [newValue.first, newValue.second.first, newValue.second.second]
+            x = newValue.first.first
+            y = newValue.first.second
+            z = newValue.second
         }
     }
     
@@ -28,13 +30,13 @@ extension SIMD3: @retroactive Animatable where Scalar: VectorArithmetic {
 
 extension SIMD4: @retroactive Animatable where Scalar: VectorArithmetic {
     
-    public var animatableData: AnimatablePair<AnimatablePair<Scalar, Scalar>, AnimatablePair<Scalar, Scalar>> {
-        get { AnimatablePair(AnimatablePair(x, y), AnimatablePair(z, w)) }
+    public var animatableData: AnimatableQuadruplet<Scalar> {
+        get { .init(AnimatablePair(x, y), AnimatablePair(z, w)) }
         set {
-            self = [
-                newValue.first.first, newValue.first.second,
-                newValue.second.first, newValue.second.second
-            ]
+            x = newValue.first.first
+            y = newValue.first.second
+            z = newValue.second.first
+            w = newValue.second.second
         }
     }
     
