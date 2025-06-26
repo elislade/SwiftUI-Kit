@@ -1,12 +1,12 @@
 import SwiftUI
 import Darwin
 
-public enum FontResource : Hashable, Codable {
+public enum FontResource : Hashable, Codable, Sendable {
     
     case library(familyName: String)
     case custom(url: FontURL)
     
-    public var familyName: String? {
+    public nonisolated var familyName: String? {
         if case .library(let familyName) = self {
             return familyName
         } else {
@@ -14,7 +14,7 @@ public enum FontResource : Hashable, Codable {
         }
     }
     
-    public var url: FontURL? {
+    public nonisolated var url: FontURL? {
         if case .custom(let url) = self {
             return url
         } else {
@@ -22,7 +22,7 @@ public enum FontResource : Hashable, Codable {
         }
     }
     
-    public var isValid: Bool {
+    public nonisolated var isValid: Bool {
         switch self {
         case .library(let familyName):
             if familyName.first == "." {
@@ -41,7 +41,7 @@ public enum FontResource : Hashable, Codable {
 
 extension FontResource: CustomStringConvertible {
     
-    public var description: String {
+    public nonisolated var description: String {
         design?.description ?? familyName ?? url?.absoluteString ?? "Unknown"
     }
     
