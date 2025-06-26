@@ -1,7 +1,7 @@
 import Symbols
 
 
-public enum SymbolEffectSucessiveVariableBehaviour: Sendable {
+public enum SymbolEffectSucessiveVariableBehaviour: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     
     /// Animation applies its Cumulative variant, where each sucessive
     /// variable layer is enabled and stays enabled until the end of
@@ -24,7 +24,7 @@ protocol SymbolSucessiveVariableBehaviourConformance {
 
 extension SymbolSucessiveVariableBehaviourConformance {
     
-    subscript(_ behaviour: SymbolEffectSucessiveVariableBehaviour) -> Self {
+    nonisolated subscript(_ behaviour: SymbolEffectSucessiveVariableBehaviour) -> Self {
         switch behaviour {
         case .cumulative: cumulative
         case .iterative: iterative
@@ -33,17 +33,17 @@ extension SymbolSucessiveVariableBehaviourConformance {
     
 }
 
-public enum SymbolEffectInactiveLayerBehaviour: Sendable {
+public enum SymbolEffectInactiveLayerBehaviour: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     case dim
     case hide
 }
 
-public enum SymbolEffectDirection: Sendable {
+public enum SymbolEffectDirection: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     case up
     case down
 }
 
-public enum SymbolEffectGrouping: Sendable {
+public enum SymbolEffectGrouping: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     case byLayer
     case whole
 }
@@ -55,7 +55,7 @@ protocol SymbolInactiveLayerBehaviourConformance {
 
 extension SymbolInactiveLayerBehaviourConformance  {
     
-    subscript(_ behaviour: SymbolEffectInactiveLayerBehaviour) -> Self {
+    nonisolated subscript(_ behaviour: SymbolEffectInactiveLayerBehaviour) -> Self {
         switch behaviour {
         case .dim: dimInactiveLayers
         case .hide: hideInactiveLayers
@@ -72,7 +72,7 @@ protocol SymbolDirectionConformance {
 
 extension SymbolDirectionConformance  {
     
-    subscript(_ direction: SymbolEffectDirection) -> Self {
+    nonisolated subscript(_ direction: SymbolEffectDirection) -> Self {
         switch direction {
         case .up: up
         case .down: down
@@ -88,7 +88,7 @@ protocol SymbolGroupingConformance {
 
 extension SymbolGroupingConformance {
     
-    subscript(_ grouping: SymbolEffectGrouping) -> Self {
+    nonisolated subscript(_ grouping: SymbolEffectGrouping) -> Self {
         switch grouping {
         case .byLayer: byLayer
         case .whole: wholeSymbol
