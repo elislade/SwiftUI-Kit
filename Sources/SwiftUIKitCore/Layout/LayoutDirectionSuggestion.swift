@@ -20,7 +20,7 @@ struct LayoutDirectionSuggestionKey: EnvironmentKey {
 
 
 /// A suggestion for views that may want to use as their primary layout method instead of system LTR and RTL layouts.
-public enum LayoutDirectionSuggestion: UInt8, CaseIterable {
+public enum LayoutDirectionSuggestion: UInt8, CaseIterable, Sendable, BitwiseCopyable {
     
     /// A suggestion to use system LayoutDirection with LTR or RTL.
     case useSystemDefault
@@ -32,7 +32,9 @@ public enum LayoutDirectionSuggestion: UInt8, CaseIterable {
     case useBottomToTop
     
     /// A suggestion to use vertical as primary layout.
-    public var useVertical: Bool { self != .useSystemDefault }
+    public nonisolated var useVertical: Bool { self != .useSystemDefault }
+    
+    public nonisolated var axis: Axis { useVertical ? .vertical : .horizontal }
 }
 
 
