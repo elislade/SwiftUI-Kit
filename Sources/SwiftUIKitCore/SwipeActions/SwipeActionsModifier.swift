@@ -8,13 +8,12 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     
     @State private var id = UUID()
     @State private var scroll: Double = 0
-    @State private var gestureOffset: Double?
-    @State private var lastOpenOffset: CGFloat = 0
+    @State private var gestureStart: Double?
+    @State private var horizontalInteractionOffset: Double?
     @State private var contentY: CGFloat = 0
     @State private var contentYActivated: CGFloat = 0
     @State private var leadingSize: CGFloat = 0
     @State private var trailingSize: CGFloat = 0
-    @State private var minDistanceFactor: CGFloat?
     
     @State private var internalActiveEdge: HorizontalEdge?
     private let externalActiveEdge: Binding<HorizontalEdge?>?
@@ -27,7 +26,6 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         activeEdgeBinding.wrappedValue
     }
     
-    private let gestureMinMovement: CGFloat = 25
     private let leading: Leading
     private let trailing: Trailing
     private let availableEdges: HorizontalEdge.Set
@@ -54,9 +52,9 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         self.availableEdges = set
     }
     
-    private var totalOffset: Double {
-        if let gestureOffset {
-            return gestureOffset
+    private var horizontalOffset: Double {
+        if let horizontalInteractionOffset {
+            return horizontalInteractionOffset
         } else if let activeEdge {
             switch activeEdge {
             case .leading: return leadingSize
@@ -76,13 +74,12 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
 
         withAnimation(.fastSpringInterpolating){
             activeEdgeBinding.wrappedValue = nil
-            gestureOffset = nil
-            minDistanceFactor = nil
+            horizontalInteractionOffset = nil
         }
     }
     
     private func updateInteraction(offset: Double, layoutFactor: Double){
-        let offset = (offset * layoutFactor) + lastOpenOffset
+        let offset = (offset * layoutFactor)
         
         if let activeEdge {
             guard availableEdges.contains(.init(activeEdge)) else { return }
@@ -94,19 +91,19 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             let isUnderShooting = activeEdge == .leading ? offset < 0 : offset > 0
             
             if isOverShooting {
-                gestureOffset = (edgeSize * edgeFactor) - powRetainSign(diff * edgeFactor, 0.7)
+                horizontalInteractionOffset = (edgeSize * edgeFactor) - powRetainSign(diff * edgeFactor, 0.7)
             } else if isUnderShooting {
-                gestureOffset = powRetainSign(offset, 0.75)
+                horizontalInteractionOffset = powRetainSign(offset, 0.75)
             } else {
-                gestureOffset = offset
+                horizontalInteractionOffset = offset
             }
         } else {
             // Set active edge based on direction
             if offset < 0 && availableEdges.contains(.trailing) {
-                gestureOffset = offset
+                horizontalInteractionOffset = offset
                 activeEdgeBinding.wrappedValue = .trailing
             } else if offset > 0 && availableEdges.contains(.leading) {
-                gestureOffset = offset
+                horizontalInteractionOffset = offset
                 activeEdgeBinding.wrappedValue = .leading
             }
         }
@@ -114,10 +111,9 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     
     private func endInteraction(projectedOffset: Double){
         let projectedOffset = projectedOffset * layoutFactor
-        lastOpenOffset = activeEdge == .leading ? leadingSize : trailingSize * -1
         
         withAnimation(.fastSpringInterpolating){
-            self.gestureOffset = nil
+            self.horizontalInteractionOffset = nil
             
             if let activeEdge {
                 switch activeEdge {
@@ -136,26 +132,25 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     
     #if !os(tvOS)
     private var contentGesture: some Gesture {
-        DragGesture(minimumDistance: gestureMinMovement, coordinateSpace: .global)
+        DragGesture(minimumDistance: 25, coordinateSpace: .global)
             .onChanged { g in
-                if minDistanceFactor == nil {
-                    minDistanceFactor = activeEdge == nil ? g.translation.width < 0 ? -1.0 : 1 : 0
+                if let gestureStart {
+                    let offset = g.location.x - gestureStart
+                    updateInteraction(offset: offset, layoutFactor: layoutFactor)
+                } else {
+                    gestureStart = g.location.x - (horizontalOffset * layoutFactor)
                 }
-                // Gesture translation starts from `minimumDistance` and not `zero`.
-                // This is to compensate for that to have as smooth start as possible
-                let offsetTravelledWhileDecidingToRecognize = gestureMinMovement * minDistanceFactor!
-                updateInteraction(offset: g.translation.width - offsetTravelledWhileDecidingToRecognize, layoutFactor: layoutFactor)
             }
             .onEnded { g in
+                gestureStart = nil
                 endInteraction(projectedOffset: g.predictedEndTranslation.width)
-                minDistanceFactor = nil
             }
     }
     #endif
     
     func body(content: Content) -> some View {
         content
-            .offset(x: totalOffset)
+            .offset(x: horizontalOffset)
             .contentShape(Rectangle())
             #if !os(tvOS)
             .simultaneousGesture(TapGesture().onEnded(close))
@@ -168,19 +163,12 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                         HStack(spacing: 1, content: { leading })
                             .onGeometryChangePolyfill(of: { $0.size.width }){
                                 leadingSize = $0
-                                
-                                if gestureOffset == nil {
-                                    lastOpenOffset = $0
-                                }
                             }
                             .clipShape(
                                 Rectangle()
-                                    .offset(x: min(-leadingSize + totalOffset, 0) * layoutFactor)
+                                    .offset(x: min(-leadingSize + horizontalOffset, 0) * layoutFactor)
                             )
-                            .transitions(.asymmetric(
-                                insertion: .identity,
-                                removal: .move(edge: .leading).animation(.smooth)
-                            ))
+                            .transition(.identity)
                     }
                     
                     Spacer(minLength: 0)
@@ -189,19 +177,12 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                         HStack(spacing: 1, content: { trailing })
                             .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){
                                 trailingSize = $0
-                                
-                                if gestureOffset == nil {
-                                    lastOpenOffset = $0 * -1
-                                }
                             }
                             .clipShape(
                                 Rectangle()
-                                    .offset(x: max(trailingSize + totalOffset, 0) * layoutFactor)
+                                    .offset(x: max(trailingSize + horizontalOffset, 0) * layoutFactor)
                             )
-                            .transitions(.asymmetric(
-                                insertion: .identity,
-                                removal: .move(edge: .trailing).animation(.smooth)
-                            ))
+                            .transition(.identity)
                     }
                 }
                 .buttonStyle(ButtonStyle(didCallAction: close))
@@ -210,6 +191,9 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
 //            .indirectGesture(
 //                IndirectScrollGesture(useMomentum: false, mask: .horizontal)
 //                    .onChanged{ value in
+//                        if scroll == 0 {
+//                            scroll += horizontalOffset
+//                        }
 //                        scroll += value.delta.x
 //                        updateInteraction(offset: scroll, layoutFactor: 1)
 //                    }
@@ -229,11 +213,10 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             .onChangePolyfill(of: activeEdge){
                 if activeEdge != nil {
                     contentYActivated = contentY
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
+                    Task { @MainActor in
+                        try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
                         sharedState.latestSwipeActionID = id
                     }
-                } else {
-                    lastOpenOffset = 0
                 }
             }
             .accessibilityRepresentation{
