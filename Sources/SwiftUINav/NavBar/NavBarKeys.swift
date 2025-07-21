@@ -17,19 +17,9 @@ public struct NavBarMaterialModifier<V: View> : ViewModifier {
     
 }
 
-
-struct IsInNavBarKey: EnvironmentKey {
-    
-    static var defaultValue: Bool { false }
-    
-}
-
 public extension EnvironmentValues {
     
-    var isInNavBar: Bool {
-        get { self[IsInNavBarKey.self] }
-        set { self[IsInNavBarKey.self] = newValue }
-    }
+    @Entry var isInNavBar: Bool = false
     
 }
 

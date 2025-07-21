@@ -23,21 +23,8 @@ public extension View {
 }
 
 
-struct ScrollOffsetEnvironmentKey: EnvironmentKey {
-    
-    static let defaultValue: PassthroughSubject<CGPoint, Never>? = nil
-    
-}
-
-
 public extension EnvironmentValues {
     
-    var scrollOffsetPassthrough: PassthroughSubject<CGPoint, Never>? {
-        get {
-            self[ScrollOffsetEnvironmentKey.self]
-        } set {
-            self[ScrollOffsetEnvironmentKey.self] = newValue
-        }
-    }
+    @Entry var scrollOffsetPassthrough: PassthroughSubject<CGPoint, Never>? = nil
     
 }

@@ -76,20 +76,9 @@ public extension ButtonStyle where Self == WindowPanelButtonStyle {
     
 }
 
-
-struct IsHighlightedKey: EnvironmentKey {
-    
-    static var defaultValue: Bool { false }
-    
-}
-
-
 public extension EnvironmentValues {
     
-    var isHighlighted: Bool {
-        get { self[IsHighlightedKey.self] }
-        set { self[IsHighlightedKey.self] = newValue }
-    }
+    @Entry var isHighlighted: Bool = false
     
 }
 

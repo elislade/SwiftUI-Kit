@@ -1,17 +1,9 @@
 import SwiftUI
 
 
-struct DeviceOrientationKey: EnvironmentKey {
-    static var defaultValue: DeviceOrientation { .unknown }
-}
-
-
 public extension EnvironmentValues {
     
-    var deviceOrientation: DeviceOrientation {
-        get { self[DeviceOrientationKey.self] }
-        set { self[DeviceOrientationKey.self] = newValue }
-    }
+    @Entry var deviceOrientation: DeviceOrientation = .unknown
     
 }
 

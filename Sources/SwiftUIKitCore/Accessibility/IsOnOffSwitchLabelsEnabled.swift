@@ -1,9 +1,5 @@
 import SwiftUI
 
-struct AccessibilityIsOnOffSwitchLabelsEnabledKey: EnvironmentKey {
-    static var defaultValue : Bool { false }
-}
-
 
 struct AccessibilityIsOnOffSwitchLabelsModifier: ViewModifier {
     
@@ -33,10 +29,7 @@ public extension EnvironmentValues {
     
     /// A Bool that indicates whether a `Switch` should show on/off labels. This setting can be set in system Settings under Accessibility or manually set in app with the use of the `environment()` modifier.
     /// - Note: This modifier only works with `SwiftUICore` Switches and any view that is made to take advantage of this value. It will **not** work with `SwiftUI.Toggle` with a `.switchStyle` as it does not support this setting.
-    var isOnOffSwitchLabelsEnabled: Bool {
-        get { self[AccessibilityIsOnOffSwitchLabelsEnabledKey.self] }
-        set { self[AccessibilityIsOnOffSwitchLabelsEnabledKey.self] = newValue }
-    }
+    @Entry var isOnOffSwitchLabelsEnabled: Bool = false
     
 }
 

@@ -35,20 +35,9 @@ public struct SwiftUIFontResolver: FontResolver {
     
 }
 
-
-struct FontResolverKey: EnvironmentKey {
-    
-    static var defaultValue: FontResolver { SwiftUIFontResolver() }
-    
-}
-
-
 extension EnvironmentValues {
     
-    var fontResolver: FontResolver {
-        get { self[FontResolverKey.self] }
-        set { self[FontResolverKey.self] = newValue }
-    }
+    @Entry var fontResolver: FontResolver = SwiftUIFontResolver()
     
     public var resolvedFont: ResolvedFont {
         #if canImport(UIKit) && !os(watchOS)

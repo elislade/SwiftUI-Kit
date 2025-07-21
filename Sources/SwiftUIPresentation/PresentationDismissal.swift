@@ -22,20 +22,13 @@ public struct DismissPresentationAction: Equatable {
     
 }
 
-struct DismissPresentation: EnvironmentKey {
-    
-    static var defaultValue: DismissPresentationAction {
-        .init(id: .init(), closure: {})
-    }
-    
-}
-
 public extension EnvironmentValues {
     
-    var dismissPresentation: DismissPresentationAction {
-        get { self[DismissPresentation.self] }
-        set { self[DismissPresentation.self] = newValue }
-    }
+    @Entry var dismissPresentation: DismissPresentationAction = .init(closure: {})
+    
+    /// Similar to dismiss but infers that it wants to be coordinated with another dismissal lower down in the view tree.
+    /// - NOTE: This means it should only be removed on topmost coordinator at the end of the transaction.
+    @Entry var coordinatedDismiss: DismissPresentationAction = .init(closure: {})
     
 }
 

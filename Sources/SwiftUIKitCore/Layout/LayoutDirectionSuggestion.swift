@@ -4,17 +4,7 @@ import SwiftUI
 public extension EnvironmentValues {
     
     /// A suggestion for views that may want to use as their primary layout method instead of system LTR and RTL layouts.
-    var layoutDirectionSuggestion: LayoutDirectionSuggestion {
-        get { self[LayoutDirectionSuggestionKey.self] }
-        set { self[LayoutDirectionSuggestionKey.self] = newValue }
-    }
-    
-}
-
-
-struct LayoutDirectionSuggestionKey: EnvironmentKey {
-    
-    static var defaultValue: LayoutDirectionSuggestion { .useSystemDefault }
+    @Entry var layoutDirectionSuggestion: LayoutDirectionSuggestion = .useSystemDefault
     
 }
 
