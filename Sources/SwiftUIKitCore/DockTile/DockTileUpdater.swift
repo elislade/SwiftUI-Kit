@@ -12,21 +12,21 @@ import SwiftUI
         guard let dockTile else { return }
         
         defer {
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 self?.previousPreference = preference
             }
         }
         
         if previousPreference != nil && preference == nil {
-            DispatchQueue.main.async { [dockTile] in
+            Task { @MainActor [dockTile] in
                 dockTile.contentView = nil
             }
         } else if let preference, previousPreference == nil {
-            DispatchQueue.main.async { [dockTile] in
+            Task { @MainActor [dockTile] in
                 dockTile.contentView = NSHostingView(rootView: preference.view)
             }
         } else if let preference, let previousPreference {
-            DispatchQueue.main.async { [dockTile] in
+            Task{ @MainActor [dockTile] in
                 if preference.id != previousPreference.id {
                     dockTile.contentView = NSHostingView(rootView: preference.view)
                 } else if preference.updateValue != previousPreference.updateValue {
