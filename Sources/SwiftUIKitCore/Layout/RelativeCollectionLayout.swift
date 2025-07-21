@@ -10,7 +10,7 @@ import SwiftUI
 }
 
 
-public final class AnyRelativeCollectionLayoutModifier: RelativeCollectionLayoutModifier {
+public struct AnyRelativeCollectionLayoutModifier: RelativeCollectionLayoutModifier {
     
     private let base: any RelativeCollectionLayoutModifier
     

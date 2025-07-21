@@ -7,17 +7,16 @@ public protocol PathProvider: Sendable {
     
 }
 
-public final class AnyPathProvider: PathProvider, @unchecked Sendable {
+public struct AnyPathProvider: PathProvider {
     
-    let base: Any
-    private var provider: PathProvider { base as! PathProvider }
+    let base: any PathProvider
     
-    public init<Provider: PathProvider & Sendable>(_ base: Provider) {
+    public nonisolated init<Provider: PathProvider>(_ base: Provider) {
         self.base = base
     }
     
     public func path(in rect: CGRect) -> Path {
-        provider.path(in: rect)
+        base.path(in: rect)
     }
     
 }

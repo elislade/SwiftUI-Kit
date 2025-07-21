@@ -5,16 +5,16 @@ public protocol FontModifier {
     func modify(font: Font) -> Font
 }
 
-public final class AnyFontModifier: FontModifier {
+public struct AnyFontModifier: FontModifier {
     
-    let base: Any
+    private let base: any FontModifier
     
     public init<B: FontModifier>(_ base: B) {
         self.base = base
     }
     
     public func modify(font: Font) -> Font {
-        (base as! FontModifier).modify(font: font)
+        base.modify(font: font)
     }
     
 }
