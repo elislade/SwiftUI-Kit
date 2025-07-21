@@ -3,12 +3,13 @@ import UniformTypeIdentifiers
 
 
 public protocol DraggablePayload: Codable, Sendable {
-    static var type: UTType { get }
+    static var dragType: UTType { get }
+    static var dragVisibility: NSItemProviderRepresentationVisibility { get }
 }
 
-
 public extension DraggablePayload {
-    static var type: UTType { .data }
+    static var dragType: UTType { .data }
+    static var dragVisibility: NSItemProviderRepresentationVisibility { .ownProcess }
 }
 
 
@@ -32,9 +33,12 @@ public extension View {
         })
     }
     
-    nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @escaping ([Payload], CGPoint) -> Void) -> some View {
-        onDrop(of: [ Payload.type ], isTargeted: isTargeted){ providers, location in
-            providers.decode{ callback($0, location) }
+    nonisolated func onDrop<Payload: DraggablePayload>(isTargeted: Binding<Bool>? = nil , _ callback: @MainActor @escaping ([Payload], CGPoint) -> Void) -> some View {
+        onDrop(of: [ Payload.dragType ], isTargeted: isTargeted){ providers, location in
+            Task { @MainActor in
+                let res: [Payload] = try await providers.decode()
+                callback(res, location)
+            }
             return true
         }
     }
@@ -46,9 +50,12 @@ public extension View {
 
 public extension DynamicViewContent {
     
-    nonisolated func onInsert<Payload: DraggablePayload>(callback: @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
-        onInsert(of: [ Payload.type ]){ i, providers in
-            providers.decode{ callback(i, $0) }
+    nonisolated func onInsert<Payload: DraggablePayload>(callback: @MainActor @escaping (Int, [Payload]) -> Void) -> some DynamicViewContent {
+        onInsert(of: [ Payload.dragType ]){ i, providers in
+            Task { @MainActor in
+                let items: [Payload] = try await providers.decode()
+                callback(i, items)
+            }
         }
     }
   
@@ -74,8 +81,8 @@ public extension NSItemProvider {
         self.init()
         
         self.registerDataRepresentation(
-            forTypeIdentifier: Payload.type.identifier,
-            visibility: .ownProcess
+            forTypeIdentifier: Payload.dragType.identifier,
+            visibility: Payload.dragVisibility
         ){ callback in
             do {
                 let data = try JSONEncoder().encode(payload)
@@ -97,33 +104,16 @@ public extension NSItemProvider {
 
 public extension Collection where Element == NSItemProvider {
     
-    func decode<Payload: DraggablePayload>(completion: @escaping ([Payload]) -> Void) {
+    func decode<Payload: DraggablePayload>() async throws -> [Payload] {
         var items: [Payload] = []
-        let group = DispatchGroup()
-        
         for provider in self {
-            group.enter()
-            provider.loadDataRepresentation(forTypeIdentifier: Payload.type.identifier){ data, err in
-                if let data, let item = try? JSONDecoder().decode(Payload.self, from: data) {
-                    DispatchQueue.main.sync {
-                        items.append(item)
-                    }
-                }
-                group.leave()
+            if
+                let data = try await provider.load(typeIdentifier: Payload.dragType.identifier)
+            {
+                items.append(try JSONDecoder().decode(Payload.self, from: data))
             }
         }
-        
-        group.notify(queue: .main){
-            completion(items)
-        }
-    }
-    
-    func decode<Payload: DraggablePayload>() async -> [Payload] {
-        await withCheckedContinuation{ continuation in
-            decode{
-                continuation.resume(returning: $0)
-            }
-        }
+        return items
     }
     
 }

@@ -96,7 +96,8 @@ extension SystemDragAndDropExamples.StringList: DropDelegate {
     
     func performDrop(info: DropInfo) -> Bool {
         isDropping = true
-        info.itemProviders(for: [.data]).decode{ (strings: [String]) in
+        Task {
+            let strings: [String] = try await info.itemProviders(for: [.data]).decode()
             if let pendingDropIndex {
                 items.insert(contentsOf: strings, at: pendingDropIndex)
             } else {
