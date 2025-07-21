@@ -32,10 +32,7 @@ final class KeyCaptureView: UIView {
     var phases: KeyPress.Phases = [.down, .up]
     var captured: (KeyPress) -> KeyPress.Result = { _ in .ignored }
     
-    private var repeatDelay: TimeInterval = 0.5
-    private var repeatInterval: TimeInterval = 0.1
-    private var repeatStartWorkItem: DispatchWorkItem?
-    private var repeatTimer: Timer?
+    private var repeatTask: Task<Void, Error>?
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -74,25 +71,21 @@ final class KeyCaptureView: UIView {
                 return
             }
             
-            self.repeatStartWorkItem?.cancel()
+            self.repeatTask?.cancel()
             
             if phases.contains(.repeat) {
-                let repeatItem = DispatchWorkItem{ [weak self] in
-                    guard let self else { return }
-                    self.repeatTimer?.invalidate()
-                    self.repeatTimer = .scheduledTimer(withTimeInterval: self.repeatInterval, repeats: true){ [weak self] t in
-                        DispatchQueue.main.async { [weak self] in
-                            if let press = KeyPress(event: event, repeated: true) {
-                                _ = self?.captured(press)
-                            } else {
-                                self?.repeatTimer?.invalidate()
-                            }
+                repeatTask = Task { [weak self] in
+                    try await Task.sleep(nanoseconds: NSEC_PER_SEC / 2)
+                    
+                    while !Task.isCancelled {
+                        try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
+                        if let press = KeyPress(event: event, repeated: true) {
+                            _ = self?.captured(press)
+                        } else {
+                            self?.repeatTask?.cancel()
                         }
                     }
                 }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + repeatDelay, execute: repeatItem)
-                self.repeatStartWorkItem = repeatItem
             }
             
             if captured(press) == .ignored {
