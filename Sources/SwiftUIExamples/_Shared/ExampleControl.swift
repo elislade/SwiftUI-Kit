@@ -6,13 +6,15 @@ struct ExampleControl {
         
         @Binding var value: UnitPoint
         
-        @SliderState private var x = 0
-        @SliderState private var y = 0
+        @State private var x = Clamped(0.0)
+        @State private var y = Clamped(0.0)
         
-        private var unit: UnitPoint { .init(x: x, y: y) }
+        private var unit: UnitPoint {
+            .init(x: x.value, y: y.value)
+        }
         
         var body: some View {
-            SliderView(x: _x, y: _y, hitTestHandle: false){
+            SliderView(x: $x, y: $y, hitTestHandle: false){
                 RaisedControlMaterial(Circle())
                     .frame(width: 32, height: 32)
                     .overlay{
@@ -37,8 +39,8 @@ struct ExampleControl {
             }
             .onChangePolyfill(of: value, initial: true){
                 if value != unit {
-                    x = value.x
-                    y = value.y
+                    x.value = value.x
+                    y.value = value.y
                 }
             }
         }

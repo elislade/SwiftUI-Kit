@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-/// Allows sliders to be vertical, horizontal, or both at once. If x is set it will be horizontal. if y is set it will be vertical. If both x and y are set the slider will work on both axes at once.
+/// A Slider that can be vertical, horizontal, or both at once. If x is set it will be horizontal. if y is set it will be vertical. If both x and y are set the slider will work on both axes at once.
 public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where Value.Stride : BinaryFloatingPoint {
     
     @Environment(\.layoutDirection) private var layoutDirection
@@ -10,8 +10,12 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     @State private var handleSize: CGSize = .zero
     @State private var hovering = false
     
-    let x: SliderState<Value>?
-    let y: SliderState<Value>?
+    @State private var startDrag: CGPoint?
+    
+    @Binding private var x: Clamped<Value>
+    @Binding private var y: Clamped<Value>
+    
+    let activeAxis: Axis.Set
     let hitTestHandle: Bool
     let handle: () -> Handle
     
@@ -19,18 +23,19 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     /// Creates a slider with both x and y dimension
     ///
     /// - Parameters:
-    ///   - x: A ``SliderState`` representing the value on the x-axis.
-    ///   - y: A ``SliderState`` representing the value on the y-axis.
+    ///   - x: A clamped value representing the x-axis.
+    ///   - y: A clamped value representing the y-axis.
     ///   - hitTestHandle: Bool indicating that handle should be hitTested for gesture. Defaults to true.
     ///   - handle: A view representing the slider handle. Should be smaller in size then actual area of slider.
     public init(
-        x: SliderState<Value>? = nil,
-        y: SliderState<Value>? = nil,
+        x: Binding<Clamped<Value>>,
+        y: Binding<Clamped<Value>>,
         hitTestHandle: Bool = true,
         @ViewBuilder handle: @escaping () -> Handle
     ) {
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
+        self.activeAxis = [.horizontal, .vertical]
         self.hitTestHandle = hitTestHandle
         self.handle = handle
     }
@@ -39,22 +44,30 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     /// Creates a slider with only x  dimension
     ///
     /// - Parameters:
-    ///   - horizontal: A horizontal ``SliderState`` representing the value on the x-axis.
+    ///   - x: A clamped value representing the x-axis.
     ///   - hitTestHandle: Bool indicating that handle should be hitTested for gesture. Defaults to true.
     ///   - handle: A view representing the slider handle. Should be smaller in size then actual area of slider.
-    public init(_ horizontal: SliderState<Value>, hitTestHandle: Bool = true, @ViewBuilder handle: @escaping () -> Handle) {
-        self.init(x: horizontal, hitTestHandle: hitTestHandle, handle: handle)
+    public init(x: Binding<Clamped<Value>>, hitTestHandle: Bool = true, @ViewBuilder handle: @escaping () -> Handle) {
+        self._x = x
+        self._y = x
+        self.activeAxis = .horizontal
+        self.handle = handle
+        self.hitTestHandle = hitTestHandle
     }
     
     
     /// Creates a slider with only y dimension
     ///
     /// - Parameters:
-    ///   - vertical: A vertical ``SliderState`` representing the value on the y-axis.
+    ///   - y: A clamped value representing the y-axis.
     ///   - hitTestHandle: Bool indicating that handle should be hitTested for gesture. Defaults to true.
     ///   - handle: A view representing the slider handle. Should be smaller in size then actual area of slider.
-    public init(vertical: SliderState<Value>, hitTestHandle: Bool = true, @ViewBuilder handle: @escaping () -> Handle) {
-        self.init(y: vertical, hitTestHandle: hitTestHandle, handle: handle)
+    public init(y: Binding<Clamped<Value>>, hitTestHandle: Bool = true, @ViewBuilder handle: @escaping () -> Handle) {
+        self._x = y
+        self._y = y
+        self.activeAxis = .vertical
+        self.handle = handle
+        self.hitTestHandle = hitTestHandle
     }
     
     
@@ -67,12 +80,12 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
         var _x: CGFloat = 0
         var _y: CGFloat = 0
         
-        if let x {
+        if activeAxis.contains(.horizontal) {
             _x = CGFloat(x.percentComplete) * size.width
             _x -= CGFloat(x.percentComplete) * handleSize.width
         }
         
-        if let y {
+        if activeAxis.contains(.vertical) {
             _y = CGFloat(y.percentComplete) * size.height
             _y -= CGFloat(y.percentComplete) * handleSize.height
         }
@@ -83,18 +96,22 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     #if !os(tvOS)
     @State private var space = UUID()
     
+    private func dragValue(_ translation: CGPoint, in size: CGSize) {
+        if activeAxis.contains(.horizontal) {
+            let relativeX = layoutDirection == .leftToRight ? translation.x : size.width - translation.x
+            let percentX = relativeX / (size.width)
+            x.percentComplete = Value(percentX)
+        }
+        
+        if activeAxis.contains(.vertical) {
+            let percentY = translation.y / (size.height)
+            y.percentComplete = Value(percentY)
+        }
+    }
+    
     private func gesture(in size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .named(space)).onChanged({ g in
-            if let x = x {
-                let relativeX = layoutDirection == .leftToRight ? g.location.x : size.width - g.location.x
-                let percentX = relativeX / (size.width)
-                x.percentComplete = Value(percentX)
-            }
-            
-            if let y = y {
-                let percentY = g.location.y / (size.height)
-                y.percentComplete = Value(percentY)
-            }
+            dragValue(g.location, in: size)
         })
     }
     #endif
@@ -136,27 +153,27 @@ public extension SliderView where Handle == EmptyView {
     /// Creates a slider with both x and y dimension
     ///
     /// - Parameters:
-    ///   - x: A ``SliderState`` representing the value on the x-axis.
-    ///   - y: A ``SliderState`` representing the value on the y-axis.
-    init(x: SliderState<Value>? = nil, y: SliderState<Value>? = nil) {
+    ///   - x: A clamped value representing the x-axis.
+    ///   - y: A clamped value representing the y-axis.
+    init(x: Binding<Clamped<Value>>, y: Binding<Clamped<Value>>) {
         self.init(x: x, y: y, hitTestHandle: false){ EmptyView() }
     }
     
     /// Creates a slider with only x  dimension
     ///
     /// - Parameters:
-    ///   - horizontal: A horizontal ``SliderState`` representing the value on the x-axis.
-    init(_ horizontal: SliderState<Value>) {
-        self.init(x: horizontal, hitTestHandle: false){ EmptyView() }
+    ///   - x: A clamped value representing the x-axis.
+    init(x: Binding<Clamped<Value>>) {
+        self.init(x: x, hitTestHandle: false){ EmptyView() }
     }
     
     
     /// Creates a slider with only y dimension
     ///
     /// - Parameters:
-    ///   - vertical: A vertical ``SliderState`` representing the value on the y-axis.
-    init(vertical: SliderState<Value>) {
-        self.init(y: vertical, hitTestHandle: false){ EmptyView() }
+    ///   - y: A clamped value representing the y-axis.
+    init(y: Binding<Clamped<Value>>) {
+        self.init(y: y, hitTestHandle: false){ EmptyView() }
     }
     
 }

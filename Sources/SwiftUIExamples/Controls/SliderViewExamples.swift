@@ -7,8 +7,8 @@ public struct SliderViewExamples : View {
     @State private var useStepping = false
     @State private var hitTestHandle = false
     
-    @SliderState(in: -4...(-1)) private var x = -2
-    @SliderState(in: 1...8) private var y = 2
+    @State private var x = Clamped(-2, in: -4...(-1))
+    @State private var y = Clamped(2, in: 1...8)
     
     private var size: Double = 40
     private var radius: Double { size / 2 }
@@ -29,30 +29,30 @@ public struct SliderViewExamples : View {
             VStack(spacing: spacing) {
                 HStack(spacing: spacing) {
                     VStack(spacing: spacing) {
-                        SliderView(x: _x, y: _y, hitTestHandle: hitTestHandle){ handle.frame(width: size * 3, height: size * 2)
+                        SliderView(x: $x, y: $y, hitTestHandle: hitTestHandle){ handle.frame(width: size * 3, height: size * 2)
                         }
                         .background{ bg }
                         
-                        SliderView(_x, hitTestHandle: hitTestHandle){
+                        SliderView(x: $x, hitTestHandle: hitTestHandle){
                             handle.frame(width: size, height: size)
                         }
                         .background{ bg }
                         .frame(height: size)
                     }
                     
-                    SliderView(vertical: _y, hitTestHandle: hitTestHandle){
+                    SliderView(y: $y, hitTestHandle: hitTestHandle){
                         handle.frame(width: size, height: size)
                     }
                     .background{ bg }
                     .frame(width: size)
                 }
                 
-                SliderView(_x)
+                SliderView(x: $x)
                     .background{
                         bg
                         
                         SunkenControlMaterial(isTinted: true)
-                            .scaleEffect(x: _x.percentComplete, anchor: .leading)
+                            .scaleEffect(x: x.percentComplete, anchor: .leading)
                             .clipShape(Capsule())
                     }
                     .frame(height: size)
@@ -68,11 +68,11 @@ public struct SliderViewExamples : View {
                 
                 Spacer()
                 
-                Text("X ") + Text(x, format: .number.rounded(increment: 0.01))
+                Text("X ") + Text(x.value, format: .increment(0.01))
                     .font(.exampleParameterValue)
                     .foregroundColor(.secondary)
                 
-                Text("Y ") + Text(y, format: .number.rounded(increment: 0.01))
+                Text("Y ") + Text(y.value, format: .increment(0.01))
                     .font(.exampleParameterValue)
                     .foregroundColor(.secondary)
             }
@@ -248,14 +248,14 @@ struct SliderViewEqualizerExample: View {
         @Binding var value: Double
         var size: CGFloat = 12
         
-        @SliderState(in: -12...12) private var sliderValue: Double = 0
+        @State private var clamped = Clamped(0, in: -12...12)
         
         var body: some View {
-            SliderView(y: _sliderValue){
+            SliderView(y: $clamped){
                 RaisedControlMaterial(Circle())
                     .scaleEffect(y: -1)
             }
-            .syncValue(_value, _sliderValue)
+            .syncValue($value, $clamped.value)
             .frame(width: size)
             .background{
                 ZStack {
@@ -273,7 +273,7 @@ struct SliderViewEqualizerExample: View {
                                 )
                                 .blendMode(.overlay)
                             }
-                            .scaleEffect(y: (_sliderValue.percentComplete - 0.5) * 1.9, anchor: .top)
+                            .scaleEffect(y: (clamped.percentComplete - 0.5) * 1.9, anchor: .top)
                     }
                 }
                 .clipShape(Capsule())
@@ -281,7 +281,7 @@ struct SliderViewEqualizerExample: View {
             }
             .scaleEffect(y: -1)
             .frame(maxWidth: .infinity)
-            .animation(.interactiveSpring(duration: 0.3, extraBounce: 0.1), value: sliderValue)
+            .animation(.interactiveSpring(duration: 0.3, extraBounce: 0.1), value: clamped)
         }
         
     }

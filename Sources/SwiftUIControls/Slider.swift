@@ -3,15 +3,14 @@ import SwiftUIKitCore
 
 
 /// A equivilent of SwiftUI Slider view.
-public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : BinaryFloatingPoint {
+public struct Slider<Value: BinaryFloatingPoint & Sendable>: View where Value.Stride : BinaryFloatingPoint & Sendable {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.controlRoundness) private var controlRoundness
     @Environment(\.layoutDirectionSuggestion) private var layoutDirectionSuggestion
     @Environment(\.isEnabled) private var isEnabled
     
-    @Binding private var value: Value
-    @SliderState private var state: Value
+    @Binding private var value: Clamped<Value>
     
     private var layoutVertical: Bool { layoutDirectionSuggestion.useVertical }
     
@@ -25,15 +24,13 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
         in bounds: ClosedRange<Value> = 0...1,
         step: Value.Stride? = nil
     ) {
-        self._value = value
-        self._state = SliderState(wrappedValue: value.wrappedValue, in: bounds, step: step)
+        self._value = .init(value, in: bounds, step: step)
     }
     
     /// Initializes instance
-    /// - Parameter state: Init from ``SliderState``.
-    public init(_ state: SliderState<Value>) {
-        self._value = .constant(0)
-        self._state = state
+    /// - Parameter state: Init from Clamped value.
+    public init(_ value: Binding<Clamped<Value>>) {
+        self._value = value
     }
     
     private var alignment: Alignment { layoutVertical ? .top : .leading }
@@ -49,15 +46,24 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
     }
     
     public var body: some View {
-        SliderView(x: layoutVertical ? nil : _state, y: layoutVertical ? _state : nil){
-            RaisedControlMaterialSecondary(handleShape)
-                .frame(width: handleSize, height: handleSize)
-                .scaleEffect(y: layoutDirectionSuggestion == .useBottomToTop ? -1 : 1)
+        ZStack {
+            if layoutVertical {
+                SliderView(y: _value){
+                    RaisedControlMaterialSecondary(handleShape)
+                        .frame(width: handleSize, height: handleSize)
+                        .scaleEffect(y: layoutDirectionSuggestion == .useBottomToTop ? -1 : 1)
+                }
+            } else {
+                SliderView(x: _value){
+                    RaisedControlMaterialSecondary(handleShape)
+                        .frame(width: handleSize, height: handleSize)
+                }
+            }
         }
         .background {
             GeometryReader { proxy in
                 let dimension = layoutVertical ? proxy.size.height : proxy.size.width
-                let trackLength = ((dimension -  handleSize) * Double(_state.percentComplete)) + (handleSize / 2)
+                let trackLength = ((dimension -  handleSize) * Double(value.percentComplete)) + (handleSize / 2)
                 
                 ZStack(alignment: alignment){
                     SunkenControlMaterial(Capsule())
@@ -81,14 +87,45 @@ public struct Slider<Value: BinaryFloatingPoint>: View where Value.Stride : Bina
         )
         .compositingGroup()
         .opacity(isEnabled ? 1 : 0.5)
-        .syncValue(_state, _value)
         .geometryGroupPolyfill()
         .accessibilityAdjustableAction{ direction in
             switch direction {
-            case .increment: _state.increment()
-            case .decrement: _state.decrement()
+            case .increment: value.increment()
+            case .decrement: value.decrement()
             @unknown default: return
             }
         }
     }
+}
+
+
+#if !os(tvOS)
+
+extension SwiftUI.Slider where Label == EmptyView, ValueLabel == EmptyView {
+    
+    init<V: BinaryFloatingPoint>(_ value: Binding<Clamped<V>>) where V.Stride : BinaryFloatingPoint {
+        self.init(
+            value: value.value,
+            in: value.wrappedValue.bounds,
+            step: value.wrappedValue.step!
+        )
+    }
+    
+}
+
+#endif
+
+public extension Binding {
+    
+    init<V: BinaryFloatingPoint & Sendable>(
+        _ value: Binding<V>,
+        in bounds: ClosedRange<V> = 0...1,
+        step: V.Stride? = nil
+    ) where V.Stride : BinaryFloatingPoint & Sendable, Self.Value == Clamped<V> {
+        self.init(
+            get: { Clamped<V>(value.wrappedValue, in: bounds, step: step) },
+            set: { value.wrappedValue = $0.value }
+        )
+    }
+    
 }

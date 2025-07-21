@@ -5,8 +5,8 @@ public struct LabelThatFitsExample: View {
     
     @State private var suggestion: LayoutDirectionSuggestion = .useSystemDefault
     
-    @SliderState private var height = 40
-    @SliderState private var width = 40
+    @State private var height = Clamped(40)
+    @State private var width = Clamped(40)
     @State private var prefersTitle: Bool = true
     
     public init() {}
@@ -14,20 +14,20 @@ public struct LabelThatFitsExample: View {
     public var body: some View {
         ExampleView(title: "Label That Fits"){
             Color.clear.onGeometryChangePolyfill(of: \.size){ size in
-                _height.bounds = (size.height / 10)...size.height
-                _width.bounds = (size.width / 10)...size.width
+                height.bounds = (size.height / 10)...size.height
+                width.bounds = (size.width / 10)...size.width
             }
             .overlay {
                 Rectangle()
                     .fill(.tint)
-                    .frame(width: width, height: height)
+                    .frame(width: width.value, height: height.value)
                 
                 HStack {
                     Label("Leading", systemImage: "apple.logo")
                         .frame(maxWidth: .infinity)
                     
                     Rectangle()
-                        .frame(width: width, height: 0)
+                        .frame(width: width.value, height: 0)
                     
                     Label("Trailing", systemImage: "apple.logo")
                         .frame(maxWidth: .infinity)
@@ -38,7 +38,7 @@ public struct LabelThatFitsExample: View {
                         .frame(maxHeight: .infinity)
                     
                     Rectangle()
-                        .frame(width: 0, height: height)
+                        .frame(width: 0, height: height.value)
                     
                     Label("Bottom", systemImage: "apple.logo")
                         .frame(maxHeight: .infinity)
@@ -57,14 +57,16 @@ public struct LabelThatFitsExample: View {
                     Spacer(minLength: 0)
                     
                     Group {
-                        Text(width, format: .increment(1)) + Text(" , ") + Text(height, format: .increment(1))
+                        Text(width.value, format: .increment(1)) +
+                        Text(" , ") +
+                        Text(height.value, format: .increment(1))
                     }
                     .font(.exampleParameterValue)
                 }
                 
                 HStack {
-                    Slider(_width)
-                    Slider(_height)
+                    Slider($width)
+                    Slider($height)
                 }
             }
             .exampleParameterCell()
