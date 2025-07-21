@@ -52,12 +52,12 @@ import SwiftUIPresentation
                 }
             }
             .animation(.fastSpringInterpolating, value: barIsHidden)
-            .onPreferenceChange(NavBarMaterialKey.self){ _bgMaterial.wrappedValue = $0 }
-            .onPreferenceChange(PresentationKey.self){ _items.wrappedValue = $0 }
-            .onPreferenceChange(NavBarHiddenKey.self){ _barIsHidden.wrappedValue = $0 }
-            .transformPreference(NavBarMaterialKey.self){ $0 = NavBarMaterialKey.defaultValue }
-            .transformPreference(PresentationKey<NavBarItemMetadata>.self){ $0 = [] }
-            .transformPreference(NavBarHiddenKey.self){ $0 = NavBarHiddenKey.defaultValue }
+            .onPreferenceChange(NavBarMaterialKey.self){ bgMaterial = $0 }
+            .onPreferenceChange(PresentationKey.self){ items = $0 }
+            .onPreferenceChange(NavBarHiddenKey.self){ barIsHidden = $0 }
+            .resetPreference(NavBarMaterialKey.self)
+            .resetPreference(NavBarHiddenKey.self)
+            .resetPreference(PresentationKey<NavBarItemMetadata>.self)
     }
     
     

@@ -70,9 +70,8 @@ public extension View {
 extension View {
     
     func disableNavBarPreferences(_ disabled: Bool = true) -> some View {
-        self
-            .transformPreference(NavBarHiddenKey.self){ value in if disabled { value = false } }
-            .transformPreference(PresentationKey<NavBarItemMetadata>.self){ value in if disabled { value = [] } }
+        resetPreference(NavBarHiddenKey.self, reset: disabled)
+            .resetPreference(PresentationKey<NavBarItemMetadata>.self, reset: disabled)
     }
     
 }

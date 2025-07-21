@@ -41,7 +41,7 @@ public extension View {
     ///   - key: The Preference key to reset.
     ///   - reset: A Bool indicating whether to reset key  or not. Defaults to true.
     /// - Returns: A modified preference.
-    nonisolated func resetKey<Key: PreferenceKey>(_ key: Key.Type, reset: Bool = true) -> some View {
+    nonisolated func resetPreference<Key: PreferenceKey>(_ key: Key.Type, reset: Bool = true) -> some View {
         transformPreference(Key.self){ value in
             if reset {
                 value = Key.defaultValue

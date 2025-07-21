@@ -53,7 +53,7 @@ struct BasicPresentationContext: ViewModifier {
             .onPreferenceChange(PresentationKey<BasicPresentationMetadata>.self){
                 _values.wrappedValue = $0
             }
-            .transformPreference(PresentationKey<BasicPresentationMetadata>.self){ $0 = [] }
+            .resetPreference(PresentationKey<BasicPresentationMetadata>.self)
             .presentationMatchContext()
             .onPreferenceChange(PresentationWillDismissPreferenceKey.self){ actions in
                 _willDismiss.wrappedValue = actions

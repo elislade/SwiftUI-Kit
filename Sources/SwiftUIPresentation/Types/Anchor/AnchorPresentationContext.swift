@@ -118,10 +118,7 @@ struct AnchorPresentationContext: ViewModifier {
                     }
                 }
             }
-            .transformPreference(PresentationKey<Metadata>.self){
-                // don't let presentations continue up the chain if caught by this context
-                $0 = []
-            }
+            .resetPreference(PresentationKey<Metadata>.self)
         }
     
 }
