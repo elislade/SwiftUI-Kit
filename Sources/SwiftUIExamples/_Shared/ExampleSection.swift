@@ -38,7 +38,7 @@ struct ExampleSection<C: View> : View {
             .padding(.vertical, 10)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.noStyle)
+        .buttonStyle(.none)
         .background{
             VStack(spacing: 0) {
                 Rectangle()

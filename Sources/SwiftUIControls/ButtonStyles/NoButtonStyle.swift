@@ -4,6 +4,8 @@ import SwiftUIKitCore
 
 public struct NoButtonStyle: ButtonStyle {
     
+    nonisolated init(){ }
+    
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
     }
@@ -12,6 +14,6 @@ public struct NoButtonStyle: ButtonStyle {
 
 public extension ButtonStyle where Self == NoButtonStyle {
     
-    static var noStyle: NoButtonStyle { NoButtonStyle() }
+    static nonisolated var none: NoButtonStyle { NoButtonStyle() }
     
 }
