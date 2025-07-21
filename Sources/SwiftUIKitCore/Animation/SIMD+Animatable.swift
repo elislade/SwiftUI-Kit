@@ -17,7 +17,7 @@ extension SIMD2: @retroactive Animatable where Scalar: VectorArithmetic {
 extension SIMD3: @retroactive Animatable where Scalar: VectorArithmetic {
     
     public var animatableData: AnimatableTriplet<Scalar> {
-        get { .init(AnimatablePair(y, z), x) }
+        get { .init(AnimatablePair(x, y), z) }
         set {
             x = newValue.first.first
             y = newValue.first.second
