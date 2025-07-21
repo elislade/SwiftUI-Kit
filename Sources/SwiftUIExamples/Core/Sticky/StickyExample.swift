@@ -129,7 +129,7 @@ public struct StickyExample: View  {
                             )
                             .frame(width: size, height: size)
                         }
-                        .buttonStyle(.tintStyle)
+                        .buttonStyle(.tinted)
                         .id(i)
                         .sticky(edges: stickyItems.contains(i) ? .all : []){ state in
                             if state.isSticking {
@@ -182,7 +182,7 @@ public struct StickyExample: View  {
                                     isSticking: isSticking
                                 )
                             }
-                            .buttonStyle(.tintStyle)
+                            .buttonStyle(.tinted)
                             .id(i)
                             .sticky(edges: stickyItems.contains(i) ? .init(axis) : [], inset: inset){ state in
                                 if state.isSticking {

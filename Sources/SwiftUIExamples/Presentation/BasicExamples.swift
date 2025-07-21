@@ -98,7 +98,7 @@ public struct BasicExamples: View {
                             .scaledToFit()
                             .frame(width: 24)
                     }
-                    .buttonStyle(.tintStyle)
+                    .buttonStyle(.tinted)
                 }
                 .symbolRenderingMode(.hierarchical)
   

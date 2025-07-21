@@ -112,7 +112,7 @@ public struct LineWrapLayoutExample: View {
                         }
                     }
                 }
-                .buttonStyle(.tintStyle)
+                .buttonStyle(.tinted)
                 .font(.largeTitle)
                 .labelStyle(.iconOnly)
                 .symbolRenderingMode(.hierarchical)

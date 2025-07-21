@@ -109,7 +109,7 @@ public struct TextField<Leading: View>: View {
                             .aspectRatio(1, contentMode: .fit)
                         }
                     }
-                    .buttonStyle(.tintStyle)
+                    .buttonStyle(.tinted)
                     .symbolRenderingMode(.hierarchical)
                     .labelStyle(.iconOnly)
                     .transitions(.scale, .opacity)

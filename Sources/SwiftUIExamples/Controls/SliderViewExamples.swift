@@ -212,7 +212,7 @@ struct SliderViewEqualizerExample: View {
                     }
                 }
                 .font(.exampleParameterValue)
-                .buttonStyle(.tintStyle)
+                .buttonStyle(.tinted)
             }
             .padding()
         }

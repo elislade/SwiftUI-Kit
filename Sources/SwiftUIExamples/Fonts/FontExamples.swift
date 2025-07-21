@@ -150,7 +150,7 @@ public struct FontExamples: View {
                     .padding(.horizontal, -4)
                 }
                 .frame(height: height)
-                .buttonStyle(.tintStyle)
+                .buttonStyle(.tinted)
                 
                 Button(action: { value = 1 }){
                     Text("+1")
@@ -159,8 +159,8 @@ public struct FontExamples: View {
                 }
                 .disabled(value == 1)
             }
-            .syncValue(_value.animation(.interactiveSpring), _sliderValue)
-            .buttonStyle(.tintStyle)
+            // FIXME: Clamped .syncValue(_value.animation(.interactiveSpring), _clamped)
+            .buttonStyle(.tinted)
         }
     }
     
@@ -312,7 +312,7 @@ public struct FontExamples: View {
                         .labelStyle(.iconOnly)
                         .symbolRenderingMode(.hierarchical)
                         .disabled(parameters == .identity)
-                        .buttonStyle(.tintStyle)
+                        .buttonStyle(.tinted)
                     }
                 }
                 .padding([.vertical, .trailing])
@@ -431,7 +431,7 @@ public struct FontExamples: View {
                                 }
                         }
                     }
-                    .buttonStyle(.tintStyle)
+                    .buttonStyle(.tinted)
                     .padding(.horizontal)
                     .lineLimit(1)
                 }

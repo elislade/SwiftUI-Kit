@@ -6,6 +6,8 @@ public struct TintButtonStyle: ButtonStyle {
     
     @Environment(\.isEnabled) private var isEnabled
     
+    nonisolated public init(){ }
+    
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .contentShape(Rectangle())
@@ -18,6 +20,6 @@ public struct TintButtonStyle: ButtonStyle {
 
 public extension ButtonStyle where Self == TintButtonStyle {
     
-    static var tintStyle: TintButtonStyle { TintButtonStyle() }
+    static nonisolated var tinted: TintButtonStyle { TintButtonStyle() }
     
 }

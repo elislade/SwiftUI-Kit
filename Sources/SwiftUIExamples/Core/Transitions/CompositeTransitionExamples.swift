@@ -98,7 +98,7 @@ public struct CompositeTransitionExamples: View {
             }
             .animation(.smooth, value: order)
         }
-        .buttonStyle(.tintStyle)
+        .buttonStyle(.tinted)
         .symbolRenderingMode(.hierarchical)
         .labelStyle(.iconOnly)
     }
