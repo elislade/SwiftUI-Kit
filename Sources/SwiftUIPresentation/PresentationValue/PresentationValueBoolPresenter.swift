@@ -5,7 +5,7 @@ import SwiftUIKitCore
 struct PresentationValueBoolPresenter<Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
     
     @Environment(\.presentationIdentityBehaviour) private var behaviour
-    let environmentRef: ClosureKeyPath<EnvironmentValues>
+    let environmentRef: MainActorClosureKeyPath<EnvironmentValues>
     
     @State private var stableID = UUID()
     @State private var customID: UUID?

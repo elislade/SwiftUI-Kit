@@ -9,7 +9,7 @@ public protocol PresentationValueConformable: Sendable {
     var view: @MainActor () -> AnyView { get }
     var dispose: @Sendable () -> Void { get }
     var requestIDChange: @Sendable (UUID?) -> Void { get }
-    var envProxy: ClosureKeyPath<EnvironmentValues> { get }
+    var envProxy: MainActorClosureKeyPath<EnvironmentValues> { get }
 }
 
 
@@ -38,7 +38,7 @@ public protocol Translatable {
     public let view: @MainActor () -> AnyView
     public let dispose: @Sendable () -> Void
     public let requestIDChange: @Sendable (UUID?) -> Void
-    public let envProxy: ClosureKeyPath<EnvironmentValues>
+    public let envProxy: MainActorClosureKeyPath<EnvironmentValues>
     
     init(
         id: UUID,
@@ -49,7 +49,7 @@ public protocol Translatable {
         view: @escaping @MainActor () -> AnyView,
         dispose: @Sendable @escaping () -> Void,
         requestIDChange: @Sendable @escaping (UUID?) -> Void = { _ in },
-        envProxy: ClosureKeyPath<EnvironmentValues>
+        envProxy: MainActorClosureKeyPath<EnvironmentValues>
     ) {
         self.id = id
         self.tag = tag
@@ -78,7 +78,7 @@ public protocol Translatable {
         metadata[keyPath: path]
     }
     
-    public subscript<V: Sendable>(dynamicMember path: KeyPath<EnvironmentValues, V>) -> V {
+    @MainActor public subscript<V: Sendable>(dynamicMember path: KeyPath<EnvironmentValues, V>) -> V {
         envProxy[path]
     }
     
@@ -123,7 +123,7 @@ public extension View {
     ) -> some View {
         modifier(EnvironmentModifierWrap { environment in
             PresentationValueBoolPresenter(
-                environmentRef: ClosureKeyPath(environment),
+                environmentRef: MainActorClosureKeyPath(environment),
                 isPresented: isPresented,
                 tag: tag,
                 presentationRespondsToBoundsChange: respondsToBoundsChange,
@@ -142,7 +142,7 @@ public extension View {
     ) -> some View {
         modifier(EnvironmentModifierWrap{ environment in
             PresentationValueOptionalPresenter(
-                environmentRef: ClosureKeyPath(environment),
+                environmentRef: MainActorClosureKeyPath(environment),
                 value: value,
                 tag: tag,
                 presentationRespondsToBoundsChange: respondsToBoundsChange,
