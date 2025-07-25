@@ -97,6 +97,27 @@ extension SymbolGroupingConformance {
     
 }
 
+public enum SymbolEffectRotationDirection: Hashable, CaseIterable, Sendable, BitwiseCopyable {
+    case clockwise
+    case counterClockwise
+}
+
+protocol SymbolRotationDirectionConformance {
+    var clockwise: Self { get }
+    var counterClockwise: Self { get }
+}
+
+extension SymbolRotationDirectionConformance {
+    
+    nonisolated subscript(_ direction: SymbolEffectRotationDirection) -> Self {
+        switch direction {
+        case .clockwise: clockwise
+        case .counterClockwise: counterClockwise
+        }
+    }
+    
+}
+
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
 extension BounceSymbolEffect: SymbolGroupingConformance, SymbolDirectionConformance {}
@@ -118,3 +139,12 @@ extension ScaleSymbolEffect: SymbolGroupingConformance, SymbolDirectionConforman
 
 @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
 extension VariableColorSymbolEffect: SymbolInactiveLayerBehaviourConformance, SymbolSucessiveVariableBehaviourConformance {}
+
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
+extension WiggleSymbolEffect: SymbolGroupingConformance, SymbolDirectionConformance, SymbolRotationDirectionConformance {}
+
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
+extension RotateSymbolEffect: SymbolGroupingConformance, SymbolRotationDirectionConformance {}
+
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
+extension BreatheSymbolEffect: SymbolGroupingConformance {}
