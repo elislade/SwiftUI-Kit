@@ -80,7 +80,8 @@ public final class StandardWindowButtonView: NSView {
     
     public override func viewDidMoveToWindow() {
         //self.addTrackingArea(.init(rect: frame, options: [.mouseEnteredAndExited, .activeAlways], owner: self))
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){ [unowned self] in
+        Task{ @MainActor [unowned self] in
+            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 20)
             btn = NSWindow.standardWindowButton(type, for: [.miniaturizable, .closable, .resizable, .docModalWindow])!
             addSubview(btn)
             btn.target = window

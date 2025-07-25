@@ -9,7 +9,7 @@ import SwiftUI
     private unowned let window: SwiftUIWindow
     private var previousWindowRadius: CGFloat?
     private var overrideRadius: CGFloat?
-    private var windowFrameDebounceTimer: Timer?
+    private var windowFrameTask: Task<Void, Error>?
     private var persistanceFrameKey: String {
         let id = window.restoreIdentifier ?? "default"
         return"\(id)_windowFrame"
@@ -138,18 +138,16 @@ extension WindowState : NSWindowDelegate {
     }
     
     public func windowDidResize(_ notification: Notification) {
-        windowFrameDebounceTimer?.invalidate()
-        windowFrameDebounceTimer = .scheduledTimer(withTimeInterval: 2, repeats: false){ [window] _ in
-            DispatchQueue.main.async {
+        windowFrameTask = Task {
+            if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 2) {
                 UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
             }
         }
     }
     
     func windowDidMove(_ notification: Notification) {
-        windowFrameDebounceTimer?.invalidate()
-        windowFrameDebounceTimer = .scheduledTimer(withTimeInterval: 2, repeats: false){ [window]  _ in
-            DispatchQueue.main.async {
+        windowFrameTask = Task {
+            if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 2) {
                 UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
             }
         }
