@@ -4,11 +4,12 @@ import SwiftUI
 /// A SwiftUI ScrollView that you can read its content offset and content size
 public struct ReadableScrollView<Content: View>: View {
     
+    @Environment(\.frozenState) private var frozenState
     @Environment(\.scrollOffsetPassthrough) private var offsetPassthrough
     
     @State private var handlesReset: Bool = false
     @State private var isResetting = false
-    @State private var scrollOrigin: CGPoint = .zero
+    @State private var scrollOrigin: CGPoint?
     
     let axis: Axis.Set
     let showsIndicators: Bool
@@ -46,6 +47,7 @@ public struct ReadableScrollView<Content: View>: View {
                 content
                     .id("ScrollContent")
                     .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.rounded(.towardZero) }){
+                        guard let scrollOrigin else { return }
                         let origin = $0
                         let offset = CGPoint(x: origin.x - scrollOrigin.x, y: origin.y - scrollOrigin.y)
                         offsetPassthrough?.send(offset)
@@ -69,7 +71,8 @@ public struct ReadableScrollView<Content: View>: View {
                     proxy.scrollTo("ScrollContent", anchor: axis == .vertical ? .top : .leading)
                 }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                Task{
+                    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 2)
                     isResetting = false
                 }
             }
