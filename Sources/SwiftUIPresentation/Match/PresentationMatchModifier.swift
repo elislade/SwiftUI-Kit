@@ -1,35 +1,73 @@
 import SwiftUI
 
 
-struct PresentationMatchModifier<MatchID: Hashable, Content: View>: View {
+struct PresentationMatchModifier<MatchID: Hashable, Copy: View>: ViewModifier {
     
-    @Environment(\.isBeingPresentedOn) private var isPresentedOn
+    @Environment(\.presentationMatchCaptureMode) private var captureMode
+    
     @State private var hide = false
     @State private var id = UUID()
+    @State private var view: AnyView?
+    @State private var snapshotUpdatedSignal: Bool = false
     
     let matchID: MatchID
-    let content: Content
+    let copy: Copy
     
-    var body: some View {
-        content
-            .opacity(hide ? 0 : 1)
-            .overlay {
-                Color.clear
-                    .anchorPreference(key: PresentationMatchKey.self, value: .bounds){
+    private func makeElement(_ anchor: Anchor<CGRect>) -> MatchGroup.Element {
+        .init(
+            anchor: anchor,
+            view: { AnyView(copy) },
+            isVisible: $hide.inverse
+        )
+    }
+    
+    private func makeElement(_ anchor: Anchor<CGRect>, view: AnyView) -> MatchGroup.Element {
+        .init(
+            sig: .random(in: 0...100),
+            anchor: anchor,
+            view: { view },
+            isVisible: $hide.inverse
+        )
+    }
+    
+    func body(content: Content) -> some View {
+        switch captureMode {
+        case .newInstance:
+            content
+                .opacity(hide ? 0 : 1)
+                .background{
+                    Color.clear.anchorPreference(key: PresentationMatchKey.self, value: .bounds){ anchor in
                         [.init(
                             id: id,
                             matchID: matchID,
-                            isDestination: !isPresentedOn,
-                            anchor: $0,
-                            view: { AnyView(content) },
-                            visibility: { visible in
-                                DispatchQueue.main.async{
-                                    hide = !visible
-                                }
-                            }
+                            source: makeElement(anchor)
                         )]
                     }
-            }
+                }
+        case .snapshot:
+            content
+                .viewSnapshot(for: hide, initial: false){
+                    view = $0
+                    snapshotUpdatedSignal.toggle()
+                }
+                .opacity(hide ? 0 : 1)
+                .background{
+                    ZStack {
+                        // wait for snapshot
+                        if let view {
+                            Color.clear.anchorPreference(key: PresentationMatchKey.self, value: .bounds){ anchor in
+                                [.init(
+                                    id: id,
+                                    matchID: matchID,
+                                    source: makeElement(anchor, view: view)
+                                )]
+                            }
+                        }
+                    }
+                    .id(snapshotUpdatedSignal)
+                }
+        }
+
     }
     
 }

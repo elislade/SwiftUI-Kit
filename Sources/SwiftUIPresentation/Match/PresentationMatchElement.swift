@@ -2,33 +2,45 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationMatchElement: Equatable, @unchecked Sendable, Identifiable {
+struct PresentationMatchKey: PreferenceKey {
     
-    static func == (lhs: PresentationMatchElement, rhs: PresentationMatchElement) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.matchID == rhs.matchID &&
-        lhs.isDestination == rhs.isDestination &&
-        lhs.anchor == rhs.anchor
+    typealias Value = [MatchGroup]
+    
+    static var defaultValue: Value { [] }
+    
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        let next = nextValue()
+        
+        for n in next {
+            if let index = value.firstIndex(where: {
+                $0.matchID == n.matchID && $0.destination == nil && $0.id != n.id
+            }) {
+                value[index].destination = n.source
+            }
+            
+            value.append(n)
+        }
     }
-    
-    let id: UUID
-    let matchID: AnyHashable
-    let isDestination: Bool
-    let anchor: Anchor<CGRect>
-    let view: @MainActor () -> AnyView
-    let visibility: @Sendable (Bool) -> Void
     
 }
 
 
-struct PresentationMatchKey: PreferenceKey {
+struct MatchGroup: Equatable {
     
-    typealias Value = [PresentationMatchElement]
-    
-    static var defaultValue: Value{ [] }
-    
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value.append(contentsOf: nextValue())
+    struct Element: Equatable {
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.anchor == rhs.anchor && lhs.sig == rhs.sig
+        }
+        
+        var sig: Int = 0
+        let anchor: Anchor<CGRect>
+        let view: @MainActor () -> AnyView
+        @Binding var isVisible: Bool
     }
+    
+    let id: UUID
+    let matchID: AnyHashable
+    let source: Element
+    var destination: Element?
     
 }
