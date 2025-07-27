@@ -3,59 +3,52 @@ import SwiftUIKit
 
 struct ResetActionExamples: View {
     
-    @State private var resetAction: ResetAction?
-    @State private var resetAll = false
-    
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Color.clear
-                VStack(spacing: nil) {
-                    ChildView()
-                    
-                    ChildView()
-                        .disableResetAction()
-                    
-                    ChildView()
+        Content()
+            .resetContext()
+    }
+    
+    struct Content: View {
+        
+        @Environment(\.reset) private var reset
+        
+        var body: some View {
+            VStack(spacing: 0) {
+                ZStack {
+                    Color.clear
+                    VStack(spacing: nil) {
+                        ChildView()
+                        
+                        ChildView()
+                            .disableResetAction()
+                        
+                        ChildView()
+                    }
+                    .padding()
                 }
-                .padding()
-                .childResetAction { action in
-                    _resetAction.wrappedValue = action
-                }
-                .onChangePolyfill(of: resetAction){
-                    if resetAll {
-                        if let resetAction {
-                            resetAction()
-                        } else {
-                            resetAll = false
+                .background(.regularMaterial)
+                
+                Divider().ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    ExampleTitle("Reset Action")
+                        .padding(.vertical)
+                    
+                    HStack {
+                        Button("Reset"){ reset(.once) }
+                        
+                        Button("Reset All"){
+                            reset(.all)
                         }
                     }
+                    .lineLimit(1)
+                    .padding()
                 }
-            }
-            .background(.regularMaterial)
-            
-            Divider().ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                ExampleTitle("Reset Action")
-                    .padding(.vertical)
-                
-                HStack {
-                    Button("Reset"){ resetAction?() }
-                        .disabled(resetAction == nil)
-                    
-                    Button("Reset All"){
-                        resetAll = true
-                        resetAction?()
-                    }
-                    .disabled(resetAction == nil)
-                }
-                .lineLimit(1)
-                .padding()
             }
         }
+        
     }
     
     struct ChildView: View {

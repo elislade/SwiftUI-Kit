@@ -39,6 +39,11 @@ public struct ResetActionKey: PreferenceKey {
 
 public extension View {
     
+    /// Spcifies when to merge reset preferences to the environment
+    func resetContext() -> some View {
+        modifier(ResetActionContext())
+    }
+    
     
     /// Disables all ResetActions from this view downwards from having their preference seen.
     /// 
@@ -68,7 +73,7 @@ public extension View {
     
     /// - Parameter closure: A closure that gets called with the bottom most ResetAction available. If no action is available a nil value will be returned.
     /// - Returns: A view that handles child ResetActions.
-    func childResetAction(_ closure: @escaping @Sendable (ResetAction?) -> Void) -> some View {
+    func childResetAction(_ closure: @escaping (ResetAction?) -> Void) -> some View {
         onPreferenceChange(ResetActionKey.self, perform: closure)
     }
     
