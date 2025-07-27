@@ -81,6 +81,8 @@ public extension CGSize {
         )
     }
     
+    var simd: SIMD2<Double> { [width,height] }
+    
 }
 
 public func scaleOfFitting(_ size: CGSize, in other: CGSize) -> Double {
@@ -168,6 +170,8 @@ public extension CGPoint {
         }
     }
     
+    
+    var simd: SIMD2<Double> { [x,y] }
 }
 
 
@@ -212,6 +216,10 @@ public extension CGRect {
     
     func inset(_ insets: EdgeInsets) -> CGRect {
         CGRect(x: 0, y: 0, width: 0, height: 0)
+    }
+    
+    var simd: SIMD4<Double> {
+        [origin.x, origin.y, width, height]
     }
     
 }
