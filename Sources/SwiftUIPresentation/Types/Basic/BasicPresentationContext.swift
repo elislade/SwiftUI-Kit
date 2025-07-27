@@ -31,6 +31,7 @@ struct BasicPresentationContext: ViewModifier {
                     if !values.isEmpty {
                         BackdropView(preference: backdropPreference, dismiss: dismiss)
                             .zIndex(2 + Double(values.count - 1))
+                            .transition((.opacity + .noHitTesting).animation(.smooth))
                     }
                     
                     ForEach(values, id: \.id){ value in
@@ -51,14 +52,13 @@ struct BasicPresentationContext: ViewModifier {
                 }
             }
             .onPreferenceChange(PresentationKey<BasicPresentationMetadata>.self){
-                _values.wrappedValue = $0
+                values = $0
             }
             .resetPreference(PresentationKey<BasicPresentationMetadata>.self)
-            .presentationMatchContext()
             .onPreferenceChange(PresentationWillDismissPreferenceKey.self){ actions in
-                _willDismiss.wrappedValue = actions
+                willDismiss = actions
             }
-                
     }
+    
 }
 

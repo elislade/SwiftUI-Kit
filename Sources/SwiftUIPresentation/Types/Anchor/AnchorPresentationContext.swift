@@ -10,6 +10,7 @@ struct AnchorPresentationContext: ViewModifier {
     @Environment(\.presentationEnvironmentBehaviour) private var envBehaviour
     @Environment(\.layoutDirection) private var envLayoutDirection
     
+    @State private var willDismiss: [PresentationWillDismissAction] = []
     @State private var backdropPreference: BackdropPreference?
     @State private var presentedValue: Presentation?
 
@@ -55,15 +56,19 @@ struct AnchorPresentationContext: ViewModifier {
     
     private func dismiss() {
         guard let presentedValue else { return }
+        for action in willDismiss {
+            action()
+        }
         presentedValue.dispose()
     }
     
     func body(content: Content) -> some View {
         content
             .isBeingPresentedOn(presentedValue != nil)
+            .disableOnPresentationWillDismiss(presentedValue != nil)
             .accessibilityHidden(presentedValue != nil)
             .onPreferenceChange(PresentationKey<Metadata>.self) {
-                _presentedValue.wrappedValue = $0.last
+                presentedValue = $0.last
             }
             .overlay {
                 GeometryReader{ proxy in

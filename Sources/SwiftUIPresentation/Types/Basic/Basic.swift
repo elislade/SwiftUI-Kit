@@ -4,7 +4,7 @@ public extension View {
     
     
     /// Defines the presentation context for which children that use presentation will present to.
-    nonisolated func presentationContext() -> some View {
+    nonisolated func basicPresentationContext() -> some View {
         modifier(BasicPresentationContext())
     }
     
