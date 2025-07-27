@@ -78,7 +78,7 @@ public func compare<T: Comparable>(_ lhs: T, _ type: CompareType, _ rhs: T) -> B
 
 
 /// Resolves the keypath of an object through an escaping  MainActor closure by way of subscript.
-public struct MainActorClosureKeyPath<T>: Sendable {
+@dynamicMemberLookup public struct MainActorClosureKeyPath<T>: Sendable {
     
     private let closure: @MainActor () -> T
     
@@ -90,10 +90,14 @@ public struct MainActorClosureKeyPath<T>: Sendable {
         closure()[keyPath: key]
     }
     
+    @MainActor public subscript<V: Sendable>(dynamicMember key: KeyPath<T, V>) -> V {
+        closure()[keyPath: key]
+    }
+    
 }
 
 /// Resolves the keypath of an object through an escaping  Sendable closure by way of subscript.
-public struct SendableClosureKeyPath<T>: Sendable {
+@dynamicMemberLookup public struct SendableClosureKeyPath<T>: Sendable {
     
     private let closure: @Sendable () -> T
     
@@ -102,6 +106,10 @@ public struct SendableClosureKeyPath<T>: Sendable {
     }
     
     public subscript<V: Sendable>(key: KeyPath<T, V>) -> V {
+        closure()[keyPath: key]
+    }
+    
+    public subscript<V: Sendable>(dynamicMember key: KeyPath<T, V>) -> V {
         closure()[keyPath: key]
     }
     
