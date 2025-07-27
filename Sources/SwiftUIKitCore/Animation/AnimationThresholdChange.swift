@@ -11,6 +11,16 @@ public extension View {
         ))
     }
     
+    func onAnimationComplete(when completeFlag: Bool, perform action: @escaping () -> Void, else elseAction: @escaping () -> Void = {}) -> some View {
+        background{
+            if !completeFlag {
+                Color.clear.onDisappear(perform: action)
+            } else {
+                Color.clear.onDisappear(perform: elseAction)
+            }
+        }
+    }
+    
 }
 
 
