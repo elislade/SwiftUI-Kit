@@ -36,4 +36,13 @@ public extension View {
         }
     }
     
+    func disableAnimations(_ disabled: Bool = true) -> some View {
+        transaction{
+            if disabled {
+                $0.disablesAnimations = true
+                $0.animation = nil
+            }
+        }
+    }
+    
 }
