@@ -296,3 +296,10 @@ public extension SetAlgebra {
     
 }
 
+public func nanoseconds(seconds: Double) -> UInt64 {
+    UInt64(Double(NSEC_PER_SEC) * seconds)
+}
+
+public func nanoseconds(milliseconds: Double) -> UInt64 {
+    nanoseconds(seconds: milliseconds / 1000)
+}
