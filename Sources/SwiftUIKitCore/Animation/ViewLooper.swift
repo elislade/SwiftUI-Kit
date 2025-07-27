@@ -9,6 +9,7 @@ public enum TimeSpan {
 ///  Scrolls view along its desired axis at a looped wait time interval.
 public struct ViewLooper<Content: View>: View {
     
+    @Environment(\.frozenState) private var frozenState
     @State private var scrollToCopy = false
     @State private var size: CGSize = .zero
     @State private var count: Int = 0
@@ -16,29 +17,36 @@ public struct ViewLooper<Content: View>: View {
     private let axis: Axis
     private let duration: TimeSpan
     private let wait: TimeInterval
-    private let featherMask: Bool
+    private let edgeFadeAmount: Double
     private let content: Content
+    
+    private var startTask: Int {
+        var hasher = Hasher()
+        hasher.combine(frozenState)
+        hasher.combine(count)
+        return hasher.finalize()
+    }
     
     
     /// Initialize instance
     ///
     /// - Parameters:
     ///   - axis: The axis along which the scrolling happens.
-    ///   - duration: How long it takes for the view to scroll. Either absolute which is in seconds or relative which is in millisecondsPerPoint relative to the views size.  Defaults to 5 millisecondsPerPoint.
-    ///   - wait: How long to pause between scrolls. Defaults to 8 seconds.
-    ///   - featherMask: Bool indicating whether to feather the mask edges for a feathered scroll clipping. Defaults to true.
-    ///   - content: A view builder of the content to scroll.
+    ///   - duration: How long it takes for the view to loop. Either absolute which is in seconds or relative which is in millisecondsPerPoint relative to the views size.  Defaults to 5 millisecondsPerPoint.
+    ///   - wait: How long to pause between loopa. Defaults to 8 seconds.
+    ///   - edgeFadeAmount: Amount in points of how much edge fade there should be for the content. Defaults to 12.
+    ///   - content: A view builder of the content to loop.
     public init(
         _ axis: Axis,
         duration: TimeSpan = .millisecondsPerPoint(5),
         wait: TimeInterval = 8,
-        featherMask: Bool = true,
+        edgeFadeAmount: Double = 12,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.axis = axis
         self.duration = duration
         self.wait = wait
-        self.featherMask = featherMask
+        self.edgeFadeAmount = edgeFadeAmount
         self.content = content()
     }
     
@@ -56,25 +64,25 @@ public struct ViewLooper<Content: View>: View {
     private var maskContent: some View {
         AxisStack(axis, spacing: 0){
             LinearGradient(
-                colors: [.black.opacity(featherMask ? 0 : 1), .black],
+                colors: [.black.opacity(0), .black],
                 startPoint: axis == .horizontal ? .leading : .top,
                 endPoint: axis == .horizontal ? .trailing : .bottom
             )
             .frame(
-                width: axis == .horizontal ? 12 : nil,
-                height: axis == .vertical ? 12 : nil
+                width: axis == .horizontal ? edgeFadeAmount : nil,
+                height: axis == .vertical ? edgeFadeAmount : nil
             )
             
             Color.black
             
             LinearGradient(
-                colors: [.black, .black.opacity(featherMask ? 0 : 1)],
+                colors: [.black, .black.opacity(0)],
                 startPoint: axis == .horizontal ? .leading : .top,
                 endPoint: axis == .horizontal ? .trailing : .bottom
             )
             .frame(
-                width: axis == .horizontal ? 12 : nil,
-                height: axis == .vertical ? 12 : nil
+                width: axis == .horizontal ? edgeFadeAmount : nil,
+                height: axis == .vertical ? edgeFadeAmount : nil
             )
         }
         .drawingGroup()
@@ -85,10 +93,12 @@ public struct ViewLooper<Content: View>: View {
        content
             .hidden()
             .overlay(alignment: .topLeading){
-                AxisStack(axis, spacing: 0) {
+                AxisStack(axis, spacing: edgeFadeAmount) {
                     content
                     content
                 }
+                .padding(.leading, axis == .horizontal ? edgeFadeAmount : 0)
+                .padding(.top, axis == .vertical ? edgeFadeAmount : 0)
                 .fixedSize(horizontal: axis == .horizontal, vertical: axis == .vertical)
                 .onGeometryChangePolyfill(of: \.size){ size = $0 }
                 .offset(
@@ -98,19 +108,20 @@ public struct ViewLooper<Content: View>: View {
                 .animation(.easeInOut(duration: seconds(in: size)), value: scrollToCopy)
                 .id(count)
             }
-            .task(id: count){
-                let waitNano = UInt64(Double(NSEC_PER_SEC) * wait)
-                if let _ = try? await Task.sleep(nanoseconds: waitNano) {
+            .task(id: startTask){
+                guard frozenState.isThawed else { return }
+                
+                if let _ = try? await Task.sleep(nanoseconds: nanoseconds(seconds: wait)) {
                     scrollToCopy = true
-                    let durationNano = UInt64(Double(NSEC_PER_SEC) * seconds(in: size))
-                    if let _ = try? await Task.sleep(nanoseconds: durationNano) {
+                    if let _ = try? await Task.sleep(nanoseconds: nanoseconds(seconds: seconds(in: size))) {
                         count += 1
                         scrollToCopy = false
                     }
                 }
             }
-            .clipped()
             .mask(maskContent)
+            .padding(.leading, axis == .horizontal ? -edgeFadeAmount : 0)
+            .padding(.top, axis == .vertical ? -edgeFadeAmount : 0)
     }
     
 }

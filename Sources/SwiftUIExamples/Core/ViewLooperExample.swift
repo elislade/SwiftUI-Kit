@@ -4,7 +4,7 @@ import SwiftUIKit
 public struct ViewLooperExample: View {
     
     @State private var axis: Axis = .horizontal
-    @State private var feather = true
+    @State private var edgeFadeAmount: Double = 12
     @State private var durationSpan: TimeSpanMode = .relative
     @State private var duration: Double = 5
     @State private var wait: Double = 3
@@ -29,16 +29,25 @@ public struct ViewLooperExample: View {
     
     public var body: some View {
         ExampleView(title: "View Looper"){
-            ViewLooper(
-                axis,
-                duration: durationEnum,
-                wait: wait,
-                featherMask: feather
-            ) {
-                Text("Supercalifragilisticexpialidocious")
-                    .font(.system(size: 18, design: .serif).bold().italic())
-                    .lineLimit(1)
-                    .padding(.horizontal)
+            HStack(spacing: max(12, edgeFadeAmount)) {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.tint)
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(width: 60)
+                
+                VStack(alignment: .leading) {
+                    Text("Not Looping")
+                    ViewLooper(
+                        axis,
+                        duration: durationEnum,
+                        wait: wait,
+                        edgeFadeAmount: edgeFadeAmount
+                    ) {
+                        Text("Supercalifragilisticexpialidocious")
+                            .font(.system(size: 18, design: .serif).bold().italic())
+                            .lineLimit(1)
+                    }
+                }
             }
         } parameters: {
             HStack {
@@ -81,19 +90,32 @@ public struct ViewLooperExample: View {
                     
                     Spacer()
                     
-                    Group {
-                        Text(wait, format: .increment(0.1)) + Text(" Seconds")
-                    }
-                    .font(.exampleParameterValue)
+        
+                    Text(wait, format: .increment(0.1))
+                        .font(.exampleParameterValue)
+                    +
+                    
+                    Text(" Seconds")
+                        .font(.caption2)
+                        .foregroundColor(.primary.opacity(0.5))
                 }
                 
                 Slider(value: $wait, in: 0...10)
             }
             .exampleParameterCell()
           
-            Toggle(isOn: $feather){
-                Text("Feather Edges")
-                    .font(.exampleParameterTitle)
+            VStack {
+                HStack {
+                    Text("Edge Fade Amount")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Text(edgeFadeAmount, format: .increment(0.1))
+                        .font(.exampleParameterValue)
+                }
+                
+                Slider(value: $edgeFadeAmount, in: 0...24)
             }
             .exampleParameterCell()
         }
