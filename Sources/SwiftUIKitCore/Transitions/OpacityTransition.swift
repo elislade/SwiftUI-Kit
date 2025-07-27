@@ -3,10 +3,10 @@ import SwiftUI
 
 public extension AnyTransition {
     
-    static func opacity(_ value: Double = 0) -> AnyTransition {
+    static func opacity(_ value: Double, identity: Double = 1) -> AnyTransition {
         .modifier(
             active: OpacityModifier(value: value),
-            identity: OpacityModifier(value: 1)
+            identity: OpacityModifier(value: identity)
         )
     }
     
