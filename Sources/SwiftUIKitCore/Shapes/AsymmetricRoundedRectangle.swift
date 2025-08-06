@@ -48,27 +48,17 @@ public struct RadiusValues: Hashable, Animatable, Sendable {
         self.init(topLeft: value, topRight: value, bottomRight: value, bottomLeft: value)
     }
     
-    
-    /// The type defining the top data to animate.
-    public typealias AnimatableTop = AnimatablePair<Double, Double>
-    
-    /// The type defining the bottom data to animate.
-    public typealias AnimatableBottom = AnimatablePair<Double, Double>
-    
     /// The type defining the data to animate.
-    public typealias AnimatableData = AnimatablePair<AnimatableTop, AnimatableBottom>
+    public typealias AnimatableData = AnimatableQuadruplet<Double>
     
     /// The data to animate.
     public var animatableData: AnimatableData {
         get {
-            let top = AnimatableTop(topLeft, topRight)
-            let bottom = AnimatableBottom(bottomLeft, bottomRight)
-            return AnimatableData(top, bottom)
+            AnimatableData(.init(topLeft, topRight), .init(bottomLeft, bottomRight))
         }
         set {
             topLeft = newValue.first.first
             topRight = newValue.first.second
-            
             bottomLeft = newValue.second.first
             bottomRight = newValue.second.second
         }
@@ -83,7 +73,7 @@ public struct RadiusValues: Hashable, Animatable, Sendable {
         }
     }
     
-    public static func + (lhs:  RadiusValues, value: Double) -> RadiusValues {
+    public static func + (lhs: RadiusValues, value: Double) -> RadiusValues {
         var copy = lhs
         copy.topLeft += value
         copy.topRight += value
@@ -215,23 +205,20 @@ public struct AsymmetricRoundedRectangle: Shape {
         let rect = rect.insetBy(dx: inset, dy: inset)
         let radius = safeRadius(in: rect.size)
         return Path{ path in
-            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
             
-            if radius.topLeft > 0 {
-                let center = CGPoint(
-                    x: rect.minX + radius.topLeft,
-                    y: rect.minY + radius.topLeft
-                )
-                path.addRelativeArc(
-                    center: center,
-                    radius: radius.topLeft,
-                    startAngle: .degrees(-180),
-                    delta: .degrees(90)
-                )
-            }
+            let center = CGPoint(
+                x: rect.minX + radius.topLeft,
+                y: rect.minY + radius.topLeft
+            )
+            path.addRelativeArc(
+                center: center,
+                radius: radius.topLeft,
+                startAngle: .degrees(-180),
+                delta: .degrees(90)
+            )
             
             path.addLine(to: CGPoint(
-                x: rect.maxX,
+                x: rect.maxX - radius.topRight,
                 y: rect.minY
             ))
             
@@ -267,7 +254,7 @@ public struct AsymmetricRoundedRectangle: Shape {
             }
             
             path.addLine(to: CGPoint(
-                x: rect.minX,
+                x: rect.minX + radius.bottomLeft,
                 y: rect.maxY
             ))
             
@@ -311,7 +298,7 @@ extension AsymmetricRoundedRectangle: InsettableShape {
     
     public func inset(by amount: CGFloat) -> AsymmetricRoundedRectangle {
         var copy = self
-        copy.inset = amount
+        copy.inset += amount
         return copy
     }
  

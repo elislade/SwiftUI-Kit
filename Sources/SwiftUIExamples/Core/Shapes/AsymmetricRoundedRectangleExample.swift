@@ -20,6 +20,10 @@ public struct AsymmetricRoundedRectangleExamples: View {
                 AsymmetricRoundedRectangle(values: values)
                     .inset(by: inset)
                     .fill(.tint)
+                
+                AsymmetricRoundedRectangle(values: values)
+                    .inset(by: inset)
+                    .strokeBorder(.primary, style: .init(lineWidth: 3, lineCap: .round, dash: [4,6]))
             }
             .padding()
         } parameters: {
