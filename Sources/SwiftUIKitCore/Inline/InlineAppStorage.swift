@@ -1,13 +1,13 @@
 import SwiftUI
 
 
-public struct InlineAppStorage<Value : Codable & Equatable, Content: View>: View  {
+public struct InlineAppStorage<Value : Codable & Equatable, Content: View>  {
     
     let value: State<Value>
     let storage: AppStorage<Data?>
     let content: (Binding<Value>) -> Content
     
-    public init(
+    public nonisolated init(
         _ key: String,
         initial: Value,
         store: UserDefaults? = nil,
@@ -22,6 +22,11 @@ public struct InlineAppStorage<Value : Codable & Equatable, Content: View>: View
         self.storage = sotrageData
         self.content = content
     }
+    
+}
+
+
+extension InlineAppStorage: View {
     
     public var body: some View {
         content(value.projectedValue)

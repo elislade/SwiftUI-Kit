@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct InlinePreferenceKeyReader<Key: PreferenceKey, Content: View>: View where Key.Value : Equatable & Sendable {
+public struct InlinePreferenceKeyReader<Key: PreferenceKey, Content: View> where Key.Value : Equatable & Sendable {
     
     @State private var value: Key.Value
     let content: (Key.Value) -> Content
@@ -9,10 +9,15 @@ public struct InlinePreferenceKeyReader<Key: PreferenceKey, Content: View>: View
     /// - Parameters:
     ///   - key: The` PreferenceKey` to read.
     ///   - content: A view builder that take the PreferenceKey value as an argument.
-    public init(_ key: Key.Type, @ViewBuilder content: @escaping (Key.Value) -> Content) {
+    public nonisolated init(_ key: Key.Type, @ViewBuilder content: @escaping (Key.Value) -> Content) {
         self.content = content
         self.value = Key.defaultValue
     }
+    
+}
+
+
+extension InlinePreferenceKeyReader: View {
     
     public var body: some View {
         content(value)
