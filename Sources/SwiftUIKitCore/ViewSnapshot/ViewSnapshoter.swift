@@ -1,12 +1,19 @@
 import SwiftUI
 
 
-@MainActor struct ViewSnapshoter<V: Equatable, Content: View> {
+struct ViewSnapshoter<V: Equatable, Content: View> {
     
     let content: Content
     let value: V
     let initial: Bool
     let action: @MainActor (AnyView) -> Void
+    
+    nonisolated init(content: Content, value: V, initial: Bool, action: @MainActor @escaping (AnyView) -> Void) {
+        self.content = content
+        self.value = value
+        self.initial = initial
+        self.action = action
+    }
     
     final class Coordinator {
         var lastValue: V?

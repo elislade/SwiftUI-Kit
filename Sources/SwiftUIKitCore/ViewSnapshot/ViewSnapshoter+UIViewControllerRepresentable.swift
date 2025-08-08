@@ -14,6 +14,9 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
         
         let c = UIHostingController(rootView: content)
         c.view.backgroundColor = .clear
+        if #available(iOS 16.0, tvOS 16.0, *) {
+            c.sizingOptions = .preferredContentSize
+        }
         return c
     }
     
@@ -24,7 +27,7 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
                 format.scale = context.environment.displayScale
                 let renderer = UIGraphicsImageRenderer(size: uiViewController.view.bounds.size, format: format)
                 let image = renderer.image { ctx in
-                    uiViewController.view.drawHierarchy(in: uiViewController.view.bounds, afterScreenUpdates: false)
+                    uiViewController.view.drawHierarchy(in: uiViewController.view.bounds, afterScreenUpdates: true)
                 }
                 
                 action(AnyView(Image(uiImage: image).resizable()))
@@ -32,6 +35,11 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
             
             context.coordinator.lastValue = value
         }
+    }
+    
+    @available(iOS 16.0, tvOS 16.0, watchOS 9.0, *)
+    func sizeThatFits(_ proposal: ProposedViewSize, uiViewController: UIHostingController<Content>, context: Context) -> CGSize? {
+        uiViewController.sizeThatFits(in: proposal.replacingUnspecifiedDimensions())
     }
     
 }

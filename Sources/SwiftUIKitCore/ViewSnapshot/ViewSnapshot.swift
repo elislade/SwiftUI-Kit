@@ -11,7 +11,7 @@ public extension View {
     ///   - initial: Bool declaring wheater to capture image on first value pass with no changes. Defaults to true.
     ///   - action: A closure that gets called with the Image that was captured.
     /// - Returns: A Modified view
-    func viewSnapshot<V: Equatable>(
+    nonisolated func viewSnapshot<V: Equatable>(
         for value: V,
         initial: Bool = true,
         perform action: @MainActor @escaping (AnyView) -> Void

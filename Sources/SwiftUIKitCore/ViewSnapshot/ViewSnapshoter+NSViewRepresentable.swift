@@ -10,7 +10,7 @@ extension ViewSnapshoter: NSViewRepresentable {
             context.coordinator.lastValue = value
         }
         let v = NSHostingView(rootView: content)
-        v.backgroundColor = .clear
+        //v.backgroundColor = .clear
         return v
     }
     
