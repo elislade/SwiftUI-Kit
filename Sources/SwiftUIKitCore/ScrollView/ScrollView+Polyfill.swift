@@ -39,4 +39,12 @@ public extension View {
         }
     }
     
+    @ViewBuilder func contentMarginsPolyfill(_ edges: Edge.Set = .all, _ length: Double) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            contentMargins(edges, length, for: .scrollIndicators)
+        } else {
+            self
+        }
+    }
+    
 }

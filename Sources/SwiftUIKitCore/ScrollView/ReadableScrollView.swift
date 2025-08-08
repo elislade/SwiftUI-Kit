@@ -5,11 +5,10 @@ import SwiftUI
 public struct ReadableScrollView<Content: View>: View {
     
     @Environment(\.frozenState) private var frozenState
-    @Environment(\.scrollOffsetPassthrough) private var offsetPassthrough
+    @Environment(\.scrollPassthrough) private var passthrough
     
     @State private var handlesReset: Bool = false
     @State private var isResetting = false
-    @State private var scrollOrigin: CGPoint?
     
     let axis: Axis.Set
     let showsIndicators: Bool
@@ -32,7 +31,7 @@ public struct ReadableScrollView<Content: View>: View {
         showsIndicators: Bool = true,
         contentOffset: @escaping (CGPoint) -> Void = { _ in },
         contentSize: @escaping (CGSize) -> Void = { _ in },
-        @ViewBuilder content: @escaping () -> Content
+        content: @escaping () -> Content
     ){
         self.axis = axis
         self.showsIndicators = showsIndicators
@@ -46,11 +45,8 @@ public struct ReadableScrollView<Content: View>: View {
             ScrollView(axis, showsIndicators: showsIndicators) {
                 content
                     .id("ScrollContent")
-                    .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.rounded(.towardZero) }){
-                        guard let scrollOrigin else { return }
-                        let origin = $0
-                        let offset = CGPoint(x: origin.x - scrollOrigin.x, y: origin.y - scrollOrigin.y)
-                        offsetPassthrough?.send(offset)
+                    .onGeometryChangePolyfill(of: { $0.frame(in: .named("ScrollView")).origin }){ offset in
+                        passthrough?.contentOffset.send(offset)
                         contentOffset(offset)
                         handlesReset = {
                             let xPass = axis.contains(.horizontal) ? offset.x < -resetScrollThreshold : false
@@ -58,13 +54,12 @@ public struct ReadableScrollView<Content: View>: View {
                             return yPass || xPass
                         }()
                     }
-                    .onGeometryChangePolyfill(of: { $0.size.rounded(.towardZero) }){
+                    .onGeometryChangePolyfill(of: \.size){
+                        passthrough?.contentSize.send($0)
                         contentSize($0)
                     }
             }
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.rounded(.towardZero) }){
-                scrollOrigin = $0
-            }
+            .coordinateSpace(name: "ScrollView")
             .resetAction(active: handlesReset && !isResetting){
                 isResetting = true
                 withAnimation(.smooth){
@@ -78,6 +73,9 @@ public struct ReadableScrollView<Content: View>: View {
             }
         }
         .stickyContext()
+        .onGeometryChangePolyfill(of: \.size){
+            passthrough?.size.send($0)
+        }
     }
     
 }
