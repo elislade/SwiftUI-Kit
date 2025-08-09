@@ -30,7 +30,7 @@ public extension AnyTransition {
     static func zIndex(_ index: Double = 2) -> AnyTransition {
         .modifier(
             active: ZIndexModifier(index: index),
-            identity: ZIndexModifier()
+            identity: ZIndexModifier(index: index)
         )
     }
     
