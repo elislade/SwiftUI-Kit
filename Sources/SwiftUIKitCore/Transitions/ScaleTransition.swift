@@ -24,15 +24,9 @@ public extension AnyTransition {
 }
 
 
-struct ScaleModifier: ViewModifier, Animatable {
+struct ScaleModifier: ViewModifier {
     
     var scale: SIMD2<Double>
-    
-    nonisolated var animatableData: SIMD2<Double>.AnimatableData {
-        get { scale.animatableData }
-        set { scale.animatableData = newValue }
-    }
-    
     let anchor: UnitPoint
     
     nonisolated init(_ scale: SIMD2<Double>, anchor: UnitPoint = .center) {
