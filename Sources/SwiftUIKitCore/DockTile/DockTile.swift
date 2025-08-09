@@ -9,7 +9,7 @@ public extension View {
         modifier(AppDockTileModifier(tileID: update, tile: content))
     }
     
-    func windowDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> some View {
+    nonisolated func windowDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> some View {
         InlineState(UUID()){ id in
             preference(
                 key: WindowDockTilePreferenceKey.self,
@@ -22,7 +22,7 @@ public extension View {
         }
     }
     
-    func windowDockTile<Content: View>(@ViewBuilder _ content: @escaping () -> Content) -> some View {
+    nonisolated func windowDockTile<Content: View>(@ViewBuilder _ content: @escaping () -> Content) -> some View {
         InlineState(UUID()){ id in
             preference(
                 key: WindowDockTilePreferenceKey.self,
@@ -37,15 +37,15 @@ public extension View {
     
     #else
     
-    func appDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> Self {
+    nonisolated func appDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> Self {
         self
     }
     
-    func windowDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> Self {
+    nonisolated func windowDockTile<ID: Hashable, Content: View>(id update: ID, @ViewBuilder _ content: @escaping () -> Content) -> Self {
         self
     }
     
-    func windowDockTile<Content: View>(@ViewBuilder _ content: @escaping () -> Content) -> Self {
+    nonisolated func windowDockTile<Content: View>(@ViewBuilder _ content: @escaping () -> Content) -> Self {
         self
     }
     
@@ -54,7 +54,7 @@ public extension View {
 }
 
 
-struct DockTilePreference: Equatable, @unchecked Sendable {
+struct DockTilePreference: Equatable {
     
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id && lhs.updateValue == rhs.updateValue
