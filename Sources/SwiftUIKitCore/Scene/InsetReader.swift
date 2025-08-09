@@ -1,18 +1,23 @@
 import SwiftUI
 
 
-public struct InsetReader<Content: View>: View {
+public struct InsetReader<Content: View> {
     
+    @Environment(\.frozenState) private var frozenState
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.insetReadingEnabled) private var enabled
     @Environment(\.sceneInsets) private var sceneInsets
     @Environment(\.sceneSize) private var sceneSize
     @State private var frame = CGRect()
-    @State private var disabledInsets: EdgeInsets?
+    @State private var frozenInsets: EdgeInsets?
     
     private let content: @MainActor (EdgeInsets) -> Content
     
-    public init(@ViewBuilder _ content: @MainActor @escaping (EdgeInsets) -> Content) {
+    private var shouldFreeze: Bool {
+        !enabled || frozenState.isFrozen
+    }
+    
+    public nonisolated init(@ViewBuilder _ content: @MainActor @escaping (EdgeInsets) -> Content) {
         self.content = content
     }
     
@@ -27,11 +32,15 @@ public struct InsetReader<Content: View>: View {
         )
     }
     
+}
+
+extension InsetReader: View {
+    
     public var body: some View {
-        content(disabledInsets ?? calculate())
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ frame = $0 }
-            .onChangePolyfill(of: enabled, initial: true){
-                disabledInsets = !enabled ? calculate() : nil
+        content(frozenInsets ?? calculate())
+            .onGeometryChangePolyfill(of: { $0.globalFrame() }){ frame = $0 }
+            .onChangePolyfill(of: shouldFreeze, initial: true){
+                frozenInsets = shouldFreeze ? calculate() : nil
             }
     }
     
@@ -81,7 +90,7 @@ public extension View {
     }
     
     
-    func safeAreaInsets(_ inset: EdgeInsets, including edges: Edge.Set = .all) -> some View {
+    nonisolated func safeAreaInsets(_ inset: EdgeInsets, including edges: Edge.Set = .all) -> some View {
         safeAreaInset(edge: .top, spacing: 0){
             if edges.contains(.top) {
                 Color.clear.frame(height: inset.top)
@@ -104,15 +113,16 @@ public extension View {
         }
     }
     
-}
-
-
-struct DisableInsetReaderKey: EnvironmentKey {
+    nonisolated func safeAreaInsets(_ amount: Double, _ edges: Edge.Set = .all) -> some View {
+        safeAreaInsets(.init(
+            top: edges.contains(.top) ? amount : 0,
+            leading: edges.contains(.leading) ? amount : 0,
+            bottom: edges.contains(.bottom) ? amount : 0,
+            trailing: edges.contains(.trailing) ? amount : 0
+        ))
+    }
     
-    static var defaultValue: Bool { false }
-    
 }
-
 
 public extension EnvironmentValues {
     
@@ -137,6 +147,38 @@ public extension View {
                 enabled = false
             }
         }
+    }
+    
+}
+
+
+extension GeometryProxy {
+    
+    func globalFrame(withSafeAreaInsetEdges edges: Edge.Set = .all) -> CGRect {
+        frame(in: .global).addingInsets(safeAreaInsets, mask: edges)
+    }
+    
+}
+
+
+public extension CGRect {
+    
+    func addingInsets(
+        _ insets: EdgeInsets,
+        mask: Edge.Set = .all,
+        isRTL: Bool = false
+    ) -> CGRect {
+        guard !mask.isEmpty else { return self }
+        
+        var rect = self
+        
+        if mask.contains(.top) { rect.size.height += insets.top }
+        if mask.contains(.bottom) { rect.size.height += insets.bottom }
+        
+        if mask.contains(.leading) { rect.size.width += insets.leading }
+        if mask.contains(.trailing) { rect.size.width += insets.trailing }
+        
+        return rect
     }
     
 }
