@@ -7,13 +7,15 @@ public extension View {
         mask{
             ZStack {
                 Rectangle().fill(.white)
-                Rectangle()
-                    .fill(enabled ? .black : .white)
-                    .matchedGeometryEffect(
-                        id: "negativeMask",
-                        in: namespace,
-                        isSource: false
-                    )
+                if enabled {
+                    Rectangle()
+                        .fill(.black)
+                        .matchedGeometryEffect(
+                            id: "negativeMask",
+                            in: namespace,
+                            isSource: false
+                        )
+                }
             }
             .drawingGroup()
             .luminanceToAlpha()

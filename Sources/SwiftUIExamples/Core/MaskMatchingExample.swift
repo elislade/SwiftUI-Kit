@@ -31,6 +31,7 @@ public struct MaskMatchingExample: View {
                 }
                 .offset(offset)
                 .padding()
+                #if !os(tvOS)
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged{ _ in enabled = true }
@@ -39,6 +40,7 @@ public struct MaskMatchingExample: View {
                             b = state.translation
                         }
                 )
+                #endif
         }
         .ignoresSafeArea()
         .safeAreaInset(edge: .top){
@@ -52,4 +54,5 @@ public struct MaskMatchingExample: View {
 
 #Preview {
     MaskMatchingExample()
+        .previewSize()
 }
