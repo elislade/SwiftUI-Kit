@@ -27,7 +27,7 @@ struct FrozenStateModifier: ViewModifier {
                 height: frozenSize?.height
             )
             .disableAnimations(state == .frozenInvisible)
-            .scrollOffsetDisabled(state.isFrozen)
+            .scrollPassthroughDisabled(state.isFrozen)
     }
     
 }
