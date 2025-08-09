@@ -7,7 +7,7 @@ struct ReduceMotionKey: EnvironmentKey {
 
 public extension EnvironmentValues {
     
-    /// A bool indicating if the environment wants reduced motion. This can be either `accessibilityReduceMotion` from the system or an explicity set `reduceMotion` value.
+    /// A Bool indicating if the environment wants reduced motion. This can be either `accessibilityReduceMotion` from the system or an explicitly set `reduceMotion` value.
     var reduceMotion: Bool {
         get { accessibilityReduceMotion || self[ReduceMotionKey.self] }
         set { self[ReduceMotionKey.self] = newValue }
