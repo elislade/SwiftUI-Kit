@@ -6,7 +6,7 @@ public extension View {
     
     func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
         InlineEnvironmentReader(\.windowDragEnabled){ enabled in
-            simultaneousGesture(
+            contentShape(Rectangle()).simultaneousGesture(
                 DragGesture(minimumDistance: 0, coordinateSpace: .global)
                     .onChanged{ action(.init(phase: .changed, locations: [$0.location])) }
                     .onEnded{ action(.init(phase: .ended, locations: [$0.location])) },
