@@ -19,24 +19,24 @@ struct WindowRootView<Content: View>: View {
             .containerShape(RoundedRectangle(cornerRadius: radius))
             .environment(\.windowIsKey, state.isKey)
             .onPreferenceChange(WindowCornerRadiusKey.self){ values in
-                _radius.wrappedValue = values.last ?? 16
+                radius = values.last ?? 16
             }
             .onPreferenceChange(WindowTitleKey.self){ values in
-                _title.wrappedValue = values.last
+                title = values.last
             }
             .onPreferenceChange(WindowIndexPreference.self){ values in
                 if let values {
-                    _zIndex.wrappedValue = values
+                    zIndex = values
                 }
             }
             .onPreferenceChange(WindowPickerPositioningPreference.self){ values in
                 if let values {
-                    _pickerPositioning.wrappedValue = values
+                    pickerPositioning = values
                 }
             }
             .onPreferenceChange(WindowDockTilePreferenceKey.self){ values in
                 if let values {
-                    _dockTile.wrappedValue = values
+                    dockTile = values
                 }
             }
             .environment(\.performWindowAction){ state.perform(action: $0) }
