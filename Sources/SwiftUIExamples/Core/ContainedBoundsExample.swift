@@ -4,29 +4,32 @@ import SwiftUIKit
 public struct ContainedBoundsExample: View {
     
     @State private var layoutDirection: LayoutDirection = .leftToRight
+    @GestureState(reset: { _ , t in t.animation = .bouncy }) private var offset: CGSize = .zero
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Contained Bounds"){
-            ScrollView([.horizontal, .vertical]) {
-                VStack(spacing: 16) {
-                    ForEach(0...2){ _ in
-                        HStack(spacing: 16) {
-                            ForEach(0...9){ i in
-                                Cell(i: i)
+            ZStack {
+                Color.clear
+                
+                Cell(i: 0)
+                    .frame(width: 120, height: 120)
+                    .offset(offset)
+                    #if !os(tvOS)
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .updating($offset) { value, state, _ in
+                                state = value.translation
                             }
-                        }
-                        .frame(height: 110)
-                    }
-                }
-                .padding()
+                    )
+                    #endif
+                    .environment(\.layoutDirection, .leftToRight)
             }
             .containedBoundsContext("Test")
             .scrollClipDisabledPolyfill()
             .border(.tint, width: 2)
-            .padding(54)
-            .clipped()
+            .frame(width: 170, height: 170)
             .environment(\.layoutDirection, layoutDirection)
         } parameters: {
             ExampleCell.LayoutDirection(value: $layoutDirection)
@@ -52,7 +55,7 @@ public struct ContainedBoundsExample: View {
                     
                     Spacer(minLength: 1)
                     
-                    EdgeLables(edges: state.edges)
+                    EdgeLabels(edges: state.edges)
                         .font(.footnote)
                         .opacity(0.8)
                 }
@@ -64,10 +67,11 @@ public struct ContainedBoundsExample: View {
                 RoundedRectangle(cornerRadius: 22)
                     .opacity(0.05)
             }
+            .geometryGroupPolyfill()
         }
         
         
-        struct EdgeLables: View {
+        struct EdgeLabels: View {
             let edges: Edge.Set
             
             var body: some View {

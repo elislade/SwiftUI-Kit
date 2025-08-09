@@ -16,7 +16,7 @@ struct DidChangeContainedBounds: ViewModifier {
                     context: context,
                     anchor: $0,
                     didChangeVisibility: { state in
-                        DispatchQueue.main.async{
+                        Task{ @MainActor in
                             action(state)
                         }
                     }
