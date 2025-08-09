@@ -27,6 +27,6 @@ public extension EnvironmentValues {
 
 public extension EnvironmentValues {
     
-    @Entry internal(set) var windowIsKey: Bool = false
+    @Entry internal(set) var windowIsKey: Bool = true
     
 }
