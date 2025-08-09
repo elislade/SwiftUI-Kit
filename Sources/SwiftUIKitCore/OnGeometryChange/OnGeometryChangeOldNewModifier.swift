@@ -3,6 +3,7 @@ import SwiftUI
 
 struct OnGeometryChangeOldNewModifier<Value: Equatable>: ViewModifier {
     
+    @Environment(\.frozenState) private var frozenState
     @Environment(\.onGeometryChangesEnabled) private var isEnabled
     
     let transform: (GeometryProxy) -> Value
@@ -10,10 +11,10 @@ struct OnGeometryChangeOldNewModifier<Value: Equatable>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .overlay {
-                if isEnabled {
+            .background {
+                if isEnabled && frozenState.isThawed {
                     GeometryReader{ proxy in
-                        Color.clear.onChangePolyfill(of: transform(proxy), initial: true){ old , new in
+                        Color.clear.onChangePolyfill(of: transform(proxy), initial: true){ old, new in
                             didChange(old, new)
                         }
                     }

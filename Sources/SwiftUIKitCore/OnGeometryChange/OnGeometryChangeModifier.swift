@@ -3,6 +3,7 @@ import SwiftUI
 
 struct OnGeometryChangeModifier<Value: Equatable>: ViewModifier {
     
+    @Environment(\.frozenState) private var frozenState
     @Environment(\.onGeometryChangesEnabled) private var isEnabled
     
     let transform: (GeometryProxy) -> Value
@@ -10,8 +11,8 @@ struct OnGeometryChangeModifier<Value: Equatable>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .overlay {
-                if isEnabled {
+            .background {
+                if isEnabled && frozenState.isThawed {
                     GeometryReader{ proxy in
                         let value = transform(proxy)
                         
