@@ -59,13 +59,13 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
             }
         }
 
-        self._dragItems.wrappedValue.removeAll()
+        self.dragItems.removeAll()
         self.dropAreasEntered.removeAll()
     }
     
-    nonisolated private func update(_ items: [DragItem<Value>]) {
+    private func update(_ items: [DragItem<Value>]) {
         withAnimation(.bouncy){
-            _dragItems.wrappedValue = items
+            dragItems = items
         }
     }
     
@@ -74,8 +74,9 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
             .preferredParentGestureMask(dragItems.isEmpty ? nil : .subviews)
             .onGeometryChangePolyfill(of: { $0.frame(in: .global).rounded(.toNearestOrEven) }){ frame = $0 }
             .onPreferenceChange(DropAreaPreference<Value>.self){
-                _dropAreas.wrappedValue = $0
+                dropAreas = $0
             }
+            .resetPreference(DropAreaPreference<Value>.self)
             .onWindowDrag { evt in
                 if evt.phase == .ended {
                     self.end()
@@ -115,7 +116,7 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
             }
             .environment(\.dragSessionNamspace, dragAndDropSession)
             .environment(\.dragItemAction, .init(namespace: dragAndDropSession){
-                self._dragItems.wrappedValue.append($0)
+                self.dragItems.append($0)
                 
                 if let location {
                     handle(location: location.applying(.init(translationX: 0, y: -eventOffset)))
