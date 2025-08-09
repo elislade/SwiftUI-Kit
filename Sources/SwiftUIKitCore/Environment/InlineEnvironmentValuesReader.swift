@@ -23,17 +23,22 @@ struct EnvReaderModifier<Reader: View>: @preconcurrency EnvironmentalModifier {
 
 
 /// A View that can read **all** EnvironmentValues inline.
-public struct InlineEnvironmentValuesReader<Content: View>: View {
+public struct InlineEnvironmentValuesReader<Content: View> {
 
     private let content: (EnvironmentValues) -> Content
     
     /// Initializes view.
     /// - Parameter content: A ViewBuilder of the content that takes EnvironmentValues as en argument.
-    public init(
+    public nonisolated init(
         @ViewBuilder content: @escaping (EnvironmentValues) -> Content
     ) {
         self.content = content
     }
+     
+}
+
+
+extension InlineEnvironmentValuesReader : View {
     
     public var body: some View {
         Color.clear.modifier(EnvReaderModifier(view: content))
