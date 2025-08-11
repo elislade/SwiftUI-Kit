@@ -24,6 +24,7 @@ struct BasicPresentationContext: ViewModifier {
             .isBeingPresentedOn(!values.isEmpty)
             .disabled(!values.isEmpty && backdropPreference?.isInteractive ?? true)
             .disableOnPresentationWillDismiss(!values.isEmpty)
+            .disableInsetReading(!values.isEmpty)
             .overlay {
                 ZStack(alignment: values.last?.metadata.alignment ?? .bottom) {
                     Color.clear
@@ -42,6 +43,7 @@ struct BasicPresentationContext: ViewModifier {
                             .accessibilityAddTraits(.isModal)
                             .accessibilityHidden(values.count > 1 ? value != values.last : false)
                             .disableOnPresentationWillDismiss(values.last != value)
+                            .disableInsetReading(values.last != value)
                             .isBeingPresentedOn(value != values.last)
                     }
                 }

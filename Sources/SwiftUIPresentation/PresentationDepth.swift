@@ -2,18 +2,26 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationDepthKey: EnvironmentKey {
+public extension EnvironmentValues {
     
-    static var defaultValue: Int { 0 }
+    @Entry var presentationDepth: Int = 0
+    @Entry var presentationContextNamespaces: [Namespace.ID] = []
+    
+    var closestPresentationContextNamespace: Namespace.ID? {
+        presentationContextNamespaces.last
+    }
     
 }
 
 
-extension EnvironmentValues {
+public extension View {
     
-    public var presentationDepth: Int {
-        get { self[PresentationDepthKey.self] }
-        set { self[PresentationDepthKey.self] = newValue }
+    nonisolated func presentationNamespace(_ namespace: Namespace.ID, active: Bool = true) -> some View {
+        transformEnvironment(\.presentationContextNamespaces){ namespaces in
+            if active {
+                namespaces.append(namespace)
+            }
+        }
     }
     
 }

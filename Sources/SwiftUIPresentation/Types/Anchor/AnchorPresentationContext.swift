@@ -75,7 +75,7 @@ struct AnchorPresentationContext: ViewModifier {
                     let proxyWidth = proxy.size.width
                     
                     ZStack(alignment: .topLeading) {
-                        Color.clear
+                        Color.clear.zIndex(1)
                         
                         if let presentedValue {
                             let dir = layoutDirection(for: presentedValue)
@@ -85,6 +85,7 @@ struct AnchorPresentationContext: ViewModifier {
                             
                             presentedValue.metadata
                                 .view(.init(anchor: anchors.presentation, edge: presEdge ?? .bottom))
+                                .zIndex(2)
                                 .environment(\._isBeingPresented, true)
                                 .transition(
                                     (.scale(0, anchor: anchors.presentation) + .opacity)
@@ -115,6 +116,7 @@ struct AnchorPresentationContext: ViewModifier {
                             }
                     }
                 }
+                .animation(.bouncy, value:  presentedValue)
                 .environment(\.layoutDirection, layoutDirection)
                 .background {
                     if presentedValue != nil {

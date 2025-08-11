@@ -31,7 +31,7 @@ struct BasicPresenter<Presentation: View>: ViewModifier {
 }
 
 
-struct BasicPresenterOptional<Presentation: View, Value>: ViewModifier {
+struct BasicPresenterOptional<Presentation: View, Value> {
     
     @Environment(\.colorScheme) private var colorScheme
     @Binding var value: Value?
@@ -39,7 +39,7 @@ struct BasicPresenterOptional<Presentation: View, Value>: ViewModifier {
     let alignment: Alignment
     @ViewBuilder let presentation: @MainActor (Value) -> Presentation
     
-    init(
+    nonisolated init(
         value: Binding<Value?>,
         alignment: Alignment = .bottom,
         @ViewBuilder presentation: @MainActor @escaping (Value) -> Presentation
@@ -48,6 +48,11 @@ struct BasicPresenterOptional<Presentation: View, Value>: ViewModifier {
         self.alignment = alignment
         self.presentation = presentation
     }
+
+}
+
+
+extension BasicPresenterOptional: ViewModifier {
     
     func body(content: Content) -> some View {
         content

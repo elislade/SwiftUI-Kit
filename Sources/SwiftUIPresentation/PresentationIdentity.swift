@@ -32,19 +32,9 @@ public enum PresentationIdentityBehaviour: Hashable {
 }
 
 
-struct PresentationIdentityBehaviourKey: EnvironmentKey {
+public extension EnvironmentValues {
     
-    static var defaultValue: PresentationIdentityBehaviour { .stable }
-    
-}
-
-
-extension EnvironmentValues {
-    
-    public var presentationIdentityBehaviour: PresentationIdentityBehaviour {
-        get { self[PresentationIdentityBehaviourKey.self] }
-        set { self[PresentationIdentityBehaviourKey.self] = newValue }
-    }
+    @Entry var presentationIdentityBehaviour: PresentationIdentityBehaviour = .stable
     
 }
 

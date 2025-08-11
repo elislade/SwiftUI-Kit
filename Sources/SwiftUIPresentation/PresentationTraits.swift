@@ -108,7 +108,7 @@ public extension View {
         preference(key: PresentationTraitsPreferenceKey.self, value: traits)
     }
     
-    func childPrefersPresentationTraits(_ perform: @escaping @Sendable (PresentationTraits) -> Void) -> some View {
+    func childPrefersPresentationTraits(_ perform: @escaping (PresentationTraits) -> Void) -> some View {
         onPreferenceChange(PresentationTraitsPreferenceKey.self, perform: perform)
     }
     

@@ -34,15 +34,17 @@ public struct PresentationWillDismissPreferenceKey: PreferenceKey {
 public extension View {
     
     func onPresentationWillDismiss(perform action: @MainActor @escaping () -> Void) -> some View {
-        InlineState(UUID()){ id in
-            preference(
-                key: PresentationWillDismissPreferenceKey.self,
-                value: [.init(id: id.uuidString, action: action)]
-            )
+        InlineEnvironmentValue(\.frozenState){ state in
+            InlineState(UUID()){ id in
+                preference(
+                    key: PresentationWillDismissPreferenceKey.self,
+                    value: state.isThawed ? [.init(id: id.uuidString, action: action)] : []
+                )
+            }
         }
     }
     
-    func disableOnPresentationWillDismiss(_ disabled: Bool = true) -> some View {
+    nonisolated func disableOnPresentationWillDismiss(_ disabled: Bool = true) -> some View {
         transformPreference(PresentationWillDismissPreferenceKey.self){ value in
             if disabled {
                 value = []

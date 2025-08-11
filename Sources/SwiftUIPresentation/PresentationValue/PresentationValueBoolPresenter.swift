@@ -29,14 +29,14 @@ struct PresentationValueBoolPresenter<Metadata: Equatable & Sendable, Presentati
                     metadata: metadata,
                     anchor: anchor,
                     includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                    view: { AnyView(presentation()) },
+                    view: { AnyView(presentation().routeRelay().environment(\.parent, environmentRef)) },
                     dispose: {
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             isPresented = false
                         }
                     },
                     requestIDChange: { id in
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             stableID = id ?? .init()
                         }
                     },

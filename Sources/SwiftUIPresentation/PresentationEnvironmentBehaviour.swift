@@ -4,24 +4,15 @@ import SwiftUI
 public extension View {
     
     /// - Parameter behaviour: The ``PresentationEnvironmentBehaviour`` to use when presenting views.
-    func presentationEnvironmentBehaviour(_ behaviour: PresentationEnvironmentBehaviour) -> some View {
+    nonisolated func presentationEnvironmentBehaviour(_ behaviour: PresentationEnvironmentBehaviour) -> some View {
         environment(\.presentationEnvironmentBehaviour, behaviour)
     }
     
 }
 
-struct PresentationEnvironmentBehaviourKey: EnvironmentKey {
+public extension EnvironmentValues {
     
-    static let defaultValue: PresentationEnvironmentBehaviour = .useContext
-    
-}
-
-extension EnvironmentValues {
-    
-    public var presentationEnvironmentBehaviour: PresentationEnvironmentBehaviour {
-        get { self[PresentationEnvironmentBehaviourKey.self] }
-        set { self[PresentationEnvironmentBehaviourKey.self] = newValue }
-    }
+    @Entry var presentationEnvironmentBehaviour: PresentationEnvironmentBehaviour = .useContext
     
 }
 

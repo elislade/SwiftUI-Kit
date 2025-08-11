@@ -18,19 +18,6 @@ struct AnchorPresentationMetadata: Hashable, @unchecked Sendable {
     let anchorAlignment: AnchorAlignment
     let view: @MainActor (AutoAnchorState) -> AnyView
     
-    func translate() -> BasicPresentationMetadata {
-        .init(alignment: .bottom)
-    }
-    
-}
-
-
-extension BasicPresentationMetadata {
-    
-    init(translating: AnchorPresentationMetadata) {
-        self.init(alignment: .center)
-    }
-    
 }
 
 public struct AutoAnchorState: Hashable, Sendable {

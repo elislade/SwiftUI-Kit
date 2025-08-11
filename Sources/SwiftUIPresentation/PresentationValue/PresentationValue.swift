@@ -131,6 +131,7 @@ public extension View {
                 presentation: content
             )
         })
+        .routeRelayReceiver()
     }
     
     func presentationValue<Value, Metadata: Equatable & Sendable, Content: View>(
@@ -150,6 +151,7 @@ public extension View {
                 presentation: content
             )
         })
+        .routeRelayReceiver()
     }
     
 }

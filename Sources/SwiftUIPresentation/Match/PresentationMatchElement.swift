@@ -27,12 +27,12 @@ struct PresentationMatchKey: PreferenceKey {
 
 struct MatchGroup: Equatable {
     
-    struct Element: Equatable {
+    struct Element: Equatable, Sendable {
         static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.anchor == rhs.anchor && lhs.sig == rhs.sig
+            lhs.anchor == rhs.anchor && lhs.id == rhs.id
         }
         
-        var sig: Int = 0
+        var id: Int = 0
         let anchor: Anchor<CGRect>
         let view: @MainActor () -> AnyView
         @Binding var isVisible: Bool

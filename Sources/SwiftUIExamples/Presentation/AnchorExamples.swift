@@ -19,25 +19,27 @@ public struct AnchorPresentationExample : View   {
     public init() {}
     
     private var sourceView: some View {
-        Button(action: { isPresented = true }){
-            RoundedRectangle(cornerRadius: 20)
-                .fill(sourceTint)
-                .frame(width: 60, height: 60)
+        Button{ isPresented = true } label: {
+            Text("Source")
+                .foregroundStyle(.white)
+                .frame(width: 80, height: 50)
+                .background{
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(sourceTint)
+                }
         }
         .buttonStyle(.plain)
     }
     
     public var body: some View {
-        ExampleView(
-            title: "Anchor Presentation"//,
-            //maxSize: .init(width: CGFloat.infinity, height: 500)
-        ){
+        ExampleView(title: "Anchor Presentation"){
             ZStack {
                 Color.clear
                 
                 if useAutoAnchored {
-                    sourceView.autoAnchorPresentation(isPresented: $isPresented){ state in
+                    sourceView.anchorPresentation(isPresented: $isPresented){ state in
                         PresentedView()
+                            .frame(width: 200, height: 200)
                             .tint(presentedTint)
                             .padding(.init(state.edge))
                     }
@@ -49,6 +51,7 @@ public struct AnchorPresentationExample : View   {
                         presentationAnchor: presentationAnchor
                     ){
                         PresentedView()
+                            .frame(width: 200, height: 200)
                             .tint(presentedTint)
                     }
                     .offset(sourceLocation)
@@ -137,39 +140,38 @@ public struct AnchorPresentationExample : View   {
         
         @Environment(\.dismissPresentation) private var dismissPresentation
         
-        var title = "Presented View"
-        
         var body: some View {
             VStack{
-                HStack {
-                    Text(title)
+                HStack(alignment: .top) {
+                    Text("Presented")
                         .font(.title2.weight(.bold))
                     
                     Spacer()
                     
-                    Button(action: { dismissPresentation() }){
-                        Image(systemName: "xmark.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
+                    Button{ dismissPresentation() } label: {
+                        Label{ Text("Dismiss") } icon: {
+                            Image(systemName: "xmark.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24)
+                        }
+                        .labelStyle(.iconOnly)
                     }
                     .buttonStyle(.plain)
                 }
                 
-                Color.white
-                    .opacity(0.5)
-                    .clipShape(ContainerRelativeShape())
+                ContainerRelativeShape()
+                    .fill(.white.opacity(0.3))
             }
             .symbolRenderingMode(.hierarchical)
             .padding()
             .foregroundStyle(.white)
             .background{
-                Rectangle()
+                ContainerRelativeShape()
                     .fill(.tint)
             }
-            .clipShape(ContainerRelativeShape())
             .containerShape(RoundedRectangle(cornerRadius: 22))
-            .frame(width: 200, height: 240)
+            .transition(.scale(0.8) + .opacity)
         }
         
     }

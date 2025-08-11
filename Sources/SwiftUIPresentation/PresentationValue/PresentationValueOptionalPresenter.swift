@@ -31,14 +31,14 @@ struct PresentationValueOptionalPresenter<Value, Metadata: Equatable & Sendable,
                             metadata: metadata,
                             anchor: anchor,
                             includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                            view: { AnyView(presentation(value)) },
+                            view: { AnyView(presentation(value).routeRelay().environment(\.parent, environmentRef)) },
                             dispose: {
-                                DispatchQueue.main.async {
+                                Task { @MainActor in
                                     self.value = nil
                                 }
                             },
                             requestIDChange: { id in
-                                DispatchQueue.main.async {
+                                Task { @MainActor in
                                     stableID = id ?? .init()
                                 }
                             },

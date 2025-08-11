@@ -4,15 +4,15 @@ import SwiftUIKitCore
 
 public extension View {
     
-    func presentationMatchContext() -> some View {
+    nonisolated func presentationMatchContext() -> some View {
         modifier(PresentationMatchContextModifier())
     }
     
     func presentationMatch<ID: Hashable>(_ id: ID) -> some View {
-        modifier(PresentationMatchModifier(matchID: id, copy: self))
+        modifier(PresentationMatchModifier(id: id, copy: { self }))
     }
     
-    func presentationMatchCaptureMode(_ mode: PresentationMatchCaptureMode) -> some View {
+    nonisolated func presentationMatchCaptureMode(_ mode: PresentationMatchCaptureMode) -> some View {
         environment(\.presentationMatchCaptureMode, mode)
     }
     

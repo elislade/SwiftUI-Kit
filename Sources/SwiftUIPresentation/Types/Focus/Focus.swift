@@ -14,7 +14,7 @@ public extension View {
     /// - Parameter isPresented: A binding to the presentation for programatic presentation and dismissal.
     /// - Returns: A view that presents this view for focus presentation.
     func focusPresentation(isPresented: Binding<Bool>) -> some View {
-        FocusPresenter(
+        return FocusPresenter(
             isPresented: isPresented,
             content: { self },
             focusView: { AnyView(self) }

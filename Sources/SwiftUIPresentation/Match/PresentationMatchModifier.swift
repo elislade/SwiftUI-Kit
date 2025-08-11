@@ -11,25 +11,30 @@ struct PresentationMatchModifier<MatchID: Hashable, Copy: View>: ViewModifier {
     @State private var snapshotUpdatedSignal: Bool = false
     
     let matchID: MatchID
-    let copy: Copy
+    let copy: @MainActor () -> Copy
+    
+    init(id: MatchID, @ViewBuilder copy: @MainActor @escaping () -> Copy){
+        self.matchID = id
+        self.copy = copy
+    }
     
     private func makeElement(_ anchor: Anchor<CGRect>) -> MatchGroup.Element {
         .init(
             anchor: anchor,
-            view: { AnyView(copy) },
+            view: { AnyView(copy()) },
             isVisible: $hide.inverse
         )
     }
     
     private func makeElement(_ anchor: Anchor<CGRect>, view: AnyView) -> MatchGroup.Element {
         .init(
-            sig: .random(in: 0...100),
+            id: UUID().hashValue,
             anchor: anchor,
             view: { view },
             isVisible: $hide.inverse
         )
     }
-    
+
     func body(content: Content) -> some View {
         switch captureMode {
         case .newInstance:
@@ -46,7 +51,7 @@ struct PresentationMatchModifier<MatchID: Hashable, Copy: View>: ViewModifier {
                 }
         case .snapshot:
             content
-                .viewSnapshot(for: hide, initial: false){
+                .viewSnapshot(for: hide, initial: true){
                     view = $0
                     snapshotUpdatedSignal.toggle()
                 }
@@ -67,7 +72,6 @@ struct PresentationMatchModifier<MatchID: Hashable, Copy: View>: ViewModifier {
                     .id(snapshotUpdatedSignal)
                 }
         }
-
     }
     
 }

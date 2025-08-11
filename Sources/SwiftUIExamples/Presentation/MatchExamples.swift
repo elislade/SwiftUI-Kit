@@ -58,7 +58,6 @@ public struct MatchExampleView: View {
                         .fill(.background)
                         .ignoresSafeArea()
                 }
-                .presentationMatch(i)
                 .frame(maxHeight: 400)
                 .transition(
                     .offset([0, 590]).animation(.fastSpring)
@@ -113,7 +112,7 @@ public struct MatchExampleView: View {
                                 .opacity(0.2)
                                 .frame(height: 50)
                         }
-//                        
+                        
                         Button{ detail = true } label: {
                             Label("Detail", systemImage: "eye.fill")
                         }

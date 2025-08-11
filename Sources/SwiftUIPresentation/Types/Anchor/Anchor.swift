@@ -11,15 +11,24 @@ public extension View {
         modifier(AnchorPresentationContext())
     }
     
+    //TODO: Remove Depricated name
+    nonisolated func autoAnchorPresentation<P: View>(
+        isPresented: Binding<Bool>,
+        @ViewBuilder presentation: @MainActor @escaping (AutoAnchorState) -> P
+    ) -> some View {
+        anchorPresentation(isPresented: isPresented, presentation: presentation)
+    }
+    
     
     /// Uses this current view for the source anchor that the presentation will be auto anchored to in the first parent `anchorPresentationContext` available.
     /// Auto anchors are determined based on the location of the source view relative to its presentation context bounds.
     ///
     /// - Parameters:
     ///   - isPresented: A binding to the presentation for programatic presentation and dismissal.
+    ///   - edges: A mask of edges to pick from when deciding auto anchoring location. Defaults to all edges.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    nonisolated func autoAnchorPresentation<P: View>(
+    nonisolated func anchorPresentation<P: View>(
         isPresented: Binding<Bool>,
         @ViewBuilder presentation: @MainActor @escaping (AutoAnchorState) -> P
     ) -> some View {
@@ -33,7 +42,7 @@ public extension View {
     
     /// Uses this current view for the source alignment that the presentation will be aligned to in the first parent `alignedPresentationContext` available.
     ///
-    /// - Note: With default anchor of source `center` and presentation `center` the presented views center will be aligned with the sources center. This will result in both views being centered on top of each other like defaut `ZStack` behaviour.
+    /// - Note: With default anchor of source `center` and presentation `center` the presented views center will be aligned with the sources center. This will result in both views being centered on top of each other like default `ZStack` behaviour.
     /// Eg. If you want the presented views `center` to be aligned to the `topTrailing` corner of the source view, specify a source anchor of `topTrailing` and a presentation anchor of `center`.
     /// If you don't need the control of both the source and presentation alignment you can use the convenience anchor presentations:  `anchorBottomPresentation`, `anchorTopPresentation`,  `anchorLeadingPresentation`,  or `anchorTrailingPresentation` which will generate source and presentation anchors to give you alignment for the desired edge.
     ///
@@ -149,6 +158,21 @@ public extension View {
     }
     
     
+    //TODO: Remove Depricated name
+    nonisolated func autoAnchorOrthogonalToEdgePresentation<P: View>(
+        isPresented: Binding<Bool>,
+        edge: Edge,
+        @ViewBuilder presentation: @MainActor @escaping () -> P
+    ) -> some View {
+        anchorOrthogonalToEdgePresentation(
+            isPresented: isPresented,
+            edge: edge,
+            presentation: presentation
+        )
+    }
+    
+    
+    
     /// Auto anchors orthogonal to the given edge.
     ///
     /// - Parameters:
@@ -156,7 +180,7 @@ public extension View {
     ///   - edge: The edge you want the presentation to appear on.
     ///   - presentation: The view builder of the view to present.
     /// - Returns: Modified content that handles the anchor presentation.
-    nonisolated func autoAnchorOrthogonalToEdgePresentation<P: View>(
+    nonisolated func anchorOrthogonalToEdgePresentation<P: View>(
         isPresented: Binding<Bool>,
         edge: Edge,
         @ViewBuilder presentation: @MainActor @escaping () -> P

@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-public struct DismissPresentationAction: Equatable {
+public struct DismissPresentationAction: Equatable, Sendable {
     
     public static func == (lhs: DismissPresentationAction, rhs: DismissPresentationAction) -> Bool {
         lhs.id == rhs.id
@@ -32,20 +32,14 @@ public extension EnvironmentValues {
     
 }
 
-
 public extension View {
     
-    func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
-        InlineState(UUID()){ id in
-            InlineEnvironmentValue(\.isBeingPresentedOn){ isBeingPresentedOn in
-                self.transformEnvironment(\.dismissPresentation) { value in
-                    // only set value if view is not being presented on
-                    if isBeingPresentedOn == false {
-                        value = .init(id: id, closure: action)
-                    }
-                }
-            }
-        }
+    nonisolated func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
+        modifier(PresentationDismissalModifier(action: action))
+    }
+    
+    nonisolated func onCoordinatedDismiss(perform action: @MainActor @escaping () -> Void) -> some View {
+        modifier(CoordinatedDismissalModifier(action: action))
     }
     
 }

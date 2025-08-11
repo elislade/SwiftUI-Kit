@@ -42,7 +42,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
                     isPresented.wrappedValue = shouldPresent
                 }
             }
-            .autoAnchorOrthogonalToEdgePresentation(isPresented: isPresented, edge: edge){
+            .anchorOrthogonalToEdgePresentation(isPresented: isPresented, edge: edge){
                 tip()
                     #if !os(tvOS)
                     .onTapGesture { isPresented.wrappedValue = false }
