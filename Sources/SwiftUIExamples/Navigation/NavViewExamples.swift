@@ -3,88 +3,95 @@ import SwiftUIKit
 
 public struct NavViewExamples: View {
    
-    @State private var layout: LayoutDirection = .leftToRight
-    @State private var valueToPresent: Color?
-    @State private var useCustomTransition = false
-    @State private var useNavBar = true
-    @State private var resetAction: ResetAction?
-    
-    private var content: some View {
-        ZStack {
-            Color.clear
-                .ignoresSafeArea()
-
-            Button("Next"){
-                valueToPresent = .random
-            }
-        }
-        .navBarTitle("Hello")
-        .navDestination(value: $valueToPresent){
-            Destination(color: $0)
-                .navBarTitle($0.description)
-        }
-    }
-    
+    public init(){}
     
     public var body: some View {
-        ExampleView(title: "Nav View"){
-            Group {
-                if useCustomTransition {
-                    NavView(transition: CustomTransition(), useNavBar: useNavBar) {
-                        content
-                    }
-                } else {
-                    NavView(useNavBar: useNavBar) {
-                        content
+        Content()
+            .resetContext()
+    }
+    
+    struct Content: View {
+        
+        @Environment(\.reset) private var reset
+        @State private var layout: LayoutDirection = .leftToRight
+        @State private var useCustomTransition = false
+        @State private var useNavBar = true
+        
+        public var body: some View {
+            ExampleView(title: "Nav View"){
+                Group {
+                    if useCustomTransition {
+                        NavView(transition: CustomTransition.self, useNavBar: useNavBar) {
+                            Destination(color: .random)
+                        }
+                    } else {
+                        NavView(useNavBar: useNavBar) {
+                            Destination(color: .random)
+                        }
                     }
                 }
-            }
-            .childResetAction{ _resetAction.wrappedValue = $0 }
-            .environment(\.layoutDirection, layout)
-        } parameters: {
-            Toggle(isOn: $useCustomTransition){
-                Text("Use Custom Transition")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            Toggle(isOn: $useNavBar){
-                Text("Use Nav Bar")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            HStack {
-                Text("Reset Action")
-                    .font(.exampleParameterTitle)
+                .environment(\.layoutDirection, layout)
+            } parameters: {
+                Toggle(isOn: $useCustomTransition){
+                    Text("Use Custom Transition")
+                        .font(.exampleParameterTitle)
+                }
+                .exampleParameterCell()
                 
-                Spacer()
+                Toggle(isOn: $useNavBar){
+                    Text("Use Nav Bar")
+                        .font(.exampleParameterTitle)
+                }
+                .exampleParameterCell()
                 
-                Button("Trigger", action: { resetAction?() })
-                    .disabled(resetAction == nil)
+                HStack {
+                    Text("Reset Action")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Button("Trigger", action: { reset(.all) })
+                }
+                .exampleParameterCell()
+                
+                ExampleCell.LayoutDirection(value: $layout)
             }
-            .exampleParameterCell()
-            
-            ExampleCell.LayoutDirection(value: $layout)
         }
+        
     }
     
     
     struct Destination: View {
+        
         @State private var valueToPresent: Color?
+        @State private var test = false
         
         let color: Color
+        
         var body: some View {
-            ZStack {
-                color.ignoresSafeArea()
-                
-                Button("Next"){
-                    valueToPresent = .random
-                }
+            ReadableScrollView {
+                color
+                    .frame(height: 400)
+                    .ignoresSafeArea()
+                    .overlay {
+                        Button("Next"){
+                            valueToPresent = .random
+                        }
+                        .buttonStyle(.bar)
+                    }
             }
             .navDestination(value: $valueToPresent){
                 Destination(color: $0)
-                    .navBarTitle($0.description)
+            }
+            .navBarTitle(Text(color.description))
+            .navBarTrailing{
+                Button{} label: { Text("A") }
+            }
+            .navBarTrailing{
+                Toggle(isOn: $test){ Text("B") }
+            }
+            .navBarTrailing{
+                Button{} label: { Text("C") }
             }
         }
     }
@@ -99,26 +106,22 @@ public struct NavViewExamples: View {
 
 
 
-struct CustomTransition : TransitionProvider {
+struct CustomTransition : TransitionModifier {
     
-    func modifier(_ state: SwiftUINav.TransitionState) -> some ViewModifier {
-        Modifier(state: state)
+    let pushAmount: Double
+    
+    init(pushAmount: Double) {
+        self.pushAmount = pushAmount
     }
     
-    struct Modifier : ViewModifier {
-        
-        let state: SwiftUINav.TransitionState
-        
-        func body(content: Content) -> some View {
-           GeometryReader { proxy in
-                content
-                    .hinge(degrees: state.value * 90, edge: .trailing)
-                    .offset(x: state.value * -proxy.size.width)
-                    .ignoresSafeArea()
-            }
-           .paddingAddingSafeArea()
+    func body(content: Content) -> some View {
+       GeometryReader { proxy in
+            content
+                .hinge(degrees: pushAmount * 90, edge: .trailing)
+                .offset(x: pushAmount * -proxy.size.width)
+                .ignoresSafeArea()
         }
-        
+       .paddingAddingSafeArea()
     }
-    
+        
 }

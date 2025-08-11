@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftUIKitCore
 import SwiftUIPresentation
 
 
@@ -15,45 +16,24 @@ public extension View {
         )
     }
     
-    func navBarTitle(_ title: String) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: .title)
-        ){
-            Text(title)
-        }
+    func navBarTitle(_ text: Text) -> some View {
+        navBar(.title){ text.font(.title2[.semibold]) }
     }
     
     func navBarTitle<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: .title),
-            content: view
-        )
+        navBar(.title, view: view)
     }
     
     func navBarLeading<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: .leading),
-            content: view
-        )
+        navBar(.leading, view: view)
     }
     
     func navBarTrailing<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: .trailing),
-            content: view
-        )
+        navBar(.trailing, view: view)
     }
     
     func navBarAccessory<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: .accessory),
-            content: view
-        )
+        navBar(.accessory, view: view)
     }
     
     func navBarMaterial<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
@@ -68,6 +48,10 @@ public extension View {
 
 
 extension View {
+    
+    func disableNavBarItems(_ disabled: Bool = true) -> some View {
+        resetPreference(PresentationKey<NavBarItemMetadata>.self, reset: disabled)
+    }
     
     func disableNavBarPreferences(_ disabled: Bool = true) -> some View {
         resetPreference(NavBarHiddenKey.self, reset: disabled)

@@ -4,120 +4,139 @@ import SwiftUIKitCore
 
 //MARK: - Button
 
-public struct NavBarButtonStyle: SwiftUI.ButtonStyle {
+public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
     
-    @Environment(\.isInNavBar) private var isInNavBar
-    @Environment(\.controlSize) private var controlSize: ControlSize
-    @Environment(\.controlRoundness) private var controlRoundness
-    @State private var isHovering = false
+    @State private var overscroll: Double = 0
     
-    private var size: CGFloat {
-        switch controlSize {
-        case .mini: return 26
-        case .small: return 30
-        case .regular: return 36
-        case .large: return 40
-        case .extraLarge: return 46
-        @unknown default: return 36
-        }
-    }
+    public init(){ }
     
-    private let isSelected: Bool
-    private var shape: some InsettableShape {
-        RoundedRectangle(cornerRadius: (controlRoundness ?? 1) * (size / 2))
-    }
-    
-    public init(isSelected: Bool = false){
-        self.isSelected = isSelected
-    }
-    
-    public func makeBody(configuration: ButtonStyleConfiguration) -> some View {
-        let hasSelection = configuration.isPressed || isSelected
-        configuration.label
-            .foregroundStyle(.tint)
-            .opacity(hasSelection ? 0 : 1)
-            .padding(size / 4)
-            .frame(height: size)
-            .frame(minWidth: size)
-            .background(
-                ZStack {
-                    Rectangle()
-                        .fill(.tint)
-                        .opacity(0.08)
-                        .zIndex(1)
-                    
-                    shape
-                        .scale(y: hasSelection ? 1 : 0, anchor: .top)
-                        .fill(.tint)
-                        .mask {
-                            LinearGradient(
-                                colors: [.black.opacity(0.6), .black.opacity(0.95)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        }
-                        .opacity(hasSelection ? 1 : 0)
-                        .zIndex(2)
-                    
-                    shape
-                        .strokeBorder(.tint)
-                        .mask {
-                            LinearGradient(
-                                colors: [.black, .black.opacity(0)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        }
-                        .opacity(hasSelection ? 1 : 0)
-                    
-                    shape
-                        .strokeBorder(configuration.isPressed ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary), lineWidth: 0.5)
-                        .opacity(0.1)
-                        .zIndex(3)
+    public func makeBody(configuration: Configuration) -> some View {
+        Button(configuration)
+            .buttonStyle(InnerStyle(overscroll: overscroll))
+            .onOverscroll{ prog in
+                if prog >= 0.99 {
+                    overscroll = 0
+                    configuration.trigger()
+                } else {
+                    overscroll = prog
                 }
-                .mask {
-                    ZStack {
-                        Color.white
-                        
-                        configuration.label
-                            .foregroundStyle(.black)
-                            .padding(size / 4)
-                    }
-                    .drawingGroup()
-                    .luminanceToAlpha()
-                }
-                .clipShape(shape)
-            )
-            .font(.body.bold())
-            .lineLimit(1)
-            .contentShape(shape)
-            .animation(.fastSpringInterpolating, value: configuration.isPressed)
-            .animation(.fastSpringInterpolating, value: isSelected)
-            .geometryGroupPolyfill()
+            }
     }
     
-    
-    struct LabelStyle: SwiftUI.LabelStyle {
+    private struct InnerStyle: SwiftUI.ButtonStyle {
         
-        func makeBody(configuration: Configuration) -> some View {
-            HStack(spacing: 2) {
-                configuration.icon
-                    .scaledToFit()
-                    .font(.body.weight(.semibold))
-                    .background(Color.green)
-                
-                configuration.title
+        @Environment(\.isEnabled) private var isEnabled
+        @Environment(\.isInNavBar) private var isInNavBar
+        @Environment(\.controlSize) private var controlSize: ControlSize
+        @Environment(\.controlRoundness) private var controlRoundness
+        @Environment(\.isHighlighted) private var isHighlighted
+        
+        @State private var isHovering = false
+        private let overscroll: Double
+        
+        private var fontStyle: Font {
+            switch controlSize {
+            case .mini: return .caption
+            case .small: return .footnote
+            case .regular: return .body
+            case .large: return .title3.weight(.medium)
+            case .extraLarge: return .title2.weight(.medium)
+            @unknown default: return .body
             }
         }
         
+        private var size: CGFloat {
+            switch controlSize {
+            case .mini: return 26
+            case .small: return 30
+            case .regular: return 36
+            case .large: return 40
+            case .extraLarge: return 46
+            @unknown default: return 36
+            }
+        }
+        
+        private var shape: some InsettableShape {
+            RoundedRectangle(cornerRadius: (controlRoundness ?? 1) * (size / 2))
+        }
+        
+        init(overscroll: Double = 0){
+            self.overscroll = overscroll
+        }
+        
+        func makeBody(configuration: Configuration) -> some View {
+            let pressing = configuration.isPressed
+            let hasSelection = isHighlighted
+            configuration.label
+                .symbolEffectBounce(value: isHighlighted, grouping: .byLayer)
+                .font(fontStyle.weight(.semibold))
+                .blendMode(hasSelection ? .destinationOut : .normal)
+                .foregroundStyle(.tint)
+                .padding(size / 4)
+                .frame(height: size)
+                .frame(minWidth: size)
+                .background(
+                    ZStack {
+                        OuterShadowMaterial(
+                            shape,
+                            fill: Color.black.opacity(0.08),
+                            radius: 8,
+                            y: 2
+                        )
+                        .zIndex(1)
+                        
+                        shape
+                            .fill(.tint)
+                            .mask {
+                                LinearGradient(
+                                    colors: [.black.opacity(0.9), .black.opacity(0.65)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                .opacity(hasSelection ? 1 : 0.1 + overscroll)
+                            }
+                            .zIndex(2)
+                        
+                        EdgeHighlightMaterial(shape)
+                            .zIndex(3)
+                    }
+                    .scaleEffect(pressing ? 1.2 : 1 + (overscroll * 0.2))
+                    .animation(.smooth, value: pressing)
+                    .animation(.bouncy, value: overscroll)
+                )
+                .compositingGroup()
+                //.font(.body.bold())
+                .lineLimit(1)
+                .contentShape(shape)
+                .geometryGroupPolyfill()
+                .opacity(isEnabled ? 1 : 0.4)
+                .animation(.smooth, value: hasSelection)
+        }
+        
+        
+        struct LabelStyle: SwiftUI.LabelStyle {
+            
+            func makeBody(configuration: Configuration) -> some View {
+                HStack(spacing: 2) {
+                    configuration.icon
+                        .scaledToFit()
+                        .font(.body.weight(.semibold))
+                    
+                    configuration.title
+                }
+            }
+            
+        }
     }
+    
     
 }
 
 
-public extension ButtonStyle where Self == NavBarButtonStyle {
+
+public extension PrimitiveButtonStyle where Self == BarButtonStyle {
     
-    static var navBarStyle: NavBarButtonStyle { NavBarButtonStyle() }
+    static var bar: BarButtonStyle { BarButtonStyle() }
     
 }
 
@@ -125,22 +144,23 @@ public extension ButtonStyle where Self == NavBarButtonStyle {
 //MARK: - Toggle
 
 
-public struct NavBarToggleStyle: SwiftUI.ToggleStyle {
+public struct BarToggleStyle: SwiftUI.ToggleStyle {
     
     public init(){}
     
     public func makeBody(configuration: ToggleStyleConfiguration) -> some View {
-        Button(action: { configuration.isOn.toggle() }){
+        Button{ configuration.isOn.toggle() } label: {
             configuration.label
         }
-        .buttonStyle(NavBarButtonStyle(isSelected: configuration.isOn))
+        .isHighlighted(configuration.isOn)
+        .buttonStyle(.bar)
     }
     
 }
 
 
-public extension ToggleStyle where Self == NavBarToggleStyle {
+public extension ToggleStyle where Self == BarToggleStyle {
     
-    static var navBarStyle: NavBarToggleStyle { NavBarToggleStyle() }
+    static var bar: BarToggleStyle { BarToggleStyle() }
     
 }

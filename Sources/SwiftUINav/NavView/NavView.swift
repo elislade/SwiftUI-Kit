@@ -3,49 +3,55 @@ import SwiftUIKitCore
 import SwiftUIPresentation
 
 
-/// Similar to deprecated SwiftUI  `NavigationView`.
-public struct NavView<Root: View, Transition: TransitionProvider> : View {
+public struct NavView<Root: View, Transition: TransitionModifier> : View {
 
+    @Namespace private var namespace
     @Environment(\.layoutDirection) private var layoutDirection
     
-    private let transition: Transition
     private let useNavBar: Bool
     private let root: Root
     
-    @State private var backAction: BackAction = .none
     @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     @State private var willDismiss: [PresentationWillDismissAction] = []
-    @State private var size: CGSize = .zero
     
     @State private var scrollGestureTotal: Double = 0
-    @State private var pendingReset = false
-    @State private var transitionFraction: CGFloat = 0
+    @State private var updatingStack = false
+    @State private var resetting = false
+    
+    @GestureState(reset: { _, transaction in
+        transaction.animation = .fastSpring
+    }) private var transitionFraction: CGFloat = 0
+    
+    //@State private var transitionFraction: Double = 0
     @State private var isUpdatingTransition: Bool = false
     
     /// - Parameters:
-    ///   - transition: The ``TransitionProvider`` to use for push/pop transitions.
+    ///   - transition: The ``Transition`` to use for push/pop transitions.
     ///   - useNavBar: If true the root view will be wrapped in a ``NavBarContainer``. If false the navigation view will have no nav bar. Defaults to true.
     ///   - content: The view builder of the root view
     public init(
-        transition: Transition,
+        transition: Transition.Type,
         useNavBar: Bool = true,
         content: @escaping () -> Root
     ){
-        self.transition = transition
         self.useNavBar = useNavBar
         self.root = content()
     }
     
     #if !os(tvOS)
-    private func edgeDrag() -> some Gesture {
+    private func edgeDrag(size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0)
-            .onChanged({ g in
-                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-                updateTransition(value: max(g.translation.width * directionFactor, 0))
-            }).onEnded({ g in
+            .onChanged{ _ in
+                isUpdatingTransition = true
+            }
+            .onEnded({ g in
                 let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
                 commitTransition(at: g.predictedEndTranslation.width * directionFactor)
             })
+            .updating($transitionFraction){ gesture, state, transaction in
+                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
+                state = max(gesture.translation.width * directionFactor, 0) / size.width
+            }
     }
     #endif
     
@@ -59,80 +65,40 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
         last.dispose()
     }
     
-    private func updateTransition(value: Double) {
-        transitionFraction = value / size.width
-        if isUpdatingTransition == false {
-            isUpdatingTransition = true
-        }
-    }
-    
     private func commitTransition(at value: Double) {
         if value > 150 {
-            // user dragged enough
-            // dispose of the transition element
-            // after completing the animation
-
+            // user dragged enough, pop element
             popElement()
-            withAnimation(.fastSpringInterpolating.delay(0.1)) {
-                transitionFraction = 0
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
-                isUpdatingTransition = false
-            }
-        } else {
-            // user did not drag enough
-            // reinstate the transition element
-            // after rolling back the animation
-            
-            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-                withAnimation(.fastSpringInterpolating) {
-                    transitionFraction = 0
-                } completion: {
-                    isUpdatingTransition = false
-                }
-            } else {
-                withAnimation(.fastSpringInterpolating) {
-                    transitionFraction = 0
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-                    isUpdatingTransition = false
-                }
-            }
         }
     }
     
-    private func offset(_ index: Int) -> CGFloat {
-        index == elements.indices.last ? transitionFraction * size.width : 0
-    }
-    
-    private var baseModifier: Transition.TransitionModifier {
-        guard elements.count <= 1 else { return transition.modifier(.progress(1)) }
+    private var rootPushAmount: Double {
+        guard elements.count <= 1 else { return 1 }
         
         if elements.isEmpty {
-            return transition.identity
+            return 0
         } else if isUpdatingTransition {
-            return transition.modifier(.progress(1 - transitionFraction))
+            return 1 - transitionFraction
         } else {
-            return transition.modifier(.progress(1))
+            return 1
         }
     }
     
-    private func detailModifier(_ index: Int) -> Transition.TransitionModifier {
-        guard elements.count > 1 else { return transition.identity }
+    private func pushAmount(_ index: Int) -> Double {
+        guard elements.count > 1 else { return 0 }
         
         if index == elements.indices.last {
-            return transition.modifier(percent: 0)
-        } else if isUpdatingTransition && elements.count - 2 == index {
-            return transition.modifier(percent: 1 - transitionFraction)
+            return 0
+        } else if isUpdatingTransition && elements.indices.last?.advanced(by: -1) == index {
+            return 1 - transitionFraction
         } else {
-            return transition.modifier(percent: 1)
+            return 1
         }
     }
     
-    private nonisolated func newElements(_ new: [PresentationValue<NavViewElementMetadata>]) {
-        guard _elements.wrappedValue != new else { return }
-        var elements = self._elements.wrappedValue
+    private func newElements(_ new: [PresentationValue<NavViewElementMetadata>]) {
+        guard elements != new else { return }
+        var elements = self.elements
         let diff = new.difference(from: elements, by: { $0.id == $1.id })
 
         for item in diff {
@@ -143,86 +109,96 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
                 elements.removeAll(where: { $0.id == element.id })
             }
         }
-
-        self._elements.wrappedValue = elements
+        
+        self.elements = elements
     }
     
     private var content: some View {
         InsetReader { insets in
             GeometryReader { proxy in
-                //let trailingInset = proxy.safeAreaInsets.trailing
-                
-                ZStack(alignment: .topLeading) {
-                    root
-                        .modifier(baseModifier)
-                        .allowsHitTesting(elements.isEmpty)
-                        .opacity(elements.count > 1 ? 0 : 1)
-                        .accessibilityHidden(!elements.isEmpty)
-                        .zIndex(1)
-                        .environment(\.presentationDepth, elements.count)
-                        .isBeingPresentedOn(!elements.isEmpty)
-                        .disableResetAction(!elements.isEmpty)
-                        .safeAreaInsets(insets)
-                        .disableInsetReading(isUpdatingTransition ? true : !elements.isEmpty)
-                        .disableNavBarPreferences(!elements.isEmpty)
-                        .disableOnGeometryChanges(!elements.isEmpty)
-                        .disableOnPresentationWillDismiss(!elements.isEmpty)
-                        .scrollOffsetDisabled(!elements.isEmpty)
-                        .onGeometryChangePolyfill(of: \.size){ size = $0 }
-                        .overlay {
-                            ZStack {
-                                ForEach(elements, id: \.id){ ele in
-                                    let index = elements.firstIndex(of: ele)!
-                                    let isLast = index == elements.indices.last
-                                    let shouldDisable = !isLast
-                                    let shouldIgnore = index < (elements.count - 2)
-                                    
-                                    var isDisabled: Bool {
-                                        isUpdatingTransition ? shouldIgnore : shouldDisable
-                                    }
-                                    
-                                    ele.view()
-                                        .modifier(detailModifier(index))
-                                        .offset(x: isDisabled ? 0 : offset(index))
-                                        .accessibilityHidden(shouldDisable)
-                                        .opacity(shouldIgnore ? 0 : 1)
-                                        .zIndex(Double(index) + 2.0)
-                                        .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
-                                        .environment(\.presentationDepth, elements.count - index)
-                                        .isBeingPresentedOn(!isLast)
-                                        .disableResetAction(shouldDisable)
-                                        .disableNavBarPreferences(shouldDisable)
-                                        .safeAreaInsets(insets)
-                                        .disableInsetReading(shouldIgnore)
-                                        .disableOnPresentationWillDismiss(!isLast)
-                                        .allowsHitTesting(!shouldDisable)
-                                        .scrollOffsetDisabled(shouldDisable)
-                                        .transition(
-                                            .offset([size.width, 0])
-                                        )
-                                }
-                            }
-                        }
-                    
-                    Color.clear
-                        .frame(width: 14)
-                        .paddingAddingSafeArea(.leading)
-                        .contentShape(Rectangle())
-                        .zIndex(Double(elements.count + 3))
-                        #if !os(tvOS)
-                        .highPriorityGesture(edgeDrag(), including: .gesture)
-                        #endif
-                        .allowsHitTesting(elements.isEmpty == false)
-                        .defersSystemGesturesPolyfill(on: .leading)
+                let size = proxy.size
+                var rootFrozen: FrozenState {
+                    elements.isEmpty ? .thawed : elements.count > 1 ? .frozenInvisible : .frozen
                 }
-                .resetAction(active: !elements.isEmpty && !pendingReset){
-                    pendingReset = true
-                    popElement()
+                
+                root
+                    .frozen(rootFrozen)
+                    .modifier(Transition(pushAmount: rootPushAmount))
+                    .zIndex(1)
+                    .environment(\.presentationDepth, elements.count)
+                    .isBeingPresentedOn(!elements.isEmpty)
+                    .safeAreaInsets(insets)
+                    .disableNavBarItems(!elements.isEmpty)
+                    .disableOnPresentationWillDismiss(!elements.isEmpty)
+                    .maskMatching(using: namespace, enabled: !elements.isEmpty)
+                    .overlay {
+                        ZStack(alignment: .leading) {
+                            ForEach(elements, id: \.id){ ele in
+                                let index = elements.firstIndex(of: ele)!
+                                let isLast = index == elements.indices.last
+                                let shouldDisable = !isLast
+                                let shouldIgnore = index < (elements.count - 2)
+                                
+                                var frozenState: FrozenState {
+                                    isLast ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
+                                }
+                                
+                                ele.view()
+                                    .frozen(frozenState)
+                                    .modifier(Transition(pushAmount: pushAmount(index)))
+                                    .maskMatchingSource(using: namespace, enabled: isLast)
+                                    .offset(
+                                        x: isLast ? (transitionFraction) * size.width : 0
+                                    )
+                                    .zIndex(Double(index) + 2.0)
+                                    .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
+                                    .environment(\.presentationDepth, (elements.count - 1) - index)
+                                    .isBeingPresentedOn(!isLast)
+                                    .disableNavBarItems(shouldDisable)
+                                    .disableOnPresentationWillDismiss(!isLast)
+                                    .safeAreaInsets(insets)
+                                    .transition(.offset([size.width, 0]))
+                                    .maskMatching(using: namespace, enabled: !isLast)
+                            }
+                            
+                            Color.clear
+                                .frame(width: 14)
+                                .paddingAddingSafeArea(.leading)
+                                .contentShape(Rectangle())
+                                .zIndex(Double(elements.count + 3))
+                                #if !os(tvOS)
+                                .highPriorityGesture(edgeDrag(size: size), including: .gesture)
+                                #endif
+                                .allowsHitTesting(!elements.isEmpty && !resetting)
+                                .defersSystemGesturesPolyfill(on: .leading)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .resetAction(active: !elements.isEmpty && !resetting){
+                    Task {
+                        resetting = true
+                        defer { resetting = false }
+                        while !elements.isEmpty {
+                            popElement()
+                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 200)
+                        }
+                    }
                 }
                 .mask {
                     Rectangle().ignoresSafeArea()
                 }
-                .animation(.fastSpringInterpolating.speed(pendingReset ? 1.5 : 1), value: elements)
+                .navBar(elements.isEmpty ? .none : .leading){
+                    Button{ popElement() } label: {
+                        Label { Text("Go Back") } icon: {
+                            Image(systemName: "arrow.left")
+                                .layoutDirectionMirror()
+                        }
+                    }
+                    .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
+                    .labelStyle(.iconOnly)
+                    .transition(.move(edge: .leading) + .opacity)
+                }
+                .animation(.fastSpringInterpolating.speed(resetting ? 1.5 : 1), value: elements)
 //                .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
 //                    let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
 //                    scrollGestureTotal += g.delta.x
@@ -233,26 +209,16 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
 //                    scrollGestureTotal = 0
 //                })
                 .handleDismissPresentation(popElement)
-                .onChangePolyfill(of: elements){
-                    backAction.visible = !elements.isEmpty
-                    
-                    if pendingReset {
-                        if elements.isEmpty {
-                            pendingReset = false
-                        } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
-                                popElement()
-                            }
-                        }
-                    }
-                }
-                .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){ items in
-                    self.newElements(items)
-                }
+                .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self, perform: newElements)
+                .resetPreference(PresentationKey<NavViewElementMetadata>.self)
             }
         }
+        .geometryGroupPolyfill()
         .onPreferenceChange(PresentationWillDismissPreferenceKey.self){
-            _willDismiss.wrappedValue = $0
+            willDismiss = $0
+        }
+        .onAnimationComplete(when: transitionFraction == 0){
+            isUpdatingTransition = false
         }
     }
     
@@ -260,35 +226,34 @@ public struct NavView<Root: View, Transition: TransitionProvider> : View {
     public var body: some View {
         Group {
             if useNavBar {
-                NavBarContainer(backAction: backAction){
+                NavBarContainer{
                     content
                 }
                 .ignoresSafeArea(edges: [.bottom, .horizontal])
-                .onAppear {
-                    backAction.action = popElement
-                }
             } else {
                 content
+                    .disableNavBarPreferences()
                     .ignoresSafeArea()
             }
         }
-        .scrollOffsetContext()
+        .scrollPassthroughContext()
     }
     
 }
 
-
-public extension NavView where Transition == DefaultNavTransitionProvider {
+public extension NavView where Transition == DefaultNavTransitionModifier {
+    
     init(
         useNavBar: Bool = true,
         @ViewBuilder content: @escaping () -> Root
     ){
         self.init(
-            transition: DefaultNavTransitionProvider(),
+            transition: DefaultNavTransitionModifier.self,
             useNavBar: useNavBar,
             content: content
         )
     }
+    
 }
 
 
@@ -312,36 +277,5 @@ struct NavViewDestinationValue: Equatable {
     let id: UUID
     let value: AnyHashable
     let dispose: () -> Void
-    
-}
-
-
-struct DisableViewDrawingModifier: ViewModifier {
-    
-    @State private var size: CGSize = .zero
-    
-    var isDisabled: Bool = true
-    
-    func body(content: Content) -> some View {
-        content
-            .accessibilityHidden(isDisabled)
-            .opacity(isDisabled ? 0 : 1)
-            .disabled(isDisabled)
-            .disableResetAction(isDisabled)
-            .disableNavBarPreferences(isDisabled)
-            .disableInsetReading(isDisabled)
-            .disableOnGeometryChanges(isDisabled)
-            .allowsHitTesting(!isDisabled)
-            .scrollOffsetDisabled(isDisabled)
-            .onGeometryChangePolyfill(of: \.size){
-                if !isDisabled {
-                    size = $0
-                }
-            }
-            .frame(
-                maxWidth: isDisabled ? size.width : nil,
-                maxHeight: isDisabled ? size.height : nil
-            )
-    }
     
 }

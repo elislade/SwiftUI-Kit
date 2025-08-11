@@ -4,7 +4,6 @@ import SwiftUIKit
 public struct NavBarExamples: View {
     
     @State private var barHidden = false
-    @State private var showBackAction = false
     @State private var placements = Set(NavBarItemMetadata.Placement.allCases)
     @State private var selection = "A"
     
@@ -12,9 +11,7 @@ public struct NavBarExamples: View {
     
     public var body: some View {
         ExampleView(title: "NavBar"){
-            NavBarContainer(backAction: .init(visible: showBackAction, action: {
-                showBackAction = false
-            })){
+            NavBarContainer{
                 ScrollView {
                     Rectangle()
                         .fill(.tint)
@@ -51,20 +48,11 @@ public struct NavBarExamples: View {
                         )
                 }
                 .navBarHidden(barHidden)
-                .navBarMaterial {
-                    Rectangle().fill(.background)
-                }
             }
         } parameters: {
             ExampleSection("Bar", isExpanded: true){
                 Toggle(isOn: $barHidden){
                     Text("Hide")
-                        .font(.exampleParameterTitle)
-                }
-                .exampleParameterCell()
-                
-                Toggle(isOn: $showBackAction){
-                    Text("Show Back Action")
                         .font(.exampleParameterTitle)
                 }
                 .exampleParameterCell()

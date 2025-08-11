@@ -11,13 +11,14 @@ struct NavViewPresentingStackModifier<Element, Destination: View>: ViewModifier 
         Binding(
             get: { data.indices.contains(index) },
             set: {
-                if $0 == false {
+                if $0 == false, data.indices.contains(index) {
                     self.data.remove(at: index)
                 }
             }
         )
     }
     
+
     func body(content: Content) -> some View {
         content
             .overlay {
@@ -33,6 +34,7 @@ struct NavViewPresentingStackModifier<Element, Destination: View>: ViewModifier 
     }
     
 }
+
 
 struct NavViewPresentingModifier<Destination: View>: ViewModifier {
     

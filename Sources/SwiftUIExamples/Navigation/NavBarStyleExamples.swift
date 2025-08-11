@@ -7,6 +7,7 @@ public struct NavBarStyleExamples : View {
     @State private var controlRondness: Double = 1
     @State private var colorScheme: ColorScheme = .light
     @State private var layoutDirection: LayoutDirection = .leftToRight
+    @State private var isOn: Bool = false
     
     public init(){ }
     
@@ -14,41 +15,39 @@ public struct NavBarStyleExamples : View {
         ExampleView(title: "NavBar Styles") {
             VStack {
                 HStack {
-                    Button("Item A"){}
-                    
-                    Button(action: {}){
-                        Label{ Text("Back") } icon: {
-                            Color.clear
-                                .aspectRatio(1, contentMode: .fit)
-                                .overlay {
-                                    Image(systemName: "play.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .offset(x: 2)
-                                }
-                        }
-                        .labelStyle(.iconOnly)
+                    Toggle(isOn: $isOn){
+                        Label("Filter", systemImage: "camera.filters")
                     }
+                    
+                    Toggle(isOn: $isOn){
+                        Label("Filter", systemImage: "camera.filters")
+                    }
+                    .labelStyle(.iconOnly)
+                    
+                    Toggle(isOn: $isOn){
+                        Label("Filter", systemImage: "camera.filters")
+                    }
+                    .labelStyle(.titleOnly)
                 }
                 
                 HStack {
-                    InlineBinding(true){ b in
-                        Toggle(isOn: b){
-                            Text(b.wrappedValue ? "ON" : "OFF")
-                                .contentTransitionNumericText()
-                        }
+                    Button{} label: {
+                        Label("Filter", systemImage: "camera.filters")
                     }
                     
-                    InlineBinding(false){
-                        Toggle(isOn: $0){
-                            Label("Alpha", systemImage: "a.circle")
-                            //.labelStyle(.titleOnly)
-                        }
+                    Button{} label: {
+                        Label("Filter", systemImage: "camera.filters")
                     }
+                    .labelStyle(.iconOnly)
+                    
+                    Button{} label: {
+                        Label("Filter", systemImage: "camera.filters")
+                    }
+                    .labelStyle(.titleOnly)
                 }
             }
-            .buttonStyle(.navBarStyle)
-            .toggleStyle(.navBarStyle)
+            .buttonStyle(.bar)
+            .toggleStyle(.bar)
             .environment(\.layoutDirection, layoutDirection)
             .environment(\.controlSize, controlSize)
             .environment(\.controlRoundness, controlRondness)
