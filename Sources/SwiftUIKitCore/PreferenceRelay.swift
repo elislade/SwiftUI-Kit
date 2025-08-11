@@ -73,39 +73,3 @@ extension EnvironmentValues {
     @Entry internal var preferenceValueRelay: (UUID, Any) -> Void = { _, _ in }
     
 }
-
-
-struct TransitionPhaseChange: ViewModifier {
-    
-    let active: Bool
-    
-    func body(content: Content) -> some View {
-        content
-            //.scaleEffect(0.5)
-            .overlay{
-                Color.red
-                    .onDisappear{
-                        print("DISSAPPEAR", active)
-                    }
-            }
-            .disableAnimations()
-//            .onAppear {
-//                print("APPEAR", active)
-//            }
-//            .onDisappear{
-//                print("DISSAPPEAR", active)
-//            }
-    }
-    
-}
-
-
-extension AnyTransition {
-    
-    static func phaseChange() -> AnyTransition {
-        .modifier(
-            active: TransitionPhaseChange(active: true),
-            identity: TransitionPhaseChange(active: false)
-        )
-    }
-}
