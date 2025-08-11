@@ -4,6 +4,7 @@ import SwiftUI
 public struct MenuGroupDivider: View {
     
     @Environment(\.isInMenu) private var isInMenu
+    @Environment(\.menuStyle) private var style
     
     public init() { }
     
@@ -17,7 +18,15 @@ public struct MenuGroupDivider: View {
     
     public var body: some View {
         if isInMenu {
-            Color.primary.opacity(0.1).frame(height: height)
+            switch style {
+            case .compact:
+                Color.primary.opacity(0.1).frame(height: height)
+            case .regular:
+                Capsule()
+                    .opacity(0.1)
+                    .frame(height: 2)
+                    .padding(8)
+            }
         } else {
             Divider()
         }
@@ -30,12 +39,16 @@ public struct MenuGroupDivider: View {
 public struct MenuDivider: View {
     
     @Environment(\.isInMenu) private var isInMenu
+    @Environment(\.menuStyle) private var style
     
     public init() { }
     
     public var body: some View {
         if isInMenu {
-            Divider()
+            switch style {
+            case .compact: Divider()
+            case .regular: EmptyView()
+            }
         }
     }
     

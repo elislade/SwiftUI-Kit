@@ -1,24 +1,49 @@
 import SwiftUI
+import SwiftUIKitCore
 
-struct MenuBackgroundKey: EnvironmentKey {
-    
-    static var defaultValue: AnyView? { nil }
-    
-}
 
 extension EnvironmentValues {
     
-    var menuBackground: AnyView? {
-        get { self[MenuBackgroundKey.self] }
-        set { self[MenuBackgroundKey.self] = newValue }
-    }
+    @Entry internal var menuBackgroundStyle: AnyMaterialStyle?
     
 }
 
 public extension View {
     
-    func menuBackground<Content: View>(@ViewBuilder content: @escaping () -> Content) -> some View {
-        environment(\.menuBackground, AnyView(ZStack(content: content)))
+    //TODO: Depricated use menuBackgroundStyle instead.
+    func menuBackground<Content: View>(@ViewBuilder content: @escaping () -> Content) -> Self {
+        self
     }
     
+    func menuBackgroundStyle(_ style: some MaterialStyle) -> some View {
+        environment(\.menuBackgroundStyle, AnyMaterialStyle(style))
+    }
+    
+}
+
+
+struct MenuBackground: View {
+    
+    @Environment(\.menuBackgroundStyle) private var backgroundStyle
+    @Environment(\.menuVisualDepth) var visualDepth
+    
+    var body: some View {
+        Group {
+            if let backgroundStyle {
+                backgroundStyle.makeBody(ContainerRelativeShape())
+            } else {
+                ContainerRelativeShape()
+                    .fill(.regularMaterial)
+                    .shadow(
+                        color: .black.opacity(0.2),
+                        radius: 20 * visualDepth,
+                        y: 20 * visualDepth
+                    )
+                
+                EdgeHighlightMaterial(ContainerRelativeShape())
+                    .blendMode(.overlay)
+            }
+        }
+        .opacity(visualDepth)
+    }
 }

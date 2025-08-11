@@ -31,7 +31,7 @@ let package = Package(
         .target(name: "SwiftUIControls", dependencies: ["SwiftUIKitCore"]),
         .target(name: "SwiftUIPresentation", dependencies: ["SwiftUIKitCore"]),
         .target(name: "SwiftUINav", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
-        .target(name: "SwiftUIMenu", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
+        .target(name: "SwiftUIMenu", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation", "SwiftUIControls"]),
     ],
     swiftLanguageVersions: [ .version("6") ]
 )

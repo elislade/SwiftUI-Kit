@@ -1,15 +1,17 @@
 import SwiftUI
 
-struct MenuKey: EnvironmentKey {
-    static var defaultValue: Bool { false }
+extension EnvironmentValues {
+    
+    @Entry public internal(set) var isInMenu: Bool = false
+    @Entry public var menuStyle: MenuStyle = .regular
+    
+    @Entry internal var menuVisualDepth: Double = 1
+    @Entry internal var menuRoundness: Double = 1
+    
 }
 
 
-public extension EnvironmentValues {
-    
-    var isInMenu: Bool {
-        get{ self[MenuKey.self] }
-        set{ self[MenuKey.self] = newValue }
-    }
-    
+public enum MenuStyle: Int, CaseIterable, Sendable {
+    case compact
+    case regular
 }

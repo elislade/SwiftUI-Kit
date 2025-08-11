@@ -4,16 +4,14 @@ import SwiftUIKitCore
 struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View {
     
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
-    
-    var presentedBinding: Binding<Bool>?
-    
-    let source: Source
-    @ViewBuilder let presentedView: Presented
-    @ViewBuilder let content: Content
-    
     @State private var isPresented = false
     @State private var origin: CGPoint = .zero
     @State private var mouseLocation: SIMD2<Double> = .zero
+    
+    var presentedBinding: Binding<Bool>?
+    let source: Source
+    @ViewBuilder let presentedView: Presented
+    @ViewBuilder let content: Content
     
     private var binding: Binding<Bool> {
         presentedBinding ?? $isPresented
@@ -36,7 +34,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
             .background{
                 Color.clear
                     .frame(width: 1, height: 1)
-                    .autoAnchorOrthogonalToEdgePresentation(isPresented: binding, edge: .trailing){
+                    .anchorOrthogonalToEdgePresentation(isPresented: binding, edge: .trailing){
                         MenuContainer{ content }
                             .presentationBackdrop{ Color.clear }
                     }
@@ -67,7 +65,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>: View 
                 },
                 accessory: { state in
                     MenuContainer{ content }
-                        .shadow(radius: 10, y: 5)
+                        .submenuPresentationContext()
                         .windowInteractionEffects([.scale(anchor: state.anchor)])
                         .padding(.init(state.edge))
                 }

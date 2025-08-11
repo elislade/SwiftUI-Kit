@@ -3,13 +3,11 @@ import SwiftUIKitCore
 
 public struct Menu<Label: View, Content: View>: View {
     
-    @Environment(\.menuBackground) private var menuBackground
     @Environment(\.isInMenu) private var isInMenu
-    
+    @State private var id = UUID()
     @State private var isOpen = false
-    
-    @ViewBuilder let label: @MainActor () -> Label
-    @ViewBuilder let content: @MainActor () -> Content
+    @ViewBuilder private let label: @MainActor () -> Label
+    @ViewBuilder private let content: @MainActor () -> Content
     
     public init(
         @ViewBuilder label: @MainActor @escaping () -> Label,
@@ -19,7 +17,6 @@ public struct Menu<Label: View, Content: View>: View {
         self.content = content
     }
     
-
     public init(
         @ViewBuilder content: @MainActor @escaping () -> Content,
         @ViewBuilder label: @MainActor @escaping () -> Label
@@ -35,23 +32,23 @@ public struct Menu<Label: View, Content: View>: View {
                 content: { content() }
             )
         } else {
-            Button(action: { isOpen = true }){
+            Button{ isOpen = true } label: {
                 label()
                     .opacity(isOpen ? 0.3 : 1)
                     .contentShape(Rectangle())
                     .simultaneousLongPress { isOpen = true }
             }
             .buttonStyle(.plain)
-            .autoAnchorPresentation(isPresented: $isOpen){ state in
+            //.presentationMatch(id)
+            .anchorPresentation(isPresented: $isOpen){ state in
                 MenuContainer {
                     content()
                 }
+                //.presentationMatch(id)
                 .padding(.init(state.edge))
-                .shadow(color: .black.opacity(0.1), radius: 30, y: 20)
                 .windowInteractionEffects([.scale(anchor: state.anchor)])
                 .presentationBackdrop(.touchEndedDismiss){ Color.clear }
-                .modifier(SubmenuPresentationContext())
-                .environment(\.menuBackground, menuBackground)
+                .submenuPresentationContext()
             }
             .accessibilityRepresentation {
                 content()

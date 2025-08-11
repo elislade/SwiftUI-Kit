@@ -5,6 +5,7 @@ public struct ContextMenuExamples: View  {
         
     @State private var presentedIndices: Set<Int> = []
     @State private var tint: Color = .random
+    @State private var gotDog: Bool = false
     
     public init() {}
     
@@ -18,29 +19,36 @@ public struct ContextMenuExamples: View  {
                             .opacity(0.1 + Double(i) / 15)
                             .background(.background)
                             .aspectRatio(1, contentMode: .fit)
-                            .customContextMenu(isPresented: Binding($presentedIndices, contains:  i)) {
-                                Button(action: {}){
-                                    Text("Item A")
-                                        .equalInsetItem()
+                            .customContextMenu(isPresented: Binding($presentedIndices, contains: i)) {
+                                
+                                Button{} label: {
+                                    Label { Text("Item A") } icon: {
+                                        Image(systemName: "a.circle")
+                                    }
                                 }
                                 
                                 MenuGroupDivider()
                                 
-                                Toggle(isOn: .constant(true)){ Text("Got Dog ?") }
+                                Toggle(isOn: $gotDog){
+                                    Label { Text("Got Dog ?") } icon: {
+                                        Image(systemName: "dog.fill")
+                                    }
+                                }
                                 
                                 MenuDivider()
                                 
                                 Menu {
                                     Label("Title", systemImage: "car")
                                 } label: {
-                                    Text("Item B")
+                                    Label { Text("Menu B") } icon: {
+                                        Image(systemName: "b.circle")
+                                    }
                                 }
                             }
                     }
                 }
                 .padding()
             }
-            .focusPresentationContext()
             .background(.regularMaterial)
             
             Divider().ignoresSafeArea()
@@ -48,6 +56,7 @@ public struct ContextMenuExamples: View  {
             ExampleTitle("Context Menu")
                 .padding()
         }
+        .presentationContext()
         .tint(tint)
     }
     

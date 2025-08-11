@@ -4,6 +4,7 @@ import SwiftUIKitCore
 
 public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>: View where Data.Element == V {
     
+    @Environment(\.menuStyle) private var style
     @Environment(\.isInMenu) private var isInMenu
     
     @Binding private var selection: V
@@ -31,22 +32,17 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
     
     public var body: some View {
         if isInMenu {
-            VStack(spacing: 0){
-                ForEach(data, id: \.self){ i in
-                    Toggle(isOn: binding(for: i)){
-                        HStack {
-                            label(i)
-                        }
-                    }
-                    
-                    if i != data.last {
-                        Divider()
-                    }
+            ForEach(data, id: \.self){ i in
+                Toggle(isOn: binding(for: i)){
+                    label(i)
                 }
                 
+                if i != data.last {
+                    MenuDivider()
+                }
             }
-            .toggleStyle(MenuToggleStyle())
-            .menuActionTriggerBehaviour(.immediate)
+            .toggleStyle(MenuToggleStyle(exclusivity: .exclusive))
+            .actionTriggerBehaviour(.immediate)
         } else {
             Picker("", selection: $selection){
                 ForEach(data, id: \.self){
@@ -62,17 +58,32 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
 #Preview {
     InlineBinding("A"){ binding in
         MenuContainer{
-            MenuPicker(selection: binding, data: ["A", "B", "C"]){ ele in
-                Text(ele)
+            VStack(spacing: nil) {
+                Image(systemName: "xbox.logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 40)
+                    .opacity(0.1)
+                
+                Text("Is this an XBox?")
+                    .font(.system(.title2, design: .serif)[.bold])
+                
+                Text("Pick it now!!!")
+                    .font(.system(.body, design: .serif).italic())
+                    .opacity(0.5)
             }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .fixedSize(horizontal: false, vertical: true)
             
             MenuGroupDivider()
             
-            Button(action: {}){
-                Text("Non-picker Item")
-                    .equalInsetItem()
+            MenuPicker(selection: binding, data: ["No", "Yes", "Everything is an xbox."]){ ele in
+                Text(ele)
+                    .font(.headline)
             }
         }
         .padding()
+        .tint(.pink)
     }
 }

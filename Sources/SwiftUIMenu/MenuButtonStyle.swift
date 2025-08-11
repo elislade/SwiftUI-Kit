@@ -1,93 +1,117 @@
 import SwiftUI
 import SwiftUIKitCore
 
+
 public struct MenuButtonStyle: PrimitiveButtonStyle {
     
+    @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
+    @Environment(\.actionDwellDuration) private var dwellDuration
+    @Environment(\.actionTriggerBehaviour) private var triggerBehaviour
     @Environment(\.dismissPresentation) private var dismiss
     @Environment(\.isEnabled) private var isEnabled
     
-    private let dismissOnAction: Bool
+    private let dismissWhenTriggered: Bool
     
-    @State private var id = UUID()
-    @State private var isActive = false
+    @State private var activatedAt: Date? = nil
+    @State private var bounce = false
+    @State private var actionShouldTriggerOnDisappear = false
     
-    public init(dismissOnAction: Bool = true) {
-        self.dismissOnAction = dismissOnAction
+    private var isActive: Bool { activatedAt != nil }
+    
+    public init(dismissWhenTriggered: Bool = true){
+        self.dismissWhenTriggered = dismissWhenTriggered
     }
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .symbolEffectBounce(value: bounce, grouping: .byLayer)
             .frame(maxWidth: .infinity, alignment: .leading)
             .lineLimit(2)
             .contentShape(Rectangle())
             .accessibilityAction {
                 configuration.trigger()
                 
-                if dismissOnAction {
+                if dismissWhenTriggered {
                     dismiss()
                 }
             }
-            .foregroundStyle(isActive ? AnyShapeStyle(.background) : AnyShapeStyle(configuration.role == .destructive ? .red : Color.primary))
+            .onChangePolyfill(of: isBeingPresentedOn){
+                if isBeingPresentedOn {
+                    activatedAt = nil
+                }
+            }
+            .foregroundStyle(isActive ? AnyShapeStyle(.white) : AnyShapeStyle(configuration.role == .destructive ? .red : Color.primary))
             .symbolVariant(isActive ? .fill : .none)
             .background{
-                Rectangle()
-                    .fill(configuration.role == .destructive ? AnyShapeStyle(.red) : AnyShapeStyle(.tint))
-                    .opacity(isActive ? 1 : 0)
-                    .allowsHitTesting(false)
-                
-                Rectangle()
-                    .fill(.linearGradient(
-                        colors: [.black.opacity(0.3), .white.opacity(0.1)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ))
-                    .blendMode(.overlay)
-                    .opacity(isActive ? 0.6 : 0)
-            }
-            .opacity(isEnabled ? 1 : 0.5)
-            .background {
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: MenuButtonPreferenceKey.self,
-                        value: isEnabled ? [
-                            .init(
-                                id: id,
-                                globalRect: proxy.frame(in: .global),
-                                dismissOnAction: dismissOnAction,
-                                active: { _isActive.wrappedValue = $0 },
-                                action: { configuration.trigger() }
-                            )
-                        ] : []
+                if isActive {
+                    ZStack {
+                        ContainerRelativeShape()
+                            .fill(configuration.role == .destructive ? AnyShapeStyle(.red) : AnyShapeStyle(.tint))
+                            .allowsHitTesting(false)
+                        
+                        ContainerRelativeShape()
+                            .fill(.linearGradient(
+                                colors: [.black.opacity(0.3), .white.opacity(0.1)],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            ))
+                            .blendMode(.overlay)
+                            .opacity(0.6)
+                        
+                        if let dwellDuration  {
+                            DwellHighlight(duration: dwellDuration)
+                        }
+                        
+                        EdgeHighlightMaterial(ContainerRelativeShape())
+                    }
+                    .drawingGroup()
+                    .shadow(color: .black.opacity(0.2), radius: 4, y: 3)
+                    .transition(
+                        (.opacity + .blur(radius: 10)).animation(.fastSpringInteractive)
                     )
                 }
-                .hidden()
             }
-    }
-    
-    
-    struct Style: ButtonStyle {
-        
-        @Environment(\.isEnabled) private var isEnabled
-        
-        var isActive: Bool = false
-        
-        func makeBody(configuration: Configuration) -> some View {
-            let isPressed = isActive || configuration.isPressed
-            configuration.label
-                .symbolVariant(isActive ? .fill : .none)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .lineLimit(2)
-                .contentShape(Rectangle())
-                .foregroundStyle(isPressed ? AnyShapeStyle(.background) : AnyShapeStyle(Color.primary))
-                .background{
-                    Rectangle()
-                        .fill(configuration.role == .destructive ? AnyShapeStyle(.red) : AnyShapeStyle(.tint))
-                        .opacity(isPressed ? 1 : 0)
-                        .allowsHitTesting(false)
+            .geometryGroupPolyfill()
+            .opacity(isEnabled ? 1 : 0.5)
+            .task(id: activatedAt){
+                guard activatedAt != nil, let dwellDuration else { return }
+                if let _ = try? await Task.sleep(nanoseconds: nanoseconds(seconds: dwellDuration)) {
+                    configuration.trigger()
                 }
-                .opacity(isEnabled ? 1 : 0.5)
-        }
-        
+            }
+            .onDisappear {
+                if actionShouldTriggerOnDisappear, triggerBehaviour == .onDisappear {
+                    configuration.trigger()
+                }
+            }
+            .onWindowInteractionHover{ phase in
+                guard isEnabled else { return }
+                
+                switch phase {
+                case .entered:
+                    activatedAt = Date()
+                case .left:
+                    activatedAt = nil
+                case .ended:
+                    activatedAt = nil
+                    if dismissWhenTriggered {
+                        dismiss()
+                    }
+                    
+                    if triggerBehaviour == .immediate {
+                        configuration.trigger()
+                    } else {
+                        actionShouldTriggerOnDisappear = true
+                    }
+                }
+            }
+            .onHoverPolyfill{ isHovering in
+                if isHovering {
+                    activatedAt = Date()
+                } else {
+                    activatedAt = nil
+                }
+            }
     }
     
 }
@@ -95,34 +119,54 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
 
 public extension PrimitiveButtonStyle where Self == MenuButtonStyle {
     
-    var menuStyle: MenuButtonStyle { .init() }
+    static var menu: MenuButtonStyle { .init() }
     
 }
 
 
 
-public enum MenuActionTriggerBehaviour: Hashable, Sendable {
+public enum ActionTriggerBehaviour: Hashable, Sendable, BitwiseCopyable {
     case immediate
-    case afterDismissal
+    case onDisappear
 }
 
 
 public extension View {
     
-    func menuActionTriggerBehaviour(_ behaviour: MenuActionTriggerBehaviour) -> some View {
-        transformPreference(MenuButtonPreferenceKey.self){ actions in
-            for i in actions.indices {
-                actions[i].actionBehaviour = behaviour
-            }
-        }
+    nonisolated func actionTriggerBehaviour(_ behaviour: ActionTriggerBehaviour) -> some View {
+        environment(\.actionTriggerBehaviour, behaviour)
     }
     
-    func menuActionDwellDuration(_ duration: TimeInterval?) -> some View {
-        transformPreference(MenuButtonPreferenceKey.self){ actions in
-            for i in actions.indices {
-                actions[i].dwellDuration = duration
-            }
-        }
+    nonisolated func actionDwellDuration(_ duration: TimeInterval?) -> some View {
+        environment(\.actionDwellDuration, duration)
+    }
+    
+}
+
+
+extension EnvironmentValues {
+    
+    @Entry var actionTriggerBehaviour: ActionTriggerBehaviour = .immediate
+    @Entry var actionDwellDuration: TimeInterval? = nil
+    
+}
+
+
+struct DwellHighlight: View {
+    
+    let duration: Double
+    @State private var active = false
+    
+    var body: some View {
+        Rectangle()
+            .fill(.white.opacity(0.1))
+            .scaleEffect(
+                x: active ? 1 : 0,
+                anchor: .leading
+            )
+            .animation(.linear(duration: duration), value: active)
+            .onAppear{ active = true }
+            .clipShape(ContainerRelativeShape())
     }
     
 }
