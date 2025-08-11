@@ -1,15 +1,11 @@
 import SwiftUI
 
 
-struct EnvChangeModifier: @preconcurrency EnvironmentalModifier {
+struct EnvironmentChangeModifier {
     
     let onChange: (EnvironmentValues) -> Void
     
-    func resolve(in environment: EnvironmentValues) -> some ViewModifier {
-        Modifier(environment: environment, onChange: onChange)
-    }
-    
-    struct Modifier: ViewModifier {
+    struct InnerModifier {
         
         let environment: EnvironmentValues
         let onChange: (EnvironmentValues) -> Void
@@ -18,23 +14,35 @@ struct EnvChangeModifier: @preconcurrency EnvironmentalModifier {
             self.environment = environment
             self.onChange = onChange
         }
-        
-        func body(content: Content) -> some View {
-            content.onChangePolyfill(of: environment.description, initial: true){
-                onChange(environment)
-            }
-        }
     
     }
+    
 }
 
+extension EnvironmentChangeModifier.InnerModifier : ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content.onChangePolyfill(of: environment.description, initial: true){
+            onChange(environment)
+        }
+    }
+    
+}
+
+extension EnvironmentChangeModifier : EnvironmentalModifier {
+    
+    func resolve(in environment: EnvironmentValues) -> some ViewModifier {
+        InnerModifier(environment: environment, onChange: onChange)
+    }
+    
+}
 
 public extension View {
     
     /// - Parameter changed: A closure that gets called every time any EnvironmentValue changes.
     /// - Returns: A view that can monitor any `EnvironmentValues` changes.
-    func onEnvironmentValuesChanged(_ changed: @escaping (EnvironmentValues) -> Void) -> some View {
-        modifier(EnvChangeModifier(onChange: changed))
+    nonisolated func onEnvironmentValuesChanged(_ changed: @escaping (EnvironmentValues) -> Void) -> some View {
+        modifier(EnvironmentChangeModifier(onChange: changed))
     }
     
 }

@@ -116,7 +116,7 @@ extension View {
     }
 #else
     func previewSize() -> some View {
-        InlineEnvironmentReader(\.colorScheme){ sch in
+        InlineEnvironmentValue(\.colorScheme){ sch in
             self
                 .background{
                     switch sch {

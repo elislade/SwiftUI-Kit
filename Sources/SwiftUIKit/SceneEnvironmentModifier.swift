@@ -22,7 +22,7 @@ struct SceneEnvironmentModifier: ViewModifier {
         // If parent size is zero we know it hasen't been setup before as this is the default value
         // views can't have zero size
         if parentSceneSize == .zero {
-            InlineEnvironmentReader(\.deviceOrientation){ orientation in
+            InlineEnvironmentValue(\.deviceOrientation){ orientation in
                 GeometryReader{ proxy in
                     var safeArea: EdgeInsets {
                         var area = proxy.safeAreaInsets

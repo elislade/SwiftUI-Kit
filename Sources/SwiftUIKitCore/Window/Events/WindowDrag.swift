@@ -5,7 +5,7 @@ public extension View {
     #if os(watchOS)
     
     func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
-        InlineEnvironmentReader(\.windowDragEnabled){ enabled in
+        InlineEnvironmentValue(\.windowDragEnabled){ enabled in
             contentShape(Rectangle()).simultaneousGesture(
                 DragGesture(minimumDistance: 0, coordinateSpace: .global)
                     .onChanged{ action(.init(phase: .changed, locations: [$0.location])) }

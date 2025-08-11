@@ -40,7 +40,7 @@ public extension View {
     }
  
     func resolveFont<V>(_ resource: FontResource? = nil, overriding key: WritableKeyPath<FontParameters, V>, value: V) -> some View {
-        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+        InlineEnvironmentValue(\.resolvedFont){ resolvedFont in
             font(resolvedFont.opaqueFont)
         }
         .transformEnvironment(\.fontResource){
@@ -54,7 +54,7 @@ public extension View {
     }
     
     func resolveFont(_ resource: FontResource? = nil, with parameters: FontParameters? = nil) -> some View {
-        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+        InlineEnvironmentValue(\.resolvedFont){ resolvedFont in
             font(resolvedFont.opaqueFont)
         }
         .transformEnvironment(\.fontResource){
@@ -70,14 +70,14 @@ public extension View {
     }
     
     func font(_ parameters: FontParameters) -> some View {
-        InlineEnvironmentReader(\.resolvedFont){ resolvedFont in
+        InlineEnvironmentValue(\.resolvedFont){ resolvedFont in
             font(resolvedFont.opaqueFont)
         }
         .transformEnvironment(\.fontParameters){ $0 = parameters }
     }
     
     func font(_ resource: FontResource, modifier: @escaping (FontParameters) -> FontParameters = { $0 }) -> some View {
-        InlineEnvironmentReader(\.resolvedFont){ font in
+        InlineEnvironmentValue(\.resolvedFont){ font in
             self.font(font.opaqueFont)
         }
         .transformEnvironment(\.fontResource){ $0 = resource }

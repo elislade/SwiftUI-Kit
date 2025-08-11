@@ -37,7 +37,7 @@ public extension View {
     
     func handleDismissPresentation(_ action: @MainActor @escaping () -> Void) -> some View {
         InlineState(UUID()){ id in
-            InlineEnvironmentReader(\.isBeingPresentedOn){ isBeingPresentedOn in
+            InlineEnvironmentValue(\.isBeingPresentedOn){ isBeingPresentedOn in
                 self.transformEnvironment(\.dismissPresentation) { value in
                     // only set value if view is not being presented on
                     if isBeingPresentedOn == false {

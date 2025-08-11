@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Reads Environment value inline without having to use @Environment property wrapper. Usefull for Previews or initializing views wilth just a quick inline wrapper instead of having to create a whole wrapper view just to access an @Environment value.
-public struct InlineEnvironmentReader<Value: Sendable, Content: View> {
+/// A view that can read a **single** environment value inline.
+public struct InlineEnvironmentValue<Value: Sendable, Content: View> {
     
     private let env: Environment<Value>
     private let content: @MainActor (Value) -> Content
@@ -20,7 +20,7 @@ public struct InlineEnvironmentReader<Value: Sendable, Content: View> {
     
 }
 
-extension InlineEnvironmentReader: View {
+extension InlineEnvironmentValue: View {
     
     public var body: some View {
         content(env.wrappedValue)
