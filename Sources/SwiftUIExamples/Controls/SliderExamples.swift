@@ -10,7 +10,6 @@ public struct SliderExamples: View {
     @State private var direction = LayoutDirection.leftToRight
     @State private var directionSuggestion = LayoutDirectionSuggestion.useSystemDefault
     @State private var controlRoundness: Double = 1
-    @State private var animation: Animation?
     
     public init() {}
     
@@ -24,7 +23,7 @@ public struct SliderExamples: View {
                 #endif
                 
                 ExampleCard(title: "SwiftUIKit Slider") {
-                    Slider(value: $value.animation(animation))
+                    Slider(value: $value)
                 }
             }
             .padding()
@@ -40,13 +39,8 @@ public struct SliderExamples: View {
                 Spacer()
                 
                 Button("Animate") {
-                    animation = .bouncy.speed(0.6)
-                    //withAnimation(.bouncy){
+                    withAnimation(.bouncy){
                         value = .random(in: 0...1)
-                   // }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                        animation = nil
                     }
                 }
             }

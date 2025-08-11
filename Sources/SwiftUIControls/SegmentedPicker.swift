@@ -127,6 +127,7 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
             #if !os(tvOS)
             .highPriorityGesture(gesture(viewSize: proxy.size))
             #endif
+            .geometryGroupPolyfill()
             .background{
                 let shape = RoundedRectangle(cornerRadius: (dimension / 2) * (controlRoundness ?? 0.4))
                 let width = proxy.size.width / Double(items.count)
@@ -157,7 +158,6 @@ public struct SegmentedPicker<Data: RandomAccessCollection, Label: View>: View w
             width: layoutVertical ? dimension : nil,
             height: layoutVertical ? nil : dimension
         )
-        .geometryGroupPolyfill()
         .lineLimit(1)
         .animation(.smooth, value: pendingIndex)
         .opacity(isEnabled ? 1 : 0.5)

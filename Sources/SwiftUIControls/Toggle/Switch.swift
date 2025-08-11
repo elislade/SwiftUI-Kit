@@ -8,7 +8,7 @@ import SwiftUIKitCore
 /// - Properly animated values with the current `Transaction` animation. Base `UIKit` bridge does not participate in the `Transaction` animation properly.
 /// - Works inside a `DrawingGroup` as it does not bridge to `UIKit` or `AppKit`.
 /// - Works with `ControlSize` of environment on all platforms.
-/// - Support for ``/SwiftUI/EnvironmentValues/isOnOffSwitchLabelsEnabled`` EnvironmentValue.
+/// - Support for ``EnvironmentValues/isOnOffSwitchLabelsEnabled`` EnvironmentValue.
 /// - Support for ``EnvironmentValues/controlRadius-property`` modifer.
 /// - Support for ``LayoutDirectionSuggestion`` with vertical layouts.
 /// - Ability to add custom on/off labels.
