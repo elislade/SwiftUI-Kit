@@ -4,17 +4,15 @@ struct ExampleControl {
     
     struct Anchor: View {
         
+        @Environment(\.isEnabled) private var isEnabled
         @Binding var value: UnitPoint
         
-        @State private var x = Clamped(0.0)
-        @State private var y = Clamped(0.0)
-        
-        private var unit: UnitPoint {
-            .init(x: x.value, y: y.value)
-        }
-        
         var body: some View {
-            SliderView(x: $x, y: $y, hitTestHandle: false){
+            SliderView(
+                x: .init($value.x),
+                y: .init($value.y),
+                hitTestHandle: false
+            ){
                 RaisedControlMaterial(Circle())
                     .frame(width: 32, height: 32)
                     .overlay{
@@ -22,27 +20,18 @@ struct ExampleControl {
                             .font(.title2)
                             .foregroundStyle(.black)
                     }
+                    .opacity(isEnabled ? 1 : 0.7)
             }
             .padding(2)
             .background{
                 SunkenControlMaterial(RoundedRectangle(cornerRadius: 20))
-                Dots(anchor: unit)
+                Dots(anchor: value)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .opacity(0.2)
                     .blendMode(.hardLight)
+                    .opacity(isEnabled ? 1 : 0.5)
             }
             .aspectRatio(1, contentMode: .fit)
-            .onChangePolyfill(of: unit){
-                if unit != value {
-                    value = unit
-                }
-            }
-            .onChangePolyfill(of: value, initial: true){
-                if value != unit {
-                    x.value = value.x
-                    y.value = value.y
-                }
-            }
         }
         
         

@@ -82,7 +82,6 @@ struct ExampleView<E: View, P: View>: View {
             #endif
         }
         .presentationContext()
-        .toolTipContext()
         .tint(color)
     }
     

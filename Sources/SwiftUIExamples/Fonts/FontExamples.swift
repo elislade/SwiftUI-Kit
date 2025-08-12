@@ -111,7 +111,6 @@ public struct FontExamples: View {
         @Environment(\.interactionGranularity) private var interactionGranularity
         
         @Binding var value: Double
-        @State private var clamped = Clamped(0, in: -1...1, step: 0.1)
         
         private var height: CGFloat {
             50 - (interactionGranularity * 28)
@@ -126,7 +125,10 @@ public struct FontExamples: View {
                 }
                 .disabled(value == -1)
                 
-                SliderView(x: $clamped, hitTestHandle: false){
+                SliderView(
+                    x: .init($value, in: -1...1, step: 0.1),
+                    hitTestHandle: false
+                ){
                     SunkenControlMaterial(Capsule(), isTinted: true)
                         .frame(width: 8)
                         .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
@@ -159,7 +161,6 @@ public struct FontExamples: View {
                 }
                 .disabled(value == 1)
             }
-            .syncValue(_value.animation(.interactiveSpring), _clamped)
             .buttonStyle(.tinted)
         }
     }

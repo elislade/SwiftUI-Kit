@@ -58,7 +58,10 @@ struct ExampleCell {
                 
                 Spacer()
                 
-                SegmentedPicker(selection: $value.animation(.smooth), items: SwiftUIKit.ColorScheme.allCases){
+                SegmentedPicker(
+                    selection: $value.animation(.smooth),
+                    items: SwiftUIKit.ColorScheme.allCases
+                ){
                     switch $0 {
                     case .light: Text("Light")
                     case .dark: Text("Dark")
@@ -107,7 +110,7 @@ struct ExampleCell {
                     
                     Spacer()
                     
-                    Text(value, format: .number.rounded(increment: 0.1))
+                    Text(value, format: .increment(0.1))
                         .font(.exampleParameterValue)
                 }
                 
@@ -187,6 +190,7 @@ extension View {
         .lineLimit(2)
         .minimumScaleFactor(0.5)
         .controlRoundness(1)
+        .contentTransitionNumericText()
     }
     
 }
