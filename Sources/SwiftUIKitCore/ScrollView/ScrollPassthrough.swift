@@ -4,19 +4,8 @@ import SwiftUI
 
 public extension View {
     
-    // TODO: Remove Depricated Function
-    func scrollOffsetDisabled(_ disabled: Bool = true) -> some View {
-        scrollPassthroughDisabled(disabled)
-    }
-    
-    // TODO: Remove Depricated Function
-    func scrollOffsetContext(enabled: Bool = true) -> some View {
-        scrollPassthroughContext(enabled: enabled)
-    }
-    
-    
     /// Any views below this one will have shared access to all scroll passthrough events in any sibling or cousin branches.
-    func scrollPassthroughContext(enabled: Bool = true) -> some View {
+    nonisolated func scrollPassthroughContext(enabled: Bool = true) -> some View {
         InlineState(ScrollPassthrough()){ passthrough in
             environment(\.scrollPassthrough, enabled ? passthrough : nil)
         }
@@ -24,7 +13,7 @@ public extension View {
     
     
     /// Disables any scroll passthrough reading and writing to views below this one.
-    func scrollPassthroughDisabled(_ disabled: Bool = true) -> some View {
+    nonisolated func scrollPassthroughDisabled(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.scrollPassthrough){ passthrough in
             if disabled {
                 passthrough = nil

@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct RoutingQueryModifier: ViewModifier {
+struct RoutingQueryModifier {
     
     @State private var id = UUID()
     
@@ -26,3 +26,5 @@ struct RoutingQueryModifier: ViewModifier {
     }
     
 }
+
+extension RoutingQueryModifier: ViewModifier {}

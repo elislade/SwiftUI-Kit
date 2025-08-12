@@ -38,7 +38,7 @@ public extension View {
     
     /// Listens to changes of `UIAccessibility.isOnOffSwitchLabelsEnabled` and sets an environment value to match.
     /// - Returns: A view that listens to changes of `UIAccessibility.isOnOffSwitchLabelsEnabled` and sets an environment value to match.
-    func listenForOnOffSwitchLabelsEnabled() -> some View {
+    nonisolated func listenForOnOffSwitchLabelsEnabled() -> some View {
         modifier(AccessibilityIsOnOffSwitchLabelsModifier())
     }
     

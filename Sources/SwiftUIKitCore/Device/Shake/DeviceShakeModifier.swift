@@ -19,12 +19,15 @@ extension UIWindow {
     
 }
 
-struct DeviceShakeViewModifier: ViewModifier {
+struct DeviceShakeViewModifier {
     
     @Environment(\.deviceShakeEnabled) private var isEnabled
-    
     let action: () -> Void
+    
+}
 
+extension DeviceShakeViewModifier: ViewModifier {
+    
     func body(content: Content) -> some View {
         content
             .overlay {

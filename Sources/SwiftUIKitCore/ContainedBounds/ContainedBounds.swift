@@ -6,7 +6,7 @@ public extension View {
     /// Sets bounds for calculating child bounds containment.
     /// - Parameter id: Hashable value to identify this context.
     /// - Returns: A modified view.
-    func containedBoundsContext<V: Hashable>(_ id: V) -> some View {
+    nonisolated func containedBoundsContext<V: Hashable>(_ id: V) -> some View {
         modifier(ContainedBoundsContext(id: id))
     }
     
@@ -16,7 +16,7 @@ public extension View {
     ///   - context: A hashable value identifying what context to use.
     ///   - action: A closure that passes the `ContainedBoundsState` into.
     /// - Returns: A modified view.
-    func onContainedBoundsChange<V: Hashable>(in context: V, action: @escaping (ContainedBoundsState) -> Void) -> some View {
+    nonisolated func onContainedBoundsChange<V: Hashable>(in context: V, action: @escaping (ContainedBoundsState) -> Void) -> some View {
         modifier(DidChangeContainedBounds(context: context, action: action))
     }
     

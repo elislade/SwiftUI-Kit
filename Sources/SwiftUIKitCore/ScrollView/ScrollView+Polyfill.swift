@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    @ViewBuilder func scrollClipDisabledPolyfill(_ disabled: Bool = true) -> some View {
+    @ViewBuilder nonisolated func scrollClipDisabledPolyfill(_ disabled: Bool = true) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollClipDisabled(disabled)
         } else {
@@ -11,7 +11,7 @@ public extension View {
         }
     }
 
-    @ViewBuilder func scrollPositionPolyfill<V: Hashable>(id: Binding<V?>, anchor: UnitPoint? = nil) -> some View {
+    @ViewBuilder nonisolated func scrollPositionPolyfill<V: Hashable>(id: Binding<V?>, anchor: UnitPoint? = nil) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollPosition(id: id, anchor: anchor)
         } else {
@@ -31,7 +31,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func scrollTargetLayoutPolyfill(isEnabled: Bool = true) -> some View {
+    @ViewBuilder nonisolated func scrollTargetLayoutPolyfill(isEnabled: Bool = true) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollTargetLayout(isEnabled: isEnabled)
         } else {
@@ -39,7 +39,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func contentMarginsPolyfill(_ edges: Edge.Set = .all, _ length: Double) -> some View {
+    @ViewBuilder nonisolated func contentMarginsPolyfill(_ edges: Edge.Set = .all, _ length: Double) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             contentMargins(edges, length, for: .scrollIndicators)
         } else {

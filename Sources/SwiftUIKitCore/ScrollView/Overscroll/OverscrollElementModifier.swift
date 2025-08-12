@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct OverscrollElementModifier: ViewModifier {
+struct OverscrollElementModifier {
     
     let action: (Double) -> Void
     
@@ -13,6 +13,7 @@ struct OverscrollElementModifier: ViewModifier {
     
 }
 
+extension  OverscrollElementModifier: ViewModifier {}
 
 struct OverscrollElement {
     

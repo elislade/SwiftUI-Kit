@@ -13,7 +13,7 @@ public extension View {
     ///   - shouldDeferUnhandled: Bool defining if links that arn't currently matched deffered to try again later. Defaults to false.
     /// - Returns: A modified router view.
     /// - Note: If shouldDefer is true the last unmatched link that passes router qualifications, will be stored until shouldDefer becomes false again; at which point it will be evaluated. This can be used to handle links that open the app with blocked access like onboarding. Eg. If onboarding is visible set deffered to true, once onboarding finishes set to false and the link will continue.
-    func router(
+    nonisolated func router(
         _ scheme: String = "https",
         port: Int? = nil,
         host: String = "*",
@@ -27,7 +27,7 @@ public extension View {
         ))
     }
     
-    func routesDisabled(_ disabled: Bool = true) -> some View {
+    nonisolated func routesDisabled(_ disabled: Bool = true) -> some View {
         resetPreference(RoutePreferenceKey.self, reset: disabled)
     }
     
@@ -37,7 +37,7 @@ public extension View {
     /// An example of this pattern is when exposing `TabView` content through its `TabBarItem` where the item is not a view parent of its content.
     /// - Parameter component: The Path component of this view.
     /// - Returns: A modified view that handles routing.
-    func routeNamespace(_ component: String) -> some View {
+    nonisolated func routeNamespace(_ component: String) -> some View {
         modifier(RoutingPathModifier(
             path: component,
             action: { },
@@ -52,7 +52,7 @@ public extension View {
     ///   - action: The action to perform when a route with this path as its leaf is called.
     ///   - other: Optional action to perform when another route is called that is not this one. Defaults to nil.
     /// - Returns: A modified view that handles routing.
-    func onRoute(_ component: String, perform action: @escaping () async -> Void, other: (() -> Void)? = nil) -> some View {
+    nonisolated func onRoute(_ component: String, perform action: @escaping () async -> Void, other: (() -> Void)? = nil) -> some View {
         modifier(RoutingPathModifier(
             path: component,
             action: action,
@@ -62,7 +62,7 @@ public extension View {
     
     
     @available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
-    func onRouteRegex<R: RegexComponent>(_ component: R, perform action: @escaping (R.RegexOutput) async -> Void, other: (() -> Void)? = nil) -> some View where R.RegexOutput: Sendable, R.RegexOutput : Equatable {
+    nonisolated func onRouteRegex<R: RegexComponent>(_ component: R, perform action: @escaping (R.RegexOutput) async -> Void, other: (() -> Void)? = nil) -> some View where R.RegexOutput: Sendable, R.RegexOutput : Equatable {
         modifier(RoutingRegexModifier(
             regex: component,
             action: action,
@@ -76,7 +76,7 @@ public extension View {
     ///   - key: The key that is to be matched
     ///   - action: A closure that recieves the vcale of the key.
     /// - Returns: A modified view.
-    func onRouteQuery(_ key: String, perform action: @escaping (String) async -> Void) -> some View {
+    nonisolated func onRouteQuery(_ key: String, perform action: @escaping (String) async -> Void) -> some View {
         modifier(RoutingQueryModifier(
             keys: [key],
             action: { args in
@@ -87,7 +87,7 @@ public extension View {
         ))
     }
     
-    func onRouteQuery(_ keys: String..., perform action: @escaping ([String]) async -> Void) -> some View {
+    nonisolated func onRouteQuery(_ keys: String..., perform action: @escaping ([String]) async -> Void) -> some View {
         modifier(RoutingQueryModifier(keys: keys, action: action))
     }
     
@@ -109,7 +109,7 @@ public extension View {
     ///
     /// - Note: Use just outside of severed environments/view hirarchies. Can be used in conjunction with SwiftUI native presentation adapters on iOS 17 and above.
     /// - Returns: A modified relay reciever view.
-    func routeRelayReceiver() -> some View {
+    nonisolated func routeRelayReceiver() -> some View {
         preferenceRelayReceiver(RoutePreferenceKey.self)
     }
     

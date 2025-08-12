@@ -10,7 +10,7 @@ public extension View {
     ///   - verticalEdge: The vertical edge to flip to. Defaults to nil.
     ///   - content: A ViewBuilder of the view you want to show when flipped.
     /// - Returns: A view that will show the flipped content when isFlipped is set to true.
-    func flippedContent<FlipView: View>(
+    nonisolated func flippedContent<FlipView: View>(
         active: Bool,
         horizontalEdge: HorizontalEdge? = nil,
         verticalEdge: VerticalEdge? = nil,

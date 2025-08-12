@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    func onAnimationThresholdChange(_ threshold: Double = 0.5, active: Bool, perform action: @escaping () -> Void) -> some View {
+    nonisolated func onAnimationThresholdChange(_ threshold: Double = 0.5, active: Bool, perform action: @escaping () -> Void) -> some View {
         modifier(AnimationThresholdChangeViewModifier(
             active: active,
             threshold: threshold,
@@ -11,7 +11,7 @@ public extension View {
         ))
     }
     
-    func onAnimationComplete(when completeFlag: Bool, perform action: @escaping () -> Void, else elseAction: @escaping () -> Void = {}) -> some View {
+    nonisolated func onAnimationComplete(when completeFlag: Bool, perform action: @escaping () -> Void, else elseAction: @escaping () -> Void = {}) -> some View {
         background{
             if !completeFlag {
                 Color.clear.onDisappear(perform: action)
@@ -24,7 +24,7 @@ public extension View {
 }
 
 
-struct AnimationThresholdChangeViewModifier: ViewModifier & Animatable {
+struct AnimationThresholdChangeViewModifier: Animatable {
     
     private let active: Bool
     private let threshold: Double
@@ -44,6 +44,12 @@ struct AnimationThresholdChangeViewModifier: ViewModifier & Animatable {
             changed = newValue > threshold
         }
     }
+    
+    
+    
+}
+
+extension AnimationThresholdChangeViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content

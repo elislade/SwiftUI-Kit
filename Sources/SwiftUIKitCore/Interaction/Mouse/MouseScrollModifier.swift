@@ -3,12 +3,16 @@
 import SwiftUI
 
 
-struct MouseScrollModifier: ViewModifier {
+struct MouseScrollModifier {
     
     @State private var id = UUID()
     @State private var windowRef: OSWindow?
     
     let action: (MouseScrollEvent) -> Void
+
+}
+
+extension MouseScrollModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
@@ -21,7 +25,7 @@ struct MouseScrollModifier: ViewModifier {
                 }
             }
     }
-
+    
 }
 
 #endif

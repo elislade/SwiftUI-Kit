@@ -5,19 +5,19 @@ public extension View {
     
     #if os(watchOS) || os(visionOS) || os(tvOS)
     
-    func onWindowHover(perform action: @MainActor @escaping (WindowHoverEvent) -> Void) -> Self {
+    nonisolated func onWindowHover(perform action: @MainActor @escaping (WindowHoverEvent) -> Void) -> Self {
         self
     }
     
     #else
     
-    func onWindowHover(perform action: @MainActor @escaping (WindowHoverEvent) -> Void) -> some View {
+    nonisolated func onWindowHover(perform action: @MainActor @escaping (WindowHoverEvent) -> Void) -> some View {
         modifier(WindowHoverModifier(hover: action))
     }
     
     #endif
     
-    func disableWindowHover(_ disabled: Bool = true) -> some View {
+    nonisolated func disableWindowHover(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.windowHoverEnabled){ isEnabled in
             if disabled {
                 isEnabled = false

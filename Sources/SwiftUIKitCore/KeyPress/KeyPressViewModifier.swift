@@ -2,7 +2,7 @@
 
 import SwiftUI
 
-struct KeyPressViewModifier: ViewModifier {
+struct KeyPressViewModifier {
     
     enum MaskType: Hashable, Sendable {
         case charSet(CharacterSet)
@@ -35,5 +35,6 @@ struct KeyPressViewModifier: ViewModifier {
     
 }
 
+extension KeyPressViewModifier: ViewModifier {}
 
 #endif

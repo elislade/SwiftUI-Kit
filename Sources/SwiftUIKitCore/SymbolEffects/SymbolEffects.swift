@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    @ViewBuilder func symbolEffectBounce<V: Equatable>(
+    @ViewBuilder nonisolated func symbolEffectBounce<V: Equatable>(
         value: V,
         grouping: SymbolEffectGrouping = .whole,
         direction: SymbolEffectDirection = .up
@@ -15,7 +15,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectPulse<V: Equatable>(value: V, grouping: SymbolEffectGrouping = .whole) -> some View {
+    @ViewBuilder nonisolated func symbolEffectPulse<V: Equatable>(value: V, grouping: SymbolEffectGrouping = .whole) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             symbolEffect(.pulse[grouping], value: value)
         } else {
@@ -23,7 +23,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectVariableColor<V: Equatable>(
+    @ViewBuilder nonisolated func symbolEffectVariableColor<V: Equatable>(
         value: V,
         inactiveBehaviour: SymbolEffectInactiveLayerBehaviour = .hide,
         successiveBehaviour: SymbolEffectSucessiveVariableBehaviour = .cumulative
@@ -35,7 +35,7 @@ public extension View {
         }
     }
    
-    @ViewBuilder func symbolEffectScale(grouping: SymbolEffectGrouping = .whole, direction: SymbolEffectDirection = .up) -> some View {
+    @ViewBuilder nonisolated func symbolEffectScale(grouping: SymbolEffectGrouping = .whole, direction: SymbolEffectDirection = .up) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             symbolEffect(.scale[grouping][direction])
         } else {
@@ -43,7 +43,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectWiggle<V: Equatable>(
+    @ViewBuilder nonisolated func symbolEffectWiggle<V: Equatable>(
         value: V,
         grouping: SymbolEffectGrouping = .whole,
         direction: SymbolEffectDirection = .up,
@@ -56,7 +56,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectRotate<V: Equatable>(
+    @ViewBuilder nonisolated func symbolEffectRotate<V: Equatable>(
         value: V,
         grouping: SymbolEffectGrouping = .whole,
         direction: SymbolEffectRotationDirection = .clockwise
@@ -68,7 +68,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectBreathe<V: Equatable>(value: V, grouping: SymbolEffectGrouping = .whole) -> some View {
+    @ViewBuilder nonisolated func symbolEffectBreathe<V: Equatable>(value: V, grouping: SymbolEffectGrouping = .whole) -> some View {
         if #available(macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
             symbolEffect(.breathe[grouping], value: value)
         } else {
@@ -76,7 +76,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func symbolEffectsRemovedPolyfill(_ isEnabled: Bool = true) -> some View {
+    @ViewBuilder nonisolated func symbolEffectsRemovedPolyfill(_ isEnabled: Bool = true) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             symbolEffectsRemoved(isEnabled)
         } else {

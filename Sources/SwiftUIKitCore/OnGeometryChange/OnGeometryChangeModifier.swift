@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct OnGeometryChangeModifier<Value: Equatable>: ViewModifier {
+struct OnGeometryChangeModifier<Value: Equatable> {
     
     @Environment(\.frozenState) private var frozenState
     @Environment(\.onGeometryChangesEnabled) private var isEnabled
@@ -26,3 +26,5 @@ struct OnGeometryChangeModifier<Value: Equatable>: ViewModifier {
     }
     
 }
+
+extension OnGeometryChangeModifier: ViewModifier {}

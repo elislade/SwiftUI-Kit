@@ -3,13 +3,13 @@ import SwiftUI
 
 public extension View {
     
-    func maxReadableWidth(_ value: Double) -> some View {
+    nonisolated func maxReadableWidth(_ value: Double) -> some View {
         self
             .frame(maxWidth: value)
             .frame(maxWidth: .infinity)
     }
     
-    @ViewBuilder func geometryGroupPolyfill() -> some View {
+    @ViewBuilder nonisolated func geometryGroupPolyfill() -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             geometryGroup()
         } else {

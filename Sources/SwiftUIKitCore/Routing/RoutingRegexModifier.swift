@@ -3,7 +3,7 @@ import RegexBuilder
 
 
 @available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
-struct RoutingRegexModifier<R:RegexComponent>: ViewModifier where R.RegexOutput: Sendable, R.RegexOutput: Equatable {
+struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.RegexOutput: Equatable {
     
     @State private var id = UUID()
     @State private var previousMatch: R.RegexOutput?
@@ -88,3 +88,6 @@ struct RoutingRegexModifier<R:RegexComponent>: ViewModifier where R.RegexOutput:
     }
     
 }
+
+@available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
+extension RoutingRegexModifier: ViewModifier {}

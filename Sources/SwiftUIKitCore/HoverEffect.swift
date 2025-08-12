@@ -5,21 +5,21 @@ public extension View {
     
 #if os(macOS) || os(watchOS)
     
-    func hoverEffectPolyfill() -> Self {
+    nonisolated func hoverEffectPolyfill() -> Self {
         self
     }
     
-    func hoverEffectLift() -> Self {
+    nonisolated func hoverEffectLift() -> Self {
         self
     }
     
-    func hoverEffectHighlight() -> Self {
+    nonisolated func hoverEffectHighlight() -> Self {
         self
     }
     
 #else
     
-    @ViewBuilder func hoverEffectPolyfill() -> some View {
+    @ViewBuilder nonisolated func hoverEffectPolyfill() -> some View {
         if #available(iOS 13.4, tvOS 16.0, visionOS 1.0, *) {
             hoverEffect()
         } else {
@@ -27,7 +27,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func hoverEffectLift() -> some View {
+    @ViewBuilder nonisolated func hoverEffectLift() -> some View {
         if #available(iOS 13.4, tvOS 16.0, visionOS 1.0, *) {
             hoverEffect(.lift)
         } else {
@@ -35,7 +35,7 @@ public extension View {
         }
     }
     
-    @ViewBuilder func hoverEffectHighlight() -> some View {
+    @ViewBuilder nonisolated func hoverEffectHighlight() -> some View {
         if #available(tvOS 17.0, *) {
             hoverEffect(.highlight)
         } else {

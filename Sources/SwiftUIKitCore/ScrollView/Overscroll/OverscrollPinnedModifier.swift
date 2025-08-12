@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 
-struct OverscrollPinnedModifier: ViewModifier {
+struct OverscrollPinnedModifier {
 
     @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.verticalOverscrollCompensation) private var overscrollV
@@ -35,3 +35,5 @@ struct OverscrollPinnedModifier: ViewModifier {
     }
     
 }
+
+extension OverscrollPinnedModifier: ViewModifier {}

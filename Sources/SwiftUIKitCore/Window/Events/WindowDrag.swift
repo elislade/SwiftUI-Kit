@@ -17,13 +17,13 @@ public extension View {
     
     #else
     
-    func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
+    nonisolated func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
         modifier(WindowDragModifier(action: action))
     }
     
     #endif
     
-    func disableWindowDrag(_ disabled: Bool = true) -> some View {
+    nonisolated func disableWindowDrag(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.windowDragEnabled){ isEnabled in
             if disabled {
                 isEnabled = false

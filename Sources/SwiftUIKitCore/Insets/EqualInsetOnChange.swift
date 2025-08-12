@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct OnEqualInsetChangeModifier<V: Equatable>: ViewModifier {
+struct OnEqualInsetChangeModifier<V: Equatable> {
 
     @State private var id = UUID().uuidString
     @State private var value: V?
@@ -22,3 +22,5 @@ struct OnEqualInsetChangeModifier<V: Equatable>: ViewModifier {
     }
     
 }
+
+extension OnEqualInsetChangeModifier: ViewModifier { }

@@ -2,7 +2,7 @@
 import SwiftUI
 
 
-struct OnChangeOldNewModifier<Value: Equatable>: ViewModifier {
+struct OnChangeOldNewModifier<Value: Equatable> {
     
     @State private var oldValue: Value
     
@@ -31,5 +31,7 @@ struct OnChangeOldNewModifier<Value: Equatable>: ViewModifier {
     }
  
 }
+
+extension OnChangeOldNewModifier: ViewModifier {}
 
 #endif

@@ -1,11 +1,15 @@
 import SwiftUI
 
 
-struct ContainedBoundsContext: ViewModifier {
+struct ContainedBoundsContext {
     
     @Environment(\.layoutDirection) private var layoutDirection
-    
     let id: AnyHashable
+    
+}
+
+
+extension ContainedBoundsContext: ViewModifier {
     
     func body(content: Content) -> some View {
         content
@@ -44,5 +48,6 @@ struct ContainedBoundsContext: ViewModifier {
                 }
             }
     }
+    
     
 }

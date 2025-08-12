@@ -43,7 +43,7 @@ struct SelectionFeedbackModifier<Value: Equatable>: ViewModifier {
 
 #endif
 
-struct SensoryFeedbackModifier<V: Equatable>: ViewModifier {
+struct SensoryFeedbackModifier<V: Equatable> {
     
     let value: V
     let type: FeedbackType
@@ -52,6 +52,10 @@ struct SensoryFeedbackModifier<V: Equatable>: ViewModifier {
         self.type = type
         self.value = value
     }
+    
+}
+
+extension SensoryFeedbackModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         #if os(iOS)

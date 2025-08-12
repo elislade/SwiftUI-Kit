@@ -31,15 +31,14 @@ public extension View {
         ))
     }
     
-
-    func onEqualInsetChange<V: Equatable>(
+    nonisolated func onEqualInsetChange<V: Equatable>(
         for transform: @escaping (EdgeInsets) -> V,
         action: @escaping (V) -> Void
     ) -> some View {
         modifier(OnEqualInsetChangeModifier(transform: transform, action: action))
     }
     
-    func onEqualInsetChange(action: @escaping (EdgeInsets) -> Void) -> some View {
+    nonisolated func onEqualInsetChange(action: @escaping (EdgeInsets) -> Void) -> some View {
         modifier(OnEqualInsetChangeModifier(transform: { $0 }, action: action))
     }
     

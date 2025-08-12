@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    func containerFrameContext() -> some View {
+    nonisolated func containerFrameContext() -> some View {
         backgroundPreferenceValue(ContainerFramePreferenceKey.self){ prefs in
             GeometryReader{ proxy in
                 Color.clear.onChangePolyfill(of: proxy.size, initial: true){
@@ -15,7 +15,7 @@ public extension View {
         }
     }
     
-    func containerRelativeFramePolyfill(_ axes: Axis.Set, alignment: Alignment = .center) -> some View {
+    nonisolated func containerRelativeFramePolyfill(_ axes: Axis.Set, alignment: Alignment = .center) -> some View {
         modifier(RelativeFrameModifier(axes: axes, alignment: alignment))
     }
     

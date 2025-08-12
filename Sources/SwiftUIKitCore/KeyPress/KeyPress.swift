@@ -5,25 +5,25 @@ public extension View {
     
     #if os(watchOS)
     
-    func onKeyPressPolyfill(phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
+    nonisolated func onKeyPressPolyfill(phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
         self
     }
     
-    func onKeyPressPolyfill(_ key: KeyEquivalent, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
+    nonisolated func onKeyPressPolyfill(_ key: KeyEquivalent, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
         self
     }
     
-    func onKeyPressPolyfill(keys: Set<KeyEquivalent>, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
+    nonisolated func onKeyPressPolyfill(keys: Set<KeyEquivalent>, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
         self
     }
     
-    func onKeyPressPolyfill(characters: CharacterSet, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
+    nonisolated func onKeyPressPolyfill(characters: CharacterSet, phases: KeyPress.Phases = [.down, .repeat], action: @escaping (KeyPress) -> KeyPress.Result) -> Self {
         self
     }
     
     #else
     
-    func onKeyPressPolyfill(
+    nonisolated func onKeyPressPolyfill(
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result
     ) -> some View {
@@ -34,7 +34,7 @@ public extension View {
         ))
     }
     
-    func onKeyPressPolyfill(
+    nonisolated func onKeyPressPolyfill(
         _ key: KeyEquivalent,
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result
@@ -42,7 +42,7 @@ public extension View {
         onKeyPressPolyfill(keys: [key], phases: phases, action: action)
     }
     
-    func onKeyPressPolyfill(
+    nonisolated func onKeyPressPolyfill(
         keys: Set<KeyEquivalent>,
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping  (KeyPress) -> KeyPress.Result
@@ -54,7 +54,7 @@ public extension View {
         ))
     }
     
-    func onKeyPressPolyfill(
+    nonisolated func onKeyPressPolyfill(
         characters: CharacterSet,
         phases: KeyPress.Phases = [.down, .repeat],
         action: @escaping (KeyPress) -> KeyPress.Result

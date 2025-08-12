@@ -30,13 +30,13 @@ public extension Animation {
 
 public extension View {
     
-    func delayAnimation(_ delay: Double) -> some View {
+    nonisolated func delayAnimation(_ delay: Double) -> some View {
         transaction{
             $0.animation = $0.animation?.delay(delay)
         }
     }
     
-    func disableAnimations(_ disabled: Bool = true) -> some View {
+    nonisolated func disableAnimations(_ disabled: Bool = true) -> some View {
         transaction{
             if disabled {
                 $0.disablesAnimations = true

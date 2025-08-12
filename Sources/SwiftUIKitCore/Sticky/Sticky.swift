@@ -6,7 +6,7 @@ public extension View {
     /// Defines the `StickyContext` for which children will stick to.
     /// - Parameter grouping : The grouping behaviour to use for views that don't have special behaviour defined. Defaults to ``StickyGrouping/displaced``
     /// - Returns: A view that calculates sticky offsets for its participating children.
-    func stickyContext(grouping: StickyGrouping = .displaced) -> some View {
+    nonisolated func stickyContext(grouping: StickyGrouping = .displaced) -> some View {
         modifier(StickyContext(grouping: grouping))
     }
     
@@ -25,7 +25,7 @@ public extension View {
     ///   - stateDidChange: A closure that gets called every time the sticking state changes for this view. Defaults to an empty closure.
     ///
     /// - Returns: A view that will stick to its `StickyContext`.
-    func sticky(
+    nonisolated func sticky(
         top: Double? = nil,
         bottom: Double? = nil,
         leading: Double? = nil,
@@ -60,7 +60,7 @@ public extension View {
     ///   - stateDidChange: A closure that gets called every time the sticking state changes for this view. Defaults to an empty closure.
     ///
     /// - Returns: A view that will stick to its `StickyContext`.
-    func sticky(
+    nonisolated func sticky(
         edges: Edge.Set,
         inset: Double = 0,
         grouping: StickyGrouping? = nil,

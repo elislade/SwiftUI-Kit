@@ -3,11 +3,11 @@ import SwiftUI
 public extension View {
     
 #if os(iOS)
-    func listenForDeviceOrientation() -> some View {
+    nonisolated func listenForDeviceOrientation() -> some View {
         modifier(DeviceOrientationModifier())
     }
 #else
-    func listenForDeviceOrientation() -> Self {
+    nonisolated func listenForDeviceOrientation() -> Self {
         self
     }
 #endif

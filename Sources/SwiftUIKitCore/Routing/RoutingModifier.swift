@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct RoutingModifier: ViewModifier {
+struct RoutingModifier {
     
     let scheme: String
     let port: Int?
@@ -55,6 +55,10 @@ struct RoutingModifier: ViewModifier {
         return true
     }
     
+}
+
+extension RoutingModifier: ViewModifier {
+    
     func body(content: Content) -> some View {
         content
             .onPreferenceChange(RoutePreferenceKey.self){
@@ -92,7 +96,6 @@ struct RoutingModifier: ViewModifier {
     }
     
 }
-
 
 extension Collection where Element == URLQueryItem {
     

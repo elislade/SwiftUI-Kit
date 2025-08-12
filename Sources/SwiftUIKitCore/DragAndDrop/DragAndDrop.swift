@@ -3,11 +3,11 @@ import SwiftUI
 
 public extension View {
     
-    func dragSession<Value: Hashable & Sendable>(_ type: Value.Type) -> some View {
+    nonisolated func dragSession<Value: Hashable & Sendable>(_ type: Value.Type) -> some View {
         modifier(DragAndDropSession<Value, DefaultDraggingLayout>())
     }
     
-    func dragSession<Value: Hashable & Sendable, Layout: DragSessionStackLayout>(_ type: Value.Type, layout: Layout.Type) -> some View {
+    nonisolated func dragSession<Value: Hashable & Sendable, Layout: DragSessionStackLayout>(_ type: Value.Type, layout: Layout.Type) -> some View {
         modifier(DragAndDropSession<Value, Layout>())
     }
     

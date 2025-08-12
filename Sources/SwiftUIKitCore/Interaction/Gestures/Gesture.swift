@@ -4,7 +4,7 @@ import SwiftUI
 
 struct PanGestureRepresentable<V: View>: UIViewControllerRepresentable {
     
-    var touches: ([InteractionEvent]) -> Void = { _ in }
+    var touches: ([CGPoint]) -> Void = { _ in }
     
     @ViewBuilder let source: V
     
@@ -24,9 +24,9 @@ struct PanGestureRepresentable<V: View>: UIViewControllerRepresentable {
     
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         
-        private let touches: ([InteractionEvent]) -> Void
+        private let touches: ([CGPoint]) -> Void
         
-        init(touches: @escaping ([InteractionEvent]) -> Void) {
+        init(touches: @escaping ([CGPoint]) -> Void) {
             self.touches = touches
         }
         
@@ -45,7 +45,7 @@ struct PanGestureRepresentable<V: View>: UIViewControllerRepresentable {
                 touches([])
             } else {
                 touches((0..<g.numberOfTouches).map{ i in
-                    .init(location: g.location(ofTouch: i, in: nil))
+                    g.location(ofTouch: i, in: nil)
                 })
             }
         }
@@ -70,7 +70,7 @@ public extension View {
     
 #if os(iOS)
     
-    @ViewBuilder func defersSystemGesturesPolyfill(on edges: Edge.Set) -> some View {
+    @ViewBuilder nonisolated func defersSystemGesturesPolyfill(on edges: Edge.Set) -> some View {
         if #available(iOS 16.0, *) {
             self.defersSystemGestures(on: edges)
         } else {
@@ -80,7 +80,7 @@ public extension View {
     
 #else
     
-    func defersSystemGesturesPolyfill(on edges: Edge.Set) -> Self {
+    nonisolated func defersSystemGesturesPolyfill(on edges: Edge.Set) -> Self {
         self
     }
     

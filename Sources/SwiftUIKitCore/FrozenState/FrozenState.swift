@@ -21,7 +21,7 @@ public extension EnvironmentValues {
 
 public extension View {
     
-    func frozen(_ newState: FrozenState = .frozen) -> some View {
+    nonisolated func frozen(_ newState: FrozenState = .frozen) -> some View {
         modifier(FrozenStateModifier())
             .transformEnvironment(\.frozenState){ state in
                 // Only override parent value it's set to default thawed

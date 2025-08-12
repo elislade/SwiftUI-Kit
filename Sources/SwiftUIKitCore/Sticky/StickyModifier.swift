@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct StickyModifier: ViewModifier {
+struct StickyModifier {
 
     @State private var id = UUID()
     @State private var state: StickingState = .init()
@@ -64,3 +64,5 @@ struct StickyModifier: ViewModifier {
     }
     
 }
+
+extension StickyModifier: ViewModifier {}

@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct OverscrollGroupModifier: ViewModifier {
+struct OverscrollGroupModifier {
     
     @Environment(\.scrollOffsetPassthrough) private var scrollOffset
     
@@ -79,3 +79,5 @@ struct OverscrollGroupModifier: ViewModifier {
     }
     
 }
+
+extension OverscrollGroupModifier: ViewModifier {}

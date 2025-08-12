@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    func onContinuousHoverPolyfill(
+    nonisolated func onContinuousHoverPolyfill(
         space: CoordinateSpace = .local,
         perform action: @escaping (HoverPhase) -> Void
     ) -> some View {
@@ -16,7 +16,7 @@ public extension View {
 }
 
 
-struct OnContinuousHoverPolyfill: ViewModifier {
+struct OnContinuousHoverPolyfill {
     
     @State private var safeInset: EdgeInsets = .init()
     @State private var rects: Conversion = .init(.zero, .zero)
@@ -24,6 +24,10 @@ struct OnContinuousHoverPolyfill: ViewModifier {
     
     let coordinateSpace: CoordinateSpace
     let action: (HoverPhase) -> Void
+  
+}
+
+extension OnContinuousHoverPolyfill: ViewModifier {
     
     func body(content: Content) -> some View {
         content

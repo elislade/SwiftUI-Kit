@@ -3,7 +3,7 @@ import SwiftUI
 
 public extension View {
     
-    func hinge(degrees: Double, edge: Edge) -> some View {
+    nonisolated func hinge(degrees: Double, edge: Edge) -> some View {
         modifier(HingeModifier(degrees: degrees, edge: edge))
     }
     

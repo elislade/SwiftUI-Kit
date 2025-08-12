@@ -5,11 +5,11 @@ public extension View {
     
     #if os(visionOS)
     
-    func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping (_ oldValue: V, _ newValue: V) -> Void) -> some View {
+    nonisolated func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping (_ oldValue: V, _ newValue: V) -> Void) -> some View {
         onChange(of: value, initial: initial, action)
     }
     
-    func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping () -> Void) -> some View {
+    nonisolated func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping () -> Void) -> some View {
         onChange(of: value, initial: initial, action)
     }
     
@@ -27,7 +27,7 @@ public extension View {
     ///   - newValue: The new value that failed the comparison check.
     ///
     /// - Returns: A view that fires an action when the specified value changes.
-    @ViewBuilder func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping (_ oldValue: V, _ newValue: V) -> Void) -> some View {
+    @ViewBuilder nonisolated func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping (_ oldValue: V, _ newValue: V) -> Void) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             onChange(of: value, initial: initial, action)
         } else {
@@ -44,7 +44,7 @@ public extension View {
     ///   - action: A closure to run when the value changes.
     ///   
     /// - Returns: A view that fires an action when the specified value changes.
-    @ViewBuilder func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping () -> Void) -> some View {
+    @ViewBuilder nonisolated func onChangePolyfill<V: Equatable>(of value: V, initial: Bool = false, _ action: @escaping () -> Void) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             onChange(of: value, initial: initial, action)
         } else {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct FlipModifier<FlipView: View>: ViewModifier {
+struct FlipModifier<FlipView: View> {
     
     @State private var show = false
     
@@ -68,3 +68,5 @@ struct FlipModifier<FlipView: View>: ViewModifier {
     }
     
 }
+
+extension FlipModifier: ViewModifier { }

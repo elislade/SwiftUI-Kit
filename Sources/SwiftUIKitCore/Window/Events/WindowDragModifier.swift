@@ -3,12 +3,16 @@ import SwiftUI
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 
-struct WindowDragModifier: ViewModifier {
+struct WindowDragModifier {
     
     @Environment(\.windowDragEnabled) private var isEnabled
     @State private var windowRef: NSWindow?
     
-    var action: (WindowDragEvent) -> Void
+    let action: (WindowDragEvent) -> Void
+    
+}
+
+extension WindowDragModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content.overlay {
@@ -37,12 +41,16 @@ struct WindowDragModifier: ViewModifier {
 
 #elseif os(iOS) || os(visionOS) || os(tvOS)
 
-struct WindowDragModifier : ViewModifier {
+struct WindowDragModifier {
     
     @Environment(\.windowDragEnabled) private var isEnabled
     @State private var hasStarted: Bool = false
     
-    var action: (WindowDragEvent) -> Void
+    let action: (WindowDragEvent) -> Void
+    
+}
+
+extension  WindowDragModifier : ViewModifier {
     
     func body(content: Content) -> some View {
         content.overlay {
@@ -103,8 +111,6 @@ struct WindowDragModifier : ViewModifier {
             .disableAnimations()
         }
     }
-    
 }
-
 
 #endif

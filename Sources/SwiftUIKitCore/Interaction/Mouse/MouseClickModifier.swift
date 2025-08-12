@@ -3,12 +3,15 @@
 import SwiftUI
 
 
-struct MouseClickModifier: ViewModifier {
+struct MouseClickModifier {
     
     @State private var id = UUID()
     @State private var windowRef: OSWindow?
-    
     let action: (MouseClickEvent) -> Void
+
+}
+
+extension MouseClickModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
@@ -21,8 +24,7 @@ struct MouseClickModifier: ViewModifier {
                 }
             }
     }
-
+    
 }
-
 
 #endif

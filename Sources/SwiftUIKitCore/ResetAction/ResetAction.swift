@@ -40,7 +40,7 @@ public struct ResetActionKey: PreferenceKey {
 public extension View {
     
     /// Spcifies when to merge reset preferences to the environment
-    func resetContext() -> some View {
+    nonisolated func resetContext() -> some View {
         modifier(ResetActionContext())
     }
     
@@ -49,7 +49,7 @@ public extension View {
     /// 
     /// - Parameter disabled: A boolean indicating whether to disable ResetActions or not.
     /// - Returns: A view that disables child ResetActions.
-    func disableResetAction(_ disabled: Bool = true) -> some View {
+    nonisolated func disableResetAction(_ disabled: Bool = true) -> some View {
         transformPreference(ResetActionKey.self){ action in
             if disabled {
                 action = nil
@@ -66,14 +66,14 @@ public extension View {
     ///   - action : The action that the view wants to be called to reset itself.
     ///
     /// - Returns: A view that set its ResetAction.
-    func resetAction(active: Bool = true, _ action: @escaping @MainActor() -> Void) -> some View {
+    nonisolated func resetAction(active: Bool = true, _ action: @escaping @MainActor() -> Void) -> some View {
         modifier(ResetActionModifier(active: active, action: action))
     }
     
     
     /// - Parameter closure: A closure that gets called with the bottom most ResetAction available. If no action is available a nil value will be returned.
     /// - Returns: A view that handles child ResetActions.
-    func childResetAction(_ closure: @escaping (ResetAction?) -> Void) -> some View {
+    nonisolated func childResetAction(_ closure: @escaping (ResetAction?) -> Void) -> some View {
         onPreferenceChange(ResetActionKey.self, perform: closure)
     }
     

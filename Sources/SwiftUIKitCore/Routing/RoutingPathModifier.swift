@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-struct RoutingPathModifier: ViewModifier {
+struct RoutingPathModifier {
     
     @State private var id = UUID()
     @State private var children: [RoutePreference] = []
@@ -70,6 +70,7 @@ struct RoutingPathModifier: ViewModifier {
     
 }
 
+extension RoutingPathModifier: ViewModifier {}
 
 struct RoutePreference: Equatable {
     
