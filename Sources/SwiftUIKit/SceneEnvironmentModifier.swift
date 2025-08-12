@@ -53,8 +53,6 @@ struct SceneEnvironmentModifier: ViewModifier {
                         content
                     }
                     .presentationContext()
-                    .anchorPresentationContext()
-                    .focusPresentationContext()
                     .ignoresSafeArea()
                     .environment(\.sceneSize, CGSize(
                         width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,
