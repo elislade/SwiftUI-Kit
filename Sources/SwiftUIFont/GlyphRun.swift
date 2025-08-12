@@ -124,9 +124,7 @@ extension GlyphRun : InsettableShape {
     @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public nonisolated func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         let size = proposal.replacingUnspecifiedDimensions()
-        let widthRatio = size.width / totalSize.width
-        let heightRatio = size.height / totalSize.height
-        let scale = min(widthRatio, heightRatio)
+        let scale = scaleOfFitting(size, in: totalSize)
         return CGSize(
             width: totalSize.width * scale,
             height: totalSize.height * scale
