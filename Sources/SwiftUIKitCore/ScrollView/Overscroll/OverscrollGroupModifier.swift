@@ -10,10 +10,8 @@ struct OverscrollGroupModifier {
     @State private var hasMatchedCompletion = false
     
     var scrollRange: ClosedRange<CGFloat> = 10...110
-    //var scrollBuffer: CGFloat = 10
     
     private func reset() {
-        hasMatchedCompletion = false
         itemIndex = nil
         inRange = false
     }
@@ -57,7 +55,6 @@ struct OverscrollGroupModifier {
                             itemIndex = closestIndices.first
                         } else if evt.phase == .ended {
                             reset()
-                            
                             for item in items {
                                 item.action(0)
                             }
@@ -74,6 +71,12 @@ struct OverscrollGroupModifier {
                 Color.clear.onReceive(scrollOffset.map{ scrollRange.contains($0.y) }){
                     inRange = $0
                 }
+            }
+        }
+        .onWindowDrag{ evt in
+            if evt.phase == .ended {
+                reset()
+                hasMatchedCompletion = false
             }
         }
     }

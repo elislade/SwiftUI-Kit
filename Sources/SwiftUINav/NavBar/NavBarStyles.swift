@@ -14,7 +14,7 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
         Button(configuration)
             .buttonStyle(InnerStyle(overscroll: overscroll))
             .onOverscroll{ prog in
-                if prog >= 0.99 {
+                if prog >= 1 {
                     overscroll = 0
                     configuration.trigger()
                 } else {
