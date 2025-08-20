@@ -21,7 +21,7 @@ public extension View {
     }
     
     /// Listen for child requests of mask change
-    nonisolated func onPreferredGestureMaskChange(perform action: @escaping @Sendable (GestureMask?) -> Void) -> some View {
+    nonisolated func onPreferredGestureMaskChange(perform action: @escaping (GestureMask?) -> Void) -> some View {
         onPreferenceChange(PreferredGestureMask.self, perform: action)
     }
     
