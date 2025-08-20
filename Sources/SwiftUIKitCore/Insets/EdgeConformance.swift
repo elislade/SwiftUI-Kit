@@ -56,6 +56,16 @@ public extension EdgeConformance {
         set { set(edge, value: newValue) }
     }
     
+    /// replaces the edges of self with that of the other mask.
+    func copy<Other: EdgeConformance>(replacing edges: Edge.Set, from other: Other) -> Self where Other.Value == Value {
+        var copy = self
+        if edges.contains(.leading) { copy.leading = other.leading }
+        if edges.contains(.trailing) { copy.trailing = other.trailing }
+        if edges.contains(.top) { copy.top = other.top }
+        if edges.contains(.bottom) { copy.bottom = other.bottom }
+        return copy
+    }
+    
 }
 
 extension EdgeInsets : EdgeConformance {}
