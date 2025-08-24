@@ -36,7 +36,7 @@ import SwiftUIPresentation
                     Bar(items: items)
                         .padding(padding)
                         .frame(maxWidth: .infinity, minHeight: minHeight)
-                        .paddingAddingSafeArea(.horizontal)
+                        .clipped()
                         .background {
                             if bgMaterial.isEmpty {
                                 NavBarDefaultMaterial().ignoresSafeArea()
@@ -76,35 +76,31 @@ import SwiftUIPresentation
         var body: some View {
             VStack(spacing: 10) {
                 if !items.isEmpty {
-                    HStack(spacing: 0) {
-                        HStack(spacing: 10) {
-                            ForEach(items.filter({ $0.metadata.placement == .leading }), id: \.id) { item in
-                                item
-                                    .view()
-                                    .transition(actionsTransition.animation(.bouncy))
-                                    .id(item.id)
-                            }
+                    HStack(spacing: 12) {
+                        ForEach(items.filter({ $0.metadata.placement == .leading }), id: \.id) { item in
+                            item
+                                .view()
+                                .transition(actionsTransition.animation(.bouncy))
+                                .id(item.id)
                         }
                         
                         if let title = items.filter({ $0.metadata.placement == .title }).last {
                             title
                                 .view()
-                                .padding(.horizontal, 12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .transition(
                                     (.scale(0.8, anchor: .leading) + .opacity).animation(.bouncy)
                                 )
                                 .id(title.id)
+                        } else {
+                            Spacer(minLength: 0)
                         }
-                        
-                        Spacer(minLength: 0)
-                        
-                        HStack(spacing: 10) {
-                            ForEach(items.filter({ $0.metadata.placement == .trailing }), id: \.id) { item in
-                                item
-                                    .view()
-                                    .transition(actionsTransition.animation(.bouncy))
-                                    .id(item.id)
-                            }
+ 
+                        ForEach(items.filter({ $0.metadata.placement == .trailing }), id: \.id) { item in
+                            item
+                                .view()
+                                .transition(actionsTransition.animation(.bouncy))
+                                .id(item.id)
                         }
                     }
                     .overscrollGroup()
