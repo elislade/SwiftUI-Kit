@@ -17,7 +17,8 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
     public var body: some View {
         ZStack {
             shape
-                .fill(Color(white: colorScheme == .light ? 0.9 : 0.2))
+                .fill(Color(white: colorScheme == .light ? 0.95 : 0.1))
+                .opacity(0.2)
                 
             shape
                 .fill(.tint)
@@ -25,11 +26,10 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
             
             shape
                 .fill(.linearGradient(
-                    colors: [.black.opacity(0.3), .white.opacity(0.1)],
+                    colors: [.black.opacity(0.1), .white.opacity(0.1)],
                     startPoint: .top,
                     endPoint: .bottom
                 ))
-                //.opacity(0.5)
                 .blendMode(.overlay)
             
             shape
@@ -42,8 +42,8 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
                 .blur(radius: 3)
                 .offset(y: 1)
         }
+        .compositingGroup()
         .clipShape(shape)
-        .blendMode(isTinted ? .normal : .luminosity)
     }
     
 }
