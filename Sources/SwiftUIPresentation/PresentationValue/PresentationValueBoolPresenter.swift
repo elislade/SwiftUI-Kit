@@ -30,16 +30,7 @@ struct PresentationValueBoolPresenter<Metadata: Equatable & Sendable, Presentati
                     anchor: anchor,
                     includeAnchorInEquatance: presentationRespondsToBoundsChange,
                     view: { AnyView(presentation().routeRelay().environment(\.parent, environmentRef)) },
-                    dispose: {
-                        Task { @MainActor in
-                            isPresented = false
-                        }
-                    },
-                    requestIDChange: { id in
-                        Task { @MainActor in
-                            stableID = id ?? .init()
-                        }
-                    },
+                    dispose: { isPresented = false },
                     envProxy: environmentRef
                 )] : []
             }

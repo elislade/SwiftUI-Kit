@@ -1,14 +1,13 @@
 import SwiftUI
 import SwiftUIKitCore
 
-public protocol PresentationValueConformable: Sendable {
+public protocol PresentationValueConformable {
     var id: UUID { get }
     var tag: String? { get }
     var anchor: Anchor<CGRect> { get }
     var includeAnchorInEquatance: Bool { get }
     var view: @MainActor () -> AnyView { get }
-    var dispose: @Sendable () -> Void { get }
-    var requestIDChange: @Sendable (UUID?) -> Void { get }
+    var dispose: @MainActor () -> Void { get }
     var envProxy: MainActorClosureKeyPath<EnvironmentValues> { get }
 }
 
@@ -19,7 +18,7 @@ public protocol Translatable {
 }
 
 
-@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable & Sendable>: Equatable, PresentationValueConformable, Sendable {
+@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable>: Equatable, PresentationValueConformable {
     
     public static func == (lhs: PresentationValue, rhs: PresentationValue) -> Bool {
         var values: [Bool] = [lhs.id == rhs.id, lhs.tag == rhs.tag]
@@ -36,8 +35,7 @@ public protocol Translatable {
     public let anchor: Anchor<CGRect>
     public let includeAnchorInEquatance: Bool
     public let view: @MainActor () -> AnyView
-    public let dispose: @Sendable () -> Void
-    public let requestIDChange: @Sendable (UUID?) -> Void
+    public let dispose: @MainActor () -> Void
     public let envProxy: MainActorClosureKeyPath<EnvironmentValues>
     
     init(
@@ -46,9 +44,8 @@ public protocol Translatable {
         metadata: Metadata,
         anchor: Anchor<CGRect>,
         includeAnchorInEquatance: Bool = true,
-        view: @escaping @MainActor () -> AnyView,
-        dispose: @Sendable @escaping () -> Void,
-        requestIDChange: @Sendable @escaping (UUID?) -> Void = { _ in },
+        view: @MainActor @escaping () -> AnyView,
+        dispose: @MainActor @escaping () -> Void,
         envProxy: MainActorClosureKeyPath<EnvironmentValues>
     ) {
         self.id = id
@@ -58,7 +55,6 @@ public protocol Translatable {
         self.includeAnchorInEquatance = includeAnchorInEquatance
         self.view = view
         self.dispose = dispose
-        self.requestIDChange = requestIDChange
         self.envProxy = envProxy
     }
     
@@ -70,7 +66,6 @@ public protocol Translatable {
         self.includeAnchorInEquatance = other.includeAnchorInEquatance
         self.view = other.view
         self.dispose = other.dispose
-        self.requestIDChange = other.requestIDChange
         self.envProxy = other.envProxy
     }
     
@@ -105,7 +100,6 @@ public extension PresentationValue {
             includeAnchorInEquatance: other.includeAnchorInEquatance,
             view: other.view,
             dispose: other.dispose,
-            requestIDChange: other.requestIDChange,
             envProxy: other.envProxy
         )
     }

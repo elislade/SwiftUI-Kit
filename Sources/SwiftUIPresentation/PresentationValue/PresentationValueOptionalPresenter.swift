@@ -32,16 +32,7 @@ struct PresentationValueOptionalPresenter<Value, Metadata: Equatable & Sendable,
                             anchor: anchor,
                             includeAnchorInEquatance: presentationRespondsToBoundsChange,
                             view: { AnyView(presentation(value).routeRelay().environment(\.parent, environmentRef)) },
-                            dispose: {
-                                Task { @MainActor in
-                                    self.value = nil
-                                }
-                            },
-                            requestIDChange: { id in
-                                Task { @MainActor in
-                                    stableID = id ?? .init()
-                                }
-                            },
+                            dispose: { self.value = nil },
                             envProxy: environmentRef
                         )]
                     } else {
