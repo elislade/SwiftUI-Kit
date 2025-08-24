@@ -1,22 +1,8 @@
 import SwiftUI
 
-struct BeingPresentedOnKey: EnvironmentKey {
-    
-    static var defaultValue: Bool { false }
-    
-}
+extension EnvironmentValues {
 
-
-public extension EnvironmentValues {
-
-    var _isBeingPresentedOn: Bool {
-        get { self[BeingPresentedOnKey.self] }
-        set { self[BeingPresentedOnKey.self] = newValue }
-    }
-    
-    var isBeingPresentedOn: Bool {
-        _isBeingPresentedOn
-    }
+    @Entry public var isBeingPresentedOn = false
     
 }
 
@@ -27,7 +13,7 @@ public extension View {
     /// - Parameter flag: A Bool indicating if the view is being presented on.
     /// - Returns: A view that has the isBeingPresentedOn environment value set.
     nonisolated func isBeingPresentedOn(_ flag: Bool) -> some View {
-        transformEnvironment(\._isBeingPresentedOn) { value in
+        transformEnvironment(\.isBeingPresentedOn) { value in
             if flag {
                 value = true
             }

@@ -3,7 +3,7 @@ import SwiftUIKit
 
 struct ReadableScrollViewExample : View {
     
-    @State private var resetAction: ResetAction?
+    @Environment(\.reset) private var reset
     @State private var size: CGFloat = 1000
     @State private var offset = CGPoint()
     @State private var axis: Axis.Set = [.vertical]
@@ -63,7 +63,7 @@ struct ReadableScrollViewExample : View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.3)
             }
-            .childResetAction{ _resetAction.wrappedValue = $0 }
+            //.resetActionsChanged{ _resetAction.wrappedValue = $0 }
         } parameters: {
             Toggle(isOn: Binding($axis, contains: .horizontal)){
                 Text("Horizontal Axis")
@@ -84,8 +84,8 @@ struct ReadableScrollViewExample : View {
                 
                 Spacer()
                 
-                Button("Trigger", action: { resetAction?() })
-                    .disabled(resetAction == nil)
+                Button("Trigger", action: { reset() })
+                    //.disabled(resetAction == nil)
             }
             .exampleParameterCell()
             

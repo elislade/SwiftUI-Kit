@@ -7,7 +7,6 @@ public struct NavViewExamples: View {
     
     public var body: some View {
         Content()
-            .resetContext()
     }
     
     struct Content: View {
@@ -50,7 +49,7 @@ public struct NavViewExamples: View {
                     
                     Spacer()
                     
-                    Button("Trigger", action: { reset(.all) })
+                    Button("Trigger", action: { reset() })
                 }
                 .exampleParameterCell()
                 
@@ -85,13 +84,13 @@ public struct NavViewExamples: View {
             }
             .navBarTitle(Text(color.description))
             .navBarTrailing{
-                Button{} label: { Text("A") }
+                Button{ print("A") } label: { Text("A") }
             }
             .navBarTrailing{
                 Toggle(isOn: $test){ Text("B") }
             }
             .navBarTrailing{
-                Button{} label: { Text("C") }
+                Button{ print("C") } label: { Text("C") }
             }
         }
     }

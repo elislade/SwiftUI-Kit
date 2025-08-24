@@ -16,11 +16,12 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
     
     @State private var scrollGestureTotal: Double = 0
     @State private var updatingStack = false
-    @State private var resetting = false
     
     @GestureState(reset: { _, transaction in
         transaction.animation = .fastSpring
     }) private var transitionFraction: CGFloat = 0
+    
+    @FocusedValue(\.resign) private var resignFocus
     
     //@State private var transitionFraction: Double = 0
     @State private var isUpdatingTransition: Bool = false
@@ -110,108 +111,107 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             }
         }
         
+        if elements.last?.id != self.elements.last?.id {
+            resignFocus?()
+        }
+        
         self.elements = elements
     }
     
     private var content: some View {
-        InsetReader { insets in
-            GeometryReader { proxy in
-                let size = proxy.size
-                var rootFrozen: FrozenState {
-                    elements.isEmpty ? .thawed : elements.count > 1 ? .frozenInvisible : .frozen
-                }
-                
-                root
-                    .frozen(rootFrozen)
-                    .modifier(Transition(pushAmount: rootPushAmount))
-                    .zIndex(1)
-                    .environment(\.presentationDepth, elements.count)
-                    .isBeingPresentedOn(!elements.isEmpty)
-                    .safeAreaInsets(insets)
-                    .disableNavBarItems(!elements.isEmpty)
-                    .disableOnPresentationWillDismiss(!elements.isEmpty)
-                    .maskMatching(using: namespace, enabled: !elements.isEmpty)
-                    .overlay {
-                        ZStack(alignment: .leading) {
-                            ForEach(elements, id: \.id){ ele in
-                                let index = elements.firstIndex(of: ele)!
-                                let isLast = index == elements.indices.last
-                                let shouldDisable = !isLast
-                                let shouldIgnore = index < (elements.count - 2)
-                                
-                                var frozenState: FrozenState {
-                                    isLast ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
-                                }
-                                
-                                ele.view()
-                                    .frozen(frozenState)
-                                    .modifier(Transition(pushAmount: pushAmount(index)))
-                                    .maskMatchingSource(using: namespace, enabled: isLast)
-                                    .offset(
-                                        x: isLast ? (transitionFraction) * size.width : 0
-                                    )
-                                    .zIndex(Double(index) + 2.0)
-                                    .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
-                                    .environment(\.presentationDepth, (elements.count - 1) - index)
-                                    .isBeingPresentedOn(!isLast)
-                                    .disableNavBarItems(shouldDisable)
-                                    .disableOnPresentationWillDismiss(!isLast)
-                                    .safeAreaInsets(insets)
-                                    .transition(.offset([size.width, 0]))
-                                    .maskMatching(using: namespace, enabled: !isLast)
+        GeometryReader { proxy in
+            let size = proxy.size
+            var rootFrozen: FrozenState {
+                elements.count < 2 ? .thawed : elements.count > 1 ? .frozenInvisible : .frozen
+            }
+
+            root
+                .frozen(rootFrozen)
+                .modifier(Transition(pushAmount: rootPushAmount))
+                .zIndex(1)
+                .environment(\.presentationDepth, elements.count)
+                .isBeingPresentedOn(!elements.isEmpty)
+                .disableNavBarItems(!elements.isEmpty)
+                .disableOnPresentationWillDismiss(!elements.isEmpty)
+                .maskMatching(using: namespace, enabled: !elements.isEmpty)
+                .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
+                .overlay {
+                    ZStack(alignment: .leading) {
+                        ForEach(elements, id: \.id){ ele in
+                            let index = elements.firstIndex(of: ele)!
+                            let isLast = index == elements.indices.last
+                            let isBeforeLast = index == elements.indices.last! - 1
+                            let shouldDisable = !isLast
+                            let shouldIgnore = index < (elements.count - 2)
+                            
+                            var frozenState: FrozenState {
+                                isLast || (isBeforeLast) ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
                             }
                             
-                            Color.clear
-                                .frame(width: 14)
-                                .paddingAddingSafeArea(.leading)
-                                .contentShape(Rectangle())
-                                .zIndex(Double(elements.count + 3))
-                                #if !os(tvOS)
-                                .highPriorityGesture(edgeDrag(size: size), including: .gesture)
-                                #endif
-                                .allowsHitTesting(!elements.isEmpty && !resetting)
-                                .defersSystemGesturesPolyfill(on: .leading)
+                            ele.view()
+                                .frozen(frozenState)
+                                .modifier(Transition(pushAmount: pushAmount(index)))
+                                .maskMatchingSource(using: namespace, enabled: isLast)
+                                .offset(
+                                    x: isLast ? (transitionFraction) * size.width : 0
+                                )
+                                .zIndex(Double(index) + 2.0)
+                                .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
+                                .environment(\.presentationDepth, (elements.count - 1) - index)
+                                .isBeingPresentedOn(!isLast)
+                                .disableNavBarItems(shouldDisable)
+                                .disableOnPresentationWillDismiss(!isLast)
+                                .transition(.offset(x: size.width))
+                                .maskMatching(using: namespace, enabled: !isLast)
+                                .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .resetAction(active: !elements.isEmpty && !resetting){
-                    Task {
-                        resetting = true
-                        defer { resetting = false }
-                        while !elements.isEmpty {
-                            popElement()
-                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 200)
-                        }
+                        
+                        Color.clear
+                            .frame(width: 14 + proxy.safeAreaInsets.leading)
+                            .contentShape(Rectangle())
+                            .zIndex(Double(elements.count + 3))
+                            #if !os(tvOS)
+                            .highPriorityGesture(edgeDrag(size: size), including: .gesture)
+                            #endif
+                            .allowsHitTesting(!elements.isEmpty)
+                            .defersSystemGesturesPolyfill(on: .leading)
+                            .ignoresSafeArea()
                     }
-                }
-                .mask {
-                    Rectangle().ignoresSafeArea()
-                }
-                .navBar(elements.isEmpty ? .none : .leading){
-                    Button{ popElement() } label: {
-                        Label { Text("Go Back") } icon: {
-                            Image(systemName: "arrow.left")
-                                .layoutDirectionMirror()
-                        }
-                    }
-                    .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
-                    .labelStyle(.iconOnly)
-                    .transition(.move(edge: .leading) + .opacity)
-                }
-                .animation(.fastSpringInterpolating.speed(resetting ? 1.5 : 1), value: elements)
-//                .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
-//                    let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-//                    scrollGestureTotal += g.delta.x
-//                    updateTransition(value: scrollGestureTotal * directionFactor, in: proxy)
-//                }.onEnded{ g in
-//                    let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-//                    commitTransition(at: scrollGestureTotal * directionFactor)
-//                    scrollGestureTotal = 0
-//                })
-                .handleDismissPresentation(popElement)
-                .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self, perform: newElements)
-                .resetPreference(PresentationKey<NavViewElementMetadata>.self)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .resetActionContainer(active: !elements.isEmpty){ @MainActor in
+                while !elements.isEmpty {
+                    popElement()
+                    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
+                }
+            }
+            .mask {
+                Rectangle().ignoresSafeArea()
+            }
+            .navBar(elements.isEmpty ? .none : .leading){
+                Button{ popElement() } label: {
+                    Label { Text("Go Back") } icon: {
+                        Image(systemName: "arrow.left")
+                            .layoutDirectionMirror()
+                    }
+                }
+                .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
+                .labelStyle(.iconOnly)
+                .transition(.move(edge: .leading) + .opacity)
+            }
+            .animation(.fastSpringInterpolating, value: elements)
+//            .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
+//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
+//                scrollGestureTotal += g.delta.x
+//                updateTransition(value: scrollGestureTotal * directionFactor, in: proxy)
+//            }.onEnded{ g in
+//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
+//                commitTransition(at: scrollGestureTotal * directionFactor)
+//                scrollGestureTotal = 0
+//            })
+            .handleDismissPresentation(popElement)
+            .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self, perform: newElements)
+            .resetPreference(PresentationKey<NavViewElementMetadata>.self)
         }
         .geometryGroupPolyfill()
         .onPreferenceChange(PresentationWillDismissPreferenceKey.self){
@@ -229,11 +229,9 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                 NavBarContainer{
                     content
                 }
-                .ignoresSafeArea(edges: [.bottom, .horizontal])
             } else {
                 content
                     .disableNavBarPreferences()
-                    .ignoresSafeArea()
             }
         }
         .scrollPassthroughContext()

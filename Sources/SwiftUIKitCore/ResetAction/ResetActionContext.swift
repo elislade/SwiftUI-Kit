@@ -1,39 +1,34 @@
 import SwiftUI
 
 
-struct ResetActionContext: ViewModifier {
+struct ResetActionContext {
     
-    @State private var resetAction: ResetAction?
+    @State private var actions: [AsyncResetAction] = []
+    
+}
+
+extension ResetActionContext: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .environment(\.reset){ amount in
-                switch amount {
-                case .once:
-                    resetAction?()
-                case .all:
-                    Task {
-                        while let resetAction {
-                            resetAction()
-                            try await Task.sleep(nanoseconds: nanoseconds(seconds: 0.05))
-                        }
+            .environment(\.reset){
+                Task {
+                    // get unmutable actions copy to make sure actions don't change while resetting.
+                    let actions = self.actions
+                    for action in actions {
+                        await action()
                     }
                 }
             }
-            .childResetAction{ resetAction = $0 }
-            .disableResetAction()
+            .resetActionsChanged{ actions = $0 }
+            .resetActionsDisabled()
     }
     
 }
 
+
 public extension EnvironmentValues {
     
-    @Entry var reset: (ResetAmount) -> Void = { _ in }
+    @Entry var reset: () -> Void = { }
     
-}
-
-
-public enum ResetAmount: Equatable, Sendable, BitwiseCopyable {
-    case once
-    case all
 }

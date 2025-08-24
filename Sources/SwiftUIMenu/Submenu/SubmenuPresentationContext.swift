@@ -16,7 +16,7 @@ struct SubmenuPresentationContext: ViewModifier {
         ZStack(alignment: alignment) {
             ZStack {
                 content
-                    .environment(\._isBeingPresentedOn, !presentedStack.isEmpty)
+                    .isBeingPresentedOn(!presentedStack.isEmpty)
                     .environment(\.presentationDepth, presentedStack.count)
                     .scaleEffect(1 - (Double(presentedStack.count) / 10), anchor: .init(alignment))
                     .disableWindowDrag(!stack.isEmpty)
@@ -38,7 +38,7 @@ struct SubmenuPresentationContext: ViewModifier {
                                 }
                                 .frame(width: bounds.width + 12)
                                 .environment(\.presentationDepth, isLast ? 0 : presentedStack.count - (i + 1))
-                                .environment(\._isBeingPresentedOn, stack.last?.id != item.id)
+                                .isBeingPresentedOn(stack.last?.id != item.id)
                                 .environment(\._isBeingPresented, true)
                                 .transition(.identity)
                                 .background{

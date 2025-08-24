@@ -4,11 +4,11 @@ import SwiftUI
 /// A SwiftUI ScrollView that you can read its content offset and content size
 public struct ReadableScrollView<Content: View>: View {
     
+    @Environment(\.isBeingPresentedOn) private var isPresentedOn
     @Environment(\.frozenState) private var frozenState
     @Environment(\.scrollPassthrough) private var passthrough
     
     @State private var handlesReset: Bool = false
-    @State private var isResetting = false
     
     let axis: Axis.Set
     let showsIndicators: Bool
@@ -60,15 +60,9 @@ public struct ReadableScrollView<Content: View>: View {
                     }
             }
             .coordinateSpace(name: "ScrollView")
-            .resetAction(active: handlesReset && !isResetting){
-                isResetting = true
+            .resetAction(active: handlesReset && !isPresentedOn){ @MainActor in
                 withAnimation(.smooth){
                     proxy.scrollTo("ScrollContent", anchor: axis == .vertical ? .top : .leading)
-                }
-                
-                Task{
-                    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 2)
-                    isResetting = false
                 }
             }
         }

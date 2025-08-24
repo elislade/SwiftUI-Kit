@@ -7,7 +7,7 @@ struct ResetActionExamples: View {
     
     public var body: some View {
         Content()
-            .resetContext()
+            .resetActionContext()
     }
     
     struct Content: View {
@@ -22,7 +22,7 @@ struct ResetActionExamples: View {
                         ChildView()
                         
                         ChildView()
-                            .disableResetAction()
+                            .resetActionsDisabled()
                         
                         ChildView()
                     }
@@ -37,11 +37,7 @@ struct ResetActionExamples: View {
                         .padding(.vertical)
                     
                     HStack {
-                        Button("Reset"){ reset(.once) }
-                        
-                        Button("Reset All"){
-                            reset(.all)
-                        }
+                        Button("Reset"){ reset() }
                     }
                     .lineLimit(1)
                     .padding()

@@ -59,8 +59,6 @@ struct ExampleView<E: View, P: View>: View {
                     .paddingAddingSafeArea()
                 }
                 .scrollClipDisabledPolyfill()
-                //.sceneInset(proxy.safeAreaInsets)
-                //.environment(\.sceneProxy, proxy)
                 .stickyContext()
                 #if os(watchOS)
                 .ignoresSafeArea(edges: [.top, .horizontal])
@@ -112,6 +110,7 @@ extension View {
 #if canImport(AppKit)
     func previewSize() -> some View {
         frame(width: 340, height: 600)
+            .resetActionContext()
     }
 #else
     func previewSize() -> some View {
@@ -125,7 +124,7 @@ extension View {
                     }
                 }
         }
-        
+        .resetActionContext()
     }
 #endif
     
