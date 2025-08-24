@@ -66,6 +66,15 @@ public extension EdgeConformance {
         return copy
     }
     
+    func copy<Other: EdgeConformance>(transforming edges: Edge.Set, from other: Other, transform: (Value, Value) -> Value) -> Self where Other.Value == Value {
+        var copy = self
+        if edges.contains(.leading) { copy.leading = transform(copy.leading, other.leading) }
+        if edges.contains(.trailing) { copy.trailing = transform(copy.trailing, other.trailing) }
+        if edges.contains(.top) { copy.top = transform(copy.top, other.top) }
+        if edges.contains(.bottom) { copy.bottom = transform(copy.bottom, other.bottom) }
+        return copy
+    }
+    
 }
 
 extension EdgeInsets : EdgeConformance {}

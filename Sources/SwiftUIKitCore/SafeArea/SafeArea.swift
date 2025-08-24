@@ -35,4 +35,8 @@ extension View {
         ))
     }
     
+    public nonisolated func ignoresSafeAreaOppositeNotch() -> some View {
+        modifier(SafeAreaHorizontalNotchModifier())
+    }
+    
 }
