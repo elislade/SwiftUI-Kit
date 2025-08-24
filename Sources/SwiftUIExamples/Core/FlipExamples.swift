@@ -11,22 +11,18 @@ public struct FlipExamplesView: View {
     
     public var body: some View {
         ExampleView(title: "Flip"){
-            AxisStack(isFlipped ? .vertical : .horizontal) {
-                ForEach(1...2){ i in
-                    Card(name: "Front \(i)")
-                        .flippedContent(
-                            active: isFlipped,
-                            horizontalEdge: horizontal,
-                            verticalEdge: vertical
-                        ){
-                            Card(name: "Back \(i)", aspect: 1.8)
-                        }
+            Card(name: "Front")
+                .flippedContent(
+                    active: isFlipped,
+                    horizontalEdge: horizontal,
+                    verticalEdge: vertical
+                ){
+                    Card(name: "Back", aspect: 1.8)
                 }
-            }
-            .padding()
-            .animation(.bouncy, value: horizontal)
-            .animation(.bouncy, value: vertical)
-            .animation(.bouncy, value: isFlipped)
+                .padding()
+                .animation(.bouncy, value: horizontal)
+                .animation(.bouncy, value: vertical)
+                .animation(.bouncy, value: isFlipped)
         } parameters: {
             HStack {
                 Text("Actions")
