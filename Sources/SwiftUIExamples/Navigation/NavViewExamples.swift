@@ -92,6 +92,7 @@ public struct NavViewExamples: View {
             .navBarTrailing{
                 Button{ print("C") } label: { Text("C") }
             }
+           // .navBarMaterial{ Color.clear }
         }
     }
     
@@ -106,7 +107,7 @@ public struct NavViewExamples: View {
 
 
 struct CustomTransition : TransitionModifier {
-    
+
     let pushAmount: Double
     
     init(pushAmount: Double) {
@@ -114,13 +115,12 @@ struct CustomTransition : TransitionModifier {
     }
     
     func body(content: Content) -> some View {
-       GeometryReader { proxy in
-            content
-                .hinge(degrees: pushAmount * 90, edge: .trailing)
-                .offset(x: pushAmount * -proxy.size.width)
-                .ignoresSafeArea()
-        }
-       .paddingAddingSafeArea()
+        content
+            .releaseContainerSafeArea()
+            .blur(radius: pushAmount * 20)
+            .opacity(1 - pushAmount)
+            .scaleEffect(1 - (0.1 * pushAmount), anchor: .top)
+            .captureContainerSafeArea()
     }
         
 }

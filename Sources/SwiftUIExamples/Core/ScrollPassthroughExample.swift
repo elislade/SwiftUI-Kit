@@ -96,4 +96,5 @@ public struct ScrollPassthroughExample: View {
 
 #Preview {
     ScrollPassthroughExample()
+        .previewSize()
 }

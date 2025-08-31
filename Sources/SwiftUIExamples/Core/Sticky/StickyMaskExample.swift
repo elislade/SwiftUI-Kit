@@ -35,7 +35,7 @@ public struct StickyMaskExample: View {
     struct Cell: View {
         
         var body: some View {
-            HStack(alignment: .top, spacing: 16) {
+            HStack(alignment: .center, spacing: 16) {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(.tint)
                     .aspectRatio(2, contentMode: .fit)
