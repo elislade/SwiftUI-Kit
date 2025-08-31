@@ -12,7 +12,7 @@ public struct NavBarExamples: View {
     public var body: some View {
         ExampleView(title: "NavBar"){
             NavBarContainer{
-                ScrollView {
+                ReadableScrollView {
                     Rectangle()
                         .fill(.tint)
                         .mask {
@@ -49,6 +49,7 @@ public struct NavBarExamples: View {
                 }
                 .navBarHidden(barHidden)
             }
+            .scrollPassthroughContext()
         } parameters: {
             ExampleSection("Bar", isExpanded: true){
                 Toggle(isOn: $barHidden){
