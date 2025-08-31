@@ -185,7 +185,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                             .transition(.identity)
                     }
                 }
-                .buttonStyle(ButtonStyle(didCallAction: close))
+                .buttonStyle(SwipeButtonStyle(didCallAction: close))
             }
             .animation(.fastSpringInterpolating, value: activeEdge)
 //            .indirectGesture(
