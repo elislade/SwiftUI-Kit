@@ -10,6 +10,8 @@ public enum TimeSpan {
 public struct ViewLooper<Content: View>: View {
     
     @Environment(\.frozenState) private var frozenState
+    @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
+    
     @State private var scrollToCopy = false
     @State private var size: CGSize = .zero
     @State private var count: Int = 0
@@ -23,6 +25,7 @@ public struct ViewLooper<Content: View>: View {
     private var startTask: Int {
         var hasher = Hasher()
         hasher.combine(frozenState)
+        hasher.combine(isBeingPresentedOn)
         hasher.combine(count)
         return hasher.finalize()
     }
@@ -108,8 +111,8 @@ public struct ViewLooper<Content: View>: View {
                 .animation(.easeInOut(duration: seconds(in: size)), value: scrollToCopy)
                 .id(count)
             }
-            .task(id: startTask){
-                guard frozenState.isThawed else { return }
+            .task(id: startTask, priority: .background){
+                guard frozenState.isThawed && !isBeingPresentedOn else { return }
                 
                 if let _ = try? await Task.sleep(nanoseconds: nanoseconds(seconds: wait)) {
                     scrollToCopy = true
