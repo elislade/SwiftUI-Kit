@@ -108,7 +108,7 @@ public extension PresentationValue {
 
 public extension View {
     
-    func presentationValue<Metadata: Equatable & Sendable, Content: View>(
+    func presentationValue<Metadata: Equatable, Content: View>(
         isPresented: Binding<Bool>,
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
@@ -128,7 +128,7 @@ public extension View {
         .routeRelayReceiver()
     }
     
-    func presentationValue<Value, Metadata: Equatable & Sendable, Content: View>(
+    func presentationValue<Value: Hashable, Metadata: Equatable, Content: View>(
         value: Binding<Value?>,
         tag: String? = nil,
         respondsToBoundsChange: Bool = false,
@@ -150,7 +150,7 @@ public extension View {
     
 }
 
-public struct PresentationKey<Metadata: Equatable & Sendable>: PreferenceKey {
+public struct PresentationKey<Metadata: Equatable>: PreferenceKey {
     
     public static var defaultValue: [PresentationValue<Metadata>] { [] }
     

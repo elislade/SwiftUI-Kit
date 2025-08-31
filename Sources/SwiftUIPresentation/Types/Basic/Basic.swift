@@ -30,7 +30,7 @@ public extension View {
         ))
     }
     
-    nonisolated func presentation<Content: View, Value>(
+    nonisolated func presentation<Content: View, Value: Hashable>(
         value: Binding<Value?>,
         alignment: Alignment = .bottom,
         @ViewBuilder content: @MainActor @escaping (Value) -> Content

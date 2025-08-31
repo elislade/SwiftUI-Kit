@@ -42,7 +42,7 @@ public extension View {
     ///   - value: A binding to the presentation for programatic presentation and dismissal.
     ///   - focus: A ViewBuilder for the focused view that will replace this current view when focusing
     /// - Returns: A view that presents the focus view for presentation.
-    func focusPresentation<Value: Sendable, Focus: View>(
+    func focusPresentation<Value: Hashable, Focus: View>(
         value: Binding<Value?>,
         @ViewBuilder focus: @MainActor @escaping (Value) -> Focus
     ) -> some View {

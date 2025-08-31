@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationValueOptionalPresenter<Value, Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
+struct PresentationValueOptionalPresenter<Value: Hashable, Metadata: Equatable, Presentation: View>: ViewModifier {
     
     @Environment(\.presentationIdentityBehaviour) private var behaviour
     let environmentRef: MainActorClosureKeyPath<EnvironmentValues>
@@ -42,6 +42,11 @@ struct PresentationValueOptionalPresenter<Value, Metadata: Equatable & Sendable,
             }
             .onChangePolyfill(of: behaviour.customHashable){
                 customID = behaviour.customHashable == nil ? nil : .init()
+            }
+            .onChangePolyfill(of: value){ old, new in
+                if old != nil {
+                    stableID = UUID()
+                }
             }
     }
     

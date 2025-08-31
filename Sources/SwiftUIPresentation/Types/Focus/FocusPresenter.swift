@@ -39,7 +39,7 @@ struct FocusPresenter<Content: View>: View {
 }
 
 
-struct FocusOptionalPresenter<Value : Sendable, Content: View>: View {
+struct FocusOptionalPresenter<Value : Hashable, Content: View> {
     
     @Binding var value: Value?
     let content: @MainActor () -> Content
@@ -57,6 +57,11 @@ struct FocusOptionalPresenter<Value : Sendable, Content: View>: View {
         self.focusView = focusView
         self.accessory = accessory
     }
+    
+}
+
+
+extension FocusOptionalPresenter: View {
     
     var body: some View {
         content()

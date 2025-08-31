@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct PresentationValueBoolPresenter<Metadata: Equatable & Sendable, Presentation: View>: ViewModifier {
+struct PresentationValueBoolPresenter<Metadata: Equatable, Presentation: View>: ViewModifier {
     
     @Environment(\.presentationIdentityBehaviour) private var behaviour
     let environmentRef: MainActorClosureKeyPath<EnvironmentValues>

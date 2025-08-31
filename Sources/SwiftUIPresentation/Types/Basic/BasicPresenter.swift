@@ -31,7 +31,7 @@ struct BasicPresenter<Presentation: View>: ViewModifier {
 }
 
 
-struct BasicPresenterOptional<Presentation: View, Value> {
+struct BasicPresenterOptional<Presentation: View, Value: Hashable> {
     
     @Environment(\.colorScheme) private var colorScheme
     @Binding var value: Value?
