@@ -18,7 +18,6 @@ public extension View {
 
 struct OnContinuousHoverPolyfill {
     
-    @State private var safeInset: EdgeInsets = .init()
     @State private var rects: Conversion = .init(.zero, .zero)
     @State private var phase: HoverPhase = .ended
     
@@ -31,7 +30,6 @@ extension OnContinuousHoverPolyfill: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .onGeometryChangePolyfill(of: { $0.safeAreaInsets }){ safeInset = $0 }
             .onGeometryChangePolyfill(of: {
                 Conversion(
                     $0.frame(in: .global),
