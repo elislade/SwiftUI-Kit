@@ -46,7 +46,7 @@ public struct EdgeHighlightMaterial<Shape: InsettableShape>: View {
                 }
             }
         }
-        .task{
+        .onAppear{
             if !reduceMotion {
                 center = .init(x: 0.9, y: 0.1)
             }
