@@ -140,10 +140,10 @@ public struct CompositeTransitionExamples: View {
                     transition = t
                     add = false
                 }
-                .paddingAddingSafeArea(.bottom)
                 .background{
                     AsymmetricRoundedRectangle(values: .init(top: 20))
                         .fill(.regularMaterial)
+                        .ignoresSafeArea(edges: .bottom)
                 }
                 .transitions(
                     (.opacity + .blur(radius: 10) + .offset([0, 500]))
@@ -186,6 +186,7 @@ public struct CompositeTransitionExamples: View {
                         Provider{ t, u in transition = t }
                     }
                 }
+                .frame(maxHeight: 360)
             }
         }
         
@@ -227,6 +228,5 @@ public struct CompositeTransitionExamples: View {
 
 #Preview("Composite Transitions") {
     CompositeTransitionExamples()
-        .sceneEnvironment()
         .previewSize()
 }

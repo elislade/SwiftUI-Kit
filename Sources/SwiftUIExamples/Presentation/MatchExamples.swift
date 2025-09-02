@@ -139,7 +139,5 @@ public struct MatchExampleView: View {
 
 #Preview {
     MatchExampleView()
-        .paddingAddingSafeArea()
-        .sceneEnvironment()
         .previewSize()
 }

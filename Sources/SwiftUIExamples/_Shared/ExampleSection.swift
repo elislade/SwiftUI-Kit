@@ -44,9 +44,9 @@ struct ExampleSection<C: View> : View {
                 Rectangle()
                     .fill(.regularMaterial)
                 
-                Divider().ignoresSafeArea()
+                Divider()
             }
-            .paddingSubtractingSafeArea()
+            .ignoresSafeArea()
             .opacity(isSticking ? 1 : 0)
         }
         .sticky(edges: isExpanded ? .top : []){ isSticking = $0.isSticking }

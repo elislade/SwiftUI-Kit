@@ -56,7 +56,6 @@ struct ExampleView<E: View, P: View>: View {
                         parameters
                     }
                     .toggleStyle(.swiftUIKitSwitch)
-                    .paddingAddingSafeArea()
                 }
                 .scrollClipDisabledPolyfill()
                 .stickyContext()
@@ -72,7 +71,6 @@ struct ExampleView<E: View, P: View>: View {
                         example
                     }
                     .frame(width: proxy.size.width, height: maxSize.height)
-                    .paddingAddingSafeArea()
                     .background(.regularMaterial)
                     .overlay(alignment: .bottom) { Divider().ignoresSafeArea() }
                 }
