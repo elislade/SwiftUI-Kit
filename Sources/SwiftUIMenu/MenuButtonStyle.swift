@@ -93,22 +93,26 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
             }
             .onWindowInteractionHover{ phase in
                 guard isEnabled else { return }
-                
-                switch phase {
-                case .entered:
-                    activatedAt = Date()
-                case .left:
-                    activatedAt = nil
-                case .ended:
-                    activatedAt = nil
-                    if dismissWhenTriggered {
-                        dismiss()
-                    }
-                    
-                    if triggerBehaviour == .immediate {
-                        configuration.trigger()
-                    } else {
-                        actionShouldTriggerOnDisappear = true
+                Task {
+                    switch phase {
+                    case .entered: activatedAt = Date()
+                    case .left: activatedAt = nil
+                    case .ended:
+                        activatedAt = nil
+                        
+                        if triggerBehaviour == .immediate {
+                            if dismissWhenTriggered {
+                                dismiss()
+                            }
+                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 100)
+                            configuration.trigger()
+                        } else {
+                            actionShouldTriggerOnDisappear = true
+                            
+                            if dismissWhenTriggered {
+                                dismiss()
+                            }
+                        }
                     }
                 }
             }

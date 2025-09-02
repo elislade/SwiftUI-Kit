@@ -13,8 +13,8 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
     
     public init(
         selection: Binding<V>,
-        data: Data, @ViewBuilder
-        label: @MainActor @escaping (Data.Element) -> Label
+        data: Data,
+        @ViewBuilder label: @MainActor @escaping (Data.Element) -> Label
     ) {
         self._selection = selection
         self.data = data
