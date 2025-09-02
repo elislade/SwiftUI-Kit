@@ -17,13 +17,13 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
     @State private var scrollGestureTotal: Double = 0
     @State private var updatingStack = false
     
-    @GestureState(reset: { _, transaction in
-        transaction.animation = .fastSpring
-    }) private var transitionFraction: CGFloat = 0
+//    @GestureState(reset: { _, transaction in
+//        transaction.animation = .none//.fastSpring
+//    }) private var transitionFraction: CGFloat = 0
     
     @FocusedValue(\.resign) private var resignFocus
     
-    //@State private var transitionFraction: Double = 0
+    @State private var transitionFraction: Double = 0
     @State private var isUpdatingTransition: Bool = false
     
     /// - Parameters:
@@ -42,17 +42,20 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
     #if !os(tvOS)
     private func edgeDrag(size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0)
-            .onChanged{ _ in
-                isUpdatingTransition = true
+            .onChanged{ gesture in
+                withAnimation(.none){
+                    isUpdatingTransition = true
+                    transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
+                }
+                //transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
             }
             .onEnded({ g in
-                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-                commitTransition(at: g.predictedEndTranslation.width * directionFactor)
+                commitTransition(at: g.predictedEndTranslation.width * layoutDirection.scaleFactor)
             })
-            .updating($transitionFraction){ gesture, state, transaction in
-                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-                state = max(gesture.translation.width * directionFactor, 0) / size.width
-            }
+//            .updating($transitionFraction){ gesture, state, transaction in
+//                transaction.animation = .none
+//                state = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
+//            }
     }
     #endif
     
@@ -70,6 +73,11 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
         if value > 150 {
             // user dragged enough, pop element
             popElement()
+        }
+        else {
+            withAnimation(.smooth.speed(1.8)){
+                transitionFraction = 0
+            }
         }
     }
     
@@ -115,6 +123,7 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             resignFocus?()
         }
         
+        transitionFraction = 0
         self.elements = elements
     }
     
@@ -124,60 +133,72 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             var rootFrozen: FrozenState {
                 elements.count < 2 ? .thawed : elements.count > 1 ? .frozenInvisible : .frozen
             }
-
-            root
-                .frozen(rootFrozen)
-                .modifier(Transition(pushAmount: rootPushAmount))
-                .zIndex(1)
-                .environment(\.presentationDepth, elements.count)
-                .isBeingPresentedOn(!elements.isEmpty)
-                .disableNavBarItems(!elements.isEmpty)
-                .disableOnPresentationWillDismiss(!elements.isEmpty)
-                .maskMatching(using: namespace, enabled: !elements.isEmpty)
-                .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
-                .overlay {
-                    ZStack(alignment: .leading) {
-                        ForEach(elements, id: \.id){ ele in
-                            let index = elements.firstIndex(of: ele)!
-                            let isLast = index == elements.indices.last
-                            let isBeforeLast = index == elements.indices.last! - 1
-                            let shouldDisable = !isLast
-                            let shouldIgnore = index < (elements.count - 2)
-                            
-                            var frozenState: FrozenState {
-                                isLast || (isBeforeLast) ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
-                            }
-                            
-                            ele.view()
-                                .frozen(frozenState)
-                                .modifier(Transition(pushAmount: pushAmount(index)))
-                                .maskMatchingSource(using: namespace, enabled: isLast)
-                                .offset(
-                                    x: isLast ? (transitionFraction) * size.width : 0
-                                )
-                                .zIndex(Double(index) + 2.0)
-                                .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
-                                .environment(\.presentationDepth, (elements.count - 1) - index)
-                                .isBeingPresentedOn(!isLast)
-                                .disableNavBarItems(shouldDisable)
-                                .disableOnPresentationWillDismiss(!isLast)
-                                .transition(.offset(x: size.width))
-                                .maskMatching(using: namespace, enabled: !isLast)
-                                .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
-                        }
-                        
-                        Color.clear
-                            .frame(width: 14 + proxy.safeAreaInsets.leading)
-                            .contentShape(Rectangle())
-                            .zIndex(Double(elements.count + 3))
-                            #if !os(tvOS)
-                            .highPriorityGesture(edgeDrag(size: size), including: .gesture)
-                            #endif
-                            .allowsHitTesting(!elements.isEmpty)
-                            .defersSystemGesturesPolyfill(on: .leading)
-                            .ignoresSafeArea()
+            
+            ZStack(alignment: .leading) {
+                root
+                    .accessibilityHidden(!elements.isEmpty)
+                    .releaseContainerSafeArea()
+                    .frozen(rootFrozen)
+                    .modifier(Transition(pushAmount: rootPushAmount))
+                    .zIndex(1)
+                    .environment(\.presentationDepth, elements.count)
+                    .isBeingPresentedOn(!elements.isEmpty)
+                    .disableNavBarItems(!elements.isEmpty)
+                    .disableOnPresentationWillDismiss(!elements.isEmpty)
+                    //.maskMatching(using: namespace, enabled: !elements.isEmpty)
+                    .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
+      
+                ForEach(elements, id: \.id){ ele in
+                    let index = elements.firstIndex(of: ele)!
+                    let isLast = index == elements.indices.last
+                    let isBeforeLast = index == elements.indices.last! - 1
+                    let shouldDisable = !isLast
+                    let shouldIgnore = index < (elements.count - 2)
+                    
+                    var frozenState: FrozenState {
+                        isLast || (isBeforeLast) ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    ele.view()
+                        .accessibilityHidden(!isLast)
+                        .releaseContainerSafeArea()
+                        .frozen(frozenState)
+                        .background{
+                            if isLast {
+                                Rectangle()
+                                    .fill(.background)
+                                    .shadow(radius: 20, x: -10, y: 0)
+                            }
+                        }
+                        .modifier(Transition(pushAmount: pushAmount(index)))
+                        //.maskMatchingSource(using: namespace, enabled: isLast)
+                        .offset(
+                            x: isLast ? (transitionFraction) * size.width : 0
+                        )
+                        .zIndex(Double(index) + 2.0)
+                        .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
+                        .environment(\.presentationDepth, (elements.count - 1) - index)
+                        .isBeingPresentedOn(!isLast)
+                        .disableNavBarItems(shouldDisable)
+                        .disableOnPresentationWillDismiss(!isLast)
+                        .transition(.offset([size.width + 50, 0]))
+                        //.maskMatching(using: namespace, enabled: !isLast)
+                        .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
+                        .onDisappear{
+                            transitionFraction = 0
+                        }
+                }
+                
+                Color.clear
+                    .frame(width: 14 + proxy.safeAreaInsets.leading)
+                    .contentShape(Rectangle())
+                    .zIndex(Double(elements.count + 3))
+                    #if !os(tvOS)
+                    .highPriorityGesture(edgeDrag(size: size), including: .gesture)
+                    #endif
+                    .allowsHitTesting(!elements.isEmpty)
+                    .defersSystemGesturesPolyfill(on: .leading)
+                    .ignoresSafeArea()
             }
             .resetActionContainer(active: !elements.isEmpty){ @MainActor in
                 while !elements.isEmpty {
@@ -199,14 +220,13 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                 .labelStyle(.iconOnly)
                 .transition(.move(edge: .leading) + .opacity)
             }
-            .animation(.fastSpringInterpolating, value: elements)
+            .animation(.smooth.speed(1.5), value: elements)
 //            .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
-//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
 //                scrollGestureTotal += g.delta.x
-//                updateTransition(value: scrollGestureTotal * directionFactor, in: proxy)
+//                isUpdatingTransition = true
+//                transitionFraction = max(scrollGestureTotal * layoutDirection.scaleFactor, 0) / size.width
 //            }.onEnded{ g in
-//                let directionFactor: Double = layoutDirection == .rightToLeft ? -1 : 1
-//                commitTransition(at: scrollGestureTotal * directionFactor)
+//                commitTransition(at: scrollGestureTotal * layoutDirection.scaleFactor)
 //                scrollGestureTotal = 0
 //            })
             .handleDismissPresentation(popElement)
@@ -214,6 +234,7 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             .resetPreference(PresentationKey<NavViewElementMetadata>.self)
         }
         .geometryGroupPolyfill()
+        .captureContainerSafeArea()
         .onPreferenceChange(PresentationWillDismissPreferenceKey.self){
             willDismiss = $0
         }

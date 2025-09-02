@@ -25,11 +25,12 @@ public struct DefaultNavTransitionModifier: TransitionModifier {
     
     public func body(content: Content) -> some View {
         content
-            .offset(x: reduceMotion ? 0 : pushAmount * -120)
+            .opacity(depth < 2 ? 1 - (pushAmount * 0.7) : 0)
+            .scaleEffect(1 - (pushAmount * 0.2), anchor: .leading)
             .overlay {
                 Color.black
-                    .opacity(depth < 3 ? pushAmount / 2 : 0)
-                    .ignoresSafeArea()
+                    .opacity(depth < 2 ? pushAmount / 4 : 0)
+                    .allowsHitTesting(false)
             }
     }
     
