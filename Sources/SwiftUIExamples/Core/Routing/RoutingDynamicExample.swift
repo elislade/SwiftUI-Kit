@@ -15,21 +15,16 @@ public struct RoutingDynamicExample: View {
         }
     }
     
-    @Environment(\.isPresented) private var isPresented
-    
     public init(){}
     
     public var body: some View {
         Reciever()
             .safeAreaInset(edge: .top, spacing: 0){
                 Sender()
-                    .paddingAddingSafeArea()
                     .background(.regularMaterial)
                 
             }
-            .presentationMatchCaptureMode(.snapshot)
-            //.paddingAddingSafeArea()
-            .sceneEnvironment()
+            .presentationContext()
             .router()
     }
     
@@ -49,16 +44,12 @@ public struct RoutingDynamicExample: View {
                     .font(.largeTitle[.bold])
                     .navBarTitle(Text("Content \(index)"))
                     .presentation(isPresented: $showModal){
-                        if #available(iOS 16.4, *) {
-                            NavView{
-                                Content(index: index + 1)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: 320)
-                            .background(.regularMaterial)
-                            .transition(.offset([0, 340]).animation(.fastSpring))
-                        } else {
-                            
+                        NavView{
+                            Content(index: index + 1)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: 320)
+                        .background(.regularMaterial)
+                        .transition(.offset([0, 340]).animation(.fastSpring))
                     }
                     .navDestination(isPresented: $showDetail){
                         Content(index: index + 1)
@@ -126,11 +117,125 @@ public struct RoutingDynamicExample: View {
             var style: PresentationStyle
         }
         
-        private var divider: some View {
-            Image(systemName: "chevron.compact.right")
-                .imageScale(.large)
-                .opacity(0.3)
+        struct RouteComposer: View {
+            
+            @Binding var tab: RoutingDynamicExample.Option
+            @Binding var elements: [Element]
+            
+            struct RouteDivider: View {
+                
+                var body: some View {
+                    Image(systemName: "chevron.compact.right")
+                        .imageScale(.large)
+                        .opacity(0.3)
+                }
+                
+            }
+            
+            var body: some View {
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false){
+                        HStack(spacing: 8) {
+                            Menu{
+                                MenuPicker(
+                                    selection: $tab,
+                                    data: RoutingDynamicExample.Option.allCases
+                                ){
+                                    TabLabel($0)
+                                }
+                            } label: {
+                                TabLabel(tab)
+                                    .foregroundStyle(.tint)
+                            }
+                            
+                            RouteDivider()
+                            
+                            EditElementsView(
+                                elements: $elements.animation(.bouncy)
+                            )
+                        }
+                        .padding(10)
+                        .id("content")
+                        .onChange(of: elements){ _ in
+                            withAnimation(.fastSpring){
+                               proxy.scrollTo("content", anchor: .trailing)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            struct EditElementsView: View {
+                
+                @Binding var elements: [Element]
+                
+                var body: some View {
+                    ForEach($elements.lazy){ element in
+                        ElementView(element: element){
+                            if let idx = elements.firstIndex(where: { $0.id == element.wrappedValue.id }){
+                                self.elements.remove(at: idx)
+                            }
+                        }
+                        .transition(.scale)
+                        
+                        RouteDivider()
+                    }
+                    
+                    Menu {
+                        ForEach(PresentationStyle.allCases, id: \.self){ s in
+                            Button{ elements.append(.init(style: s)) } label: {
+                                PresentationStyleLabel(s)
+                            }
+                            .actionTriggerBehaviour(.immediate)
+                        }
+                    } label: {
+                        Label{ Text("Add") } icon: {
+                            Image(systemName: "plus")
+                        }
+                        .foregroundStyle(.tint)
+                    }
+                }
+                
+                
+                struct ElementView: View {
+                    
+                    @Binding var element: Element
+                    
+                    let delete: () -> Void
+                    
+                    var body: some View {
+                        Menu{
+                            MenuPicker(
+                                selection: $element.style,
+                                data: PresentationStyle.allCases
+                            ){
+                                PresentationStyleLabel($0)
+                            }
+
+                            MenuGroupDivider()
+                            
+                            Button(role: .destructive){
+                                delete()
+                            } label: {
+                                Label{ Text("Remove") } icon: {
+                                    Image(systemName: "trash")
+                                }
+                            }
+                            .actionTriggerBehaviour(.immediate)
+                        } label: {
+                            PresentationStyleLabel(element.style)
+                                .foregroundStyle(.tint)
+                                .symbolEffectBounce(value: element.style)
+                        }
+                        .transition(.scale)
+                    }
+                    
+                }
+            }
+            
         }
+        
         
         var body: some View {
             VStack(spacing: 0) {
@@ -138,71 +243,7 @@ public struct RoutingDynamicExample: View {
                     .padding(.horizontal)
                 
                 HStack(spacing: 0) {
-                    ScrollViewReader { proxy in
-                        ScrollView(.horizontal, showsIndicators: false){
-                            HStack(spacing: 8) {
-                                Menu{
-                                    MenuPicker(selection: $tab, data: RoutingDynamicExample.Option.allCases){
-                                        TabLabel($0)
-                                    }
-                                } label: {
-                                    TabLabel(tab)
-                                        .foregroundStyle(.tint)
-                                }
-                                
-                               divider
-                                
-                                ForEach($elements){ binding in
-                                    Menu{
-                                        MenuPicker(selection: binding.style, data: PresentationStyle.allCases){ s in
-                                            PresentationStyleLabel(s)
-                                        }
-                                        
-                                        MenuGroupDivider()
-                                        
-                                        Button(role: .destructive){
-                                            elements.removeAll(where: {
-                                                $0.id == binding.wrappedValue.id
-                                            })
-                                        } label: {
-                                            Label{ Text("Remove") } icon: {
-                                                Image(systemName: "trash")
-                                            }
-                                        }
-                                    } label: {
-                                        PresentationStyleLabel(binding.wrappedValue.style)
-                                            .foregroundStyle(.tint)
-                                            .symbolEffectBounce(value: binding.wrappedValue.style)
-                                            //.contentTransition(.symbolEffect)
-                                    }
-                                    .transition(.scale)
-                                    
-                                    divider
-                                }
-                                
-                                Menu {
-                                    ForEach(PresentationStyle.allCases, id: \.self){ s in
-                                        Button{ elements.append(.init(style: s)) } label: {
-                                            PresentationStyleLabel(s)
-                                        }
-                                    }
-                                } label: {
-                                    Label{ Text("Add") } icon: {
-                                        Image(systemName: "plus")
-                                    }
-                                    .foregroundStyle(.tint)
-                                }
-                                .id("last")
-                            }
-                            .padding(10)
-                            .animation(.bouncy, value: elements)
-                        }
-                        .onChangePolyfill(of: elements){
-                            withAnimation(.fastSpring){
-                                proxy.scrollTo("last", anchor: .trailing)
-                            }
-                        }
-                    }
+                    RouteComposer(tab: $tab, elements: $elements)
                     
                     Capsule()
                         .frame(width: 3, height: 32)
@@ -210,7 +251,6 @@ public struct RoutingDynamicExample: View {
                     
                     Button{
                         let path = ([tab.description] + elements.map(\.style.rawValue)).joined(separator: "/")
-                        print("Open", path)
                         open(.example(path))
                     } label: {
                         Label{ Text("Run") } icon: {
@@ -228,6 +268,7 @@ public struct RoutingDynamicExample: View {
             }
             .tint(Color(tab))
         }
+        
         
         struct PresentationStyleLabel: View {
             let style: PresentationStyle
@@ -249,6 +290,7 @@ public struct RoutingDynamicExample: View {
                 }
             }
         }
+        
     }
 
     

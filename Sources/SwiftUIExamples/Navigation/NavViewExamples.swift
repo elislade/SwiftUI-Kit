@@ -92,7 +92,6 @@ public struct NavViewExamples: View {
             .navBarTrailing{
                 Button{ print("C") } label: { Text("C") }
             }
-           // .navBarMaterial{ Color.clear }
         }
     }
     
@@ -116,11 +115,9 @@ struct CustomTransition : TransitionModifier {
     
     func body(content: Content) -> some View {
         content
-            .releaseContainerSafeArea()
             .blur(radius: pushAmount * 20)
             .opacity(1 - pushAmount)
             .scaleEffect(1 - (0.1 * pushAmount), anchor: .top)
-            .captureContainerSafeArea()
     }
         
 }
