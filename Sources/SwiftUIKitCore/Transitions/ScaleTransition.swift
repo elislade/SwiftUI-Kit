@@ -21,6 +21,13 @@ public extension AnyTransition {
         )
     }
     
+    static func bindedScale(_ active: Binding<SIMD2<Double>>, identity: Binding<SIMD2<Double>> = .constant([1,1]), anchor: UnitPoint = .center) -> AnyTransition {
+        .modifier(
+            active: BindedScaleModifier(active, anchor: anchor),
+            identity: BindedScaleModifier(identity, anchor: anchor)
+        )
+    }
+    
 }
 
 
@@ -31,6 +38,23 @@ struct ScaleModifier: ViewModifier {
     
     nonisolated init(_ scale: SIMD2<Double>, anchor: UnitPoint = .center) {
         self.scale = scale
+        self.anchor = anchor
+    }
+    
+    func body(content: Content) -> some View {
+        content.scaleEffect(x: scale.x, y: scale.y, anchor: anchor)
+    }
+    
+}
+
+
+struct BindedScaleModifier: ViewModifier {
+    
+    @Binding var scale: SIMD2<Double>
+    let anchor: UnitPoint
+    
+    nonisolated init(_ scale: Binding<SIMD2<Double>>, anchor: UnitPoint = .center) {
+        self._scale = scale
         self.anchor = anchor
     }
     
