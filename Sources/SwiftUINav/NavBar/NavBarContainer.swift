@@ -79,14 +79,14 @@ import SwiftUIPresentation
                     HStack(spacing: 12) {
                         ForEach(items.filter({ $0.metadata.placement == .leading }), id: \.id) { item in
                             item
-                                .view()
+                                .view
                                 .transition(actionsTransition.animation(.bouncy))
                                 .id(item.id)
                         }
                         
                         if let title = items.filter({ $0.metadata.placement == .title }).last {
                             title
-                                .view()
+                                .view
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .transition(
                                     (.scale(0.8, anchor: .leading) + .opacity).animation(.bouncy)
@@ -98,7 +98,7 @@ import SwiftUIPresentation
  
                         ForEach(items.filter({ $0.metadata.placement == .trailing }), id: \.id) { item in
                             item
-                                .view()
+                                .view
                                 .transition(actionsTransition.animation(.bouncy))
                                 .id(item.id)
                         }
@@ -113,7 +113,7 @@ import SwiftUIPresentation
                 
                 ForEach(items.filter({ $0.metadata.placement == .accessory }), id: \.id) { item in
                     item
-                        .view()
+                        .view
                         .transition(actionsTransition)
                 }
             }
