@@ -6,11 +6,18 @@ public protocol PresentationValueConformable {
     var tag: String? { get }
     var anchor: Anchor<CGRect> { get }
     var includeAnchorInEquatance: Bool { get }
-    var view: @MainActor () -> AnyView { get }
+    var view: AnyView { get }
     var dispose: @MainActor () -> Void { get }
     var envProxy: MainActorClosureKeyPath<EnvironmentValues> { get }
 }
 
+
+public extension PresentationValueConformable {
+    
+    // depricated support for closure based view.
+    func view() -> AnyView { view }
+    
+}
 
 public protocol Translatable {
     associatedtype Translation
@@ -21,12 +28,12 @@ public protocol Translatable {
 @dynamicMemberLookup public struct PresentationValue<Metadata: Equatable>: Equatable, PresentationValueConformable {
     
     public static func == (lhs: PresentationValue, rhs: PresentationValue) -> Bool {
-        var values: [Bool] = [lhs.id == rhs.id, lhs.tag == rhs.tag]
+        let base = lhs.id == rhs.id && lhs.tag == rhs.tag && lhs.metadata == rhs.metadata
         if lhs.includeAnchorInEquatance && rhs.includeAnchorInEquatance {
-            values.append(lhs.anchor == rhs.anchor)
+            return base && lhs.anchor == rhs.anchor
+        } else {
+            return base
         }
-        values.append(lhs.metadata == rhs.metadata)
-        return values.allSatisfy({ $0 })
     }
     
     public let id: UUID
@@ -34,7 +41,7 @@ public protocol Translatable {
     public let metadata: Metadata
     public let anchor: Anchor<CGRect>
     public let includeAnchorInEquatance: Bool
-    public let view: @MainActor () -> AnyView
+    public let view: AnyView
     public let dispose: @MainActor () -> Void
     public let envProxy: MainActorClosureKeyPath<EnvironmentValues>
     
@@ -44,7 +51,7 @@ public protocol Translatable {
         metadata: Metadata,
         anchor: Anchor<CGRect>,
         includeAnchorInEquatance: Bool = true,
-        view: @MainActor @escaping () -> AnyView,
+        view: AnyView,
         dispose: @MainActor @escaping () -> Void,
         envProxy: MainActorClosureKeyPath<EnvironmentValues>
     ) {

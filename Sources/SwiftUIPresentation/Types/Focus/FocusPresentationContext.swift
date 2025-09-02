@@ -67,7 +67,7 @@ struct FocusPresentationContext: ViewModifier {
                             
                             if let focused {
                                 focused
-                                    .view()
+                                    .view
                                     .environment(\.reduceMotion, true)
                                     .environment(\._isBeingPresented, true)
                                     .matchedGeometryEffect(id: "View", in: ns)

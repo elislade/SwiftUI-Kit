@@ -29,7 +29,7 @@ struct PresentationValueBoolPresenter<Metadata: Equatable, Presentation: View>: 
                     metadata: metadata,
                     anchor: anchor,
                     includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                    view: { AnyView(presentation().routeRelay().environment(\.parent, environmentRef)) },
+                    view: AnyView(presentation().routeRelay().environment(\.parent, environmentRef)),
                     dispose: { isPresented = false },
                     envProxy: environmentRef
                 )] : []

@@ -37,7 +37,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
             .contentShape(Rectangle())
             .focused($isFocused)
             .onHoverPolyfill{ isHovering = $0 }
-            .task(id: shouldPresent) {
+            .task(id: shouldPresent, priority: .background) {
                 if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC) {
                     isPresented.wrappedValue = shouldPresent
                 }

@@ -36,7 +36,7 @@ struct BasicPresentationContext: ViewModifier {
                     }
                     
                     ForEach(values, id: \.id){ value in
-                        value.view()
+                        value.view
                             .environment(\._isBeingPresented, true)
                             .environment(\.dismissPresentation, .init(id: value.id, closure: dismiss))
                             .zIndex(2 + Double(values.firstIndex(of: value)!))

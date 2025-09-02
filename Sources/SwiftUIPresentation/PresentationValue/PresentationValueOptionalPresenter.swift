@@ -31,7 +31,7 @@ struct PresentationValueOptionalPresenter<Value: Hashable, Metadata: Equatable, 
                             metadata: metadata,
                             anchor: anchor,
                             includeAnchorInEquatance: presentationRespondsToBoundsChange,
-                            view: { AnyView(presentation(value).routeRelay().environment(\.parent, environmentRef)) },
+                            view: AnyView(presentation(value).routeRelay().environment(\.parent, environmentRef)),
                             dispose: { self.value = nil },
                             envProxy: environmentRef
                         )]
