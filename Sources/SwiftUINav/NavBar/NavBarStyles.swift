@@ -15,8 +15,13 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
             .buttonStyle(InnerStyle(overscroll: overscroll))
             .onOverscroll{ prog in
                 if prog >= 1 {
-                    overscroll = 0
-                    configuration.trigger()
+                    Task {
+                        overscroll = 1
+                        try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 30)
+                        overscroll = 0
+                        try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 8)
+                        configuration.trigger()
+                    }
                 } else {
                     overscroll = prog
                 }
@@ -68,7 +73,10 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
             let pressing = configuration.isPressed
             let hasSelection = isHighlighted
             configuration.label
-                .symbolEffectBounce(value: isHighlighted, grouping: .byLayer)
+                .symbolEffectBounce(
+                    value: isHighlighted || overscroll >= 1,
+                    grouping: .byLayer
+                )
                 .font(fontStyle.weight(.semibold))
                 .blendMode(hasSelection ? .destinationOut : .normal)
                 .foregroundStyle(.tint)
@@ -77,35 +85,47 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
                 .frame(minWidth: size)
                 .background(
                     ZStack {
+                        if overscroll >= 1 {
+                            shape.fill(.tint)
+                                .opacity(0.5)
+                                .transition(.asymmetric(
+                                    insertion: .identity.animation(nil),
+                                    removal: (.scale(3) + .opacity).animation(.smooth)
+                                ))
+                                .zIndex(1)
+                        }
+                        
                         OuterShadowMaterial(
                             shape,
-                            fill: Color.black.opacity(0.08),
-                            radius: 8,
-                            y: 2
+                            fill: Color.black.opacity(0.1),
+                            radius: 3,
+                            y: 1
                         )
-                        .zIndex(1)
+                        .zIndex(2)
                         
                         shape
                             .fill(.tint)
                             .mask {
                                 LinearGradient(
-                                    colors: [.black.opacity(0.9), .black.opacity(0.65)],
+                                    colors: [
+                                        .black.opacity(hasSelection ? 0.75 : 0.55),
+                                        .black.opacity(hasSelection ? 0.55 : 0.45)
+                                    ],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 )
-                                .opacity(hasSelection ? 1 : 0.1 + overscroll)
+                                .opacity(hasSelection ? 1 : 0.3 + overscroll)
                             }
-                            .zIndex(2)
-                        
-                        EdgeHighlightMaterial(shape)
                             .zIndex(3)
+                        
+                        EdgeHighlightSmallMaterial(shape)
+                            .zIndex(4)
                     }
                     .scaleEffect(pressing ? 1.2 : 1 + (overscroll * 0.2))
                     .animation(.smooth, value: pressing)
                     .animation(.bouncy, value: overscroll)
                 )
                 .compositingGroup()
-                //.font(.body.bold())
                 .lineLimit(1)
                 .contentShape(shape)
                 .geometryGroupPolyfill()
