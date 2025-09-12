@@ -4,14 +4,14 @@ import SwiftUIKitCore
 
 public extension View {
     
-    func customContextMenuContext() -> some View {
+    nonisolated func customContextMenuContext() -> some View {
         focusPresentationContext()
     }
     
     
     /// - Parameter items: A View Builder of the context menu items to present.
     /// - Returns: A `ContextMenuPresenter` view.
-    func customContextMenu<Menu: View>(@ViewBuilder items: @escaping () -> Menu) -> some View {
+    nonisolated func customContextMenu<Menu: View>(@ViewBuilder items: @escaping () -> Menu) -> some View {
         ContextMenuPresenter(
             presentedBinding: nil,
             source: self,
@@ -25,7 +25,7 @@ public extension View {
     ///   - isPresented: Programatically show or hide the context menu.
     ///   - items: A View Builder of the context menu items to present.
     /// - Returns: A `ContextMenuPresenter` view.
-    func customContextMenu<Menu: View>(isPresented: Binding<Bool>, @ViewBuilder items: @escaping () -> Menu) -> some View {
+    nonisolated func customContextMenu<Menu: View>(isPresented: Binding<Bool>, @ViewBuilder items: @escaping () -> Menu) -> some View {
         ContextMenuPresenter(
             presentedBinding: isPresented,
             source: self,
@@ -39,7 +39,7 @@ public extension View {
     ///   - items: A View Builder of the context menu items to present.
     ///   - preview: A View Builder of the view that replaces the source view when presented.
     /// - Returns: A `ContextMenuPresenter` view.
-    func customContextMenu<Menu: View, Preview: View>(
+    nonisolated func customContextMenu<Menu: View, Preview: View>(
         @ViewBuilder items: @escaping () -> Menu,
         @ViewBuilder preview: @escaping () -> Preview
     ) -> some View {
@@ -57,7 +57,7 @@ public extension View {
     ///   - items: A View Builder of the context menu view to present.
     ///   - preview: A View Builder of the view that replaces the source view when presented.
     /// - Returns: A `ContextMenuPresenter` view.
-    func customContextMenu<Menu: View, Preview: View>(
+    nonisolated func customContextMenu<Menu: View, Preview: View>(
         isPresented: Binding<Bool>,
         @ViewBuilder items: @escaping () -> Menu,
         @ViewBuilder preview: @escaping () -> Preview

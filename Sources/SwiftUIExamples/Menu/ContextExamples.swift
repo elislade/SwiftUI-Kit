@@ -13,7 +13,7 @@ public struct ContextMenuExamples: View  {
         VStack(spacing: 0) {
             ScrollView {
                 LazyVGrid(columns: [.init(.adaptive(minimum: 100, maximum: 180))]){
-                    ForEach(0...15){ i in
+                    ForEach(0..<15){ i in
                         Rectangle()
                             .fill(.tint)
                             .opacity(0.1 + Double(i) / 15)
@@ -44,6 +44,11 @@ public struct ContextMenuExamples: View  {
                                         Image(systemName: "b.circle")
                                     }
                                 }
+                            } preview: {
+                               RoundedRectangle(cornerRadius: 20)
+                                    .fill(.tint)
+                                    .shadow(radius: 20, y: 10)
+                                    .transition(.scale(0.8) + .opacity)
                             }
                     }
                 }
