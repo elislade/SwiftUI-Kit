@@ -1,12 +1,15 @@
 import SwiftUI
 
-// Window interaction hover is when an ongoing interaction has started and that interaction hovers overtop of an element. Similar to legacy UIKit touches entered, touches exited but predicated on an interaction already being started.
 
 public extension View {
     
-    nonisolated func windowInteractionHoverContext(hapticsEnabled: Bool = true) -> some View {
+    nonisolated func windowInteractionHoverContext(
+        hitTestOnStart: Bool = false,
+        hapticsEnabled: Bool = true
+    ) -> some View {
         modifier(WindowInteractionHoverContext(
-            hapticsEnabled: hapticsEnabled
+            hapticsEnabled: hapticsEnabled,
+            hitTestOnStart: hitTestOnStart
         ))
     }
     
