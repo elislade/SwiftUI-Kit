@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A way to customize VisualEffectView.
-@MainActor public struct VisualEffectView {
+public struct VisualEffectView {
 
     public enum Filter: UInt8, CaseIterable, Identifiable, Sendable, LosslessStringConvertible {
         public var id: RawValue { rawValue }

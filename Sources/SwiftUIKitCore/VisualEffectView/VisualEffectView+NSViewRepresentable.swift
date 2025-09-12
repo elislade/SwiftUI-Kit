@@ -4,7 +4,7 @@ import SwiftUI
 
 extension VisualEffectView : NSViewRepresentable {
     
-    func sync(_ v: CustomVisualEffectView) {
+    @MainActor func sync(_ v: CustomVisualEffectView) {
         if blurRadius != v.blurRadius {
             v.blurRadius = blurRadius
         }
