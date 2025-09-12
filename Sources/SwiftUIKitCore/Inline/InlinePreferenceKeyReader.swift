@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct InlinePreferenceKeyReader<Key: PreferenceKey, Content: View> where Key.Value : Equatable & Sendable {
+public struct InlinePreferenceKeyReader<Key: PreferenceKey, Content: View> where Key.Value : Equatable {
     
     @State private var value: Key.Value
     let content: (Key.Value) -> Content
@@ -21,9 +21,8 @@ extension InlinePreferenceKeyReader: View {
     
     public var body: some View {
         content(value)
-            .onPreferenceChange(Key.self){ value in
-                _value.wrappedValue = value
-            }
+            .onPreferenceChange(Key.self){ value = $0 }
+            .resetPreference(Key.self)
     }
     
 }

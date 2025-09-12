@@ -115,6 +115,7 @@ struct FocusPresentationContext: ViewModifier {
                     }
                 }
             }
+            .resetPreference(PresentationKey<FocusPresentationMetadata>.self)
     }
     
 }

@@ -70,9 +70,8 @@ struct SubmenuPresentationContext: ViewModifier {
         }
         .animation(.bouncy, value: stack)
         .animation(.bouncy, value: visuallyPresented)
-        .onPreferenceChange(SubmenuPresentationKey.self) {
-            stack = $0
-        }
+        .onPreferenceChange(SubmenuPresentationKey.self) { stack = $0 }
+        .resetPreference(SubmenuPresentationKey.self)
     }
     
 }

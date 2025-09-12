@@ -70,6 +70,7 @@ struct AnchorPresentationContext: ViewModifier {
             .onPreferenceChange(PresentationKey<Metadata>.self) {
                 presentedValue = $0.last
             }
+            .resetPreference(PresentationKey<Metadata>.self)
             .overlay {
                 GeometryReader{ proxy in
                     let proxyWidth = proxy.size.width
