@@ -47,7 +47,15 @@ public struct ContextMenuExamples: View  {
                             } preview: {
                                RoundedRectangle(cornerRadius: 20)
                                     .fill(.tint)
+                                    .opacity(0.1 + Double(i) / 15)
+                                    .background(
+                                        .background,
+                                        in: RoundedRectangle(cornerRadius: 20)
+                                    )
                                     .shadow(radius: 20, y: 10)
+                                    .overlay{
+                                        EdgeHighlightSmallMaterial(RoundedRectangle(cornerRadius: 20))
+                                    }
                                     .transition(.scale(0.8) + .opacity)
                             }
                     }

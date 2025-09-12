@@ -59,8 +59,7 @@ extension ContextMenuPresenter: View {
     #else
     
     var body: some View {
-        content
-            .focusPresentation(
+        source.focusPresentation(
             isPresented: binding,
             focus: {
                 Group {
