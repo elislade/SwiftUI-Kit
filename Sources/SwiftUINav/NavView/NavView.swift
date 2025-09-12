@@ -11,20 +11,18 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
     private let useNavBar: Bool
     private let root: Root
     
+    @State private var hasPresented: Set<UUID> = []
     @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
     @State private var willDismiss: [PresentationWillDismissAction] = []
     
     @State private var scrollGestureTotal: Double = 0
     @State private var updatingStack = false
     
-//    @GestureState(reset: { _, transaction in
-//        transaction.animation = .none//.fastSpring
-//    }) private var transitionFraction: CGFloat = 0
-    
+    @GestureState(resetTransaction: .init(animation: .smooth.speed(1.8))) private var gestureIsActive = false
     @FocusedValue(\.resign) private var resignFocus
     
     @State private var transitionFraction: Double = 0
-    @State private var isUpdatingTransition: Bool = false
+    //@State private var isUpdatingTransition: Bool = false
     
     /// - Parameters:
     ///   - transition: The ``Transition`` to use for push/pop transitions.
@@ -43,8 +41,10 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
     private func edgeDrag(size: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged{ gesture in
-                withAnimation(.none){
-                    isUpdatingTransition = true
+                var transaction = Transaction()
+                transaction.isContinuous = true
+                transaction.animation = nil
+                withTransaction(transaction){
                     transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
                 }
                 //transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
@@ -52,10 +52,10 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             .onEnded({ g in
                 commitTransition(at: g.predictedEndTranslation.width * layoutDirection.scaleFactor)
             })
-//            .updating($transitionFraction){ gesture, state, transaction in
-//                transaction.animation = .none
-//                state = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
-//            }
+            .updating($gestureIsActive){ _, state, transaction in
+                transaction.animation = nil
+                state = true
+            }
     }
     #endif
     
@@ -86,7 +86,7 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
         
         if elements.isEmpty {
             return 0
-        } else if isUpdatingTransition {
+        } else if gestureIsActive {
             return 1 - transitionFraction
         } else {
             return 1
@@ -98,7 +98,7 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
         
         if index == elements.indices.last {
             return 0
-        } else if isUpdatingTransition && elements.indices.last?.advanced(by: -1) == index {
+        } else if gestureIsActive && elements.indices.last?.advanced(by: -1) == index {
             return 1 - transitionFraction
         } else {
             return 1
@@ -142,8 +142,8 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                     .modifier(Transition(pushAmount: rootPushAmount))
                     .zIndex(1)
                     .environment(\.presentationDepth, elements.count)
-                    .isBeingPresentedOn(!elements.isEmpty)
-                    .disableNavBarItems(!elements.isEmpty)
+                    .isBeingPresentedOn(!elements.isEmpty && hasPresented.contains(elements.first!.id))
+                    .disableNavBarItems(!elements.isEmpty && hasPresented.contains(elements.first!.id))
                     .disableOnPresentationWillDismiss(!elements.isEmpty)
                     //.maskMatching(using: namespace, enabled: !elements.isEmpty)
                     .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.height)
@@ -176,9 +176,9 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                             x: isLast ? (transitionFraction) * size.width : 0
                         )
                         .zIndex(Double(index) + 2.0)
-                        .environment(\._isBeingPresented, isLast && isUpdatingTransition ? false : true)
+                        .environment(\._isBeingPresented, isLast && gestureIsActive ? false : true)
                         .environment(\.presentationDepth, (elements.count - 1) - index)
-                        .isBeingPresentedOn(!isLast)
+                        .isBeingPresentedOn(!isLast && hasPresented.contains(elements.last!.id))
                         .disableNavBarItems(shouldDisable)
                         .disableOnPresentationWillDismiss(!isLast)
                         .transition(.offset([size.width + 50, 0]))
@@ -187,6 +187,8 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                         .onDisappear{
                             transitionFraction = 0
                         }
+                        .onDisappear{ hasPresented.remove(ele.id) }
+                        .onAppear{ hasPresented.insert(ele.id) }
                 }
                 
                 Color.clear
@@ -200,14 +202,12 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                     .defersSystemGesturesPolyfill(on: .leading)
                     .ignoresSafeArea()
             }
+            .animation(.smooth.speed(1.8), value: elements)
             .resetActionContainer(active: !elements.isEmpty){ @MainActor in
                 while !elements.isEmpty {
                     popElement()
                     try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
                 }
-            }
-            .mask {
-                Rectangle().ignoresSafeArea()
             }
             .navBar(elements.isEmpty ? .none : .leading){
                 Button{ popElement() } label: {
@@ -220,7 +220,6 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                 .labelStyle(.iconOnly)
                 .transition(.move(edge: .leading) + .opacity)
             }
-            .animation(.smooth.speed(1.5), value: elements)
 //            .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
 //                scrollGestureTotal += g.delta.x
 //                isUpdatingTransition = true
@@ -234,12 +233,19 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
             .resetPreference(PresentationKey<NavViewElementMetadata>.self)
         }
         .geometryGroupPolyfill()
+        .clipped()
         .captureContainerSafeArea()
         .onPreferenceChange(PresentationWillDismissPreferenceKey.self){
             willDismiss = $0
         }
-        .onAnimationComplete(when: transitionFraction == 0){
-            isUpdatingTransition = false
+        .resetPreference(PresentationWillDismissPreferenceKey.self)
+//        .onAnimationComplete(when: transitionFraction == 0){
+//            isUpdatingTransition = false
+//        }
+        .onChangePolyfill(of: gestureIsActive){ old, new in
+            if old && !new {
+                transitionFraction = 0
+            }
         }
     }
     
