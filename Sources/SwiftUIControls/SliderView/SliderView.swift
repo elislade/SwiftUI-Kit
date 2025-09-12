@@ -9,15 +9,14 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     
     @State private var handleSize: CGSize = .zero
     @State private var hovering = false
-    
     @State private var startDrag: CGPoint?
     
     @Binding private var x: Clamped<Value>
     @Binding private var y: Clamped<Value>
     
-    let activeAxis: Axis.Set
-    let hitTestHandle: Bool
-    let handle: () -> Handle
+    private let activeAxis: Axis.Set
+    private let hitTestHandle: Bool
+    private let handle: () -> Handle
     
     
     /// Creates a slider with both x and y dimension
@@ -77,20 +76,19 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     ///
     /// - Returns: A `CGSize` representing handle offset.
     private func handleOffset(in size: CGSize) -> CGSize {
-        var _x: CGFloat = 0
-        var _y: CGFloat = 0
+        var result = CGSize.zero
         
         if activeAxis.contains(.horizontal) {
-            _x = CGFloat(x.percentComplete) * size.width
-            _x -= CGFloat(x.percentComplete) * handleSize.width
+            result.width = CGFloat(x.percentComplete) * size.width
+            result.width -= CGFloat(x.percentComplete) * handleSize.width
         }
         
         if activeAxis.contains(.vertical) {
-            _y = CGFloat(y.percentComplete) * size.height
-            _y -= CGFloat(y.percentComplete) * handleSize.height
+            result.height = CGFloat(y.percentComplete) * size.height
+            result.height -= CGFloat(y.percentComplete) * handleSize.height
         }
         
-        return CGSize(width: _x, height: _y)
+        return result
     }
     
     #if !os(tvOS)
@@ -104,14 +102,23 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
         }
         
         if activeAxis.contains(.vertical) {
-            let percentY = translation.y / (size.height)
+            let percentY = translation.y / size.height
             y.percentComplete = Value(percentY)
         }
     }
     
     private func gesture(in size: CGSize) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .named(space)).onChanged({ g in
-            dragValue(g.location, in: size)
+        DragGesture(
+            minimumDistance: 0,
+            coordinateSpace: .named(space)
+        ).onChanged({ g in
+            var transaction = Transaction()
+            transaction.animation = nil
+            transaction.isContinuous = true
+            
+            withTransaction(transaction){
+                dragValue(g.location, in: size)
+            }
         })
     }
     #endif
@@ -122,7 +129,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
                 ZStack(alignment: .topLeading) {
                     handle()
                         .hoverEffectPolyfill()
-                        .onGeometryChangePolyfill(of: { $0.size }){ handleSize = $0 }
+                        .onGeometryChangePolyfill(of: \.size){ handleSize = $0 }
                         .offset(handleOffset(in: proxy.size))
                         #if !os(tvOS)
                         .gesture(hitTestHandle ? gesture(in: proxy.size) : nil)
