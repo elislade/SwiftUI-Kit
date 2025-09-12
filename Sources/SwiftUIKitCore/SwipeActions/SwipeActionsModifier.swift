@@ -10,8 +10,6 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     @State private var scroll: Double = 0
     @State private var gestureStart: Double?
     @State private var horizontalInteractionOffset: Double?
-    @State private var contentY: CGFloat = 0
-    @State private var contentYActivated: CGFloat = 0
     @State private var leadingSize: CGFloat = 0
     @State private var trailingSize: CGFloat = 0
     
@@ -65,10 +63,10 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         }
     }
     
-    private var layoutFactor: Double { direction == .leftToRight ? 1 : -1 }
+    private var layoutFactor: Double { direction.scaleFactor }
     
     private func close() {
-        guard activeEdge != nil && contentY != .zero else {
+        guard activeEdge != nil else {
              return
         }
 
@@ -110,6 +108,8 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     }
     
     private func endInteraction(projectedOffset: Double){
+        guard activeEdge != nil else { return }
+        
         let projectedOffset = projectedOffset * layoutFactor
         
         withAnimation(.fastSpringInterpolating){
@@ -134,16 +134,24 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
     private var contentGesture: some Gesture {
         DragGesture(minimumDistance: 25, coordinateSpace: .global)
             .onChanged { g in
-                if let gestureStart {
-                    let offset = g.location.x - gestureStart
-                    updateInteraction(offset: offset, layoutFactor: layoutFactor)
-                } else {
-                    gestureStart = g.location.x - (horizontalOffset * layoutFactor)
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                transaction.isContinuous = true
+                
+                withTransaction(transaction){
+                    if let gestureStart {
+                        let offset = g.location.x - gestureStart
+                        updateInteraction(offset: offset, layoutFactor: layoutFactor)
+                    } else {
+                        gestureStart = g.location.x - (horizontalOffset * layoutFactor)
+                    }
                 }
             }
             .onEnded { g in
-                gestureStart = nil
-                endInteraction(projectedOffset: g.predictedEndTranslation.width)
+                withTransaction(.init()){
+                    gestureStart = nil
+                    endInteraction(projectedOffset: g.predictedEndTranslation.width)
+                }
             }
     }
     #endif
@@ -156,12 +164,14 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
             .simultaneousGesture(TapGesture().onEnded(close))
             .highPriorityGesture(contentGesture)
             #endif
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ contentY = $0 }
+            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ _ in
+                close()
+            }
             .overlay {
                 HStack(spacing: 0) {
                     if let activeEdge, activeEdge == .leading {
                         HStack(spacing: 1, content: { leading })
-                            .onGeometryChangePolyfill(of: { $0.size.width }){
+                            .onGeometryChangePolyfill(of: \.size.width){
                                 leadingSize = $0
                             }
                             .clipShape(
@@ -175,7 +185,7 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                     
                     if let activeEdge, activeEdge == .trailing {
                         HStack(spacing: 1, content: { trailing })
-                            .onGeometryChangePolyfill(of: { $0.size.width.rounded() }){
+                            .onGeometryChangePolyfill(of: \.size.width){
                                 trailingSize = $0
                             }
                             .clipShape(
@@ -207,13 +217,9 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
                     close()
                 }
             }
-            .onChangePolyfill(of: abs(contentY - contentYActivated) > 10){
-                close()
-            }
             .onChangePolyfill(of: activeEdge){
                 if activeEdge != nil {
-                    contentYActivated = contentY
-                    Task { @MainActor in
+                    Task {
                         try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
                         sharedState.latestSwipeActionID = id
                     }
@@ -272,10 +278,11 @@ extension SwipeActionsModifier where Trailing == EmptyView {
 }
 
 
-final class SwipeActionsState: ObservableObject {
-    @MainActor static let shared = SwipeActionsState()
+@MainActor final class SwipeActionsState: ObservableObject {
+    static let shared = SwipeActionsState()
     
     private init(){}
+    
     @Published var latestSwipeActionID: UUID?
     
 }
