@@ -36,7 +36,7 @@ public struct Menu<Label: View, Content: View>: View {
             Button{ isOpen = true } label: {
                 label()
                     .opacity(isOpen ? 0.3 : 1)
-                    .contentShape(Rectangle())
+                    .contentShape(RoundedRectangle(cornerRadius: 4).inset(by: -3))
                     .simultaneousLongPress { isOpen = true }
             }
             .buttonStyle(.plain)
@@ -45,7 +45,6 @@ public struct Menu<Label: View, Content: View>: View {
                 MenuContainer {
                     content()
                 }
-                //.presentationMatch(id)
                 .padding(.init(state.edge))
                 .windowInteractionEffects([.scale(anchor: state.anchor)])
                 .presentationBackdrop(.touchEndedDismiss){ Color.clear }

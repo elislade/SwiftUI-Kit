@@ -13,6 +13,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
     @Environment(\.actionTriggerBehaviour) private var triggerBehaviour
     @Environment(\.dismissPresentation) private var dismiss
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.colorScheme) private var colorScheme
     
     private let dismissWhenTriggered: Bool
     
@@ -29,11 +30,10 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .blendMode(isActive ? .destinationOut : .normal)
             .symbolEffectBounce(value: bounce, grouping: .byLayer)
             .frame(maxWidth: .infinity, alignment: .leading)
             .lineLimit(2)
-            .contentShape(Rectangle())
+            .contentShape(ContainerRelativeShape())
             .accessibilityAction {
                 configuration.trigger()
                 
@@ -46,38 +46,23 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     activatedAt = nil
                 }
             }
-            .foregroundStyle(isActive ? AnyShapeStyle(.white) : AnyShapeStyle(configuration.role == .destructive ? .red : Color.primary))
             .symbolVariant(isActive ? .fill : .none)
             .background{
                 ZStack {
                     if isActive {
-                        ZStack {
-                            ContainerRelativeShape()
-                                .fill(configuration.role == .destructive ? AnyShapeStyle(.red) : AnyShapeStyle(.tint))
-                                .allowsHitTesting(false)
-                            
-                            ContainerRelativeShape()
-                                .fill(.linearGradient(
-                                    colors: [.black.opacity(0.3), .white.opacity(0.1)],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                ))
-                                .blendMode(.overlay)
-                                .opacity(0.6)
-                            
+                        ContainerRelativeShape()
+                            .fill(.primary)
+                            .opacity(0.6)
+                            .blendMode(.overlay)
+                            .matchedGeometryEffect(id: "button_bg", in: namespace)
+
                             if let dwellDuration  {
                                 DwellHighlight(duration: dwellDuration)
                             }
-                            
-                            EdgeHighlightMaterial(ContainerRelativeShape())
-                        }
-                        .drawingGroup()
-                        .shadow(color: .black.opacity(0.2), radius: 4, y: 3)
-                        .transition(.identity)
                     }
                 }
             }
-            .compositingGroup()
+            .animation(.fastSpringInterpolating, value: isActive)
             .geometryGroupPolyfill()
             .opacity(isEnabled ? 1 : 0.5)
             .task(id: activatedAt){
@@ -181,13 +166,3 @@ struct DwellHighlight: View {
     }
     
 }
-
-//
-//#Preview {
-//    MenuContainer{
-//        Button{ } label: {
-//            Label("House", systemImage: "rectangle.portrait.and.arrow.right.fill")
-//        }
-//    }
-//    .tint(.teal)
-//}

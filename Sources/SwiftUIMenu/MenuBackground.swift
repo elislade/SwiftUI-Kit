@@ -28,7 +28,7 @@ struct MenuBackground: View {
     @Environment(\.menuVisualDepth) var visualDepth
     
     var body: some View {
-        Group {
+        ZStack {
             if let backgroundStyle {
                 backgroundStyle.makeBody(ContainerRelativeShape())
             } else {
@@ -39,9 +39,13 @@ struct MenuBackground: View {
                         radius: 20 * visualDepth,
                         y: 20 * visualDepth
                     )
+                    .zIndex(1)
+                
+                InteractionGlowMaterial(ContainerRelativeShape())
+                    .zIndex(2)
                 
                 EdgeHighlightMaterial(ContainerRelativeShape())
-                    .blendMode(.overlay)
+                    .zIndex(3)
             }
         }
         .opacity(visualDepth)

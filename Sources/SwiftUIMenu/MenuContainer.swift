@@ -5,6 +5,8 @@ import SwiftUIPresentation
 
 public struct MenuContainer<Content: View>: View {
     
+    @Namespace private var ns
+    
     @Environment(\.menuRoundness) private var roundness
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
@@ -40,6 +42,7 @@ public struct MenuContainer<Content: View>: View {
             .toggleStyle(MenuToggleStyle())
             .buttonStyle(MenuButtonStyle())
             .labelStyle(MenuLabelStyle())
+            .presentationNamespace(ns)
             .actionTriggerBehaviour(.onDisappear)
             .opacity(1 - (Double(presentationDepth) * 0.2))
             .padding(baseRadius * 0.25)
