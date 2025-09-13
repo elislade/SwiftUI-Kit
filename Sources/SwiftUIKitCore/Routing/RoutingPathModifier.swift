@@ -4,6 +4,7 @@ import SwiftUI
 struct RoutingPathModifier {
     
     @State private var id = UUID()
+    @State private var wasActivated = false
     @State private var children: [RoutePreference] = []
     
     let path: String
@@ -12,14 +13,18 @@ struct RoutingPathModifier {
     
     @discardableResult private func handle(_ comps: [LinkComponent]) async -> Bool {
         guard !comps.isEmpty, !children.isEmpty else { return false }
-
+        var foundMatch: Bool = false
+        
         for child in children {
-            if await child.handle(Array(comps.dropFirst())) {
-                return true
+            // if a match was found exhause others that didn't match just in case they activated on a previous link pass
+            if foundMatch {
+                await _ = child.handle([])
+            } else if await child.handle(Array(comps.dropFirst())) {
+                foundMatch = true
             }
         }
         
-        return false
+        return foundMatch
     }
     
     private func exhaustOtherChildren() async {
@@ -42,8 +47,11 @@ struct RoutingPathModifier {
                         handle: { comps in
                             if let first = comps.first?.path, (first == path || first == "*") {
                                 if comps.count == 1 {
-                                    await exhaustOtherChildren()
+                                    if wasActivated {
+                                        await exhaustOtherChildren()
+                                    }
                                     await action()
+                                    wasActivated = true
                                     return true
                                 }
                                 
@@ -53,14 +61,22 @@ struct RoutingPathModifier {
                                 if !wasHandled {
                                     await action()
                                     try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
-                                    return await handle(comps)
+                                    let handled = await handle(comps)
+                                    wasActivated = handled
+                                    return handled
+                                } else {
+                                    wasActivated = true
                                 }
                                 
                                 return wasHandled
                             }
-
-                            await exhaustOtherChildren()
-                            other?()
+                            
+                            if wasActivated {
+                                await exhaustOtherChildren()
+                                other?()
+                                wasActivated = false
+                            }
+                            
                             return false
                         }
                     )

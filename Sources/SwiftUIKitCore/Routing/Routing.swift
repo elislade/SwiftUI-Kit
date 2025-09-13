@@ -1,7 +1,7 @@
 import SwiftUI
 
-// Routing is an asyncronous route handling system built upon SwiftUI/URL routing.
-// It can be used to elegantly route to views even if they are not in a known hirachy.
+// Routing is an asynchronous route handling system built upon SwiftUI/URL routing.
+// It can be used to elegantly route to views even if they are not in a known hierarchy.
 
 public extension View {
     

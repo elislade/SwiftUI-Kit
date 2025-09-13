@@ -3,7 +3,7 @@ import SwiftUIKit
 
 public struct RoutingExample: View {
     
-    @State private var showBranch = false
+    @State private var showBranch: String?
     @State private var deferred = false
     
     public init() {}
@@ -11,18 +11,36 @@ public struct RoutingExample: View {
     public var body: some View {
         ExampleView(title: "Routing"){
             VStack {
-                VStack {
-                    if showBranch {
-                        Branch()
-                            .padding()
-                    } else {
-                        Text("Root")
+                Text("Root")
+                
+                HStack(alignment: .top) {
+                    VStack {
+                        Text("A")
+                            .opacity(showBranch == "a" ? 1 : 0.5)
+                        
+                        if showBranch == "a" {
+                            NumberRoute()
+                        }
                     }
-                }
-                .onRoute("branch"){
-                    showBranch = true
-                } other: {
-                    showBranch = false
+                    .onRoute("a"){
+                        showBranch = "a"
+                    } other: {
+                        print("Other A")
+                    }
+                    
+                    VStack {
+                        Text("B")
+                            .opacity(showBranch == "b" ? 1 : 0.5)
+                        
+                        if showBranch == "b" {
+                            NumberRoute()
+                        }
+                    }
+                    .onRoute("b"){
+                        showBranch = "b"
+                    } other: {
+                        print("Other B")
+                    }
                 }
                 
                 if !deferred {
@@ -37,27 +55,73 @@ public struct RoutingExample: View {
                 
                 Spacer()
                 
-                Group {
-                    Link("Branch 1", destination: .example("branch/1"))
-                    Link("Branch 2", destination: .example("branch/2"))
-                    Link("Root", destination: .example(""))
+                VStack(spacing: 10) {
+                    Link("Root", destination: .example("/"))
+                    HStack(spacing: 16) {
+                        VStack(spacing: 10) {
+                            Link("A", destination: .example("/a"))
+                            HStack(spacing: 16) {
+                                Link("1", destination: .example("/a/1"))
+                                Link("2", destination: .example("/a/2"))
+                            }
+                        }
+                        
+                        VStack(spacing: 10) {
+                            Link("B", destination: .example("/b"))
+                            HStack(spacing: 16) {
+                                Link("1", destination: .example("/b/1"))
+                                Link("2", destination: .example("/b/2"))
+                            }
+                        }
+                    }
                 }
                 .disabled(deferred)
-                
-                Link("Deferred", destination: .example("deferred"))
-                    .disabled(!deferred)
             }
             .buttonStyle(.tinted)
             .exampleParameterCell()
             
             Toggle(isOn: $deferred){
-                Text("Defer Unhandled")
-                    .font(.exampleParameterTitle)
+                HStack {
+                    Text("Defer Unhandled")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Link("Trigger", destination: .example("deferred"))
+                        .disabled(!deferred)
+                }
             }
             .exampleParameterCell()
             .toggleStyle(.swiftUIKitSwitch)
         }
         .router(shouldDeferUnhandled: deferred)
+    }
+    
+    
+    struct NumberRoute: View {
+        
+        @State private var number: String?
+        
+        var body: some View {
+            HStack {
+                Text("1")
+                    .opacity(number == "1" ? 1 : 0.5)
+                    .onRoute("1"){
+                        number = "1"
+                    } other: {
+                        print("Other 1")
+                    }
+                
+                Text("2")
+                    .opacity(number == "2" ? 1 : 0.5)
+                    .onRoute("2"){
+                        number = "2"
+                    } other: {
+                        print("Other 2")
+                    }
+            }
+        }
+        
     }
     
     
@@ -85,6 +149,8 @@ public struct RoutingExample: View {
                         .padding()
                         .onRoute("1"){
                             branch = "1"
+                        } other: {
+                            print("Other 1")
                         }
                     
                     Text("2")
@@ -92,6 +158,8 @@ public struct RoutingExample: View {
                         .padding()
                         .onRoute("2"){
                             branch = "2"
+                        } other: {
+                            print("Other 2")
                         }
                 }
                 

@@ -15,14 +15,17 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
     
     @discardableResult private func handle(_ comps: [LinkComponent]) async -> Bool {
         guard !comps.isEmpty, !children.isEmpty else { return false }
-
+        var foundMatch = false
+        
         for child in children {
-            if await child.handle(Array(comps.dropFirst())) {
-                return true
+            if foundMatch {
+                await _ = child.handle([])
+            } else if await child.handle(Array(comps.dropFirst())) {
+                foundMatch = true
             }
         }
         
-        return false
+        return foundMatch
     }
     
     private func exhaustOtherChildren() async {
