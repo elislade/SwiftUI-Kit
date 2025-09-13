@@ -28,7 +28,9 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
         
         for child in children {
             if foundMatch {
-                await _ = child.handle([])
+                if child.isActive {
+                    await _ = child.handle([])
+                }
             } else if await child.handle(Array(comps.dropFirst())) {
                 foundMatch = true
             }
@@ -37,8 +39,9 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
         return foundMatch
     }
     
-    private func exhaustOtherChildren() async {
+    private func deactivateActiveChildren() async {
         for child in children {
+            if !child.isActive { continue }
             _ = await child.handle([])
             try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 20)
         }
@@ -59,7 +62,7 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
                             if let path = comps.first?.path, let match = path.firstMatch(of: regex) {
                                 if let previousMatch, previousMatch != match.output {
                                     self.previousMatch = nil
-                                    await exhaustOtherChildren()
+                                    await deactivateActiveChildren()
                                     other?()
                                     //try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 20)
                                     //await action(match.output)
@@ -69,9 +72,8 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
                                 self.previousMatch = match.output
                                 
                                 if comps.count == 1 {
-                                    await exhaustOtherChildren()
+                                    await deactivateActiveChildren()
                                     await action(match.output)
-                                    print("PATH MATCH", path)
                                     return true
                                 }
                                 
@@ -87,12 +89,14 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
                                 return wasHandled
                             }
                             
-                            self.previousMatch = nil
-                            
-                            // this was not a match so cancel all other routes belonging to this one.
-                            await exhaustOtherChildren()
-  
-                            other?()
+                            if previousMatch != nil || childIsActive {
+                                self.previousMatch = nil
+                                
+                                // this was not a match so cancel all other routes belonging to this one.
+                                await deactivateActiveChildren()
+                                
+                                other?()
+                            }
                             return false
                         }
                     )

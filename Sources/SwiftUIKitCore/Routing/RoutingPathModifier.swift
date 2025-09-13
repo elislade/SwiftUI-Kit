@@ -74,7 +74,7 @@ struct RoutingPathModifier {
     @MainActor private func handleComponents(_ comps: [LinkComponent]) async -> Bool {
         if let first = comps.first?.path, (first == path || first == "*") {
             if comps.count == 1 {
-                if isActive {
+                if isActive || childIsActive {
                     await deactivateActiveChildren()
                 }
                 await prepareToActivate?()
@@ -103,8 +103,8 @@ struct RoutingPathModifier {
             return wasHandled
         }
         
-        // If this path is active an no longer matches deactivate
-        if isActive {
+        // If this path is active and no longer matches, deactivate.
+        if isActive || childIsActive {
             await deactivateActiveChildren()
             other?()
             isActive = false
