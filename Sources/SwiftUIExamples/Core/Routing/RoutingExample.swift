@@ -3,8 +3,8 @@ import SwiftUIKit
 
 public struct RoutingExample: View {
     
-    @State private var showBranch: String?
     @State private var deferred = false
+    @State private var activePath: Set<String> = []
     
     public init() {}
     
@@ -16,38 +16,43 @@ public struct RoutingExample: View {
                 HStack(alignment: .top) {
                     VStack {
                         Text("A")
-                            .opacity(showBranch == "a" ? 1 : 0.5)
+                            .opacity(activePath.contains("a") ? 1 : 0.5)
                         
-                        if showBranch == "a" {
+                        if activePath.contains("a") {
                             NumberRoute()
                         }
                     }
-                    .onRoute("a"){
-                        showBranch = "a"
-                    } other: {
-                        print("Other A")
-                    }
+                    .routeBinding(
+                        "a",
+                        isActive: Binding($activePath, contains: "a")
+                    )
                     
                     VStack {
                         Text("B")
-                            .opacity(showBranch == "b" ? 1 : 0.5)
+                            .opacity(activePath.contains("b") ? 1 : 0.5)
                         
-                        if showBranch == "b" {
+                        if activePath.contains("b") {
                             NumberRoute()
                         }
                     }
-                    .onRoute("b"){
-                        showBranch = "b"
-                    } other: {
-                        print("Other B")
-                    }
+                    .routeBinding(
+                        "b",
+                        isActive: Binding($activePath, contains: "b")
+                    )
                 }
                 
-                if !deferred {
+                if deferred {
+                    VStack {
+                        Text("Waiting for deferred link...")
+                            .font(.title)
+                    }
+                } else {
                     DeferredContent()
                 }
             }
+            .routeDelay(0.01)
             .font(.largeTitle.weight(.bold))
+            .padding()
         } parameters: {
             HStack {
                 Text("Links")
@@ -82,7 +87,7 @@ public struct RoutingExample: View {
             
             Toggle(isOn: $deferred){
                 HStack {
-                    Text("Defer Unhandled")
+                    Text("Defer Links")
                         .font(.exampleParameterTitle)
                     
                     Spacer()

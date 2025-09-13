@@ -47,6 +47,28 @@ public extension View {
     
     
     /// Defines a route component to match relative to parent components or namespaces containing it. Any routes inside are treated as child routes to this one.
+    /// - NOTE: Use this over `onRoute` when you care about the view state staying in sync with the route state; otherwise the router may miss routes that it thinks are deactivated but were actived by user action not by previous route. This should be preferred over onRoute as route state should always be in sync with actual view state.
+    /// - NOTE: `prepare` will not be followed by an `isActive` set to true when it is unable to find a suitable leaf node to handle the link after calling the function. Use `prepare` to expose views that can be crawled for matches on next pass. If you prefer override control just set the binding to true even if you know an exact match may not be found. Prepare will not be called if a match is already found in the graph.
+    /// - Parameters:
+    ///   - component: The path component to match against.
+    ///   - isActive: A binding to whether this route is active or not.
+    ///   - prepare: An asynchronous closure that will run before possibly activating from a route. Defaults to nil.
+    /// - Returns: A modified routing view.
+    nonisolated func routeBinding(
+        _ component: String,
+        isActive: Binding<Bool>,
+        prepare: (() async -> Void)? = nil
+    ) -> some View {
+        modifier(RoutingPathModifier(
+            path: component,
+            isActive: isActive,
+            action: prepare,
+            other: {}
+        ))
+    }
+    
+    
+    /// Defines a route component to match relative to parent components or namespaces containing it. Any routes inside are treated as child routes to this one.
     /// - Parameters:
     ///   - component: The path component to match.
     ///   - action: The action to perform when a route with this path as its leaf is called.
@@ -89,6 +111,14 @@ public extension View {
     
     nonisolated func onRouteQuery(_ keys: String..., perform action: @escaping ([String]) async -> Void) -> some View {
         modifier(RoutingQueryModifier(keys: keys, action: action))
+    }
+    
+    
+    /// Delays any subroute walking for every component.
+    /// - Parameter delay: Delay in seconds.
+    /// - Returns: A modified view.
+    func routeDelay(_ delay: Double) -> some View {
+        environment(\.routeDelay, delay)
     }
     
     
@@ -136,3 +166,12 @@ public extension View {
     }
     
 }
+
+
+extension EnvironmentValues {
+    
+    // TODO: Change to `Duration` when dropping iOS 15 generation support.
+    @Entry var routeDelay: Double = 0.3
+    
+}
+

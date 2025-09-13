@@ -13,6 +13,7 @@ struct RoutingQueryModifier {
             Color.clear.preference(key: RoutePreferenceKey.self, value: [
                 .init(
                     id: id,
+                    isActive: false,
                     handle: { comps in
                         if let last = comps.last?.params, keys.allSatisfy({ last.keys.contains($0) }) {
                             await action(keys.compactMap{ last[$0] })

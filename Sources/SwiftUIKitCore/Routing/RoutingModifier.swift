@@ -113,12 +113,6 @@ enum UnhandledRouteBehaviour {
     case retryAfterDelay(count: Int = 3)
 }
 
-enum RouteType: Equatable, Sendable {
-    case root
-    case child
-    case container
-}
-
 enum LinkComponent: Equatable, Sendable {
     
     static func == (lhs: LinkComponent, rhs: LinkComponent) -> Bool {

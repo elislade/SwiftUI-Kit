@@ -5,6 +5,8 @@ import RegexBuilder
 @available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
 struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.RegexOutput: Equatable {
     
+    @Environment(\.routeDelay) private var delay
+    
     @State private var id = UUID()
     @State private var previousMatch: R.RegexOutput?
     @State private var children: [RoutePreference] = []
@@ -12,6 +14,13 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
     let regex: R
     let action: (R.RegexOutput) async -> Void
     var other: (() -> Void)? = nil
+    
+    private var childIsActive: Bool {
+        for child in children {
+            if child.isActive { return true }
+        }
+        return false
+    }
     
     @discardableResult private func handle(_ comps: [LinkComponent]) async -> Bool {
         guard !comps.isEmpty, !children.isEmpty else { return false }
@@ -45,6 +54,7 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
                 Color.clear.preference(key: RoutePreferenceKey.self, value: [
                     .init(
                         id: id,
+                        isActive: previousMatch != nil || childIsActive,
                         handle: { comps in
                             if let path = comps.first?.path, let match = path.firstMatch(of: regex) {
                                 if let previousMatch, previousMatch != match.output {
@@ -70,7 +80,7 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
                                 // Only proceed if another next match does not already exists.
                                 if !wasHandled {
                                     await action(match.output)
-                                    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 3)
+                                    try? await Task.sleep(nanoseconds: nanoseconds(seconds: delay))
                                     return await handle(comps)
                                 }
                                 
