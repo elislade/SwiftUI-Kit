@@ -36,7 +36,6 @@ import SwiftUIPresentation
                     Bar(items: items)
                         .padding(padding)
                         .frame(maxWidth: .infinity, minHeight: minHeight)
-                        .clipped()
                         .background {
                             if bgMaterial.isEmpty {
                                 NavBarDefaultMaterial().ignoresSafeArea()

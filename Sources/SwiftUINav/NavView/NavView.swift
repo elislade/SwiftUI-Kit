@@ -190,17 +190,6 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                         .onDisappear{ hasPresented.remove(ele.id) }
                         .onAppear{ hasPresented.insert(ele.id) }
                 }
-                
-                Color.clear
-                    .frame(width: 14 + proxy.safeAreaInsets.leading)
-                    .contentShape(Rectangle())
-                    .zIndex(Double(elements.count + 3))
-                    #if !os(tvOS)
-                    .highPriorityGesture(edgeDrag(size: size), including: .gesture)
-                    #endif
-                    .allowsHitTesting(!elements.isEmpty)
-                    .defersSystemGesturesPolyfill(on: .leading)
-                    .ignoresSafeArea()
             }
             .animation(.smooth.speed(1.8), value: elements)
             .resetActionContainer(active: !elements.isEmpty){ @MainActor in
@@ -208,6 +197,22 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
                     popElement()
                     try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
                 }
+            }
+            .overlay{
+                #if !os(tvOS)
+                GeometryReader { proxy in
+                    Rectangle()
+                        .frame(width: 14 + proxy.safeAreaInsets.leading)
+                        .opacity(0)
+                        .contentShape(Rectangle())
+                        .highPriorityGesture(edgeDrag(size: size), including: .gesture)
+                        .allowsHitTesting(!elements.isEmpty)
+                        .defersSystemGesturesPolyfill(on: .leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .ignoresSafeArea()
+                }
+                .releaseContainerSafeArea()
+                #endif
             }
             .navBar(elements.isEmpty ? .none : .leading){
                 Button{ popElement() } label: {
