@@ -89,10 +89,7 @@ public final class GlyphRun: @unchecked Sendable {
                 total += advances[offset].width
                 
                 if var path = CTFontCreatePathForGlyph(font, glyph, &transform){
-                    if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                        path = path.normalized(using: .winding)
-                    }
-                    
+                    path = path.normalized(using: .winding)
                     ctx.addPath(Path(path))
                 }
             }
@@ -121,7 +118,6 @@ extension GlyphRun : InsettableShape {
         self
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public nonisolated func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         let size = proposal.replacingUnspecifiedDimensions()
         let scale = scaleOfFitting(size, in: totalSize)

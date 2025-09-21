@@ -3,7 +3,6 @@ import SwiftUI
 /// A vertical container that you can use in conditional layouts.
 ///
 /// This layout container behaves like a ``VStackLayout``, but layout happens from bottom-to-top instead of top-to-bottom.
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public struct ReversedVStackLayout: Layout, Sendable {
     
     public static let layoutProperties: LayoutProperties = {

@@ -9,21 +9,17 @@ public struct ViewThatFitsLabelStyle: LabelStyle {
     }
     
     public func makeBody(configuration: Configuration) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            ViewThatFits{
-                Label(configuration)
-                    .labelStyle(.layoutSuggestable)
-                
-                if prefersTitle {
-                    Label(configuration)
-                        .labelStyle(.titleOnly)
-                }
-                
-                Label(configuration)
-                    .labelStyle(.iconOnly)
-            }
-        } else {
+        ViewThatFits{
             Label(configuration)
+                .labelStyle(.layoutSuggestable)
+            
+            if prefersTitle {
+                Label(configuration)
+                    .labelStyle(.titleOnly)
+            }
+            
+            Label(configuration)
+                .labelStyle(.iconOnly)
         }
     }
     

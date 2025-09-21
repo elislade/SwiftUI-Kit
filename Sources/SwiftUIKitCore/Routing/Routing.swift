@@ -83,7 +83,6 @@ public extension View {
     }
     
     
-    @available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
     nonisolated func onRouteRegex<R: RegexComponent>(_ component: R, perform action: @escaping (R.RegexOutput) async -> Void, other: (() -> Void)? = nil) -> some View where R.RegexOutput: Sendable, R.RegexOutput : Equatable {
         modifier(RoutingRegexModifier(
             regex: component,

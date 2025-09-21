@@ -21,9 +21,7 @@ public struct SwiftUIFontResolver: FontResolver {
             font = font.italic()
         }
         
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            font = font.width(.init(parameters.width))
-        }
+        font = font.width(.init(parameters.width))
         
         return ResolvedFont(
             parameters: parameters,

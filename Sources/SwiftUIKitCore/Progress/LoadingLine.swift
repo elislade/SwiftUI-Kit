@@ -66,20 +66,14 @@ public struct LoadingLine: View {
                 .stroke(Color.primary.opacity(0.1), style: .init(lineWidth: height, lineCap: cap))
                 .padding(.horizontal, height / 2)
                 
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                shape
-                    .fill(
-                        .tint
-                            .shadow(.inner(color: .white.opacity(0.6), radius: 0, y: height / 12))
-                            .shadow(.inner(color: .black.opacity(0.2), radius: 0, y: -(height / 12)))
-                            .blendMode(.overlay)
-                    )
-                    .padding(.horizontal, height / 2)
-                
-            } else {
-                shape.fill(.tint)
-                    .padding(.horizontal, height / 2)
-            }
+            shape
+                .fill(
+                    .tint
+                        .shadow(.inner(color: .white.opacity(0.6), radius: 0, y: height / 12))
+                        .shadow(.inner(color: .black.opacity(0.2), radius: 0, y: -(height / 12)))
+                        .blendMode(.overlay)
+                )
+                .padding(.horizontal, height / 2)
         }
         .layoutDirectionMirror()
         .drawingGroup()

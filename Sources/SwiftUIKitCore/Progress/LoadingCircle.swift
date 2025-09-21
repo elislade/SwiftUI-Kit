@@ -61,18 +61,13 @@ public struct LoadingCircle: View {
                     .rotation(.degrees(rotation))
                     .stroke(style: .init(lineWidth: size * 0.8, lineCap: .round))
                 
-                if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                    shape
-                        .fill(
-                            .tint
-                                .shadow(.inner(color: .white, radius: 0.5, y: (size / 20)))
-                                .shadow(.inner(radius: 0.5, y: -(size / 20)))
-                                .blendMode(.overlay)
-                        )
-                } else {
-                    shape
-                        .fill(.tint)
-                }
+                shape
+                    .fill(
+                        .tint
+                            .shadow(.inner(color: .white, radius: 0.5, y: (size / 20)))
+                            .shadow(.inner(radius: 0.5, y: -(size / 20)))
+                            .blendMode(.overlay)
+                    )
             }
             //.rotationEffect(.degrees(rotation))
             .layoutDirectionMirror()

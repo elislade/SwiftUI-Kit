@@ -30,7 +30,6 @@ public struct LayoutSuggestableVStack<Content: View>: View {
         self.content = content
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     private var layout: AnyLayout {
         if layoutSuggestion == .useBottomToTop {
             AnyLayout(ReversedVStackLayout(alignment: alignment, spacing: spacing))
@@ -40,15 +39,7 @@ public struct LayoutSuggestableVStack<Content: View>: View {
     }
     
     public var body: some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            layout{ content() }
-        } else {
-            VStack(alignment: alignment, spacing: spacing){
-                content()
-                    .scaleEffect(y: layoutSuggestion == .useBottomToTop ? -1 : 1)
-            }
-            .scaleEffect(y: layoutSuggestion == .useBottomToTop ? -1 : 1)
-        }
+        layout{ content() }
     }
     
 }

@@ -8,11 +8,7 @@ extension Font {
     }
     
     static var exampleSectionTitle: Font {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            .title2[.bold][.expanded]
-        } else {
-            .title[.bold]
-        }
+        .title2[.bold][.expanded]
     }
 
     static var exampleParameterTitle: Font {

@@ -5,34 +5,22 @@ public extension View {
     
     /// Calls `contentTransition(.identity)` on supporting systems and nothing on systems that don't.
     /// - Returns: A view.
-    @ViewBuilder nonisolated func contentTransitionIdentity() -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.contentTransition(.identity)
-        } else {
-            self
-        }
+    nonisolated func contentTransitionIdentity() -> some View {
+        contentTransition(.identity)
     }
     
     
     /// Calls `contentTransition(.interpolate)` on supporting systems and nothing on systems that don't.
     /// - Returns: A view.
-    @ViewBuilder nonisolated func contentTransitionInterpolate() -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.contentTransition(.interpolate)
-        } else {
-            self
-        }
+    nonisolated func contentTransitionInterpolate() -> some View {
+       contentTransition(.interpolate)
     }
     
     
     /// Calls `contentTransition(.opacity)` on supporting systems and nothing on systems that don't.
     /// - Returns: A view.
-    @ViewBuilder nonisolated func contentTransitionOpacity() -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.contentTransition(.opacity)
-        } else {
-            self
-        }
+    nonisolated func contentTransitionOpacity() -> some View {
+        contentTransition(.opacity)
     }
     
     

@@ -204,20 +204,11 @@ public extension Switch where OffLabel == EmptyView, OnLabel == EmptyView {
 public struct SwitchToggleStyle: ToggleStyle {
     
     public func makeBody(configuration: Configuration) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            LabeledContent{
-                Switch(isOn: configuration.$isOn)
-            } label: {
-                configuration.label
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        } else {
-            HStack {
-                configuration.label
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Switch(isOn: configuration.$isOn)
-            }
+        LabeledContent{
+            Switch(isOn: configuration.$isOn)
+        } label: {
+            configuration.label
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     

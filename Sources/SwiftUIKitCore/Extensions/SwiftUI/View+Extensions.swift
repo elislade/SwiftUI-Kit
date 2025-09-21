@@ -29,7 +29,6 @@ public extension View {
         position(x: simd.x, y: simd.y)
     }
     
-    @available(macOS 13, iOS 16, tvOS 16, watchOS 9, *)
     nonisolated func language(_ code: Locale.LanguageCode) -> some View {
         environment(\.locale, .init(languageComponents: .init(languageCode: code)))
             .environment(\.layoutDirection, .init(languageCode: code))

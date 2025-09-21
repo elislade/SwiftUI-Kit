@@ -17,7 +17,6 @@ public struct AnyInsettableShape: InsettableShape {
         AnyInsettableShape(shape.inset(by: amount))
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     public nonisolated func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         shape.sizeThatFits(proposal)
     }

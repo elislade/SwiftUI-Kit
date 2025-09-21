@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public extension RectangleCornerRadii {
     init(_ values: RadiusValues, rightToLeft: Bool = false){
         self.init(
@@ -13,7 +12,6 @@ public extension RectangleCornerRadii {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public extension RadiusValues {
     init(_ values: RectangleCornerRadii, rightToLeft: Bool = false){
         self.init(

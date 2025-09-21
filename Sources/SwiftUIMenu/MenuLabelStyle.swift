@@ -39,7 +39,6 @@ struct MenuLabelStyle: LabelStyle {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 struct MenuLabeledContentStyle: LabeledContentStyle {
     
     func makeBody(configuration: Configuration) -> some View {
@@ -56,11 +55,7 @@ struct MenuLabeledContentStyle: LabeledContentStyle {
 extension View {
     
     @ViewBuilder func menuLabeledStyle() -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            labeledContentStyle(MenuLabeledContentStyle())
-        } else {
-            self
-        }
+        labeledContentStyle(MenuLabeledContentStyle())
     }
     
 }

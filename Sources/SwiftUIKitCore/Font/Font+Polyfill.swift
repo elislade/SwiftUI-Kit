@@ -3,12 +3,8 @@ import SwiftUI
 
 public extension View {
     
-    @ViewBuilder nonisolated func fontWidthPolyfill(_ value: CGFloat = 0) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.fontWidth(.init(value))
-        } else {
-            self
-        }
+    nonisolated func fontWidthPolyfill(_ value: CGFloat = 0) -> some View {
+        fontWidth(.init(value))
     }
     
     @ViewBuilder nonisolated func fontDesignPolyfill(_ design: Font.Design?) -> some View {
@@ -19,28 +15,16 @@ public extension View {
         }
     }
     
-    @ViewBuilder nonisolated func trackingPolyfill(_ tracking: CGFloat) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.tracking(tracking)
-        } else {
-            self
-        }
+    nonisolated func trackingPolyfill(_ tracking: CGFloat) -> some View {
+        self.tracking(tracking)
     }
     
-    @ViewBuilder nonisolated func baselineOffsetPolyfill(_ baselineOffset: CGFloat) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.baselineOffset(baselineOffset)
-        } else {
-            self
-        }
+    nonisolated func baselineOffsetPolyfill(_ baselineOffset: CGFloat) -> some View {
+        self.baselineOffset(baselineOffset)
     }
     
-    @ViewBuilder nonisolated func kerningPolyfill(_ kerning: CGFloat) -> some View {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self.kerning(kerning)
-        } else {
-            self
-        }
+    nonisolated func kerningPolyfill(_ kerning: CGFloat) -> some View {
+        self.kerning(kerning)
     }
     
 }

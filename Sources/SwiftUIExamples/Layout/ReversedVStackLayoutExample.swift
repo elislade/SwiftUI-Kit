@@ -1,6 +1,6 @@
 import SwiftUIKit
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+
 public struct ReversedVStackLayoutExample: View {
     
     public init(){}
@@ -34,7 +34,7 @@ public struct ReversedVStackLayoutExample: View {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+
 #Preview {
     ReversedVStackLayoutExample()
         .previewSize()

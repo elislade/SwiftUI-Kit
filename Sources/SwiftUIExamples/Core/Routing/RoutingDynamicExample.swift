@@ -1,6 +1,6 @@
 import SwiftUIKit
 
-@available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
+
 public struct RoutingDynamicExample: View {
     
     enum Option: Hashable, CaseIterable, CustomStringConvertible {
@@ -323,7 +323,6 @@ public struct RoutingDynamicExample: View {
 }
 
 
-@available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
 extension Color {
     init(_ option: RoutingDynamicExample.Option){
         switch option {
@@ -343,7 +342,6 @@ extension URL {
 }
 
 
-@available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
 #Preview {
     RoutingDynamicExample()
         .previewSize()

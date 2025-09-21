@@ -35,49 +35,42 @@ public struct LineWrapLayoutExample: View {
     
     public var body: some View {
         ExampleView(title: "Line Wrap Layout"){
-            Group{
-                if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *), true {
-                    LineWrapLayout(alignment: alignment, lineSpacing: spacing){
-                        Image(systemName: imageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .drawingGroup()
-                            .id(imageName)
-                            .mask{
-                                LinearGradient(
-                                    colors: [.black.opacity(0.6), .black.opacity(0.2)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                                .drawingGroup()
-                            }
-                            .border(showBorders ? Color.blue : .clear, width: 0.333)
-                            .matchedGeometryEffect(id: "icon", in: ns)
-                            .transition(
-                                .merge(.scale, .opacity)
-                                .animation(.bouncy(duration: 0.3))
-                            )
-
-                        LayoutNewLine()
-                        
-                        ForEach(phrases[index]){ char in
-                            if char.isNewline {
-                                LayoutNewLine()
-                            } else {
-                                Text("\(char)")
-                                    .layoutSeparator(groupByWhitespace && (char.isWhitespace || char == "-"))
-                                    .border(showBorders ? Color.blue : .clear, width: 0.333)
-                                    .transition(
-                                        .merge(.scale(0), .opacity)
-                                        .animation(.bouncy)
-                                    )
-                            }
-                        }
+            LineWrapLayout(alignment: alignment, lineSpacing: spacing){
+                Image(systemName: imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .drawingGroup()
+                    .id(imageName)
+                    .mask{
+                        LinearGradient(
+                            colors: [.black.opacity(0.6), .black.opacity(0.2)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .drawingGroup()
                     }
-                } else {
-                    Text(phrases[index].description)
-                        .multilineTextAlignment(alignment)
+                    .border(showBorders ? Color.blue : .clear, width: 0.333)
+                    .matchedGeometryEffect(id: "icon", in: ns)
+                    .transition(
+                        .merge(.scale, .opacity)
+                        .animation(.bouncy(duration: 0.3))
+                    )
+
+                LayoutNewLine()
+                
+                ForEach(phrases[index]){ char in
+                    if char.isNewline {
+                        LayoutNewLine()
+                    } else {
+                        Text("\(char)")
+                            .layoutSeparator(groupByWhitespace && (char.isWhitespace || char == "-"))
+                            .border(showBorders ? Color.blue : .clear, width: 0.333)
+                            .transition(
+                                .merge(.scale(0), .opacity)
+                                .animation(.bouncy)
+                            )
+                    }
                 }
             }
             .font(font)

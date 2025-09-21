@@ -14,9 +14,7 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
         
         let c = UIHostingController(rootView: content)
         c.view.backgroundColor = .clear
-        if #available(iOS 16.0, tvOS 16.0, *) {
-            c.sizingOptions = .preferredContentSize
-        }
+        c.sizingOptions = .preferredContentSize
         return c
     }
     
@@ -37,7 +35,6 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
         }
     }
     
-    @available(iOS 16.0, tvOS 16.0, watchOS 9.0, *)
     func sizeThatFits(_ proposal: ProposedViewSize, uiViewController: UIHostingController<Content>, context: Context) -> CGSize? {
         uiViewController.sizeThatFits(in: proposal.replacingUnspecifiedDimensions())
     }

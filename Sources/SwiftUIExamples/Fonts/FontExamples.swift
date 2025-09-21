@@ -198,15 +198,8 @@ public struct FontExamples: View {
                         
                         Spacer()
                         
-                        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                            Text(Font.Width(parameters.width).staticDefinedClosest.description)
-                                .opacity(0.6)
-                            //Text(Font.Width.compressed.value, format: .number)
-                        } else {
-                            Text(parameters.width, format: .number)
-                                .font(.exampleParameterValue)
-                                .opacity(0.6)
-                        }
+                        Text(Font.Width(parameters.width).staticDefinedClosest.description)
+                            .opacity(0.6)  
                     }
                     .animation(nil, value: parameters.width)
                     

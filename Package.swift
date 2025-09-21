@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftUIKit",
-    platforms: [.macOS(.v12), .iOS(.v15), .macCatalyst(.v15), .tvOS(.v15), .watchOS(.v10)],
+    platforms: [.macOS(.v13), .iOS(.v16), .macCatalyst(.v16), .tvOS(.v16), .watchOS(.v10)],
     products: [
         .library(name: "SwiftUIKit", targets: ["SwiftUIKit"]),
         .library(name: "SwiftUIKitCore", targets: ["SwiftUIKitCore"]),

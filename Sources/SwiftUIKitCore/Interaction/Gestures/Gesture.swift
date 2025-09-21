@@ -71,11 +71,7 @@ public extension View {
 #if os(iOS)
     
     @ViewBuilder nonisolated func defersSystemGesturesPolyfill(on edges: Edge.Set) -> some View {
-        if #available(iOS 16.0, *) {
-            self.defersSystemGestures(on: edges)
-        } else {
-            self
-        }
+        self.defersSystemGestures(on: edges)
     }
     
 #else

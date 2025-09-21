@@ -156,11 +156,7 @@ public struct FontWidthModifier: FontModifier {
     }
 
     public func modify(font: Font) -> Font {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            font.width(.init(width))
-        } else {
-            font
-        }
+        font.width(.init(width))
     }
     
 }
@@ -172,7 +168,6 @@ public extension FontModifier where Self == FontWidthModifier {
         FontWidthModifier(width: width)
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     static func width(_ width: Font.Width) -> FontWidthModifier {
         FontWidthModifier(width: width.value)
     }

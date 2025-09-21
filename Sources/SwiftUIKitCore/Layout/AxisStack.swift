@@ -33,7 +33,6 @@ public struct AxisStack<Content: View>: View {
         self.content = content
     }
     
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     private var layout: AnyLayout {
         switch axis {
         case .horizontal:
@@ -52,16 +51,7 @@ public struct AxisStack<Content: View>: View {
                 LazyVStack(alignment: alignment.horizontal, spacing: spacing, content: content)
             }
         } else {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                layout { content() }
-            } else {
-                switch axis {
-                case .horizontal:
-                    HStack(alignment: alignment.vertical, spacing: spacing, content: content)
-                case .vertical:
-                    VStack(alignment: alignment.horizontal, spacing: spacing, content: content)
-                }
-            }
+            layout { content() }
         }
     }
     

@@ -7,9 +7,7 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
         let ctrl = UIHostingController(rootView: content())
-        if #available(iOS 16.0, tvOS 16.0, *) {
-            ctrl.sizingOptions = .preferredContentSize
-        }
+        ctrl.sizingOptions = .preferredContentSize
         ctrl.view.backgroundColor = .clear
         context.coordinator.gesture = gesture
         ctrl.view.addGestureRecognizer(context.coordinator.pan)

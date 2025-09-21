@@ -1,7 +1,6 @@
 import SwiftUI
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public struct LineWrapLayout: Layout {
     
     public var alignment: TextAlignment
@@ -132,7 +131,6 @@ public struct LineWrapLayout: Layout {
 
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 extension LineWrapLayout {
     
     struct GroupReducerState {
@@ -243,7 +241,6 @@ extension LineWrapLayout {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public struct LayoutSeparator: View {
     
     public init(){}
@@ -254,7 +251,6 @@ public struct LayoutSeparator: View {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public struct LayoutNewLine: View {
     
     let lines: Int
@@ -269,7 +265,6 @@ public struct LayoutNewLine: View {
     
 }
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 public extension View {
     
     func layoutNewline(_ enabled: Bool = true) -> some View {
@@ -299,7 +294,6 @@ public extension View {
 }
 
 
-@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 extension Collection where Element == LineWrapLayout.LayoutGroup {
     
     func splitMerge(where shouldSplit: @escaping (Element) -> Bool) -> [Element] {
