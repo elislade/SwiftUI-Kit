@@ -22,15 +22,18 @@ public struct GridView<Data: RandomAccessCollection & Sendable, Label: View>: Vi
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
+            let columns = self.columns
+            let spacing = self.spacing
             ForEach(data){ item in
+                let index = Double(data.firstIndex(where: { $0.id == item.id })!)
                 label(item)
                     .alignmentGuide(.top) {
-                        let i = Double(data.firstIndex(where: { $0.id == item.id })!)
+                        let i = index
                         let row : Double = floor(i / Double(columns))
                         return -(($0.height + spacing) * row)
                     }
                     .alignmentGuide(.leading) {
-                        let i = Double(data.firstIndex(where: { $0.id == item.id })! + 1)
+                        let i = index + 1
                         let row : Double = floor((i - 1) / Double(columns))
                         let columns = Double(columns)
                         let column = i > columns ? ((i / columns) - row) * columns : i

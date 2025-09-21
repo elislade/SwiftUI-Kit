@@ -288,7 +288,7 @@ public struct KeyPressExample: View {
             } else if key == .tab {
                 Label("Tab", systemImage: "arrow.forward.to.line")
             } else {
-                Text("\(key.character)")
+                Text(verbatim: "\(key.character)")
             }
         }
         

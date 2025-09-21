@@ -63,7 +63,7 @@ public struct NavBarExamples: View {
                 ForEach(NavBarItemMetadata.Placement.allCases, id: \.rawValue){ placement in
                     if placement != .none {
                         Toggle(isOn: Binding($placements, contains: placement)){
-                            Text("Show \(placement)")
+                            Text(verbatim: "Show \(placement)")
                                 .font(.exampleParameterTitle)
                         }
                         .exampleParameterCell()

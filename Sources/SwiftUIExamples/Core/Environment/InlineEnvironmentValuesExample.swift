@@ -14,7 +14,7 @@ public struct InlineEnvironmentValuesExample: View {
                     .fill(.background)
                     .ignoresSafeArea()
                     .overlay{
-                        Text("\(values.colorScheme)")
+                        Text(verbatim: "\(values.colorScheme)")
                             .font(.largeTitle.bold())
                     }
             }

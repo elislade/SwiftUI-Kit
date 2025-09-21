@@ -44,8 +44,8 @@ public struct MouseEventExamples: View {
                                     Text("Click")
                                         .font(.headline)
                                     Spacer()
-                                    Text("\(evt.phase)")
-                                    Text("\(evt.button)")
+                                    Text(verbatim: "\(evt.phase)")
+                                    Text(verbatim: "\(evt.button)")
                                 }
                             }
                             .padding()

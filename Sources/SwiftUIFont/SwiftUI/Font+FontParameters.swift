@@ -18,10 +18,6 @@ extension FontParameters {
     
 }
 
-
-extension Font.Weight : Sendable {}
-
-
 extension Font.Design: @retroactive CustomStringConvertible {
     
     public var description: String {

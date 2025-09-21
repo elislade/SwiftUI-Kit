@@ -234,7 +234,7 @@ public struct FontExamples: View {
                         
                         Spacer()
                         
-                        Text("\(Font.Weight(closestToValue: parameters.weight))")
+                        Text(verbatim: "\(Font.Weight(closestToValue: parameters.weight))")
                             .opacity(0.6)
                     }
                     .animation(nil, value: parameters.weight)

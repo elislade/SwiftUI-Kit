@@ -30,7 +30,6 @@ public extension ColorScheme {
     
 }
 
-extension CharacterSet: @retroactive @unchecked Sendable { }
 
 public extension Axis {
     
