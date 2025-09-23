@@ -52,8 +52,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     if isActive {
                         ContainerRelativeShape()
                             .fill(.primary)
-                            .opacity(0.6)
-                            .blendMode(.overlay)
+                            .opacity(0.2)
                             .matchedGeometryEffect(id: "button_bg", in: namespace)
 
                             if let dwellDuration  {

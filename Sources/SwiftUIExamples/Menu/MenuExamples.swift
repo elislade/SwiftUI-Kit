@@ -60,17 +60,11 @@ public struct MenuExamples: View {
                         Text($0)
                     }
                 } label: {
-                    HStack {
-                        RoundedRectangle(cornerRadius: 20)
-                            .frame(width: 50, height: 50)
-                            .opacity(0.1)
-                        
-                        Text(selection)
-                    }
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.3)
-                    .font(.title[.bold])
-                    .menuIndicatorStyle()
+                    Text(selection)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.3)
+                        .font(.title[.bold])
+                        .menuIndicatorStyle()
                 }
             }
             .presentationContext()
@@ -134,7 +128,6 @@ public struct MenuExamples: View {
             }
         }
     }
-    .tint(.gray)
     .submenuPresentationContext()
     //.menuBackgroundStyle(.sample)
 }
@@ -146,19 +139,25 @@ public struct MenuExamples: View {
 }
 
 
-public struct SampleCustomStyle: MaterialStyle {
+public struct CustomMenuBGStyle: MaterialStyle {
     
     public func makeBody(shape: AnyInsettableShape) -> some View {
         ZStack {
-            shape.fill(.red.opacity(0.5))
-            OuterShadowMaterial(shape, radius: 10)
+            shape
+                .fill(.background)
+                .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
+            
+            RaisedControlMaterial(shape)
+                .blendMode(.overlay)
+            
+            EdgeHighlightMaterial(shape)
         }
     }
     
 }
 
 
-extension MaterialStyle where Self == SampleCustomStyle {
+extension MaterialStyle where Self == CustomMenuBGStyle {
     
     public static var sample: Self { .init() }
     

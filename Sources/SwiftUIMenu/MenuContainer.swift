@@ -28,12 +28,12 @@ public struct MenuContainer<Content: View>: View {
     private let defaultInsets = EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8)
     private let baseRadius: Double = 18
     #else
-    private let defaultInsets = EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 16)
+    private let defaultInsets = EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 16)
     private let baseRadius: Double = 24
     #endif
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: -4){ content }
+        VStack(alignment: .leading, spacing: -3){ content }
             .equalInsetContext(defaultInsets: defaultInsets)
             .disabled(isBeingPresentedOn)
             .symbolRenderingMode(.hierarchical)

@@ -33,6 +33,7 @@ struct SubmenuContainer<C: View, L: View> : View {
                 isExpanded = true
             }
         }
+        .windowInteractionEffects([.squish])
     }
     
 }

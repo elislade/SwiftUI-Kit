@@ -46,7 +46,7 @@ public struct Menu<Label: View, Content: View>: View {
                     content()
                 }
                 .padding(.init(state.edge))
-                .windowInteractionEffects([.scale(anchor: state.anchor)])
+                .windowInteractionEffects([.squish])
                 .presentationBackdrop(.touchEndedDismiss){ Color.clear }
                 .submenuPresentationContext()
             }
