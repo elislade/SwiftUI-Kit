@@ -6,7 +6,7 @@ public struct InlineBindingExample: View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
+        ExampleView("Inline Binding"){
             InlineBinding(ColorScheme.light){ binding in
                 ZStack {
                     Rectangle()
@@ -26,11 +26,6 @@ public struct InlineBindingExample: View {
                 }
                 .environment(\.colorScheme, binding.wrappedValue)
             }
-            
-            Divider().ignoresSafeArea()
-            
-            ExampleTitle("Inline Binding")
-                .padding()
         }
     }
     

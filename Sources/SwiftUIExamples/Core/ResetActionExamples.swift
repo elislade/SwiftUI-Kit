@@ -15,33 +15,19 @@ struct ResetActionExamples: View {
         @Environment(\.reset) private var reset
         
         var body: some View {
-            VStack(spacing: 0) {
-                ZStack {
-                    Color.clear
-                    VStack(spacing: nil) {
-                        ChildView()
-                        
-                        ChildView()
-                            .resetActionsDisabled()
-                        
-                        ChildView()
-                    }
-                    .padding()
-                }
-                .background(.regularMaterial)
-                
-                Divider().ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    ExampleTitle("Reset Action")
-                        .padding(.vertical)
+            ExampleView(title: "Reset Action"){
+                VStack(spacing: nil) {
+                    ChildView()
                     
-                    HStack {
-                        Button("Reset"){ reset() }
-                    }
-                    .lineLimit(1)
-                    .padding()
+                    ChildView()
+                        .resetActionsDisabled()
+                    
+                    ChildView()
                 }
+                .padding()
+            } parameters: {
+                Button("Reset"){ reset() }
+                    .padding()
             }
         }
         

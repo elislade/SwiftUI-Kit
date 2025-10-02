@@ -6,7 +6,7 @@ public struct StickyMaskExample: View {
     public init(){ }
     
     public var body: some View {
-        VStack {
+        ExampleView("Sticky Category Mask"){
             ScrollView{
                 VStack(spacing: 100) {
                     ForEach(0..<4, id: \.self) { i in
@@ -18,17 +18,7 @@ public struct StickyMaskExample: View {
                 .padding(.horizontal, 16)
             }
             .stickyContext()
-            .background{ Color.secondary.opacity(0.1) }
-            .overlay{
-                RoundedRectangle(cornerRadius: 30)
-                    .strokeBorder()
-                    .opacity(0.2)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 30))
-            
-            ExampleTitle("Sticky Category Mask")
         }
-        .padding()
     }
     
     

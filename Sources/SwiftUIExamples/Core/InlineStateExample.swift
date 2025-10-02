@@ -8,7 +8,7 @@ public struct InlineStateExample: View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
+        ExampleView(title: "Inline State"){
             InlineState(UUID()){ id in
                 ZStack {
                     Color.random.ignoresSafeArea()
@@ -18,10 +18,7 @@ public struct InlineStateExample: View {
                 }
                 .id(changeIdentity)
             }
-            
-            ExampleTitle("Inline State")
-                .padding([.horizontal, .top])
-            
+        } parameters: {
             HStack {
                 Text("Actions")
                     .font(.exampleParameterTitle)
@@ -30,7 +27,7 @@ public struct InlineStateExample: View {
                 
                 Button("Change Identity") { changeIdentity += 1 }
             }
-            .padding()
+            .exampleParameterCell()
         }
     }
     

@@ -67,7 +67,6 @@ public struct MenuExamples: View {
                         .menuIndicatorStyle()
                 }
             }
-            .presentationContext()
             .environment(\.layoutDirection, layoutDirection)
         } parameters: {
             ExampleCell.LayoutDirection(value: $layoutDirection)

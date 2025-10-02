@@ -116,22 +116,18 @@ struct SliderViewEqualizerExample: View {
     let footerSize: CGFloat = 22
     
     @State private var master: Double = 0
-    @State private var tint: Color = Color(
-        hue: .random(in: 0...1), saturation: 0.9, brightness: 0.9
-    )
-    
     @State private var frequencies: [FrequencyGain] = [
-        FrequencyGain(frequency: 48, gain: 0),
-        FrequencyGain(frequency: 500, gain: 0),
-        FrequencyGain(frequency: 1_000, gain: 0),
-        FrequencyGain(frequency: 4_000, gain: 0),
-        FrequencyGain(frequency: 6_000, gain: 0),
+        FrequencyGain(frequency: 00_048, gain: 0),
+        FrequencyGain(frequency: 00_500, gain: 0),
+        FrequencyGain(frequency: 01_000, gain: 0),
+        FrequencyGain(frequency: 04_000, gain: 0),
+        FrequencyGain(frequency: 06_000, gain: 0),
         FrequencyGain(frequency: 12_000, gain: 0),
         FrequencyGain(frequency: 18_000, gain: 0)
     ]
     
     var body: some View {
-        VStack(spacing: 0) {
+        ExampleView(title: "Equalizer"){
             ZStack {
                 Color.clear
 
@@ -194,12 +190,7 @@ struct SliderViewEqualizerExample: View {
                 }
                 .padding()
             }
-            
-            Divider()
-            
-            ExampleTitle("Equalizer")
-                .padding()
-            
+        } parameters: {
             HStack{
                 Text("Action")
                     .font(.exampleParameterTitle)
@@ -214,22 +205,8 @@ struct SliderViewEqualizerExample: View {
                 .font(.exampleParameterValue)
                 .buttonStyle(.tinted)
             }
-            .padding()
+            .exampleParameterCell()
         }
-        .background{
-            ZStack {
-                Rectangle()
-                    .fill(.tint)
-                    .zIndex(1)
-                
-                Rectangle()
-                    .fill(.background)
-                    .opacity(0.95)
-                    .zIndex(2)
-            }
-            .ignoresSafeArea()
-        }
-        .tint(tint)
     }
     
     struct GridLine: View {

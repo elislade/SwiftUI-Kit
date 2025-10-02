@@ -3,7 +3,6 @@ import SwiftUIKit
 
 public struct BoundsExamples: View {
 
-    @State private var tintColor = Color.random
     @State private var items: [CGPoint] = []
     @State private var touchingIndices: Set<Int> = []
     
@@ -21,62 +20,56 @@ public struct BoundsExamples: View {
     
     public var body: some View {
         GeometryReader { proxy in
-            Color.clear.overlay {
-                ForEach(items.indices, id: \.self){ i in
-                    let isTouching = touchingIndices.contains(i)
-                    Child()
-                        .blendMode(isTouching ? .multiply : .normal)
-                        .foregroundStyle(
-                            isTouching ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary)
-                        )
-                        .offset(x: items[i].x, y: items[i].y)
-                }
-            }
-            .drawingGroup()
-            .ignoresSafeArea()
-            .onAppear { randomItems(in: proxy.size) }
-            .childBoundsChange(tag: "Child", in: proxy){ bounds in
-                var newIndices: Set<Int> = []
-                for i in bounds.indices {
-                    for j in bounds.indices {
-                        guard
-                            j != i,
-                            !newIndices.contains(i) || !newIndices.contains(j)
-                        else { continue }
-                        
-                        if bounds[i].intersects(bounds[j]) {
-                            newIndices.insert(i)
-                            newIndices.insert(j)
-                        }
+            ExampleView(title: "Tagged Bounds"){
+                Color.clear.overlay {
+                    ForEach(items.indices, id: \.self){ i in
+                        let isTouching = touchingIndices.contains(i)
+                        Child()
+                            .blendMode(isTouching ? .multiply : .normal)
+                            .foregroundStyle(
+                                isTouching ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary)
+                            )
+                            .offset(x: items[i].x, y: items[i].y)
                     }
                 }
-                touchingIndices = newIndices
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0){
-                VStack(spacing: 22) {
-                    ExampleTitle("Tagged Bounds")
-                    
-                    HStack {
-                        Text("Randomize Items")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Button{
-                            withAnimation(.bouncy){
-                                randomItems(in: proxy.size)
+                .drawingGroup()
+                .ignoresSafeArea()
+                .onAppear { randomItems(in: proxy.size) }
+                .childBoundsChange(tag: "Child", in: proxy){ bounds in
+                    var newIndices: Set<Int> = []
+                    for i in bounds.indices {
+                        for j in bounds.indices {
+                            guard
+                                j != i,
+                                !newIndices.contains(i) || !newIndices.contains(j)
+                            else { continue }
+                            
+                            if bounds[i].intersects(bounds[j]) {
+                                newIndices.insert(i)
+                                newIndices.insert(j)
                             }
-                        } label: {
-                            Text("Perform")
                         }
                     }
+                    touchingIndices = newIndices
                 }
-                .padding()
-                .background(.regularMaterial)
+            } parameters: {
+                HStack {
+                    Text("Randomize Items")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    Button{
+                        withAnimation(.bouncy){
+                            randomItems(in: proxy.size)
+                        }
+                    } label: {
+                        Text("Perform")
+                    }
+                }
+                .exampleParameterCell()
             }
-            .tint(tintColor)
         }
-        
     }
     
     

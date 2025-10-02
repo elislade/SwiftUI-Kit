@@ -6,17 +6,20 @@ public struct AxisStackExampleView : View {
     @State private var axis: Axis = .vertical
     @State private var alignment: Alignment = .center
     @State private var spacing: Double = 0
-    @State private var items: [Color] = [.random, .random, .random, .random]
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Axis Stack"){
             AxisStack(axis, alignment: alignment, spacing: spacing){
-                ForEach(items.indices, id: \.self){ i in
-                    items[i]
+                ForEach(0..<5, id: \.self){ i in
+                    Rectangle()
+                        .fill(.tint)
+                        .opacity(Double(i + 1) / 5)
+                        .background(.background, in: .rect)
                 }
             }
+            .ignoresSafeArea()
             .animation(.smooth, value: axis)
         } parameters: {
             SegmentedPicker(selection: $axis.animation(.smooth), items: Axis.allCases){

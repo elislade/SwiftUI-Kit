@@ -62,7 +62,6 @@ public struct FlipExamplesView: View {
             HStack {
                 Text("Horizontal Direction")
                     .font(.exampleParameterTitle)
-                    .fixedSize()
                 
                 Spacer()
                 

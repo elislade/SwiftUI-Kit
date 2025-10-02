@@ -35,6 +35,8 @@ struct ExampleTitle: View {
                 .offset(x: -4, y: 4)
                 .layoutPriority(2)
                 .multilineTextAlignment(.leading)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
             
             RoundedRectangle(cornerRadius: 2)
                 .fill(.tint)

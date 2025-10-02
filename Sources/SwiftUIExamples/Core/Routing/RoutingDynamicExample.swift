@@ -18,14 +18,13 @@ public struct RoutingDynamicExample: View {
     public init(){}
     
     public var body: some View {
-        Reciever()
-            .safeAreaInset(edge: .top, spacing: 0){
-                Sender()
-                    .background(.regularMaterial)
-                
-            }
-            .presentationContext()
-            .router()
+        ExampleView(title: "Routing Dynamic") {
+            Reciever()
+                .presentationContext()
+        } parameters: {
+            Sender()
+        }
+        .router()
     }
     
     
@@ -55,6 +54,7 @@ public struct RoutingDynamicExample: View {
                         Content(index: index + 1)
                     }
             }
+            .background{ ExampleBackground().ignoresSafeArea() }
             .onRouteRegex(/modal|detail/){ match in
                 switch match {
                 case "modal":
@@ -83,7 +83,6 @@ public struct RoutingDynamicExample: View {
                         Content()
                     }
                     .routeNamespace(option.description)
-                    .presentationContext()
                     .tabItem{
                         TabLabel(option).onRoute(option.description){
                             self.option = option
@@ -92,8 +91,8 @@ public struct RoutingDynamicExample: View {
                     }
                 }
             }
+            .padding(.bottom, 1)
             .routeRelayReceiver()
-            .tint(Color(option))
         }
         
     }
@@ -239,9 +238,6 @@ public struct RoutingDynamicExample: View {
         
         var body: some View {
             VStack(spacing: 0) {
-                ExampleTitle("Routing Dynamic")
-                    .padding(.horizontal)
-                
                 HStack(spacing: 0) {
                     RouteComposer(tab: $tab, elements: $elements)
                     
@@ -266,7 +262,6 @@ public struct RoutingDynamicExample: View {
                 .symbolRenderingMode(.hierarchical)
                 .symbolVariant(.fill)
             }
-            .tint(Color(tab))
         }
         
         
@@ -305,31 +300,20 @@ public struct RoutingDynamicExample: View {
         var body: some View {
             switch option {
             case .a:
-                Label{ Text("Red") } icon: {
+                Label{ Text("Tab A") } icon: {
                     Image(systemName: "a.circle")
                 }
             case .b:
-                Label{ Text("Green") } icon: {
+                Label{ Text("Tab B") } icon: {
                     Image(systemName: "b.circle")
                 }
             case .c:
-                Label{ Text("Blue") } icon: {
+                Label{ Text("Tab C") } icon: {
                     Image(systemName: "c.circle")
                 }
             }
         }
         
-    }
-}
-
-
-extension Color {
-    init(_ option: RoutingDynamicExample.Option){
-        switch option {
-        case .a: self = .red
-        case .b: self = .green
-        case .c: self = .blue
-        }
     }
 }
 

@@ -186,6 +186,8 @@ extension View {
         .overlay(alignment: .bottom) {
             Divider()
         }
+        .toggleStyle(.swiftUIKitSwitch)
+        .fixedSize(horizontal: false, vertical: true)
         .geometryGroupPolyfill()
         .lineLimit(2)
         .minimumScaleFactor(0.5)

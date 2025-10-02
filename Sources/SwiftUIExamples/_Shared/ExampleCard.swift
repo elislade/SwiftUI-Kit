@@ -18,8 +18,8 @@ struct ExampleCard<C: View>: View {
         .padding()
         .background{
             RoundedRectangle(cornerRadius: 30)
-                .strokeBorder()
-                .opacity(0.3)
+                .fill(.tint)
+                .opacity(0.08)
         }
     }
 }

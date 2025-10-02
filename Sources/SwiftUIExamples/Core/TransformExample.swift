@@ -25,7 +25,6 @@ public struct TransformExample: View {
             HStack {
                 Text("Actions")
                     .font(.exampleParameterTitle)
-                    .fixedSize()
                 
                 Spacer()
                 
@@ -153,7 +152,6 @@ public struct TransformExample: View {
                 HStack {
                     Text("Order Mask")
                         .font(.exampleParameterTitle)
-                        .fixedSize()
                     
                     Spacer(minLength: 10)
                     
@@ -166,16 +164,16 @@ public struct TransformExample: View {
                     .labelStyle(.viewThatFits(preferring: \.title))
                 }
                 
-                VStack(spacing: 0) {
+                VStack(spacing: 2) {
                     ForEach(orderMask, id: \.hashValue){ mask in
                         let idx = orderMask.firstIndex(of: mask)!
-                        Button(action: {
+                        Button{
                             if disableMask.contains(mask) {
                                 disableMask.remove(mask)
                             } else {
                                 disableMask.insert(mask)
                             }
-                        }){
+                        } label: {
                             HStack {
                                 Image(systemName: "\(idx + 1).circle.fill")
                                     .symbolRenderingMode(.hierarchical)
@@ -218,8 +216,6 @@ public struct TransformExample: View {
                             .background(Color.secondary.opacity(0.1))
                         }
                         .buttonStyle(.plain)
-                        
-                        Divider()
                     }
                 }
                 .animation(.smooth, value: orderMask)

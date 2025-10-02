@@ -28,7 +28,6 @@ public struct FontExamples: View {
     public var body: some View {
         ExampleView(title: "Font"){
             Preview(resource: $resource, parameters: $parameters)
-                .ignoresSafeArea(edges: .bottom)
                 .dynamicTypeSize(dynamicSize)
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
@@ -309,9 +308,7 @@ public struct FontExamples: View {
                         .buttonStyle(.tinted)
                     }
                 }
-                .padding([.vertical, .trailing])
-                .padding(.leading, 8)
-                .ignoresSafeArea()
+                .padding()
             }
         }
     }

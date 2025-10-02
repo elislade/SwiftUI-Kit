@@ -7,19 +7,17 @@ public struct ReversedVStackLayoutExample: View {
     
     private var content: some View {
         ForEach(0...3){ i in
-            Color.primary
+            ContainerRelativeShape()
+                .fill(.tint)
                 .opacity(Double(i) / 10)
                 .overlay {
                     Text(i, format: .number)
                 }
-                .border(.red)
         }
     }
     
     public var body: some View {
-        VStack {
-            ExampleTitle("Reversed VStackLayout")
-            
+        ExampleView("Reversed VStack Layout"){
             HStack {
                 VStackLayout{
                     content
@@ -28,6 +26,7 @@ public struct ReversedVStackLayoutExample: View {
                     content
                 }
             }
+            .padding()
         }
     }
     

@@ -9,7 +9,7 @@ struct SystemDragAndDropExamples: View {
     @State private var groupB: [String] = ["D", "E", "F"]
     
     var body: some View {
-        VStack(spacing: 0) {
+        ExampleView("System Drag & Drop"){
             VStack(spacing: 0){
                 StringList(items: $groupA)
                 
@@ -17,19 +17,6 @@ struct SystemDragAndDropExamples: View {
                 
                 StringList(items: $groupB)
             }
-            .background{
-                RoundedRectangle(cornerRadius: 30)
-                    .fill(.bar)
-                    .shadow(color: .black.opacity(0.1), radius: 10, y: 10)
-                
-                RoundedRectangle(cornerRadius: 30)
-                    .strokeBorder()
-                    .opacity(0.1)
-            }
-            .padding()
-            
-            ExampleTitle("System Drag & Drop")
-                .padding()
         }
     }
     

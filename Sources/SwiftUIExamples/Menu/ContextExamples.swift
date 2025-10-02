@@ -4,17 +4,16 @@ import SwiftUIKit
 public struct ContextMenuExamples: View  {
         
     @State private var presentedIndices: Set<Int> = []
-    @State private var tint: Color = .random
-    @State private var gotDog: Bool = false
+    @State private var optionSelected: Bool = false
     
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
+        ExampleView("Context Menu"){
             ScrollView {
                 LazyVGrid(columns: [.init(.adaptive(minimum: 100, maximum: 180))]){
                     ForEach(0..<15){ i in
-                        Rectangle()
+                        ContainerRelativeShape()
                             .fill(.tint)
                             .opacity(0.1 + Double(i) / 15)
                             .background(.background)
@@ -29,8 +28,8 @@ public struct ContextMenuExamples: View  {
                                 
                                 MenuGroupDivider()
                                 
-                                Toggle(isOn: $gotDog){
-                                    Label { Text("Got Dog ?") } icon: {
+                                Toggle(isOn: $optionSelected){
+                                    Label { Text("Option") } icon: {
                                         Image(systemName: "dog.fill")
                                     }
                                 }
@@ -60,17 +59,9 @@ public struct ContextMenuExamples: View  {
                             }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
-            .background(.regularMaterial)
-            
-            Divider().ignoresSafeArea()
-            
-            ExampleTitle("Context Menu")
-                .padding()
         }
-        .presentationContext()
-        .tint(tint)
     }
     
 }

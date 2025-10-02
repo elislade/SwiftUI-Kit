@@ -3,82 +3,143 @@ import SwiftUIKit
 
 struct ExampleView<E: View, P: View>: View {
     
+    @Environment(\.deviceOrientation) private var orientation
+    
+    @State private var panelSize = CGSize.zero
     @State private var color = Color(
         hue: .random(in: 0...1),
         saturation: 0.9,
         brightness: 0.9
     )
     
-    let title: String
     var maxSize: CGSize = .init(width: 400, height: 340)
     
+    let title: String
     @ViewBuilder let example: E
     @ViewBuilder let parameters: P
     
     var body: some View {
         GeometryReader { proxy in
-            HStack(spacing: 0){
-                #if !os(watchOS)
-                if proxy.size.width > proxy.size.height {
-                    ZStack {
-                        Color.clear
-                        example
-                    }
-                    .frame(
-                        width: min(proxy.size.width / 1.7, proxy.size.width - 340),
-                        height: proxy.size.height
-                    )
-                    .mask {
-                        Rectangle().ignoresSafeArea()
-                    }
-                    .background(.regularMaterial)
-                    .ignoresSafeArea(edges: .bottom)
-
-                    Divider().ignoresSafeArea()
+            ZStack(alignment: .bottomTrailing){
+                Color.clear.overlay {
+                    example
                 }
-                #endif
+                .releaseContainerSafeArea(edges: [.top, .leading])
+                .safeAreaInsets(
+                    orientation.isLandscape ? .trailing : .bottom,
+                    orientation.isLandscape ? 450 - 22 : panelSize.height - 22
+                )
                 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        #if os(watchOS)
-                        Rectangle()
-                            .fill(.background)
-                            .aspectRatio(1.5, contentMode: .fit)
-                            .overlay { example }
-                            .overlay(alignment: .bottom) { Divider() }
-                            .clipped()
-                            .sticky(edges: .top)
-                        #endif
+                VStack(spacing: 0) {
+                    ExampleTitle(title)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                    
+                    if !(parameters is EmptyView) {
+                        Divider()
                         
-                        ExampleTitle(title)
-                            .padding(.vertical, 8)
-                        
-                        parameters
+                        if orientation.isLandscape {
+                            ViewThatFits(in: .vertical){
+                                VStack(spacing: 0) {
+                                    parameters
+                                }
+                                
+                                ScrollView {
+                                    VStack(spacing: 0) {
+                                        parameters
+                                    }
+                                }
+                                .stickyContext()
+                            }
+                        } else {
+                            if panelSize.height > proxy.size.height / 2.5 {
+                                ScrollView {
+                                    VStack(spacing: 0) {
+                                        parameters
+                                    }
+                                }
+                                .stickyContext()
+                                .frame(
+                                    maxHeight: orientation.isLandscape ? .infinity : (proxy.size.height / 2.5) - 75
+                                )
+                            } else {
+                                VStack(spacing: 0) {
+                                    parameters
+                                }
+                            }
+                        }
                     }
-                    .toggleStyle(.swiftUIKitSwitch)
                 }
-                .scrollClipDisabledPolyfill()
-                .stickyContext()
-                #if os(watchOS)
-                .ignoresSafeArea(edges: [.top, .horizontal])
-                #endif
+                .examplePanelBG()
+                .padding(22)
+                .onGeometryChangePolyfill(of: \.size){ panelSize = $0 }
+                .frame(maxWidth: orientation.isLandscape ? 450 : nil)
             }
-            #if !os(watchOS)
-            .safeAreaInset(edge: .top, spacing: 0){
-                if proxy.size.width < proxy.size.height {
-                    ZStack {
-                        Color.clear
-                        example
-                    }
-                    .frame(width: proxy.size.width, height: maxSize.height)
-                    .background(.regularMaterial)
-                    .overlay(alignment: .bottom) { Divider().ignoresSafeArea() }
-                }
-            }
-            #endif
+            .background{ ExampleBackground() }
         }
         .presentationContext()
+        #if os(macOS)
+        .containerShape(RoundedRectangle(cornerRadius: 34))
+        #else
+        .containerShape(RoundedRectangle(cornerRadius: 64))
+        #endif
         .tint(color)
+        .captureContainerSafeArea()
+        .ignoresSafeAreaOppositeNotch()
+    }
+    
+}
+
+extension View {
+    
+    @ViewBuilder func examplePanelBG() -> some View {
+        if #available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+            clipShape(ContainerRelativeShape())
+                .glassEffect(in: .containerRelative)
+        } else {
+            background {
+               ContainerRelativeShape()
+                    .fill(.bar)
+                    .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
+            }
+            .overlay {
+                EdgeHighlightMaterial(ContainerRelativeShape())
+            }
+            .clipShape(ContainerRelativeShape())
+            .background{
+                OuterShadowMaterial(
+                    ContainerRelativeShape(),
+                    fill: .black.opacity(0.1),
+                    radius: 15,
+                    y: 8
+                )
+            }
+        }
+    }
+    
+}
+
+struct ExampleBackground: View {
+    
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .fill(.background)
+            
+            Rectangle()
+                .fill(.tint)
+                .opacity(0.04)
+        }
+    }
+    
+}
+
+extension ExampleView where P == EmptyView {
+    
+    init(_ title: String, @ViewBuilder content: @escaping () -> E) {
+        self.title = title
+        self.example = content()
+        self.parameters = EmptyView()
     }
     
 }
@@ -123,6 +184,7 @@ extension View {
                 }
         }
         .resetActionContext()
+        .listenForDeviceOrientation()
     }
 #endif
     

@@ -47,7 +47,6 @@ public struct BasicExamples: View {
 
             HStack {
                 Text("Vertical Alignment")
-                    .fixedSize(horizontal: true, vertical: false)
                     .font(.exampleParameterTitle)
                 
                 Spacer()
@@ -62,7 +61,6 @@ public struct BasicExamples: View {
             
             HStack {
                 Text("Horizontal Alignment")
-                    .fixedSize(horizontal: true, vertical: false)
                     .font(.exampleParameterTitle)
                 
                 Spacer()
@@ -110,7 +108,6 @@ public struct BasicExamples: View {
             .background{
                 ContainerRelativeShape()
                     .fill(.background)
-                    .ignoresSafeArea()
             }
             .containerShape(RoundedRectangle(cornerRadius: 28))
         }

@@ -8,23 +8,13 @@ public struct InlineEnvironmentValuesExample: View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
+        ExampleView(title: "Inline Environment Values"){
             InlineEnvironmentValues { values in
-                Rectangle()
-                    .fill(.background)
-                    .ignoresSafeArea()
-                    .overlay{
-                        Text(verbatim: "\(values.colorScheme)")
-                            .font(.largeTitle.bold())
-                    }
+                Text(verbatim: "\(values.colorScheme)")
+                    .font(.largeTitle.bold())
             }
-            .environment(\.colorScheme, colorScheme)
-            
-            Divider()
-            
-            ExampleTitle("Environment Values")
-                .padding(.vertical)
-            
+            .preferredColorScheme(colorScheme)
+        } parameters: {
             ExampleCell.ColorScheme(value: $colorScheme)
         }
     }

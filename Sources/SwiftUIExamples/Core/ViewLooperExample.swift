@@ -74,8 +74,8 @@ public struct ViewLooperExample: View {
                         .font(.exampleParameterValue)
                     
                     Picker("", selection: $durationSpan){
-                        Text("Milliseconds/Point").tag(TimeSpanMode.relative)
-                        Text("Seconds").tag(TimeSpanMode.absolute)
+                        Text("ms/pt").tag(TimeSpanMode.relative)
+                        Text("seconds").tag(TimeSpanMode.absolute)
                     }
                 }
                 

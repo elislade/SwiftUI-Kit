@@ -40,16 +40,15 @@ struct ExampleSection<C: View> : View {
         }
         .buttonStyle(.none)
         .background{
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(.regularMaterial)
-                
+            ZStack(alignment: .bottom) {
+                VisualEffectView()
                 Divider()
             }
             .ignoresSafeArea()
             .opacity(isSticking ? 1 : 0)
         }
         .sticky(edges: isExpanded ? .top : []){ isSticking = $0.isSticking }
+        .fixedSize(horizontal: false, vertical: true)
         
         if isExpanded {
             VStack(spacing: 0) {

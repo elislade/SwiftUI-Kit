@@ -29,14 +29,15 @@ public struct CompositeTransitionExamples: View {
                     Color.clear
                     
                     if show {
-                        Color.primary
-                            .padding(-1)
+                        ContainerRelativeShape()
+                            .padding(8)
                             .transitions(orderedTransitions)
                     }
                 }
                 
                 LoadingLine(state: .progress(show ? 1 : 0))
                     .frame(height: 4)
+                    .padding(.horizontal)
             }
             .animation(.smooth, value: show)
             .overlay(alignment: .bottom){
@@ -57,7 +58,6 @@ public struct CompositeTransitionExamples: View {
                 .padding()
                 .font(.largeTitle)
             }
-            .ignoresSafeArea()
         } parameters: {
             ForEach(order){ o in
                 let i = order.firstIndex(of: o)!

@@ -80,7 +80,6 @@ struct ReadableScrollViewExample : View {
             HStack {
                 Text("Reset Action")
                     .font(.exampleParameterTitle)
-                    .fixedSize()
                 
                 Spacer()
                 

@@ -6,9 +6,7 @@ public struct WindowInteractionHoverExample: View {
     public init(){}
     
     public var body: some View {
-        VStack(spacing: 16) {
-            ExampleTitle("Window Interaction Hover")
-            
+        ExampleView("Window Interaction Hover"){
             VStack(spacing: 5) {
                 ForEach(0..<3) { _ in
                     HStack(spacing: 5) {
@@ -18,9 +16,9 @@ public struct WindowInteractionHoverExample: View {
                     }
                 }
             }
+            .padding()
+            .windowInteractionHoverContext()
         }
-        .padding()
-        .windowInteractionHoverContext()
     }
     
     
@@ -30,6 +28,7 @@ public struct WindowInteractionHoverExample: View {
         
         var body: some View {
             RoundedRectangle(cornerRadius: 30)
+                .fill(.tint)
                 .opacity(phase == .entered || phase == .ended ? 1 : 0.2)
                 .onWindowInteractionHover{ phase = $0 }
                 .overlay {

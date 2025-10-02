@@ -6,44 +6,41 @@ public struct ScrollPassthroughExample: View {
     public init(){}
     
     public var body: some View {
-        GeometryReader { proxy in
-            ReadableScrollView(.vertical){
-                VStack(spacing: 0) {
-                    Header()
-                    VStack(spacing: 20) {
-                        ForEach(0..<10){ _ in
-                            RoundedRectangle(cornerRadius: 26)
-                                .aspectRatio(1.8, contentMode: .fit)
-                                .opacity(0.1)
+        ExampleView("Scroll Passthrough"){
+            GeometryReader { proxy in
+                ReadableScrollView(.vertical){
+                    VStack(spacing: 0) {
+                        Header()
+                        VStack(spacing: 20) {
+                            ForEach(0..<10){ _ in
+                                RoundedRectangle(cornerRadius: 26)
+                                    .aspectRatio(1.8, contentMode: .fit)
+                                    .opacity(0.1)
+                            }
                         }
+                        .padding(20)
                     }
-                    .padding(20)
+                    .background{
+                        LinearGradient(
+                            colors: [
+                                .red, .orange, .yellow, .green, .blue, .purple
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .overscrollPinned(axis: .vertical)
+                        .ignoresSafeArea()
+                    }
+                    .safeAreaInsets(proxy.safeAreaInsets)
                 }
-                .background{
-                    LinearGradient(
-                        colors: [
-                            .red, .orange, .yellow, .green, .blue, .purple
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .overscrollPinned(axis: .vertical)
-                    .ignoresSafeArea()
-                }
-                .safeAreaInsets(proxy.safeAreaInsets)
+                .ignoresSafeArea()
             }
-            .ignoresSafeArea()
-        }
-        .scrollPassthroughContext()
-        .safeAreaInset(edge: .bottom, spacing: 0){
-            Text("Additional Stuff")
-                .padding()
-                .background(.regularMaterial, in: .capsule)
-        }
-        .safeAreaInset(edge: .top, spacing: 0){
-            Text("Additional Stuff")
-                .padding()
-                .background(.regularMaterial, in: .capsule)
+            .scrollPassthroughContext()
+            .safeAreaInset(edge: .top, spacing: 0){
+                Text("Additional Stuff")
+                    .padding()
+                    .background(.regularMaterial, in: .capsule)
+            }
         }
     }
     
