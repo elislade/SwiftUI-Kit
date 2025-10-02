@@ -34,6 +34,7 @@ public struct SunkenControlMaterial<Shape: InsettableShape>: View {
             
             shape
                 .strokeBorder(lineWidth: 0.5)
+                .compositingGroup()
                 .opacity(0.2)
             
             shape
