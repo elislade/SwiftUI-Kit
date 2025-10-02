@@ -3,7 +3,7 @@ import SwiftUIKitCore
 import SwiftUIPresentation
 
 
-@MainActor public struct NavBarContainer<Content: View> : View {
+public struct NavBarContainer<Content: View> : View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.reduceMotion) private var reduceMotion
@@ -25,7 +25,7 @@ import SwiftUIPresentation
     /// Initializes instance
     /// - Parameters:
     ///   - content: A view builder of the content that can set `NavBarContainer` items.
-    @MainActor public init(@ViewBuilder content: @escaping () -> Content) {
+    public init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
     }
     
