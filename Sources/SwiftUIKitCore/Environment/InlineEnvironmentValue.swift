@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A view that can read a **single** environment value inline.
-public struct InlineEnvironmentValue<Value: Sendable, Content: View> {
+public struct InlineEnvironmentValue<Value, Content: View> {
     
     private let env: Environment<Value>
     private let content: @MainActor (Value) -> Content
