@@ -166,7 +166,7 @@ extension ExampleView where P == EmptyView {
 
 extension View {
     
-#if canImport(AppKit)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
     func previewSize() -> some View {
         frame(width: 340, height: 600)
             .resetActionContext()

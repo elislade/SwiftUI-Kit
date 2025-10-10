@@ -303,3 +303,35 @@ public func nanoseconds(seconds: Double) -> UInt64 {
 public func nanoseconds(milliseconds: Double) -> UInt64 {
     nanoseconds(seconds: milliseconds / 1000)
 }
+
+
+public extension BinaryFloatingPoint {
+    
+    /// Incresenly stretches a value with resistance as it gets further outside the range's bounds.
+    /// - Note: 0 resistance is the same as just using self, where as 1 is the same as clamping self to the range.
+    /// - Parameters:
+    ///   - range: A `ClosedRange` indicating the bounds from which to streach from, when outside.
+    ///   - resistance: A relative amount of resistance ranging from 0(no-resistance) to 1(complete-resistance). Defaults to 0.3.
+    /// - Returns: Self that is resisted past its bounds.
+    func rubberBand(outside range: ClosedRange<Self>, withResistance resistance: CGFloat = 0.3) -> Self {
+        if self > range.upperBound {
+            let diff = self - range.upperBound
+            return range.upperBound + Self(pow(Double(diff), 1 - resistance.clamped(to: 0...1)))
+        } else if self < range.lowerBound {
+            let diff = abs(self - range.lowerBound)
+            return range.lowerBound - Self(pow(Double(diff), 1 - resistance.clamped(to: 0...1)))
+        } else {
+            return self
+        }
+    }
+    
+}
+
+
+extension Duration {
+    
+    public var seconds: Double {
+        Double(components.seconds) + (Double(components.attoseconds) / 1_000_000_000_000_000_000)
+    }
+    
+}
