@@ -1,35 +1,35 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
+    
+    /// Defines a group that coordinates indirect child gestures.
+    /// - Warning: Without at least one of these in your view hierarchy, `indirectScrollGestures` will not work.
+    /// - Returns: A modified view.
+    public nonisolated func indirectScrollGroup() -> some View {
+        modifier(IndirectScrollGroupModifier())
+    }
+    
     
     /// A gesture that is not directly inputed on the users screen. Eg. trackpad or mouse scroll.
-    @ViewBuilder func indirectGesture<Gesture: IndirectGesture>(_ gesture: Gesture) -> some View {
-        if let gesture = gesture as? IndirectScrollGesture {
-            modifier(IndirectScrollModifier(gesture: gesture))
-        } else {
-            self
-        }
+    /// - Warning: An `indirectScrollGesture` needs to be accompanied by at least one parent `indirectScrollGroup`.
+    public nonisolated func indirectScrollGesture(_ gesture: IndirectScrollGesture) -> some View {
+        modifier(IndirectScrollModifier(gesture: { gesture } ))
     }
     
 }
 
 
-public enum EventMaskEvaluationBehaviour: Hashable, CaseIterable, Sendable, BitwiseCopyable {
+public enum EventMaskEvaluationPhase: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     
-    /// Over the given phases of an event the mask will be evaluated continuously.
-    case continuous
+    /// The mask will only evaluate on event begin phase.
+    case onBegin
     
-    /// Once an event has started with a given mask it will not be evaluated again untill the event ends.
-    /// - Note: This does **not** mean the event will not evaluate continuously it means the **mask** will not evaluate continuously.
-    case locked
-    
-    public var isLocked: Bool {
-        self == .locked
-    }
+    /// The mask will evaluate on every event change phase.
+    case onChange
     
     public var isContinuous: Bool {
-        self == .continuous
+        self == .onChange
     }
     
 }

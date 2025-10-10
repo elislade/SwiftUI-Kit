@@ -24,9 +24,10 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
     
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         
-        var gesture: IndirectScrollGesture?
-        private var previous: CGPoint = .zero
+        var gesture: (SIMD2<Double>) -> IndirectScrollGesture? = { _ in nil}
+        private var previous: SIMD2<Double> = .zero
         private var start = Date()
+        private var activeGesture: IndirectScrollGesture? = nil
         
         lazy var pan: UIPanGestureRecognizer = {
             let g = UIPanGestureRecognizer(target: self, action: #selector(panAction))
@@ -39,24 +40,35 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
         }()
         
         @objc func panAction(_ g: UIPanGestureRecognizer) {
+            guard let gesture = activeGesture else { return }
+            
+            let translation = g.translation(in: nil).simd
             if g.state == .ended || g.state == .cancelled || g.state == .failed {
-                gesture?.callEnded(with: .init(
+                gesture.callEnded(with: .init(
                     time: start.timeIntervalSinceNow,
-                    delta: .zero
+                    delta: .zero,
+                    translation: translation
                 ))
+                activeGesture = nil
                 previous = .zero
             } else {
                 if g.state == .began {
                     start = Date()
                 }
-                let t = g.translation(in: nil)
-                gesture?.callChanged(with: .init(
+                gesture.callChanged(with: .init(
                     time: start.timeIntervalSinceNow,
-                    delta: [t.x - previous.x, t.y - previous.y]
+                    delta: translation - previous,
+                    translation: translation
                 ))
                 
-                previous = t
+                previous = translation
             }
+        }
+        
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            let location = gestureRecognizer.location(in: gestureRecognizer.view?.window)
+            activeGesture = gesture(location.simd)
+            return activeGesture != nil
         }
         
     }

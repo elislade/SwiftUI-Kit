@@ -1,62 +1,86 @@
 import SwiftUI
 
 
-public struct IndirectScrollGesture: IndirectGesture, Equatable {
-    
-    public static func ==(lhs: Self, rhs: Self) -> Bool {
-        lhs.useMomentum == rhs.useMomentum &&
-        lhs.mask == rhs.mask &&
-        lhs.maskEvaluation == rhs.maskEvaluation &&
-        lhs.onChanges.count == rhs.onChanges.count &&
-        lhs.onEnds.count == rhs.onEnds.count
-    }
+public struct IndirectScrollGesture: IndirectGesture {
     
     public let useMomentum: Bool
     public let mask: Axis.Set
-    public let maskEvaluation: EventMaskEvaluationBehaviour
+    public let maskEvaluation: EventMaskEvaluationPhase
     
-    private var onChanges: [(Value) -> Void]
-    private var onEnds: [(Value) -> Void]
+    private let onChange: @MainActor (Value) -> Void
+    private let onEnd: @MainActor (Value) -> Void
     
     public init(
         useMomentum: Bool = true,
         mask: Axis.Set = [.horizontal, .vertical],
-        maskEvaluation: EventMaskEvaluationBehaviour = .locked
+        maskEvaluation: EventMaskEvaluationPhase = .onBegin
     ){
         self.useMomentum = useMomentum
         self.mask = mask
         self.maskEvaluation = maskEvaluation
-        self.onChanges = []
-        self.onEnds = []
+        self.onChange = { _ in }
+        self.onEnd = { _ in }
     }
     
-    public struct Value: Hashable {
+    internal nonisolated init(
+        _ base: IndirectScrollGesture,
+        onChange: (@MainActor(Value) -> Void)? = nil,
+        onEnd: (@MainActor(Value) -> Void)? = nil
+    ){
+        self.useMomentum = base.useMomentum
+        self.mask = base.mask
+        self.maskEvaluation = base.maskEvaluation
+        
+        if let onChange {
+            self.onChange = {
+                base.onChange($0)
+                onChange($0)
+            }
+        } else {
+            self.onChange = base.onChange
+        }
+        
+        if let onEnd {
+            self.onEnd = {
+                base.onEnd($0)
+                onEnd($0)
+            }
+        } else {
+            self.onEnd = base.onEnd
+        }
+    }
+    
+    public struct Value: Hashable, Sendable {
         public let time: Double
         public let delta: SIMD2<Double>
+        public let translation: SIMD2<Double>
     }
     
-    public func onChanged(_ action: @escaping (Value) -> Void) -> IndirectScrollGesture {
-        var copy = self
-        copy.onChanges.append(action)
-        return copy
+    public nonisolated func onChanged(_ action: @MainActor @escaping (Value) -> Void) -> IndirectScrollGesture {
+        .init(self, onChange: action)
     }
     
-    public func onEnded(_ action: @escaping (Value) -> Void) -> IndirectScrollGesture {
-        var copy = self
-        copy.onEnds.append(action)
-        return copy
+    public nonisolated func onEnded(_ action: @MainActor @escaping (Value) -> Void) -> IndirectScrollGesture {
+        .init(self, onEnd: action)
     }
     
     internal func callChanged(with value: Value){
-        for call in onChanges {
-            call(value)
-        }
+        onChange(value)
     }
     
     internal func callEnded(with value: Value){
-        for call in onEnds {
-            call(value)
-        }
+        onEnd(value)
+    }
+    
+}
+
+
+extension IndirectScrollGesture: Equatable {
+    
+    public nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.useMomentum == rhs.useMomentum &&
+        lhs.mask == rhs.mask &&
+        lhs.maskEvaluation == rhs.maskEvaluation
     }
     
 }
@@ -64,14 +88,23 @@ public struct IndirectScrollGesture: IndirectGesture, Equatable {
 
 struct IndirectScrollModifier: ViewModifier {
     
-    var gesture: IndirectScrollGesture
+    @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
+    
+    var gesture: @MainActor () -> IndirectScrollGesture
     
     func body(content: Content) -> some View {
         #if os(watchOS)
         content
         #else
-        IndirectScrollRepresentation(gesture: gesture){
-            content
+        content.background{
+            if !isBeingPresentedOn {
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: IndirectGesturePreference.self,
+                        value: [ gesture().window(frame: proxy.frame(in: .global)) ]
+                    )
+                }
+            }
         }
         #endif
     }
