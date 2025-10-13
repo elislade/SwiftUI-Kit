@@ -6,7 +6,9 @@ struct ExampleCell {
     
     struct LayoutDirection: View {
         
-        @Binding var value: SwiftUI.LayoutDirection
+        typealias Direction = SwiftUI.LayoutDirection
+        
+        @Binding var value: Direction
         
         var body: some View {
             HStack {
@@ -16,8 +18,8 @@ struct ExampleCell {
                 Spacer()
                 
                 Picker("", selection: $value){
-                    Text("Left to Right").tag(SwiftUI.LayoutDirection.leftToRight)
-                    Text("Right to Left").tag(SwiftUI.LayoutDirection.rightToLeft)
+                    Text("Left to Right").tag(Direction.leftToRight)
+                    Text("Right to Left").tag(Direction.rightToLeft)
                 }
             }
             .exampleParameterCell()
@@ -27,7 +29,9 @@ struct ExampleCell {
     
     struct LayoutDirectionSuggestion: View {
         
-        @Binding var value: SwiftUIKit.LayoutDirectionSuggestion
+        typealias Suggestion = SwiftUIKit.LayoutDirectionSuggestion
+        
+        @Binding var value: Suggestion
         
         var body: some View {
             HStack {
@@ -37,9 +41,9 @@ struct ExampleCell {
                 Spacer()
                 
                 Picker("", selection: $value){
-                    Text("Use System").tag(SwiftUIKit.LayoutDirectionSuggestion.useSystemDefault)
-                    Text("Top to Bottom").tag(SwiftUIKit.LayoutDirectionSuggestion.useTopToBottom)
-                    Text("Bottom to Top").tag(SwiftUIKit.LayoutDirectionSuggestion.useBottomToTop)
+                    Text("Use System").tag(Suggestion.useSystemDefault)
+                    Text("Top to Bottom").tag(Suggestion.useTopToBottom)
+                    Text("Bottom to Top").tag(Suggestion.useBottomToTop)
                 }
             }
             .exampleParameterCell()
@@ -49,7 +53,9 @@ struct ExampleCell {
     
     struct ColorScheme: View {
         
-        @Binding var value: SwiftUIKit.ColorScheme
+        typealias Scheme = SwiftUI.ColorScheme
+        
+        @Binding var value: Scheme
         
         var body: some View {
             HStack {
@@ -60,7 +66,7 @@ struct ExampleCell {
                 
                 SegmentedPicker(
                     selection: $value.animation(.smooth),
-                    items: SwiftUIKit.ColorScheme.allCases
+                    items: Scheme.allCases
                 ){
                     switch $0 {
                     case .light: Text("Light")
@@ -78,7 +84,9 @@ struct ExampleCell {
     
     struct ControlSize: View {
         
-        @Binding var value: SwiftUIKit.ControlSize
+        typealias Size = SwiftUIKit.ControlSize
+        
+        @Binding var value: Size
         
         var body: some View {
             HStack {
@@ -88,7 +96,7 @@ struct ExampleCell {
                 Spacer()
                 
                 Picker("", selection: $value){
-                    ForEach(SwiftUIKit.ControlSize.allCases, id: \.self){
+                    ForEach(Size.allCases, id: \.self){
                         Text("\($0)".splitCamelCaseFormat).tag($0)
                     }
                 }
@@ -122,12 +130,12 @@ struct ExampleCell {
     
     
     struct Alignment: View {
-
+        
         @Binding var value: SwiftUI.Alignment
         
         @State private var horzOptionIndex: Int = 1
         @State private var vertOptionIndex: Int = 1
-    
+        
         let horizontalOptions: [HorizontalAlignment] = [.leading, .center, .trailing]
         let verticalOptions: [VerticalAlignment] = [.top, .center, .bottom]
         
@@ -149,7 +157,7 @@ struct ExampleCell {
             .onChangePolyfill(of: horzOptionIndex){
                 value.horizontal = horizontalOptions[horzOptionIndex]
             }
-           
+            
             HStack {
                 Text("Vertical Alignment")
                     .font(.exampleParameterTitle)
@@ -170,29 +178,50 @@ struct ExampleCell {
     }
     
     
+    struct HorizontalEdge: View {
+        
+        typealias Edge = SwiftUI.HorizontalEdge
+        
+        @Binding var edge: Edge?
+        
+        var body: some View {
+            SegmentedPicker(selection: $edge, items: [Edge.leading, nil, Edge.trailing]){ edge in
+                if let edge {
+                   switch edge {
+                   case .leading: Text("Leading")
+                   case .trailing: Text("Trailing")
+                }
+                } else {
+                    Text("None")
+                }
+            }
+            .font(.caption)
+        }
+    }
+    
 }
 
 
 extension View {
     
     func exampleParameterCell() -> some View {
-        Group {
-        #if os(macOS)
-            padding(.horizontal).padding(.vertical, 10)
-        #else
-            padding()
-        #endif
-        }
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
-        .toggleStyle(.swiftUIKitSwitch)
-        .fixedSize(horizontal: false, vertical: true)
-        .geometryGroupPolyfill()
-        .lineLimit(2)
-        .minimumScaleFactor(0.5)
-        .controlRoundness(1)
-        .contentTransitionNumericText()
+        padding(.cellPadding)
+            .overlay(alignment: .bottom) {
+                Divider()
+            }
+            .toggleStyle(.swiftUIKitSwitch)
+            .fixedSize(horizontal: false, vertical: true)
+            .geometryGroupPolyfill()
+            .lineLimit(2)
+            .minimumScaleFactor(0.5)
+            .controlRoundness(1)
+            .contentTransitionNumericText()
     }
     
+}
+
+
+extension EdgeInsets {
+    
+    static let cellPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
 }

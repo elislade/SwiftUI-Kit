@@ -1,31 +1,55 @@
 import SwiftUI
 
-
-struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
+struct SwipeInteraction: Equatable, Sendable {
+    let edge: HorizontalEdge
+    let start: Double
+    var current: Double
     
+    init(edge: HorizontalEdge, start: Double) {
+        self.edge = edge
+        self.start = start
+        self.current = start
+    }
+    
+    var offset: Double {
+        current - start
+    }
+}
+
+
+struct SwipeActionsModifier<Leading: View, Trailing: View> {
+    
+    @Environment(\.invalidateSwipeWhenMoved) private var moveInvalidation
+    @Environment(\.activeSwipeID) private var activeIDBinding
     @Environment(\.layoutDirection) private var direction
-    @StateObject private var sharedState = SwipeActionsState.shared
     
     @State private var id = UUID()
-    @State private var scroll: Double = 0
-    @State private var gestureStart: Double?
-    @State private var horizontalInteractionOffset: Double?
-    @State private var leadingSize: CGFloat = 0
-    @State private var trailingSize: CGFloat = 0
-    
+    @State private var openSize: CGFloat = 1
     @State private var internalActiveEdge: HorizontalEdge?
+    @State private var scrollInteraction: SwipeInteraction?
+    
+    @GestureState private var dragInteraction: SwipeInteraction?
+    
+    private var interaction: SwipeInteraction? { scrollInteraction ?? dragInteraction }
+    
     private let externalActiveEdge: Binding<HorizontalEdge?>?
     
-    private var activeEdgeBinding: Binding<HorizontalEdge?> {
+    private var openEdgeBinding: Binding<HorizontalEdge?> {
         externalActiveEdge ?? $internalActiveEdge
     }
     
-    private var activeEdge: HorizontalEdge? {
-        activeEdgeBinding.wrappedValue
+    private var activeID: UUID? {
+        get { activeIDBinding.wrappedValue }
+        nonmutating set { activeIDBinding.wrappedValue = newValue }
     }
     
-    private let leading: Leading
-    private let trailing: Trailing
+    private var openEdge: HorizontalEdge? {
+        get { openEdgeBinding.wrappedValue }
+        nonmutating set { openEdgeBinding.wrappedValue = newValue }
+    }
+    
+    private let leading: @MainActor () -> Leading
+    private let trailing: @MainActor () -> Trailing
     private let availableEdges: HorizontalEdge.Set
     
     init(
@@ -33,210 +57,203 @@ struct SwipeActionsModifier<Leading: View, Trailing: View>: ViewModifier {
         @ViewBuilder leading: @MainActor @escaping () -> Leading,
         @ViewBuilder trailing: @MainActor @escaping () -> Trailing
     ) {
-        self.leading = leading()
-        self.trailing = trailing()
-        
-        var set = HorizontalEdge.Set()
-        
-        if type(of: leading()) != EmptyView.self {
-            set.insert(.leading)
-        }
-        
-        if type(of: trailing()) != EmptyView.self {
-            set.insert(.trailing)
-        }
-        
+        self.leading = leading
+        self.trailing = trailing
         self.externalActiveEdge = activeEdge
-        self.availableEdges = set
+        self.availableEdges = [.leading, .trailing]
+    }
+    
+    private func scaleFactor(for edge: HorizontalEdge) -> Double {
+        switch edge {
+        case .leading: 1
+        case .trailing: -1
+        }
     }
     
     private var horizontalOffset: Double {
-        if let horizontalInteractionOffset {
-            return horizontalInteractionOffset
-        } else if let activeEdge {
-            switch activeEdge {
-            case .leading: return leadingSize
-            case .trailing: return trailingSize * -1.0
-            }
+        if let openEdge {
+            let interactionOffset = (interaction?.offset ?? 0) * direction.scaleFactor
+            return (openSize * scaleFactor(for: openEdge)) + interactionOffset
+        } else if let interaction {
+            return interaction.offset * direction.scaleFactor
         } else {
             return 0
         }
     }
     
-    private var layoutFactor: Double { direction.scaleFactor }
-    
     private func close() {
-        guard activeEdge != nil else {
+        guard openEdge != nil else {
              return
         }
 
         withAnimation(.fastSpringInterpolating){
-            activeEdgeBinding.wrappedValue = nil
-            horizontalInteractionOffset = nil
+            openEdge = nil
         }
     }
     
-    private func updateInteraction(offset: Double, layoutFactor: Double){
-        let offset = (offset * layoutFactor)
-        
-        if let activeEdge {
-            guard availableEdges.contains(.init(activeEdge)) else { return }
-            
-            let edgeSize = activeEdge == .leading ? leadingSize : trailingSize
-            let edgeFactor = activeEdge == .leading ? 1.0 : -1.0
-            let diff = edgeSize - (offset * edgeFactor)
-            let isOverShooting = diff < 0
-            let isUnderShooting = activeEdge == .leading ? offset < 0 : offset > 0
-            
-            if isOverShooting {
-                horizontalInteractionOffset = (edgeSize * edgeFactor) - powRetainSign(diff * edgeFactor, 0.7)
-            } else if isUnderShooting {
-                horizontalInteractionOffset = powRetainSign(offset, 0.75)
-            } else {
-                horizontalInteractionOffset = offset
-            }
-        } else {
-            // Set active edge based on direction
-            if offset < 0 && availableEdges.contains(.trailing) {
-                horizontalInteractionOffset = offset
-                activeEdgeBinding.wrappedValue = .trailing
-            } else if offset > 0 && availableEdges.contains(.leading) {
-                horizontalInteractionOffset = offset
-                activeEdgeBinding.wrappedValue = .leading
-            }
-        }
-    }
-    
-    private func endInteraction(projectedOffset: Double){
-        guard activeEdge != nil else { return }
-        
-        let projectedOffset = projectedOffset * layoutFactor
-        
-        withAnimation(.fastSpringInterpolating){
-            self.horizontalInteractionOffset = nil
-            
-            if let activeEdge {
-                switch activeEdge {
-                case .leading:
-                    if projectedOffset < 50 {
-                        activeEdgeBinding.wrappedValue = nil
-                    }
-                case .trailing:
-                    if projectedOffset > -50 {
-                        activeEdgeBinding.wrappedValue = nil
-                    }
-                }
-            }
-        }
-    }
-    
-    #if !os(tvOS)
-    private var contentGesture: some Gesture {
-        DragGesture(minimumDistance: 25, coordinateSpace: .global)
-            .onChanged { g in
-                var transaction = Transaction()
-                transaction.disablesAnimations = true
-                transaction.isContinuous = true
-                
-                withTransaction(transaction){
-                    if let gestureStart {
-                        let offset = g.location.x - gestureStart
-                        updateInteraction(offset: offset, layoutFactor: layoutFactor)
-                    } else {
-                        gestureStart = g.location.x - (horizontalOffset * layoutFactor)
-                    }
-                }
-            }
-            .onEnded { g in
-                withTransaction(.init()){
-                    gestureStart = nil
-                    endInteraction(projectedOffset: g.predictedEndTranslation.width)
-                }
-            }
-    }
-    #endif
+}
+
+extension SwipeActionsModifier: ViewModifier  {
     
     func body(content: Content) -> some View {
-        content
-            .offset(x: horizontalOffset)
-            .contentShape(Rectangle())
-            #if !os(tvOS)
-            .simultaneousGesture(TapGesture().onEnded(close))
-            .highPriorityGesture(contentGesture)
-            #endif
-            .onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ _ in
-                close()
+        let _interaction = self.interaction
+        let activeEdge = _interaction?.edge ?? openEdge
+        let horizontalOffset: Double = {
+            if let edge = _interaction?.edge {
+                switch edge {
+                case .leading:
+                    self.horizontalOffset.rubberBand(outside: 0...openSize)
+                case .trailing:
+                    self.horizontalOffset.rubberBand(outside: -openSize...0)
+                }
+            } else {
+                self.horizontalOffset
             }
-            .overlay {
-                HStack(spacing: 0) {
-                    if let activeEdge, activeEdge == .leading {
-                        HStack(spacing: 1, content: { leading })
-                            .onGeometryChangePolyfill(of: \.size.width){
-                                leadingSize = $0
+        }()
+        
+        content
+            .contentShape(Rectangle())
+            .offset(x: horizontalOffset)
+            .defersSystemGesturesPolyfill(on: .horizontal)
+            #if !os(tvOS)
+            .highPriorityGesture(
+                TapGesture().onEnded(close),
+                including: openEdge == nil ? .subviews : .gesture
+            )
+            .highPriorityGesture(
+                DragGesture(minimumDistance: 20, coordinateSpace: .global)
+                    .onEnded { g in
+                        let projectedOffset = g.predictedEndTranslation.width * direction.scaleFactor
+                        
+                        withAnimation(.bouncy){
+                            if let activeEdge {
+                                switch activeEdge {
+                                case .leading:
+                                    self.openEdge = projectedOffset < 50 ? nil : activeEdge
+                                case .trailing:
+                                    self.openEdge = projectedOffset > -50 ? nil : activeEdge
+                                }
                             }
-                            .clipShape(
-                                Rectangle()
-                                    .offset(x: min(-leadingSize + horizontalOffset, 0) * layoutFactor)
-                            )
-                            .transition(.identity)
+                        }
+                    }
+                    .updating($dragInteraction){ gesture, state, transaction in
+                        if state == nil {
+                            if let openEdge {
+                                state = .init(edge: openEdge, start: gesture.location.x)
+                            } else if gesture.translation.width * direction.scaleFactor < 0 && availableEdges.contains(.trailing) {
+                                state = .init(edge: .trailing, start: gesture.location.x)
+                            } else if gesture.translation.width * direction.scaleFactor > 0 && availableEdges.contains(.leading) {
+                                state = .init(edge: .leading, start: gesture.location.x)
+                            }
+                        } else {
+                            state?.current = gesture.location.x
+                        }
+                    }
+            )
+            #endif
+            .background{
+                if moveInvalidation {
+                    Color.clear.onGeometryChangePolyfill(of: { $0.frame(in: .global).origin.y.rounded() }){ _ in
+                        close()
+                    }
+                }
+            }
+            .background{
+                Color.clear.indirectScrollGesture(
+                    IndirectScrollGesture(useMomentum: false, mask: .horizontal)
+                        .onChanged{ value in
+                            if scrollInteraction == nil {
+                                if let openEdge {
+                                    scrollInteraction = .init(edge: openEdge, start: 0)
+                                } else  {
+                                    if value.delta.x > 0 {
+                                        scrollInteraction = .init(edge: .leading.invert(active: direction == .rightToLeft), start: 0)
+                                    } else if value.delta.x < 0 {
+                                        scrollInteraction = .init(edge: .trailing.invert(active: direction == .rightToLeft), start: 0)
+                                    }
+                                }
+                            }
+                            scrollInteraction?.current = value.translation.x
+                        }
+                        .onEnded{ value in
+                            let projectedOffset = value.translation.x
+                            if let activeEdge = openEdge {
+                                switch activeEdge.invert(active: direction == .rightToLeft) {
+                                case .leading:
+                                    if projectedOffset < 50 {
+                                        self.openEdge = nil
+                                    }
+                                case .trailing:
+                                    if projectedOffset > -50 {
+                                        self.openEdge = nil
+                                    }
+                                }
+                            } else {
+                                self.openEdge = scrollInteraction?.edge
+                            }
+                            scrollInteraction = nil
+                        }
+                )
+                // FIX for custom gesture not getting updated with environment.
+                .id(direction)
+            }
+            .background {
+                HStack(spacing: 0) {
+                    HStack(spacing: 4){
+                        if let activeEdge, activeEdge == .leading {
+                            leading()
+                                .transition(.swipeAction)
+                        }
+                    }
+                    .frame(maxHeight: .infinity)
+                    .onGeometryChangePolyfill(of: \.size.width){ size in
+                        guard activeEdge == .leading else { return }
+                        openSize = size + 12
                     }
                     
                     Spacer(minLength: 0)
                     
-                    if let activeEdge, activeEdge == .trailing {
-                        HStack(spacing: 1, content: { trailing })
-                            .onGeometryChangePolyfill(of: \.size.width){
-                                trailingSize = $0
-                            }
-                            .clipShape(
-                                Rectangle()
-                                    .offset(x: max(trailingSize + horizontalOffset, 0) * layoutFactor)
-                            )
-                            .transition(.identity)
+                    HStack(spacing: 4){
+                        if let activeEdge, activeEdge == .trailing {
+                            trailing()
+                                .transition(.swipeAction)
+                        }
+                    }
+                    .frame(maxHeight: .infinity)
+                    .onGeometryChangePolyfill(of: \.size.width){ size in
+                        guard activeEdge == .trailing else { return }
+                        openSize = size + 12
                     }
                 }
                 .buttonStyle(SwipeButtonStyle(didCallAction: close))
+                .interactionHoverGroup(priority: .high)
             }
-            .animation(.fastSpringInterpolating, value: activeEdge)
-//            .indirectGesture(
-//                IndirectScrollGesture(useMomentum: false, mask: .horizontal)
-//                    .onChanged{ value in
-//                        if scroll == 0 {
-//                            scroll += horizontalOffset
-//                        }
-//                        scroll += value.delta.x
-//                        updateInteraction(offset: scroll, layoutFactor: 1)
-//                    }
-//                    .onEnded{ _ in
-//                        endInteraction(projectedOffset: scroll)
-//                        scroll = 0
-//                    }
-//            )
-            .onChangePolyfill(of: sharedState.latestSwipeActionID){
-                if sharedState.latestSwipeActionID != id {
+            .animation(.bouncy, value: activeEdge)
+            .animation(.fastSpringInterpolating, value: horizontalOffset)
+            .onChangePolyfill(of: activeID){
+                if activeID != id {
                     close()
                 }
             }
             .onChangePolyfill(of: activeEdge){
                 if activeEdge != nil {
                     Task {
-                        try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
-                        sharedState.latestSwipeActionID = id
+                        try await Task.sleep(for: .milliseconds(80))
+                        activeID = id
                     }
                 }
             }
             .accessibilityRepresentation{
                 HStack {
                     content
-                    leading
-                    trailing
+                    leading()
+                    trailing()
                 }
                 .accessibilityElement(children: .combine)
             }
     }
     
 }
-
 
 extension SwipeActionsModifier where Leading == EmptyView {
     
@@ -250,8 +267,8 @@ extension SwipeActionsModifier where Leading == EmptyView {
             self.externalActiveEdge = nil
         }
         
-        self.leading = EmptyView()
-        self.trailing = trailing()
+        self.leading = { EmptyView() }
+        self.trailing = trailing
         self.availableEdges = .trailing
     }
     
@@ -270,19 +287,24 @@ extension SwipeActionsModifier where Trailing == EmptyView {
             self.externalActiveEdge = nil
         }
         
-        self.leading = leading()
-        self.trailing = EmptyView()
+        self.leading = leading
+        self.trailing = { EmptyView() }
         self.availableEdges = .leading
     }
     
 }
 
 
-@MainActor final class SwipeActionsState: ObservableObject {
-    static let shared = SwipeActionsState()
+extension EnvironmentValues {
     
-    private init(){}
+    @Entry internal var activeSwipeID: Binding<UUID?> = .constant(nil)
+    @Entry internal var invalidateSwipeWhenMoved: Bool = false
     
-    @Published var latestSwipeActionID: UUID?
+}
+
+
+extension AnyTransition {
+    
+    @MainActor static let swipeAction: Self = .scale(0.8) + .opacity + .blur(radius: 5)
     
 }

@@ -11,18 +11,18 @@ public struct LayoutSuggestableLabelStyle: LabelStyle {
         switch direction {
         case .useTopToBottom:
             VStack {
-                configuration.icon.imageScale(.large)
-                configuration.title.lineLimit(1)
+                configuration.icon
+                configuration.title
             }
         case .useBottomToTop:
             VStack {
-                configuration.title.lineLimit(1)
-                configuration.icon.imageScale(.large)
+                configuration.title
+                configuration.icon
             }
         case .useSystemDefault:
             HStack {
-                configuration.icon.imageScale(.large)
-                configuration.title.lineLimit(1)
+                configuration.icon
+                configuration.title
             }
         }
     }

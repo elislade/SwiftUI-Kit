@@ -89,6 +89,7 @@ extension IndirectScrollGesture: Equatable {
 struct IndirectScrollModifier: ViewModifier {
     
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn
+    @State private var id = UUID()
     
     var gesture: @MainActor () -> IndirectScrollGesture
     
@@ -101,7 +102,7 @@ struct IndirectScrollModifier: ViewModifier {
                 GeometryReader { proxy in
                     Color.clear.preference(
                         key: IndirectGesturePreference.self,
-                        value: [ gesture().window(frame: proxy.frame(in: .global)) ]
+                        value: [ gesture().window(id: id, frame: proxy.frame(in: .global)) ]
                     )
                 }
             }

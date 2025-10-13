@@ -5,7 +5,7 @@ import SwiftUI
 
 extension IndirectScrollRepresentation : UIViewControllerRepresentable {
     
-    func makeUIViewController(context: Context) -> UIViewController {
+    func makeUIViewController(context: Context) -> UIHostingController<Source> {
         let ctrl = UIHostingController(rootView: content())
         ctrl.sizingOptions = .preferredContentSize
         ctrl.view.backgroundColor = .clear
@@ -14,7 +14,7 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
         return ctrl
     }
     
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: UIHostingController<Source>, context: Context) {
         context.coordinator.gesture = gesture
     }
     

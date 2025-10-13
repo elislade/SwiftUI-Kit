@@ -1,19 +1,34 @@
 import SwiftUI
 
 
-public extension HorizontalEdge {
+public protocol Invertable {
     
-    var inverse: HorizontalEdge {
+    var inverse: Self { get }
+    
+}
+
+public extension Invertable {
+    
+    func invert(active: Bool = true) -> Self {
+        active ? inverse : self
+    }
+    
+}
+
+extension HorizontalEdge: Invertable {
+    
+    public var inverse: HorizontalEdge {
         switch self {
         case .leading: .trailing
         case .trailing: .leading
         }
     }
+    
 }
 
-public extension VerticalEdge {
+extension VerticalEdge: Invertable {
     
-    var inverse: VerticalEdge {
+    public var inverse: VerticalEdge {
         switch self {
         case .top: .bottom
         case .bottom: .top
@@ -21,17 +36,23 @@ public extension VerticalEdge {
     }
     
 }
+
+
+extension Edge: Invertable {
+    
+    public var inverse: Edge {
+        switch self {
+        case .top: .bottom
+        case .leading: .trailing
+        case .bottom: .top
+        case .trailing: .leading
+        }
+    }
+    
+}
+
 
 public extension Edge {
-    
-    var inverse: Edge {
-        switch self {
-        case .top: .bottom
-        case .leading: .trailing
-        case .bottom: .top
-        case .trailing: .leading
-        }
-    }
     
     static func random(in set: Edge.Set = .all) -> Edge {
         var generator = SystemRandomNumberGenerator()

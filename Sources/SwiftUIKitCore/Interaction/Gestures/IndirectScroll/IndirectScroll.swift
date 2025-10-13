@@ -5,9 +5,11 @@ extension View {
     
     /// Defines a group that coordinates indirect child gestures.
     /// - Warning: Without at least one of these in your view hierarchy, `indirectScrollGestures` will not work.
+    /// - Warning: Changing `isActive` will change this views identity.
+    /// - Parameter isActive: A boolean indicating if this group is active. Defaults to true.
     /// - Returns: A modified view.
-    public nonisolated func indirectScrollGroup() -> some View {
-        modifier(IndirectScrollGroupModifier())
+    public nonisolated func indirectScrollGroup(isActive: Bool = true) -> some View {
+        modifier(IndirectScrollGroupModifier(isActive: isActive))
     }
     
     

@@ -2,10 +2,11 @@ import SwiftUIKit
 
 struct ExampleSection<C: View> : View {
     
-    let title: String
     @State private var isExpanded = false
-    let content: C
     @State private var isSticking = false
+    
+    let title: String
+    let content: C
     
     init(_ title: String, isExpanded: Bool = false, @ViewBuilder content: @escaping () -> C) {
         self.title = title
@@ -13,32 +14,14 @@ struct ExampleSection<C: View> : View {
         self.content = content()
     }
     
-    private func toggle() {
-        withAnimation(.smooth.speed(1.6)){
-            isExpanded.toggle()
-        }
-    }
-    
     var body: some View {
-        Button(action: toggle){
-            HStack(spacing: 0) {
-                Text(title)
-                    .font(.exampleSectionTitle)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                
-                Spacer(minLength: 14)
-                
-                Image(systemName: "chevron.right")
-                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                    .font(.title3[.bold])
-                    .opacity(0.5)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
-            .contentShape(Rectangle())
+        Toggle(isOn: $isExpanded.animation(.smooth.speed(1.6))){
+            Text(title)
+                .font(.exampleSectionTitle)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
-        .buttonStyle(.none)
+        .toggleStyle(ToggleStyle())
         .background{
             ZStack(alignment: .bottom) {
                 VisualEffectView()
@@ -58,21 +41,48 @@ struct ExampleSection<C: View> : View {
         }
     }
     
+    
+    struct ToggleStyle: SwiftUI.ToggleStyle  {
+        
+        func makeBody(configuration: Configuration) -> some View {
+            Button{
+                configuration.isOn.toggle()
+            } label: {
+                HStack {
+                    configuration.label
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .rotationEffect(.degrees(configuration.isOn ? 90 : 0))
+                        .font(.title3[.bold])
+                        .opacity(0.5)
+                }
+                .padding(.cellPadding)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        
+    }
+    
+    
 }
 
 
 #Preview {
-    GeometryReader { proxy in
-        ScrollView {
-            VStack(spacing: 0) {
-                ExampleSection("Section Title"){
-                    Color.random.frame(height: 200)
-                }
-                
-                Spacer()
+    ScrollView {
+        VStack(spacing: 0) {
+            ExampleSection("Section A"){
+                Color.random.frame(height: 260)
             }
-            .ignoresSafeArea(edges: .bottom)
+            
+            ExampleSection("Section B"){
+                Color.random.frame(height: 260)
+            }
+            
+            ExampleSection("Section C"){
+                Color.random.frame(height: 260)
+            }
         }
-        .sceneInset(proxy.safeAreaInsets)
     }
+    .stickyContext()
 }

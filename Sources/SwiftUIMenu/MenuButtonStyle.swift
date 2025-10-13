@@ -75,7 +75,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     configuration.trigger()
                 }
             }
-            .onWindowInteractionHover{ phase in
+            .onInteractionHover{ phase in
                 guard isEnabled else { return }
                 Task {
                     switch phase {
@@ -84,13 +84,20 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     case .ended:
                         activatedAt = nil
                         
-                        if triggerBehaviour == .immediate {
+                        switch triggerBehaviour {
+                        case .immediate:
                             if dismissWhenTriggered {
                                 dismiss()
                             }
-                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 100)
+                            try await Task.sleep(for: .milliseconds(10))
                             configuration.trigger()
-                        } else {
+                        case .afterDelay(let delay):
+                            try await Task.sleep(for: delay)
+                            if dismissWhenTriggered {
+                                dismiss()
+                            }
+                            configuration.trigger()
+                        case .onDisappear:
                             actionShouldTriggerOnDisappear = true
                             
                             if dismissWhenTriggered {
@@ -119,18 +126,7 @@ public extension PrimitiveButtonStyle where Self == MenuButtonStyle {
 }
 
 
-
-public enum ActionTriggerBehaviour: Hashable, Sendable, BitwiseCopyable {
-    case immediate
-    case onDisappear
-}
-
-
 public extension View {
-    
-    nonisolated func actionTriggerBehaviour(_ behaviour: ActionTriggerBehaviour) -> some View {
-        environment(\.actionTriggerBehaviour, behaviour)
-    }
     
     nonisolated func actionDwellDuration(_ duration: TimeInterval?) -> some View {
         environment(\.actionDwellDuration, duration)
@@ -141,7 +137,6 @@ public extension View {
 
 extension EnvironmentValues {
     
-    @Entry var actionTriggerBehaviour: ActionTriggerBehaviour = .immediate
     @Entry var actionDwellDuration: TimeInterval? = nil
     
 }

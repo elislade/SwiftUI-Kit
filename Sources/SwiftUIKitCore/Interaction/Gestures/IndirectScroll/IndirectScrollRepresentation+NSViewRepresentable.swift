@@ -35,6 +35,10 @@ final class IndirectScrollView<Source: View> : NSHostingView<Source> {
     private var hasStartedScrolling: Bool = false
     private var totalTranslation: SIMD2<Double> = .zero
     
+    override func wantsForwardedScrollEvents(for axis: NSEvent.GestureAxis) -> Bool {
+        true
+    }
+    
     override func scrollWheel(with event: NSEvent) {
         if event.phase == .mayBegin || event.phase == .began {
             activeGesture = gesture(event.flippedYLocationInWindow.simd)
@@ -81,7 +85,6 @@ final class IndirectScrollView<Source: View> : NSHostingView<Source> {
         let resolved = IndirectScrollGesture.Value(
             event,
             for: gesture.mask,
-            flipX: userInterfaceLayoutDirection == .rightToLeft,
             totalTranslation: totalTranslation
         )
         
@@ -182,12 +185,11 @@ extension IndirectScrollGesture.Value {
     init(
         _ event: NSEvent,
         for axis: Axis.Set = [.horizontal, .vertical],
-        flipX: Bool = false,
         totalTranslation: SIMD2<Double>
     ) {
         self.time = event.timestamp
         self.delta = [
-            axis.contains(.horizontal) ? event.scrollingDeltaX * (flipX ? -1 : 1) : 0,
+            axis.contains(.horizontal) ? event.scrollingDeltaX : 0,
             axis.contains(.vertical) ? event.scrollingDeltaY : 0
         ]
         

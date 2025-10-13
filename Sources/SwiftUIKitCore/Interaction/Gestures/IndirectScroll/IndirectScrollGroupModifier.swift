@@ -1,25 +1,31 @@
 import SwiftUI
 
-
 struct IndirectScrollGroupModifier {
     
     @State private var gestures: [WindowFrame<IndirectScrollGesture>] = []
+    let isActive: Bool
     
 }
-
 
 extension IndirectScrollGroupModifier: ViewModifier {
     
     func body(content: Content) -> some View {
-        IndirectScrollRepresentation(
-            gesture: { windowLocation in
-                gestures.first(where: { $0.frame.contains(.init(windowLocation)) })?.value
-            }
-        ){
+        if isActive {
+            IndirectScrollRepresentation(
+                gesture: { windowLocation in
+                    gestures.first(where: { $0.frame.contains(.init(windowLocation)) })?.value
+                },
+                content: {
+                    content
+                        .releaseContainerSafeArea()
+                        .ignoresSafeArea()
+                }
+            )
+            .onPreferenceChange(IndirectGesturePreference.self){ gestures = $0 }
+            .resetPreference(IndirectGesturePreference.self)
+            .captureContainerSafeArea()
+        } else {
             content
-        }
-        .onPreferenceChange(IndirectGesturePreference.self){
-            gestures = $0
         }
     }
     
@@ -28,6 +34,7 @@ extension IndirectScrollGroupModifier: ViewModifier {
 
 @dynamicMemberLookup struct WindowFrame<Value> {
     
+    let id: UUID
     let frame: CGRect
     let value: Value
     
@@ -41,7 +48,7 @@ extension IndirectScrollGroupModifier: ViewModifier {
 extension WindowFrame: Equatable where Value: Equatable {
     
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.frame == rhs.frame && lhs.value == rhs.value
+        lhs.id == rhs.id && lhs.frame == rhs.frame && lhs.value == rhs.value
     }
     
 }
@@ -49,8 +56,8 @@ extension WindowFrame: Equatable where Value: Equatable {
 
 extension IndirectGesture {
     
-    func window(frame: CGRect) -> WindowFrame<Self> {
-        .init(frame: frame, value: self)
+    func window(id: UUID, frame: CGRect) -> WindowFrame<Self> {
+        .init(id: id, frame: frame, value: self)
     }
     
 }
