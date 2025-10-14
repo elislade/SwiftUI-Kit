@@ -8,9 +8,7 @@ struct StickyContext : ViewModifier {
     
     private func calculateSticky(in proxy: GeometryProxy, for items: [StickyPreferenceValue]) {
         var items = items.map{
-            var result = PendingUpdate(item: $0)
-            result.frame = proxy[$0.anchor]
-            return result
+            PendingUpdate(item: $0, frame: proxy[$0.anchor])
         }
         
         defer {
@@ -100,9 +98,10 @@ struct StickyContext : ViewModifier {
     @dynamicMemberLookup struct PendingUpdate {
         
         let item: StickyPreferenceValue
+        let frame: CGRect
+        
         var pendingGrouping: [Edge: StickyGrouping] = [:]
         var pendingEdges: [Edge: CGFloat] = [:]
-        var frame: CGRect = .zero
         
         func finalize() {
             let stickingEdges = pendingEdges.keys.reduce(into: Edge.Set()){ result, edge in
