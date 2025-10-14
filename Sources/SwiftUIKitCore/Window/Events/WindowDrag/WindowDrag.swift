@@ -1,10 +1,10 @@
 import SwiftUI
 
-public extension View {
+extension View {
     
     #if os(watchOS)
     
-    func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
+    public nonisolated func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
         InlineEnvironmentValue(\.windowDragEnabled){ enabled in
             contentShape(Rectangle()).simultaneousGesture(
                 DragGesture(minimumDistance: 0, coordinateSpace: .global)
@@ -17,13 +17,13 @@ public extension View {
     
     #else
     
-    nonisolated func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
+    public nonisolated func onWindowDrag(perform action: @escaping (WindowDragEvent) -> Void) -> some View {
         modifier(WindowDragModifier(action: action))
     }
     
     #endif
     
-    nonisolated func disableWindowDrag(_ disabled: Bool = true) -> some View {
+    public nonisolated func disableWindowDrag(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.windowDragEnabled){ isEnabled in
             if disabled {
                 isEnabled = false
@@ -48,8 +48,8 @@ public struct WindowDragEvent: Sendable {
 }
 
 
-public extension EnvironmentValues {
+extension EnvironmentValues {
     
-    @Entry var windowDragEnabled: Bool = true
+    @Entry public var windowDragEnabled: Bool = true
     
 }
