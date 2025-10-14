@@ -76,6 +76,7 @@ struct ExampleView<E: View, P: View>: View {
         .tint(color)
         .captureContainerSafeArea(edges: .vertical)
         .ignoresSafeAreaOppositeNotch()
+        .persistentSystemOverlays(.hidden)
     }
     
 }

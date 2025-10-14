@@ -86,19 +86,19 @@ public struct InteractionHoverExample: View  {
         
         var spacing: Double = 10
         var columns: Int = 3
-        var rows: Int = 3
+        var rows: Int = 2
         
         var body: some View {
             VStack(spacing: spacing) {
-                ForEach(0..<rows, id: \.self) { _ in
+                ForEach(0..<rows, id: \.self) { row in
                     HStack(spacing: spacing) {
                         ForEach(0..<columns, id: \.self) { _ in
-                            Element()
+                            Element(wrappedWithButton: row.isMultiple(of: 2))
                         }
                     }
                     
                     PercentageRoundedRectangle(.vertical, percentage: 1)
-                        .opacity(0.1)
+                        .opacity(0.05)
                 }
             }
         }
@@ -109,27 +109,48 @@ public struct InteractionHoverExample: View  {
     struct Element: View {
         
         @State private var phase: InteractionHoverPhase?
+        @State private var tapCount: Int = 0
+        
+        var wrappedWithButton: Bool = true
+        
+        private var content: some View {
+            RoundedRectangle(cornerRadius: 30)
+                .fill(.tint)
+                .opacity(phase == .entered || phase == .ended ? 1 : 0.2)
+                .overlay {
+                    if let phase {
+                        ElementPhaseLabel(phase)
+                            .foregroundStyle(.background)
+                            .font(.largeTitle.weight(.bold))
+                            .minimumScaleFactor(0.5)
+                            .labelStyle(.iconOnly)
+                            .id(phase)
+                            .transition(.blur(radius: 5) + .scale(0.6) + .opacity)
+                    }
+                }
+                .animation(.bouncy, value: phase)
+        }
         
         var body: some View {
-            Button{ print("press") } label: {
-                RoundedRectangle(cornerRadius: 30)
-                    .fill(.tint)
-                    .opacity(phase == .entered || phase == .ended ? 1 : 0.2)
-                    .onInteractionHover{ phase = $0 }
-                    .overlay {
-                        if let phase {
-                            ElementPhaseLabel(phase)
-                                .foregroundStyle(.background)
-                                .font(.largeTitle.weight(.bold))
-                                .minimumScaleFactor(0.5)
-                                .labelStyle(.iconOnly)
-                                .id(phase)
-                                .transition(.blur(radius: 5) + .scale(0.6) + .opacity)
+            Group {
+                if wrappedWithButton {
+                    Button{ tapCount += 1 } label: {
+                        VStack {
+                            content
+                            LabeledContent{
+                                Text(tapCount, format: .number)
+                            } label: {
+                                Text("Taps")
+                            }
+                            .padding(.horizontal, 8)
                         }
                     }
-                    .animation(.bouncy, value: phase)
+                    .buttonStyle(.plain)
+                } else {
+                    content
+                }
             }
-            .buttonStyle(.plain)
+            .onInteractionHover{ phase = $0 }
         }
     }
     

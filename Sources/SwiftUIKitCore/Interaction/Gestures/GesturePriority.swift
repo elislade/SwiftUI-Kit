@@ -29,9 +29,9 @@ extension View {
     /// - Returns: A modified view.
     public nonisolated func gesture(_ priority: GesturePriority, _ gesture: some Gesture) -> some View {
         self
-            .highPriorityGesture(gesture, including: priority == .high ? .all : .subviews)
-            .simultaneousGesture(gesture, including: priority == .simultaneous ? .all : .subviews)
-            .gesture(gesture, including: priority == .normal ? .all : .subviews)
+            .highPriorityGesture(gesture, isEnabled: priority == .high)
+            .simultaneousGesture(gesture, isEnabled: priority == .simultaneous)
+            .gesture(gesture, isEnabled: priority == .normal)
     }
     
 }

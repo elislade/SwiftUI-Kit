@@ -1,8 +1,9 @@
 import SwiftUI
 
-struct InteractionHoverGroupModifier {
+struct InteractionHoverGestureGroup {
     
     @Environment(\.isBeingPresentedOn) private var isBeingPresentedOn: Bool
+    @Environment(\.interactionHoverEnabled) private var enabled
     
     @State private var id = UUID()
     @State private var previousID: UUID?
@@ -10,17 +11,16 @@ struct InteractionHoverGroupModifier {
     
     @GestureState private var isActive = false
     
-    var priority: InteractionPriority = .normal
-    var delay: Duration = .zero
-    var action: (InteractionHoverGroupEvent) -> Void = { _ in }
+    let priority: GesturePriority
+    let delay: Duration
+    let action: (InteractionHoverGroupEvent) -> Void
     
 }
 
 
-extension InteractionHoverGroupModifier: ViewModifier {
+extension InteractionHoverGestureGroup: ViewModifier {
     
     func body(content: Content) -> some View {
-        //let previousID = previousID
         content
             .coordinateSpace(name: id)
             .environment(\.interactionGroupCoordinateSpace, .named(id))
@@ -28,11 +28,16 @@ extension InteractionHoverGroupModifier: ViewModifier {
             .resetPreference(InteractionHoverElementPreference.self)
             .onChangePolyfill(of: isActive){
                 if !isActive {
+                    if let previousIndex = elements.firstIndex(where: { $0.id == previousID }) {
+                        elements[previousIndex](.left)
+                        action(.init(date: Date(), phase: .exited))
+                        previousID = nil
+                    }
                     action(.init(date: Date(), phase: .ended))
                 }
             }
             .gesture(
-                priority.gesturePriority ?? .none,
+                enabled ? priority : .none,
                 LongPressGesture(
                     minimumDuration: delay.seconds,
                     maximumDistance: 3
@@ -68,23 +73,12 @@ extension InteractionHoverGroupModifier: ViewModifier {
                             }
                         }
                         .updating($isActive){ _, state, _ in
-                            if !state {
-                                print("Start")
-                            }
                             state = true
                         }
                         .onEnded{ gesture in
                             let location = gesture.location
                             
                             if let index = elements.firstIndex(where: { $0.coordinateSpaceBounds.contains(location) }) {
-//                                if
-//                                    id != previousID,
-//                                    let previousIndex = elements.firstIndex(where: { $0.id == previousID })
-//                                {
-//                                    elements[previousIndex](.left)
-//                                    action(.init(date: Date(), phase: .exited))
-//                                }
-                                
                                 elements[index](.ended)
                                 self.previousID = nil
                             }

@@ -7,6 +7,8 @@ struct InteractionHoverElementModifier {
     @Environment(\.interactionHoverEnabled) private var enabled
     
     @State private var id: UUID = UUID()
+    @State private var lastState: InteractionHoverPhase? = nil
+    
     let action: (InteractionHoverPhase) -> Void
     
     nonisolated init(action: @escaping (InteractionHoverPhase) -> Void) {
@@ -28,9 +30,17 @@ extension InteractionHoverElementModifier: ViewModifier {
                             value: enabled ? [.init(
                                 id: id,
                                 coordinateSpaceBounds: proxy.frame(in: coordinateSpace),
-                                action: action
+                                action: {
+                                    lastState = nil
+                                    lastState = $0
+                                }
                             )] : []
                         )
+                    }
+                    .onChangePolyfill(of: lastState){
+                        if let lastState {
+                            action(lastState)
+                        }
                     }
                 }
             }

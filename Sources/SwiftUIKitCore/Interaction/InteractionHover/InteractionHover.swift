@@ -1,10 +1,10 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
     
     @available(*, deprecated, message: "Use interactionHoverGroup() along with a window InteractionPriority.")
-    nonisolated func windowInteractionHoverContext(
+    nonisolated public func windowInteractionHoverContext(
         hitTestOnStart: Bool = false,
         hapticsEnabled: Bool = true
     ) -> some View {
@@ -22,7 +22,7 @@ public extension View {
     ///   - delay: A Duration of how long to wait before the gesture activates. Defaults to zero attoseconds.
     ///   - action: A closure that gets sent ``InteractionHoverGroupEvent``. Defaults to an empty closure.
     /// - Returns: A modified view.
-    @ViewBuilder nonisolated func interactionHoverGroup(
+    @ViewBuilder nonisolated public func interactionHoverGroup(
         priority: InteractionPriority = .normal,
         delay: Duration = .zero,
         perform action: @escaping (InteractionHoverGroupEvent) -> Void = { _ in }
@@ -34,8 +34,8 @@ public extension View {
                 action: action
             ))
         } else {
-            modifier(InteractionHoverGroupModifier(
-                priority: priority,
+            modifier(InteractionHoverGestureGroup(
+                priority: priority.gesturePriority ?? .none,
                 delay: delay,
                 action: action
             ))
@@ -44,32 +44,33 @@ public extension View {
     
     
     @available(*, deprecated, renamed: "onInteractionHover(perform:)")
-    nonisolated func onWindowInteractionHover(perform action: @escaping (WindowInteractionHoverPhase) -> Void) -> some View {
+    nonisolated public func onWindowInteractionHover(perform action: @escaping (WindowInteractionHoverPhase) -> Void) -> some View {
         onInteractionHover(perform: action)
     }
     
     /// Registers this view in the closest group as a interactionHover element.
     /// - Parameter action: A closure that receives the ``InteractionHoverPhase`` of the element in the closest group.
     /// - Returns: A modified view.
-    nonisolated func onInteractionHover(perform action: @escaping (InteractionHoverPhase) -> Void) -> some View {
+    nonisolated public func onInteractionHover(perform action: @escaping (InteractionHoverPhase) -> Void) -> some View {
         modifier(InteractionHoverElementModifier(action: action))
     }
     
     @available(*, deprecated, renamed: "interactionHoverDisabled")
-    nonisolated func windowInteractionHoverDisabled(_ disabled: Bool = true) -> some View {
+    nonisolated public func windowInteractionHoverDisabled(_ disabled: Bool = true) -> some View {
         interactionHoverDisabled(disabled)
     }
     
     /// Disables all interactionHover elements inside this view.
     /// - Parameter disabled: Bool indicating if should be disabling or not. Defaults to true.
     /// - Returns: A modified view.
-    nonisolated func interactionHoverDisabled(_ disabled: Bool = true) -> some View {
+    nonisolated public func interactionHoverDisabled(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.interactionHoverEnabled){ enabled in
             if disabled {
                 enabled = false
             }
         }
     }
+    
 }
 
 
