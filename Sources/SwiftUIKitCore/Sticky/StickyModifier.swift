@@ -3,12 +3,13 @@ import SwiftUI
 
 struct StickyModifier {
 
+    @Environment(\.stickyGrouping) private var grouping: StickyGrouping
+    
     @State private var id = UUID()
     @State private var state: StickingState = .init()
     @State private var offset: CGPoint = .zero
     
     let stickyInsets: OptionalEdgeInsets
-    let behaviour: StickyGrouping?
     let category: StickyCategoryMask
     private let onChange: (StickingState) -> Void
     
@@ -18,11 +19,9 @@ struct StickyModifier {
     init(
         stickyInsets: OptionalEdgeInsets,
         category: StickyCategoryMask,
-        behaviour: StickyGrouping?,
         onChange: @escaping (StickingState) -> Void = { _ in }
     ) {
         self.stickyInsets = stickyInsets
-        self.behaviour = behaviour
         self.category = category
         self.onChange = onChange
     }
@@ -39,7 +38,7 @@ struct StickyModifier {
                     id: id,
                     insets: stickyInsets,
                     categoryMask: category,
-                    grouping: behaviour,
+                    grouping: grouping,
                     anchor: anchor,
                     update: { offset, state in
                         if self.offset != offset {

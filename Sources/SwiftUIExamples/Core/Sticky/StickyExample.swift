@@ -16,11 +16,13 @@ public struct StickyExample: View  {
         ExampleView(title: "Sticky"){
             if let axis {
                 ScrollSticky(axis: axis, inset: inset, stickyItems: $stickyItems)
-                    .stickyContext(grouping: grouping)
+                    .stickyContext()
+                    .stickyGrouping(grouping)
                     .id(axis)
             } else {
                 BothSticky(stickyItems: $stickyItems)
-                    .stickyContext(grouping: grouping)
+                    .stickyContext()
+                    .stickyGrouping(grouping)
             }
         } parameters: {
             HStack {

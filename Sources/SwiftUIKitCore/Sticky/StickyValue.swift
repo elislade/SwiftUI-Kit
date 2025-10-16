@@ -61,7 +61,7 @@ struct StickyPreferenceValue: Equatable {
     let id: UUID
     let insets: OptionalEdgeInsets
     let categoryMask: StickyCategoryMask
-    let grouping: StickyGrouping?
+    let grouping: StickyGrouping
     let anchor: Anchor<CGRect>
     let update: (CGPoint, StickingState) -> Void
     
@@ -70,9 +70,9 @@ struct StickyPreferenceValue: Equatable {
 
 public struct StickyCategoryMask: OptionSet, Sendable {
     
-    public let rawValue: Int8
+    public let rawValue: UInt
     
-    public init(rawValue: Int8) {
+    public init(rawValue: UInt) {
         self.rawValue = rawValue
     }
     

@@ -4,8 +4,6 @@ struct StickyContext : ViewModifier {
     
     @Environment(\.layoutDirection) private var layoutDirection
     
-    let grouping: StickyGrouping
-    
     private func calculateSticky(in proxy: GeometryProxy, for items: [StickyPreferenceValue]) {
         var items = items.map{
             PendingUpdate(item: $0, frame: proxy[$0.anchor])
@@ -23,8 +21,6 @@ struct StickyContext : ViewModifier {
                 let item = edgeItems[i]
                 guard let itemInset = item.insets[edge] else { continue }
                 
-                let itemGrouping = item.grouping ?? grouping
-                
                 var offset = CGFloat()
                 var appliedGrouping: StickyGrouping = .none
                 
@@ -32,12 +28,12 @@ struct StickyContext : ViewModifier {
                 let dimension = item.frame.normalizedDimension(for: edge, in: proxy.size)
                 let itemSize = item.frame.size[Axis(orthogonalTo: edge)]
                 
-                if itemGrouping == .displaced {
+                if item.grouping == .displaced {
                     if itemInset > dimension {
                         offset -= dimension * normalizedFactor
                         offset += itemInset * normalizedFactor
                     } else { continue }
-                } else if itemGrouping == .stacked {
+                } else if item.grouping == .stacked {
                     if itemInset > dimension - stackedSize {
                         offset -= (dimension - stackedSize) * normalizedFactor
                         offset += itemInset * normalizedFactor
@@ -51,7 +47,7 @@ struct StickyContext : ViewModifier {
                     } else { continue }
                 }
                 
-                if itemGrouping == .displaced && i != edgeItems.indices.last {
+                if item.grouping == .displaced && i != edgeItems.indices.last {
                     for j in edgeItems.indices {
                         guard j > i else { continue }
                         
