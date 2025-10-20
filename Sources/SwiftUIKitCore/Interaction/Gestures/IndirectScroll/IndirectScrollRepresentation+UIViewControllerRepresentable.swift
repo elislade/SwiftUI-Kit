@@ -49,26 +49,19 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
             
             let translation = g.translation(in: nil).simd
             
+            let resolved = IndirectScrollGesture.Value(
+                time: Date(),
+                delta: translation - previous,
+                translation: translation,
+                velocity: g.velocity(in: nil).simd
+            )
+            
             if g.state == .ended || g.state == .cancelled || g.state == .failed {
-                gesture.callEnded(with: .init(
-                    time: Date(),
-                    delta: .zero,
-                    translation: translation,
-                    velocity: g.velocity(in: nil).simd
-                ))
+                gesture.callEnded(with: resolved)
                 activeGesture = nil
                 previous = .zero
             } else {
-                if g.state == .began {
-                    start = Date()
-                }
-                gesture.callChanged(with: .init(
-                    time: Date(),
-                    delta: translation - previous,
-                    translation: translation,
-                    velocity: g.velocity(in: nil).simd
-                ))
-                
+                gesture.callChanged(with: resolved)
                 previous = translation
             }
         }
