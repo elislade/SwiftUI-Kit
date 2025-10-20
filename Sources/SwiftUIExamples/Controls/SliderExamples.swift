@@ -31,6 +31,7 @@ public struct SliderExamples: View {
             .environment(\.layoutDirectionSuggestion, directionSuggestion)
             .controlRoundness(controlRoundness)
             .disabled(disable)
+            .indirectScrollGroup()
         } parameters: {
             HStack {
                 Text("Test Animation")
@@ -43,6 +44,7 @@ public struct SliderExamples: View {
                         value = .random(in: 0...1)
                     }
                 }
+                .buttonStyle(.tinted)
             }
             .exampleParameterCell()
             

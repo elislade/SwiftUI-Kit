@@ -86,6 +86,7 @@ public struct Slider<Value: BinaryFloatingPoint & Sendable>: View where Value.St
             height: layoutVertical ? nil : handleSize
         )
         .compositingGroup()
+        .indirectScrollInvertY(layoutDirectionSuggestion == .useBottomToTop)
         .opacity(isEnabled ? 1 : 0.5)
         .geometryGroupPolyfill()
         .accessibilityAdjustableAction{ direction in

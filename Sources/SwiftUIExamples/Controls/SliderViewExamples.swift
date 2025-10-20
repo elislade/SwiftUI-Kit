@@ -4,8 +4,7 @@ import SwiftUIKit
 public struct SliderViewExamples : View {
     
     @State private var direction = LayoutDirection.leftToRight
-    @State private var useStepping = false
-    @State private var hitTestHandle = false
+    @State private var hitTestHandle = true
     
     @State private var x = Clamped(-2, in: -4...(-1))
     @State private var y = Clamped(2, in: 1...8)
@@ -26,22 +25,174 @@ public struct SliderViewExamples : View {
     
     public var body: some View {
         ExampleView(title: "Slider View"){
+            Content(
+                size: size,
+                spacing: spacing,
+                radius: radius,
+                hitTestHandle: hitTestHandle,
+                x: $x, y: $y
+            )
+            .padding()
+            .environment(\.layoutDirection, direction)
+            .indirectScrollGroup()
+        } parameters: {
+            ExampleCell.LayoutDirection(value: $direction)
+            
+            Toggle(isOn: $hitTestHandle){
+                Text("Hit Test Handle")
+                    .font(.exampleParameterTitle)
+            }
+            .exampleParameterCell()
+            
+            ExampleSection("X: \(x.value.formatted(.increment(0.01)))", isExpanded: true){
+                EditStep(step: $x.step, bounds: x.bounds)
+                EditBounds(bounds: $x.bounds)
+            }
+            
+            ExampleSection("Y: \(y.value.formatted(.increment(0.01)))", isExpanded: true){
+                EditStep(step: $y.step, bounds: x.bounds)
+                EditBounds(bounds: $y.bounds)
+            }
+        }
+    }
+    
+    struct EditBounds: View {
+        
+        @Binding var bounds: ClosedRange<Double>
+        
+        private var lower: Binding<Double> {
+            .init(
+                get: { bounds.lowerBound },
+                set: { bounds = $0...bounds.upperBound }
+            )
+        }
+        
+        private var upper: Binding<Double> {
+            .init(
+                get: { bounds.upperBound },
+                set: { bounds = bounds.lowerBound...$0 }
+            )
+        }
+        
+        var body: some View {
+            VStack {
+                HStack(spacing: 0){
+                    Text("Range")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer(minLength: 10)
+                    Spacer(minLength: 10)
+                    
+                    Text(bounds.lowerBound, format: .increment(0.1))
+                        .font(.exampleParameterValue) +
+                    Text(" ... ") +
+                    Text(bounds.upperBound, format: .increment(0.1))
+                        .font(.exampleParameterValue)
+                }
+                
+                HStack {
+                    Slider(
+                        value: lower,
+                        in: (bounds.upperBound - 10)...(bounds.upperBound - 1),
+                        step: 0.1
+                    )
+                    
+                    Slider(
+                        value: upper,
+                        in: (bounds.lowerBound + 1)...(bounds.lowerBound + 10),
+                        step: 0.1
+                    )
+                }
+            }
+            .exampleParameterCell()
+        }
+        
+    }
+    
+    struct EditStep: View {
+        
+        @Binding var step: Double?
+        let bounds: ClosedRange<Double>
+        
+        private var binding: Binding<Double> {
+            .init(
+                get: { step ?? 0 },
+                set: { step = $0 }
+            )
+        }
+        
+        private var enabled: Binding<Bool> {
+            .init(
+                get: { step != nil },
+                set: { step = $0 ? 0.1 : nil }
+            )
+        }
+        
+        var body: some View {
+            VStack {
+                HStack{
+                    Toggle(isOn: enabled){
+                        Text("Step")
+                            .font(.exampleParameterTitle)
+                    }
+          
+                    Text(binding.wrappedValue, format: .increment(0.1))
+                        .font(.exampleParameterValue)
+                }
+                
+                Slider(value: binding)
+                    .disabled(!enabled.wrappedValue)
+            }
+            .exampleParameterCell()
+        }
+        
+    }
+    
+    struct Content: View {
+        
+        let size: Double
+        let spacing: Double
+        let radius: Double
+        let hitTestHandle: Bool
+        
+        @Binding var x: Clamped<Double>
+        @Binding var y: Clamped<Double>
+        
+        private var handle: some View {
+            RaisedControlMaterial(RoundedRectangle(cornerRadius: radius).inset(by: 3))
+        }
+        
+        private var bg: some View {
+            SunkenControlMaterial(RoundedRectangle(cornerRadius: radius))
+        }
+        
+        var body: some View {
             VStack(spacing: spacing) {
                 HStack(spacing: spacing) {
                     VStack(spacing: spacing) {
-                        SliderView(x: $x, y: $y, hitTestHandle: hitTestHandle){ handle.frame(width: size * 3, height: size * 2)
+                        SliderView(
+                            x: $x, y: $y,
+                            hitTestHandle: hitTestHandle
+                        ){
+                            handle
+                                .frame(width: size * 3, height: size * 2)
+                                .geometryGroupPolyfill()
                         }
                         .background{ bg }
                         
                         SliderView(x: $x, hitTestHandle: hitTestHandle){
-                            handle.frame(width: size, height: size)
+                            handle
+                                .frame(width: size, height: size)
+                                .geometryGroupPolyfill()
                         }
                         .background{ bg }
                         .frame(height: size)
                     }
                     
                     SliderView(y: $y, hitTestHandle: hitTestHandle){
-                        handle.frame(width: size, height: size)
+                        handle
+                            .frame(width: size, height: size)
+                            .geometryGroupPolyfill()
                     }
                     .background{ bg }
                     .frame(width: size)
@@ -57,45 +208,8 @@ public struct SliderViewExamples : View {
                     }
                     .frame(height: size)
             }
-            .animation(useStepping ? .bouncy : .fastSpringInteractive, value: x)
-            .animation(useStepping ? .bouncy : .fastSpringInteractive, value: y)
-            .padding()
-            .environment(\.layoutDirection, direction)
-        } parameters: {
-            HStack {
-                Text("Value")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Text("X ") + Text(x.value, format: .increment(0.01))
-                    .font(.exampleParameterValue)
-                    .foregroundColor(.secondary)
-                
-                Text("Y ") + Text(y.value, format: .increment(0.01))
-                    .font(.exampleParameterValue)
-                    .foregroundColor(.secondary)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.LayoutDirection(value: $direction)
-            
-            Toggle(isOn: $hitTestHandle){
-                Text("Hit Test Handle")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            Toggle(isOn: $useStepping){
-                Text("Use Stepping")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            .syncValue(_useStepping.map{ $0 ? 1 : nil }, $x.step)
-            .syncValue(_useStepping.map{ $0 ? 3 : nil }, $y.step)
         }
     }
-    
 }
 
 
@@ -190,6 +304,8 @@ struct SliderViewEqualizerExample: View {
                 }
                 .padding()
             }
+            .indirectScrollGroup()
+            .indirectScrollInvertY()
         } parameters: {
             HStack{
                 Text("Action")

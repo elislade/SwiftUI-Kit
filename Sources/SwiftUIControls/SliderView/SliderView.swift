@@ -10,6 +10,7 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
     @State private var handleSize: CGSize = .zero
     @State private var hovering = false
     @State private var startDrag: CGPoint?
+    @State private var scrollStartPercent: (x: Value, y: Value)?
     
     @Binding private var x: Clamped<Value>
     @Binding private var y: Clamped<Value>
@@ -148,6 +149,24 @@ public struct SliderView<Handle: View, Value: BinaryFloatingPoint>: View where V
                 }
             }
         }
+        .indirectScrollGesture(
+            IndirectScrollGesture(axes: activeAxis)
+                .onChanged{ value in
+                    if let scrollStartPercent {
+                        if activeAxis.contains(.horizontal) {
+                            x.percentComplete = scrollStartPercent.x + Value(value.translation.x * layoutDirection.scaleFactor / 300)
+                        }
+                        if activeAxis.contains(.vertical) {
+                            y.percentComplete = scrollStartPercent.y + Value(value.translation.y / 300)
+                        }
+                    } else {
+                        scrollStartPercent = (x.percentComplete, y.percentComplete)
+                    }
+                }
+                .onEnded{ _ in
+                    scrollStartPercent = nil
+                }
+        )
         #if !os(tvOS)
         .coordinateSpace(name: space)
         #endif
