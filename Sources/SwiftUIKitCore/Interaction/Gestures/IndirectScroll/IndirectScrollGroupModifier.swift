@@ -17,13 +17,13 @@ extension IndirectScrollGroupModifier: ViewModifier {
                 },
                 content: {
                     content
-                        .releaseContainerSafeArea()
+                        //.releaseContainerSafeArea()
                         .ignoresSafeArea()
                 }
             )
             .onPreferenceChange(IndirectGesturePreference.self){ gestures = $0 }
             .resetPreference(IndirectGesturePreference.self)
-            .captureContainerSafeArea()
+            //.captureContainerSafeArea()
         } else {
             content
         }

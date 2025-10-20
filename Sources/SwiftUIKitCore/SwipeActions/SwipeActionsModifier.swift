@@ -158,45 +158,41 @@ extension SwipeActionsModifier: ViewModifier  {
                     }
                 }
             }
-            .background{
-                Color.clear.indirectScrollGesture(
-                    IndirectScrollGesture(useMomentum: false, mask: .horizontal)
-                        .onChanged{ value in
-                            if scrollInteraction == nil {
-                                if let openEdge {
-                                    scrollInteraction = .init(edge: openEdge, start: 0)
-                                } else  {
-                                    if value.delta.x > 0 {
-                                        scrollInteraction = .init(edge: .leading.invert(active: direction == .rightToLeft), start: 0)
-                                    } else if value.delta.x < 0 {
-                                        scrollInteraction = .init(edge: .trailing.invert(active: direction == .rightToLeft), start: 0)
-                                    }
+            .indirectScrollGesture(
+                IndirectScrollGesture(axes: .horizontal)
+                    .onChanged{ value in
+                        if scrollInteraction == nil {
+                            if let openEdge {
+                                scrollInteraction = .init(edge: openEdge, start: 0)
+                            } else  {
+                                if value.delta.x > 0 {
+                                    scrollInteraction = .init(edge: .leading.invert(active: direction == .rightToLeft), start: 0)
+                                } else if value.delta.x < 0 {
+                                    scrollInteraction = .init(edge: .trailing.invert(active: direction == .rightToLeft), start: 0)
                                 }
                             }
-                            scrollInteraction?.current = value.translation.x
                         }
-                        .onEnded{ value in
-                            let projectedOffset = value.translation.x
-                            if let activeEdge = openEdge {
-                                switch activeEdge.invert(active: direction == .rightToLeft) {
-                                case .leading:
-                                    if projectedOffset < 50 {
-                                        self.openEdge = nil
-                                    }
-                                case .trailing:
-                                    if projectedOffset > -50 {
-                                        self.openEdge = nil
-                                    }
+                        scrollInteraction?.current = value.translation.x
+                    }
+                    .onEnded{ value in
+                        let projectedOffset = value.translation.x
+                        if let activeEdge = openEdge {
+                            switch activeEdge.invert(active: direction == .rightToLeft) {
+                            case .leading:
+                                if projectedOffset < 50 {
+                                    self.openEdge = nil
                                 }
-                            } else {
-                                self.openEdge = scrollInteraction?.edge
+                            case .trailing:
+                                if projectedOffset > -50 {
+                                    self.openEdge = nil
+                                }
                             }
-                            scrollInteraction = nil
+                        } else {
+                            self.openEdge = scrollInteraction?.edge
                         }
-                )
-                // FIX for custom gesture not getting updated with environment.
-                .id(direction)
-            }
+                        scrollInteraction = nil
+                    }
+            )
             .background {
                 HStack(spacing: 0) {
                     HStack(spacing: 4){

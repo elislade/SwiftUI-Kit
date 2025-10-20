@@ -48,7 +48,15 @@ extension NSEvent {
     
     @MainActor var flippedYLocationInWindow: CGPoint {
         guard let window else { return locationInWindow }
-        return CGPoint(x: locationInWindow.x, y: window.frame.height - locationInWindow.y)
+        return window.flipY(location: locationInWindow)
+    }
+    
+}
+
+extension NSWindow {
+    
+    func flipY(location: NSPoint) -> NSPoint {
+        CGPoint(x: location.x, y: frame.height - location.y)
     }
     
 }

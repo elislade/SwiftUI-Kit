@@ -4,59 +4,38 @@ import SwiftUIKit
 public struct IndirectScrollExample: View {
     
     @State private var layout: LayoutDirection = .leftToRight
-    @State private var hue: Double = .random(in: 0...1)
-    @State private var scroll: SIMD2<Double> = .zero
     @State private var useMomentum: Bool = false
-    @State private var mask: Axis.Set = [.horizontal]
-    @State private var maskEvaluation: EventMaskEvaluationPhase = .onBegin
+    @State private var axes: Axis.Set = [.horizontal, .vertical]
     
     public init() {}
     
+    private var responder: some View {
+        Responder(
+            useMomentum: useMomentum,
+            axes: axes
+        )
+    }
+    
+    private var spacer: some View {
+        RoundedRectangle(cornerRadius: 30)
+            .opacity(0.1)
+            .overlay { Text("Spacer") }
+    }
+    
     public var body: some View {
         ExampleView(title: "Indirect Scroll") {
-            ScrollView(showsIndicators: true) {
-                VStack {
-                    RoundedRectangle(cornerRadius: 30)
-                        .frame(height: 100)
-                        .opacity(0.1)
-                        .overlay { Text("Scroll Spacer Top") }
-                    
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(.gray.opacity(0.2))
-                        
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(Color(hue: hue, saturation: 1, brightness: 0.8))
-                            .offset(x: scroll.x, y: scroll.y)
-                        
-                        Button("Child Responder Test"){
-                            hue = .random(in: 0...1)
-                        }
+            GeometryReader{ proxy in
+                ScrollView(showsIndicators: true) {
+                    VStack {
+                        spacer
+                        responder
+                        spacer
+                        responder
                     }
-                    .frame(height: 300)
-                    .indirectScrollGesture(
-                        IndirectScrollGesture(
-                            useMomentum: useMomentum,
-                            mask: mask,
-                            maskEvaluation: maskEvaluation
-                        )
-                        .onChanged { value in
-                            scroll += value.delta
-                        }
-                        .onEnded { _ in
-                            withAnimation(.snappy){
-                                scroll = .zero
-                            }
-                        }
-                    )
-                    
-                    RoundedRectangle(cornerRadius: 30)
-                        .frame(height: 100)
-                        .opacity(0.1)
-                        .overlay { Text("Scroll Spacer Bottom") }
+                    .padding()
+                    .indirectScrollGroup()
+                    .frame(height: proxy.size.height)
                 }
-                .padding()
-                .indirectScrollGroup()
             }
             .environment(\.layoutDirection, layout)
         } parameters: {
@@ -65,41 +44,73 @@ public struct IndirectScrollExample: View {
                     .font(.exampleParameterTitle)
             }
             .exampleParameterCell()
-            .disabled(mask.isEmpty)
+            .disabled(axes.isEmpty)
             
             ExampleCell.LayoutDirection(value: $layout)
             
-            ExampleSection("Mask", isExpanded: true){
-                Toggle(isOn: Binding($mask, contains: .horizontal)){
-                    Text("Horizontal Axis")
+            ExampleSection("Axes", isExpanded: true){
+                Toggle(isOn: Binding($axes, contains: .horizontal)){
+                    Text("Horizontal")
                         .font(.exampleParameterTitle)
                 }
                 .exampleParameterCell()
                 
-                Toggle(isOn: Binding($mask, contains: .vertical)){
-                    Text("Vertical Axis")
+                Toggle(isOn: Binding($axes, contains: .vertical)){
+                    Text("Vertical")
                         .font(.exampleParameterTitle)
                 }
                 .exampleParameterCell()
-                
-                HStack {
-                    Text("Evaluation Phase")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Picker("", selection: $maskEvaluation){
-                        Text("On Change")
-                            .tag(EventMaskEvaluationPhase.onChange)
-                        
-                        Text("On Begin")
-                            .tag(EventMaskEvaluationPhase.onBegin)
-                    }
-                    .frame(maxWidth: 130, alignment: .trailing)
-                }
-                .exampleParameterCell()
-                .disabled(mask.isEmpty)
             }
+        }
+    }
+    
+    
+    struct Responder: View {
+        
+        @State private var scrollStart: SIMD2<Double>?
+        @State private var scroll: SIMD2<Double> = .zero
+        
+        let useMomentum: Bool
+        let axes: Axis.Set
+        
+        var body: some View {
+            ZStack {
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(.gray.opacity(0.2))
+                
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(.tint)
+                    .offset(x: scroll.x, y: scroll.y)
+                
+                Button("Child Responder Test"){
+                    withAnimation(.bouncy){
+                        scroll = .zero
+                    }
+                }
+            }
+            .indirectScrollGesture(
+                IndirectScrollGesture(axes: axes)
+                .onChanged { value in
+                    if let scrollStart {
+                        withAnimation(.interactiveSpring){
+                            scroll = scrollStart + value.translation
+                        }
+                    } else {
+                        scrollStart = scroll
+                    }
+                }
+                .onEnded { value in
+                    guard let scrollStart else { return }
+                    
+                    if useMomentum {
+                        withAnimation(.spring()){
+                            scroll = scrollStart + value.predictedEndTranslation
+                        }
+                    }
+                    
+                    self.scrollStart = nil
+                }
+            )
         }
     }
     

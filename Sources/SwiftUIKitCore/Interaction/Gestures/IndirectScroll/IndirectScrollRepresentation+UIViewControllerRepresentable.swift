@@ -22,11 +22,16 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
         Coordinator()
     }
     
+    func sizeThatFits(_ proposal: ProposedViewSize, uiViewController: UIHostingController<Source>, context: Context) -> CGSize? {
+        uiViewController.sizeThatFits(
+            in: proposal.replacingUnspecifiedDimensions(by: CGSizeMake(.infinity, .infinity))
+        )
+    }
+    
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         
-        var gesture: (SIMD2<Double>) -> IndirectScrollGesture? = { _ in nil}
+        var gesture: (SIMD2<Double>) -> IndirectScrollGesture? = { _ in nil }
         private var previous: SIMD2<Double> = .zero
-        private var start = Date()
         private var activeGesture: IndirectScrollGesture? = nil
         
         lazy var pan: UIPanGestureRecognizer = {
@@ -43,11 +48,13 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
             guard let gesture = activeGesture else { return }
             
             let translation = g.translation(in: nil).simd
+            
             if g.state == .ended || g.state == .cancelled || g.state == .failed {
                 gesture.callEnded(with: .init(
-                    time: start.timeIntervalSinceNow,
+                    time: Date(),
                     delta: .zero,
-                    translation: translation
+                    translation: translation,
+                    velocity: g.velocity(in: nil).simd
                 ))
                 activeGesture = nil
                 previous = .zero
@@ -56,9 +63,10 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
                     start = Date()
                 }
                 gesture.callChanged(with: .init(
-                    time: start.timeIntervalSinceNow,
+                    time: Date(),
                     delta: translation - previous,
-                    translation: translation
+                    translation: translation,
+                    velocity: g.velocity(in: nil).simd
                 ))
                 
                 previous = translation
@@ -66,8 +74,21 @@ extension IndirectScrollRepresentation : UIViewControllerRepresentable {
         }
         
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            let location = gestureRecognizer.location(in: gestureRecognizer.view?.window)
-            activeGesture = gesture(location.simd)
+            guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
+                return false
+            }
+            let location = pan.location(in: pan.view?.window)
+            let translation = pan.translation(in: nil)
+            
+            if
+                let gesture = gesture(location.simd),
+                let axis = translation.simd.greatestMagnitudeAxis,
+                gesture.axes.intersects(with: axis.asSet)
+            {
+                activeGesture = gesture
+            } else {
+                activeGesture = nil
+            }
             return activeGesture != nil
         }
         

@@ -286,3 +286,45 @@ extension CGRect : ReplaceWhenFloatKeyIsTrueConformance {
     }
     
 }
+
+
+extension SIMD2 where Scalar: BinaryFloatingPoint {
+    
+    nonisolated public func invert(axis: Axis.Set) -> Self {
+        self * [axis.contains(.horizontal) ? -1 : 1, axis.contains(.vertical) ? -1 : 1]
+    }
+    
+    nonisolated public func zero(keeping axes: Axis.Set) -> Self {
+        replacing(
+            with: .zero,
+            where: [!axes.contains(.horizontal), !axes.contains(.vertical)]
+        )
+    }
+    
+    nonisolated public var greatestMagnitudeAxis: Axis? {
+        let x = abs(x), y = abs(y)
+        return x > y ? .horizontal : y > x ? .vertical : nil
+    }
+    
+}
+
+
+extension SIMD2 where Scalar == Int {
+    
+    nonisolated public func invert(axis: Axis.Set) -> Self {
+        self &* [axis.contains(.horizontal) ? -1 : 1, axis.contains(.vertical) ? -1 : 1]
+    }
+    
+    nonisolated public func mask(axis: Axis.Set) -> Self {
+        replacing(
+            with: 0,
+            where: [!axis.contains(.horizontal), !axis.contains(.vertical)]
+        )
+    }
+    
+    nonisolated public var greatestMagnitudeAxis: Axis? {
+        let x = abs(x), y = abs(y)
+        return x > y ? .horizontal : y > x ? .vertical : nil
+    }
+    
+}

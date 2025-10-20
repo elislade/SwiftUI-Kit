@@ -43,7 +43,6 @@ public struct SwipeActionExamples: View {
             .layoutDirectionSuggestion(.useTopToBottom)
             .environment(\.layoutDirection, layoutDirection)
             .swipeActionInvalidation(invalidation)
-            .indirectScrollGroup()
         } parameters: {
             ExampleSection("Invalidation", isExpanded: true){
                 Toggle(isOn: Binding($invalidation, subset: .onMove)){
@@ -128,6 +127,7 @@ public struct SwipeActionExamples: View {
                     cellRadius: cellRadius,
                     actionState: actionState
                 )
+                .indirectScrollGroup()
             }
             .safeAreaInset(edge: .top, spacing: 0){
                 HStack {
