@@ -32,14 +32,17 @@ struct BasicPresentationContext: ViewModifier {
                     if !values.isEmpty {
                         BackdropView(preference: backdropPreference, dismiss: dismiss)
                             .zIndex(2 + Double(values.count - 1))
-                            .transition((.opacity + .noHitTesting).animation(.smooth))
+                            .transition(.asymmetric(
+                                insertion: (.opacity + .noHitTesting).animation(.smooth),
+                                removal: (.opacity + .noHitTesting).animation(.smooth.delay(0.25))
+                            ))
                     }
                     
                     ForEach(values, id: \.id){ value in
                         value.view
                             .environment(\._isBeingPresented, true)
                             .environment(\.dismissPresentation, .init(id: value.id, closure: dismiss))
-                            .zIndex(2 + Double(values.firstIndex(of: value)!))
+                            .zIndex((2 + Double(values.firstIndex(of: value)!) + 1))
                             .accessibilityAddTraits(.isModal)
                             .accessibilityHidden(values.count > 1 ? value != values.last : false)
                             .disableOnPresentationWillDismiss(values.last != value)
