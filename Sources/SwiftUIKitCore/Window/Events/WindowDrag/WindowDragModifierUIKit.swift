@@ -26,9 +26,14 @@ extension WindowDragModifier : ViewModifier {
                             .onDisappear{ UIWindow.exitSwizzleSendEvents() }
                             .onReceive(WindowEvents.passthrough
                                 .filter({ $0.type == .touches && isEnabled })
-                                .compactMap(\.allTouches)
-                                .map({ $0.filter{ $0.window == window }})
-                                   // Order contains the order of the touches, while sorted is the current touches following that order. Sorted will be sorted on every pass while the order changes only on begin and end phases of individual touches.
+                                .compactMap{
+                                    if let window {
+                                        $0.touches(for: window)
+                                    } else {
+                                        $0.allTouches
+                                    }
+                                }
+                               // Order contains the order of the touches, while sorted is the current touches following that order. Sorted will be sorted on every pass while the order changes only on begin and end phases of individual touches.
                                 .scan((order: [UITouch](), sorted: [UITouch]())) { state, current in
                                     var order = state.order
                                     for touch in current {
