@@ -240,12 +240,13 @@ extension SwipeActionsModifier: ViewModifier  {
                 }
             }
             .accessibilityRepresentation{
-                HStack {
-                    content
-                    leading()
-                    trailing()
-                }
-                .accessibilityElement(children: .combine)
+                content
+                    .accessibilitySortPriority(3)
+                    .background{
+                        leading().accessibilitySortPriority(2)
+                        trailing().accessibilitySortPriority(1)
+                    }
+                    .accessibilityElement(children: .combine)
             }
     }
     
