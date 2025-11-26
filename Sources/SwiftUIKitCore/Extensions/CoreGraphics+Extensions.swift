@@ -328,3 +328,21 @@ extension SIMD2 where Scalar == Int {
     }
     
 }
+
+
+extension BinaryFloatingPoint {
+    
+    nonisolated public func moveAwayFromZero(to epsilon: Self) -> Self {
+        (abs(self) < epsilon) ? (self >= .zero ? epsilon : -epsilon) : self
+    }
+    
+}
+
+
+extension SIMD where Scalar: BinaryFloatingPoint {
+    
+    nonisolated public func moveAwayFromZero(to epsilon: Scalar) -> Self {
+        .init(indices.map{ self[$0].moveAwayFromZero(to: epsilon) })
+    }
+    
+}

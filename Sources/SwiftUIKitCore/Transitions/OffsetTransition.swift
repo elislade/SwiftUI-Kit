@@ -5,56 +5,59 @@ public extension AnyTransition {
     
     static func offset(_ active: SIMD2<Double>, identity: SIMD2<Double> = .zero) -> AnyTransition {
         .modifier(
-            active: OffsetModifier(offset: active),
-            identity: OffsetModifier(offset: identity)
+            active: OffsetEffect(offset: active).ignoredByLayout(),
+            identity: OffsetEffect(offset: identity).ignoredByLayout()
         )
     }
     
-    static func bindedOffset(
+    static func offsetBinding(
         _ active: Binding<SIMD2<Double>>,
         identity: Binding<SIMD2<Double>> = .constant([0,0])
     ) -> AnyTransition {
         .modifier(
-            active: BindingOffsetModifier(offset: active),
-            identity: BindingOffsetModifier(offset: identity)
+            active: OffsetBindingEffect(offset: active).ignoredByLayout(),
+            identity: OffsetBindingEffect(offset: identity).ignoredByLayout()
         )
     }
     
 }
 
 
-struct OffsetModifier: ViewModifier, Animatable {
+struct OffsetEffect: GeometryEffect {
     
     var offset: SIMD2<Double>
     
-    public typealias AnimatableData = AnimatablePair<Double, Double>
+    public typealias AnimatableData = SIMD2<Double>.AnimatableData
     
     public nonisolated var animatableData: AnimatableData {
-        get {
-            AnimatableData(offset.x, offset.y)
-        } set {
-            offset.x = newValue.first
-            offset.y = newValue.second
-        }
+        get { offset.animatableData }
+        set { offset.animatableData = newValue }
     }
     
     nonisolated init(offset: SIMD2<Double> = .zero) {
         self.offset = offset
     }
-    
-    func body(content: Content) -> some View {
-        content.offset(x: offset.x, y: offset.y)
+     
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        .init(.init(translationX: offset.x, y: offset.y))
     }
     
 }
 
 
-struct BindingOffsetModifier: ViewModifier {
+struct OffsetBindingEffect: GeometryEffect {
     
     @Binding var offset: SIMD2<Double>
     
-    func body(content: Content) -> some View {
-        content.offset(x: offset.x, y: offset.y)
+    public typealias AnimatableData = SIMD2<Double>.AnimatableData
+    
+    public nonisolated var animatableData: AnimatableData {
+        get { offset.animatableData }
+        set { offset.animatableData = newValue }
+    }
+    
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        .init(.init(translationX: offset.x, y: offset.y))
     }
     
 }

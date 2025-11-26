@@ -129,7 +129,7 @@ struct PresentationMatchContextModifier: ViewModifier {
                                         anchor: .topLeading
                                     )
                                     +
-                                    .bindedOffset(
+                                    .offsetBinding(
                                         $sourceOrigin,
                                         identity: .constant(dst.origin.simd)
                                     )
@@ -148,7 +148,7 @@ struct PresentationMatchContextModifier: ViewModifier {
                                         anchor: .topLeading
                                     )
                                     +
-                                    .bindedOffset(
+                                    .offsetBinding(
                                         $sourceOrigin,
                                         identity: .constant(dst.origin.simd)
                                     )

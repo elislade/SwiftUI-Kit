@@ -39,7 +39,7 @@ public struct CompositeTransitionExamples: View {
                     .frame(height: 4)
                     .padding(.horizontal)
             }
-            .animation(.smooth, value: show)
+            .animation(.smooth(extraBounce: 0.5), value: show)
             .overlay(alignment: .bottom){
                 HStack(spacing: 0) {
                     Button(show ? "Hide" : "Show", systemImage: show ? "backward.end" : "forward.end"){

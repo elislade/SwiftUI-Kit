@@ -21,7 +21,7 @@ public struct ScaleTransitionExample: View {
         }
         
         @State private var isLinked = true
-        @State private var scale: SIMD2<Double> = [1,1]
+        @State private var scale: SIMD2<Double> = .zero
         @State private var anchor = UnitPoint.center
         
         var body: some View {

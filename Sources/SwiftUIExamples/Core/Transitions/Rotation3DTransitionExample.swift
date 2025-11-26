@@ -36,13 +36,16 @@ public struct Rotation3DTransitionExample: View {
         var body: some View {
             VStack {
                 HStack {
-                    Text("X Degrees")
+                    Text("X Component")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-                    Text(rot.x * 360, format: .increment(1))
-                        .font(.exampleParameterValue)
+                    Text(
+                        Measurement<UnitAngle>(value: rot.x * 360, unit: .degrees),
+                        format: .measurement(width: .abbreviated)
+                    )
+                    .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $rot.x, in : -1...1, step: 1/360)
@@ -53,13 +56,16 @@ public struct Rotation3DTransitionExample: View {
             
             VStack {
                 HStack {
-                    Text("Y Degrees")
+                    Text("Y Component")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-                    Text(rot.y * 360, format: .increment(1))
-                        .font(.exampleParameterValue)
+                    Text(
+                        Measurement<UnitAngle>(value: rot.y * 360, unit: .degrees),
+                        format: .measurement(width: .abbreviated)
+                    )
+                    .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $rot.y, in : -1...1, step: 1/360)
@@ -68,13 +74,16 @@ public struct Rotation3DTransitionExample: View {
             
             VStack {
                 HStack {
-                    Text("Z Degrees")
+                    Text("Z Component")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-                    Text(rot.z * 360, format: .increment(1))
-                        .font(.exampleParameterValue)
+                    Text(
+                        Measurement<UnitAngle>(value: rot.z * 360, unit: .degrees),
+                        format: .measurement(width: .abbreviated)
+                    )
+                    .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $rot.z, in : -1...1, step: 1/360)

@@ -1,65 +1,94 @@
 import SwiftUI
 
 
-public extension AnyTransition {
+extension AnyTransition {
     
-    static func scale(_ amount: Double = 0, anchor: UnitPoint = .center) -> AnyTransition {
-        .scale(scale: amount, anchor: anchor)
-    }
-    
-    static func scale(x: Double = 1, y: Double = 1, anchor: UnitPoint = .center) -> AnyTransition {
+    public static func scale(_ amount: Double = 0, anchor: UnitPoint = .center) -> AnyTransition {
         .modifier(
-            active: ScaleModifier([x,y], anchor: anchor),
-            identity: ScaleModifier([1,1], anchor: anchor)
+            active: ScaleEffect([amount, amount], anchor: anchor).ignoredByLayout(),
+            identity: ScaleEffect([1,1], anchor: anchor).ignoredByLayout()
         )
     }
     
-    static func scale(_ active: SIMD2<Double>, identity: SIMD2<Double> = [1,1], anchor: UnitPoint = .center) -> AnyTransition {
+    public static func scale(x: Double = 1, y: Double = 1, anchor: UnitPoint = .center) -> AnyTransition {
         .modifier(
-            active: ScaleModifier(active, anchor: anchor),
-            identity: ScaleModifier(identity, anchor: anchor)
+            active: ScaleEffect([x,y], anchor: anchor).ignoredByLayout(),
+            identity: ScaleEffect([1,1], anchor: anchor).ignoredByLayout()
         )
     }
     
-    static func bindedScale(_ active: Binding<SIMD2<Double>>, identity: Binding<SIMD2<Double>> = .constant([1,1]), anchor: UnitPoint = .center) -> AnyTransition {
+    public static func scale(_ active: SIMD2<Double>, identity: SIMD2<Double> = [1,1], anchor: UnitPoint = .center) -> AnyTransition {
         .modifier(
-            active: BindedScaleModifier(active, anchor: anchor),
-            identity: BindedScaleModifier(identity, anchor: anchor)
+            active: ScaleEffect(active, anchor: anchor).ignoredByLayout(),
+            identity: ScaleEffect(identity, anchor: anchor).ignoredByLayout()
+        )
+    }
+    
+    public static func scaleBinding(_ active: Binding<SIMD2<Double>>, identity: Binding<SIMD2<Double>> = .constant([1,1]), anchor: UnitPoint = .center) -> AnyTransition {
+        .modifier(
+            active: ScaleBindingEffect(active, anchor: anchor).ignoredByLayout(),
+            identity: ScaleBindingEffect(identity, anchor: anchor).ignoredByLayout()
         )
     }
     
 }
 
 
-struct ScaleModifier: ViewModifier {
+struct ScaleEffect: GeometryEffect {
     
     var scale: SIMD2<Double>
     let anchor: UnitPoint
+    
+    typealias AnimatableData = SIMD2<Double>.AnimatableData
+    
+    nonisolated public var animatableData: AnimatableData {
+        get { scale.animatableData }
+        set { scale.animatableData = newValue }
+    }
     
     nonisolated init(_ scale: SIMD2<Double>, anchor: UnitPoint = .center) {
         self.scale = scale
         self.anchor = anchor
     }
     
-    func body(content: Content) -> some View {
-        content.scaleEffect(x: scale.x, y: scale.y, anchor: anchor)
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let safe = scale.moveAwayFromZero(to: 0.0001)
+        return .init(
+            .init(scaleX: safe.x, y: safe.y)
+            .concatenating(.init(
+                translationX: (safe.x - 1) * (-size.width * (anchor.x)),
+                y: (safe.y - 1) * (-size.height * (anchor.y))
+            ))
+        )
     }
     
 }
 
 
-struct BindedScaleModifier: ViewModifier {
+struct ScaleBindingEffect: GeometryEffect {
     
     @Binding var scale: SIMD2<Double>
     let anchor: UnitPoint
+    
+    var animatableData: SIMD2<Double>.AnimatableData {
+        get { scale.animatableData }
+        set { scale.animatableData = newValue }
+    }
     
     nonisolated init(_ scale: Binding<SIMD2<Double>>, anchor: UnitPoint = .center) {
         self._scale = scale
         self.anchor = anchor
     }
     
-    func body(content: Content) -> some View {
-        content.scaleEffect(x: scale.x, y: scale.y, anchor: anchor)
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let safe = scale.moveAwayFromZero(to: 0.0001)
+        return .init(
+            .init(scaleX: safe.x, y: safe.y)
+            .concatenating(.init(
+                translationX: (safe.x - 1) * (-size.width * (anchor.x)),
+                y: (safe.y - 1) * (-size.height * (anchor.y))
+            ))
+        )
     }
     
 }

@@ -31,8 +31,11 @@ public struct Rotation2DTransitionExample: View {
                     
                     Spacer()
                     
-                    Text(rot, format: .number)
-                        .font(.exampleParameterValue)
+                    Text(
+                        Measurement<UnitAngle>(value: rot, unit: .degrees),
+                        format: .measurement(width: .abbreviated)
+                    )
+                    .font(.exampleParameterValue)
                 }
                 
                 Slider(value: $rot, in : -360...360, step: 1)

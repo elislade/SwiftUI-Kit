@@ -15,16 +15,16 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
                 
                 if show {
                     RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.random)
+                        .fill(.tint)
                         .transition(transition)
                 } else if let inverse {
                     RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.random)
+                        .fill(.tint)
                         .transition(inverse)
                 }
             }
             .padding()
-            .animation(.smooth.speed(speed), value: show)
+            .animation(.smooth(extraBounce: 0.5).speed(speed), value: show)
         } parameters: {
             Toggle(isOn: $show){
                 Text("Show")
