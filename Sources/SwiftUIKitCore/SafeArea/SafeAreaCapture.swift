@@ -1,25 +1,21 @@
 import SwiftUI
 
-// Since SwiftUI made the decision to evaluate SafeArea after geometry effects are applied instead of before,
-// when you drag a view around, its safe area will change which is not good.
-// Capture/release is to help mitigate this weird decision the SwiftUI team made.
-// Any offset or scale effects applied between a capture and release will not continuously observe safe area changes.
 
-public extension View {
+extension View {
     
-    /// Start capturing SafeArea.
+    /// Start capturing SafeArea and ignores it on children.
     /// - Note: Any offset or scale effects applied between a capture and release will not continuously observe safe area changes.
     /// - Parameter edges: A set of edges to capture. Defaults to all.
     /// - Returns: A modified view.
-    nonisolated func captureContainerSafeArea(edges: Edge.Set = .all) -> some View {
+    nonisolated public func captureContainerSafeArea(edges: Edge.Set = .all) -> some View {
         modifier(CaptureContainerInsetModifier(edges: edges))
     }
     
-    /// Stop capturing SafeArea.
+    /// Stop capturing SafeArea and add back on children.
     /// - Note: Any offset or scale effects applied between a capture and release will not continuously observe safe area changes.
     /// - Parameter edges: A set of edges to release from capturing.
     /// - Returns: A modified view.
-    nonisolated func releaseContainerSafeArea(edges: Edge.Set = .all) -> some View {
+    nonisolated public func releaseContainerSafeArea(edges: Edge.Set = .all) -> some View {
         modifier(ReleaseContainerInsetModifier(edges: edges))
     }
     
