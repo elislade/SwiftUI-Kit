@@ -92,3 +92,20 @@ struct ScaleBindingEffect: GeometryEffect {
     }
     
 }
+
+
+
+extension View {
+    
+    /// Supliments SwiftUIs standard Scale modifier because the base scale GeometryEffect is not publicly available to add the `ignoredByLayout()` version.
+    /// This scales the view after all geometry calculations are done right before rendering while the standard version scales before the Geometry calculations are done.
+    /// - Note: Use this if you don't wan't safeArea calculation reevaluated while the scale changes.
+    /// - Parameters:
+    ///    - scale: The amount to offset the view.
+    ///    - anchor: UnitPoint from where to scale from. Defaults to center (0.5, 0.5)
+    /// - Returns: A modified view.
+    nonisolated public func scaleIgnoredByLayout(_ scale: SIMD2<Double>, anchor: UnitPoint = .center) -> some View {
+        modifier(ScaleEffect(scale, anchor: anchor).ignoredByLayout())
+    }
+    
+}

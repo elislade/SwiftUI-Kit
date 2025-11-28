@@ -61,3 +61,17 @@ struct OffsetBindingEffect: GeometryEffect {
     }
     
 }
+
+
+extension View {
+    
+    /// Supliments SwiftUIs standard Offset modifier because the base offset GeometryEffect is not publicly available to add the `ignoredByLayout()` version.
+    /// This offsets the view after all geometry calculations are done right before rendering while the standard version offsets before the Geometry calculations are done.
+    /// - Note: Use this if you don't wan't safeArea calculation reevaluated while the offset changes.
+    /// - Parameter offset: The amount to offset the view.
+    /// - Returns: A modified view.
+    nonisolated public func offsetIgnoredByLayout(_ offset: SIMD2<Double>) -> some View {
+        modifier(OffsetEffect(offset: offset).ignoredByLayout())
+    }
+    
+}
