@@ -5,6 +5,10 @@ import SwiftUI
 
 extension ViewSnapshoter: NSViewRepresentable {
     
+//    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSViewType, context: Context) -> CGSize? {
+//        nsView.fittingSize
+//    }
+    
     @MainActor func makeNSView(context: Context) -> some NSView {
         if !initial {
             context.coordinator.lastValue = value
@@ -21,7 +25,7 @@ extension ViewSnapshoter: NSViewRepresentable {
                     nsView.cacheDisplay(in: nsView.bounds, to: rep)
                     let image = NSImage(size: nsView.bounds.size)
                     image.addRepresentation(rep)
-                    action(AnyView(Image(nsImage: image)))
+                    action(AnyView(Image(nsImage: image).resizable()))
                 }
             }
             context.coordinator.lastValue = value

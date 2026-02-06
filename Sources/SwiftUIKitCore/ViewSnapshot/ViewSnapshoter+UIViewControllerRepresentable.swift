@@ -19,6 +19,8 @@ extension ViewSnapshoter: UIViewControllerRepresentable {
     }
     
     @MainActor func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        uiViewController.rootView = content
+        
         if context.coordinator.lastValue != value {
             Task { @MainActor in
                 let format = UIGraphicsImageRendererFormat.preferred()
