@@ -47,6 +47,9 @@ extension ContainedBoundsContext: ViewModifier {
                     }
                 }
             }
+            .transformPreference(ContainedBoundsKey.self){ value in
+                value = value.filter({ id != $0.context })
+            }
     }
     
     
