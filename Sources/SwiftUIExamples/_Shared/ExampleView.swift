@@ -147,7 +147,7 @@ extension View {
             .ignoresSafeArea()
         }
         .resetActionContext()
-        .listenForDeviceOrientation()
+        .deviceOrientationListener()
         #if targetEnvironment(macCatalyst)
         .padding(.top, 36)
         #endif

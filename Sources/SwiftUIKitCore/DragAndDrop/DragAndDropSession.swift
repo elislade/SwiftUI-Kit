@@ -76,7 +76,7 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
             .onPreferenceChange(DropAreaPreference<Value>.self){
                 dropAreas = $0
             }
-            .resetPreference(DropAreaPreference<Value>.self)
+            .preferenceKeyReset(DropAreaPreference<Value>.self)
             .onWindowDrag { evt in
                 if evt.phase == .ended {
                     self.end()

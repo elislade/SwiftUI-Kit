@@ -47,7 +47,7 @@ public extension View {
     /// - Parameter disabled: A boolean indicating whether to disable ResetActions or not.
     /// - Returns: A view that disables child ResetActions.
     nonisolated func resetActionsDisabled(_ disabled: Bool = true) -> some View {
-        resetPreference(ResetActionsKey.self, reset: disabled)
+        preferenceKeyReset(ResetActionsKey.self, reset: disabled)
     }
     
     

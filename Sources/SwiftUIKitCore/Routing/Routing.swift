@@ -28,7 +28,7 @@ public extension View {
     }
     
     nonisolated func routesDisabled(_ disabled: Bool = true) -> some View {
-        resetPreference(RoutePreferenceKey.self, reset: disabled)
+        preferenceKeyReset(RoutePreferenceKey.self, reset: disabled)
     }
     
     

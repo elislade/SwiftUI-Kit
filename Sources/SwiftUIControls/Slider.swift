@@ -88,7 +88,7 @@ public struct Slider<Value: BinaryFloatingPoint & Sendable>: View where Value.St
         .compositingGroup()
         .indirectScrollInvertY(layoutDirectionSuggestion == .useBottomToTop)
         .opacity(isEnabled ? 1 : 0.5)
-        .geometryGroupPolyfill()
+        .geometryGroupIfAvailable()
         .accessibilityAdjustableAction{ direction in
             switch direction {
             case .increment: value.increment()

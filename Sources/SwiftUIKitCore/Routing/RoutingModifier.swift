@@ -64,7 +64,7 @@ extension RoutingModifier: ViewModifier {
             .onPreferenceChange(RoutePreferenceKey.self){
                 children = $0
             }
-            .resetPreference(RoutePreferenceKey.self)
+            .preferenceKeyReset(RoutePreferenceKey.self)
             .onOpenURL{ url in
                 Task {
                     if await !handle(url: url) && shouldDefer && valid(url: url) {

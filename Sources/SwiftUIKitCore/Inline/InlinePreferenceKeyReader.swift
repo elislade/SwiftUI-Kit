@@ -22,7 +22,7 @@ extension InlinePreferenceKeyReader: View {
     public var body: some View {
         content(value)
             .onPreferenceChange(Key.self){ value = $0 }
-            .resetPreference(Key.self)
+            .preferenceKeyReset(Key.self)
     }
     
 }

@@ -67,7 +67,7 @@ public struct ContainedBoundsExample: View {
                 RoundedRectangle(cornerRadius: 22)
                     .opacity(0.05)
             }
-            .geometryGroupPolyfill()
+            .geometryGroupIfAvailable()
         }
         
         

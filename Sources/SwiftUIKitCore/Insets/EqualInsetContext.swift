@@ -25,7 +25,7 @@ struct EqualInsetContext: ViewModifier {
                     item.determinedInsets(max)
                 }
             }
-            .resetPreference(EqualItemInsetPreferenceKey.self)
+            .preferenceKeyReset(EqualItemInsetPreferenceKey.self)
     }
     
 }

@@ -21,8 +21,7 @@ extension IndirectScrollGroupModifier: ViewModifier {
                         .ignoresSafeArea()
                 }
             )
-            .onPreferenceChange(IndirectGesturePreference.self){ gestures = $0 }
-            .resetPreference(IndirectGesturePreference.self)
+            .preferenceChangeConsumer(IndirectGesturePreference.self){ gestures = $0 }
             //.captureContainerSafeArea()
         } else {
             content

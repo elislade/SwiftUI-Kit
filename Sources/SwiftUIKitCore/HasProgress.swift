@@ -25,8 +25,8 @@ public extension View {
         }
     }
     
-    nonisolated func resetHasProgress(_ reset: Bool = true) -> some View {
-        resetPreference(HasProgressPreferenceKey.self, reset: reset)
+    nonisolated func hasProgressReset(_ reset: Bool = true) -> some View {
+        preferenceKeyReset(HasProgressPreferenceKey.self, reset: reset)
     }
     
     nonisolated func hasProgress(_ progress: Double, enabled: Bool = true) -> some View {

@@ -121,7 +121,7 @@ extension RoutingPathModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onPreferenceChange(RoutePreferenceKey.self){ children = $0 }
-            .resetPreference(RoutePreferenceKey.self)
+            .preferenceKeyReset(RoutePreferenceKey.self)
             .background{
                 Color.clear.preference(key: RoutePreferenceKey.self, value: [
                     .init(

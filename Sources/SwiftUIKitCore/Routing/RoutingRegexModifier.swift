@@ -51,7 +51,7 @@ struct RoutingRegexModifier<R:RegexComponent> where R.RegexOutput: Sendable, R.R
             .onPreferenceChange(RoutePreferenceKey.self){
                 children = $0
             }
-            .resetPreference(RoutePreferenceKey.self)
+            .preferenceKeyReset(RoutePreferenceKey.self)
             .background{
                 Color.clear.preference(key: RoutePreferenceKey.self, value: [
                     .init(

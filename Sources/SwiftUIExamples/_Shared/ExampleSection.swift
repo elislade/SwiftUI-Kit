@@ -24,7 +24,7 @@ struct ExampleSection<C: View> : View {
         .toggleStyle(ToggleStyle())
         .background{
             ZStack(alignment: .bottom) {
-                VisualEffectView()
+                BlurEffectView()
                 Divider()
             }
             .ignoresSafeArea()

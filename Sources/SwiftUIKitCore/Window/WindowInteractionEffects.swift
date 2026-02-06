@@ -76,7 +76,7 @@ struct WindowInteractionEffects: ViewModifier {
                     }
                 }
             }
-            .disableWindowDrag(effects.isEmpty)
+            .windowDragDisabled(effects.isEmpty)
             .animation(.bouncy(extraBounce: 0.13), value: scale)
             .animation(.bouncy, value: offset)
             .animation(.bouncy, value: scaleAnchor)
