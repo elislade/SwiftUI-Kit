@@ -6,6 +6,7 @@ struct SubmenuContainer<C: View, L: View> : View {
     
     @Environment(\.coordinatedDismiss) private var dismissCoord
     @Environment(\.dismissPresentation) private var dismiss
+    @Environment(\.isBeingPresentedOn) private var presentedOn
     
     @State private var isExpanded = false
     @ViewBuilder let content: @MainActor () -> C
@@ -15,25 +16,26 @@ struct SubmenuContainer<C: View, L: View> : View {
         MenuContainer {
             SubmenuLabel(label: label)
                 .environment(\._isBeingPresented, isExpanded)
-                .handleDismissPresentation {
+                .presentationDismissHandler {
                     withAnimation(.bouncy){
                         isExpanded = false
-                        dismissCoord()
+                        dismiss()
                     }
                 }
             
             if isExpanded {
                 MenuDivider().transition(.identity)
-                content()
+                content().transition(.identity)
             }
         }
         .environment(\.menuVisualDepth, isExpanded ? 1 : 0)
-        .onAppear{
+        //.windowInteractionEffects([.squish])
+        .task{
+            try? await Task.sleep(for: .seconds(0.1))
             withAnimation(.bouncy){
                 isExpanded = true
             }
         }
-        .windowInteractionEffects([.squish])
     }
     
 }

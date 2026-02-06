@@ -17,12 +17,38 @@ struct ExampleCell {
                 
                 Spacer()
                 
-                Picker("", selection: $value){
-                    Text("Left to Right").tag(Direction.leftToRight)
-                    Text("Right to Left").tag(Direction.rightToLeft)
+                
+                SegmentedPicker(
+                    selection: $value.animation(.smooth),
+                    items: [.leftToRight, .rightToLeft]
+                ){
+                    Label($0)
                 }
+                .labelStyle(.iconOnly)
+                .frame(width: 90)
+                .fontWeight(.bold)
             }
             .exampleParameterCell()
+        }
+        
+        struct Label: View {
+            
+            let dir: SwiftUI.LayoutDirection
+            
+            init(_ dir:  SwiftUI.LayoutDirection) {
+                self.dir = dir
+            }
+            
+            var body: some View {
+                switch dir {
+                case .leftToRight:
+                    SwiftUI.Label("Left to Right", systemImage: "arrow.right.to.line")
+                case .rightToLeft:
+                    SwiftUI.Label("Right to Left", systemImage: "arrow.left.to.line")
+                @unknown default:
+                    EmptyView()
+                }
+            }
         }
     }
     
@@ -133,48 +159,111 @@ struct ExampleCell {
         
         @Binding var value: SwiftUI.Alignment
         
-        @State private var horzOptionIndex: Int = 1
-        @State private var vertOptionIndex: Int = 1
-        
-        let horizontalOptions: [HorizontalAlignment] = [.leading, .center, .trailing]
-        let verticalOptions: [VerticalAlignment] = [.top, .center, .bottom]
-        
-        
-        var body: some View {
-            HStack {
-                Text("Horizontal Alignment")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $horzOptionIndex){
-                    Text("Leading").tag(0)
-                    Text("Center").tag(1)
-                    Text("Trailing").tag(2)
+        struct Horizontal: View {
+            
+            @State private var optionIndex: Int = 1
+            
+            let options: [HorizontalAlignment] = [.leading, .center, .trailing]
+            @Binding var value: HorizontalAlignment
+            
+            var body: some View {
+                HStack {
+                    Text("Horizontal Alignment")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    SegmentedPicker(selection: $optionIndex.animation(.bouncy), items: Array(0...2)){ i in
+                        Label(options[i])
+                            .layoutDirectionMirror()
+                    }
+                    .frame(width: 120)
+                    .labelStyle(.iconOnly)
+                    .symbolVariant(.fill)
+                    .symbolRenderingMode(.hierarchical)
+                    .imageScale(.small)
                 }
-            }
-            .exampleParameterCell()
-            .onChangePolyfill(of: horzOptionIndex){
-                value.horizontal = horizontalOptions[horzOptionIndex]
+                .exampleParameterCell()
+                .onChangePolyfill(of: optionIndex){
+                    value = options[optionIndex]
+                }
             }
             
-            HStack {
-                Text("Vertical Alignment")
-                    .font(.exampleParameterTitle)
+            struct Label: View {
                 
-                Spacer()
+                let alignment: HorizontalAlignment
                 
-                Picker("", selection: $vertOptionIndex){
-                    Text("Top").tag(0)
-                    Text("Center").tag(1)
-                    Text("Bottom").tag(2)
+                init(_ alignment: HorizontalAlignment) {
+                    self.alignment = alignment
+                }
+                
+                var body: some View {
+                    if alignment == .leading {
+                        SwiftUI.Label("Leading", systemImage: "align.horizontal.left")
+                    } else if alignment == .center {
+                        SwiftUI.Label("Center", systemImage: "align.horizontal.center")
+                    } else if alignment == .trailing {
+                        SwiftUI.Label("Trailing", systemImage: "align.horizontal.right")
+                    }
                 }
             }
-            .exampleParameterCell()
-            .onChangePolyfill(of: vertOptionIndex){
-                value.vertical = verticalOptions[vertOptionIndex]
+            
+        }
+        
+        struct Vertical: View {
+            
+            @State private var optionIndex: Int = 1
+            
+            let options: [VerticalAlignment] = [.top, .center, .bottom]
+            @Binding var value: VerticalAlignment
+            
+            var body: some View {
+                HStack {
+                    Text("Vertical Alignment")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    SegmentedPicker(selection: $optionIndex.animation(.bouncy), items: Array(0...2)){ i in
+                        Label(options[i])
+                    }
+                    .frame(width: 120)
+                    .labelStyle(.iconOnly)
+                    .symbolVariant(.fill)
+                    .symbolRenderingMode(.hierarchical)
+                    .imageScale(.small)
+                }
+                .exampleParameterCell()
+                .onChangePolyfill(of: optionIndex){
+                    value = options[optionIndex]
+                }
+            }
+            
+            struct Label: View {
+                
+                let alignment: VerticalAlignment
+                
+                init(_ alignment: VerticalAlignment) {
+                    self.alignment = alignment
+                }
+                
+                var body: some View {
+                    if alignment == .top {
+                        SwiftUI.Label("Top", systemImage: "align.vertical.top")
+                    } else if alignment == .center {
+                        SwiftUI.Label("Center", systemImage: "align.vertical.center")
+                    } else if alignment == .bottom {
+                        SwiftUI.Label("Bottom", systemImage: "align.vertical.bottom")
+                    }
+                }
             }
         }
+        
+        var body: some View {
+            Horizontal(value: $value.horizontal)
+            Vertical(value: $value.vertical)
+        }
+        
     }
     
     
@@ -199,6 +288,31 @@ struct ExampleCell {
         }
     }
     
+    
+    struct Axis: View {
+        
+        @Binding var axis: SwiftUI.Axis
+        
+        var body: some View {
+            HStack {
+                Text("Axis")
+                    .font(.exampleParameterTitle)
+                
+                Spacer()
+                
+                SegmentedPicker(selection: $axis, items: [.horizontal, .vertical]){ axis in
+                    switch axis {
+                    case .horizontal: Label("Horizontal", systemImage: "arrow.left.and.right")
+                    case .vertical: Label("Vertical", systemImage: "arrow.up.and.down")
+                    }
+                }
+                .font(.caption)
+                .labelStyle(.iconOnly)
+                .frame(width: 100)
+            }
+        }
+    }
+    
 }
 
 
@@ -206,12 +320,10 @@ extension View {
     
     func exampleParameterCell() -> some View {
         padding(.cellPadding)
-            .overlay(alignment: .bottom) {
-                Divider()
-            }
             .toggleStyle(.swiftUIKitSwitch)
+            .labeledContentStyle(.exampleCell)
             .fixedSize(horizontal: false, vertical: true)
-            .geometryGroupPolyfill()
+            .geometryGroupIfAvailable()
             .lineLimit(2)
             .minimumScaleFactor(0.5)
             .controlRoundness(1)
@@ -224,4 +336,23 @@ extension View {
 extension EdgeInsets {
     
     static let cellPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+}
+
+
+struct ExampleCellLabeledContentStyle: LabeledContentStyle {
+    
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 0){
+            configuration.label
+            Spacer(minLength: 12)
+            configuration.content
+        }
+    }
+    
+}
+
+extension LabeledContentStyle where Self == ExampleCellLabeledContentStyle {
+    
+    static var exampleCell: Self { .init() }
+    
 }

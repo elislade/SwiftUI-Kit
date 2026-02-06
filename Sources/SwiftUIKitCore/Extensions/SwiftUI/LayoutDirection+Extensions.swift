@@ -1,9 +1,9 @@
 import SwiftUI
 
 
-public extension LayoutDirection {
+extension LayoutDirection {
     
-    var inverse: LayoutDirection {
+    nonisolated public var inverse: LayoutDirection {
         switch self {
         case .leftToRight: .rightToLeft
         case .rightToLeft: .leftToRight
@@ -11,12 +11,11 @@ public extension LayoutDirection {
         }
     }
     
-    var scaleFactor: CGFloat {
+    nonisolated public var scaleFactor: CGFloat {
         self == .rightToLeft ? -1 : 1
     }
     
-    @available(macOS 13, iOS 16, tvOS 16, watchOS 9, *)
-    init(languageCode code: Locale.LanguageCode) {
+    nonisolated public init(languageCode code: Locale.LanguageCode) {
         self = {
             let rtl: Set<Locale.LanguageCode> = [
                 .arabic, .azerbaijani, .dhivehi, .hebrew, .kurdish, .persian, .urdu

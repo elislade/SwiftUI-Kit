@@ -3,56 +3,30 @@ import SwiftUIKit
 
 public struct FocusExamples : View {
 
-    @State private var presentedIndices: Set<Int> = []
-    @State private var useAccessory = false
-    @State private var useCustomFocusedView = false
+    @State private var useAccessory = true
+    @State private var useCustom = true
+    
+    static let gridItem = GridItem(.adaptive(minimum: 100), spacing: 16)
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Focus Presentation"){
-            ZStack {
-                Color.clear
-                
-                LazyVGrid(columns: [.init(.adaptive(minimum: 90, maximum: 120))]){
-                    ForEach(0...8){ i in
-                        Button(action: {
-                            Binding($presentedIndices, contains: i).wrappedValue.toggle()
-                        }){
-                            RoundedRectangle(cornerRadius: 20)
-                                .aspectRatio(1.3, contentMode: .fit)
-                                .scaleEffect(presentedIndices.contains(i) ? 1.1 : 1)
-                        }
-                        .buttonStyle(.plain)
-                        .presentationBackdrop {
-                            Rectangle().fill(.tint)
-                                .colorInvert()
-                                .opacity(0.5)
-                        }
-                        .focusPresentation(isPresented: Binding($presentedIndices, contains: i)){ state in
-                            TipView(next: { presentedIndices = [i+1] })
-                                .padding(.init(state.edge))
-                        }
+            Color.clear.overlay{
+                LazyVGrid(columns: [ Self.gridItem ], spacing: 16){
+                    ForEach(0..<15){ i in
+                        ItemView(
+                            useCustom: useCustom,
+                            useAccessory: useAccessory
+                        )
                     }
                 }
+                .scaleEffect(1.5)
             }
             .padding()
-            .animation(.smooth, value: presentedIndices)
-            .focusPresentationContext()
+            .presentationContext()
         } parameters: {
-            Toggle(isOn: .init(get: { !presentedIndices.isEmpty }, set: {
-                if $0 {
-                    presentedIndices.insert(.random(in: 0...8))
-                } else {
-                    presentedIndices = []
-                }
-            })){
-                Text("Presented")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            Toggle(isOn: $useCustomFocusedView){
+            Toggle(isOn: $useCustom){
                 Text("Custom Focused View")
                     .font(.exampleParameterTitle)
             }
@@ -67,28 +41,94 @@ public struct FocusExamples : View {
     }
     
     
-    struct TipView: View {
+    struct ItemView: View {
         
-        var next: (() -> Void)?
+        @Namespace private var ns
+        @State private var isPresented: Bool = false
+        
+        let useCustom: Bool
+        let useAccessory: Bool
+        
+        private var custom: some View {
+            VStack(alignment: .leading) {
+                ContainerRelativeShape()
+                    .fill(.tint)
+
+                Text("Focus Item")
+                    .font(.title3[.bold])
+            }
+            .frame(minHeight: 166)
+            .padding()
+            .background{
+                ContainerRelativeShape()
+                    .fill(.regularMaterial)
+                    .shadow(color: .black.opacity(0.6), radius: 20, y: 5)
+                
+                ContainerRelativeShape()
+                    .strokeBorder()
+                    .opacity(0.1)
+            }
+            .containerShape(RoundedRectangle(cornerRadius: 28))
+        }
+        
+        private var accessory: some View {
+            AccessoryView()
+                .anchorLayoutPadding(10)
+                .transition(.scale(0.8).animation(.bouncy))
+        }
+        
+        private var inner: some View {
+            Button{ isPresented.toggle() } label: {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.tint)
+            }
+            .buttonStyle(.plain)
+            .aspectRatio(1.8, contentMode: .fit)
+        }
         
         var body: some View {
-            VStack(alignment: .leading) {
-                Text("This is a Tip")
+            if useCustom && useAccessory {
+                inner.focusPresentation(
+                    isPresented: $isPresented,
+                    focus: { custom },
+                    accessory: { accessory }
+                )
+            } else if useCustom {
+                inner.focusPresentation(
+                    isPresented: $isPresented,
+                    focus: { custom }
+                )
+            } else if useAccessory {
+                inner.focusPresentation(
+                    isPresented: $isPresented,
+                    accessory: { accessory }
+                )
+            } else {
+                inner
+                    .presentationBackdrop{ Color.black.opacity(0.8) }
+                    .focusPresentation(isPresented: $isPresented)
+            }
+        }
+        
+    }
+    
+    
+    struct AccessoryView: View {
+        
+        var body: some View {
+            VStack(alignment: .center, spacing: 14) {
+                Text("Focus Accessory")
                     .font(.title2.bold())
                 
-                Text("You can do many usefull things with this tip like...")
+                Text("This is focus accessory content placed along side the focus view.")
                     .font(.callout)
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .opacity(0.5)
-                
-                if let next {
-                    Button("Next Tip", action: next)
-                }
             }
-            .padding()
-            .frame(maxWidth: 250)
+            .multilineTextAlignment(.center)
+            .frame(width: 240)
+            .padding(30)
             .background{
-                RoundedRectangle(cornerRadius: 15)
+                RoundedRectangle(cornerRadius: 28)
                     .fill(.regularMaterial)
                     .shadow(radius: 8, y: 5)
             }

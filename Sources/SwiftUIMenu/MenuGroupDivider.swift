@@ -25,7 +25,8 @@ public struct MenuGroupDivider: View {
                 Capsule()
                     .opacity(0.1)
                     .frame(height: 2)
-                    .padding(8)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 0)
             }
         } else {
             Divider()

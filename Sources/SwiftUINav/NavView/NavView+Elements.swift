@@ -7,106 +7,97 @@ extension NavView {
     
     struct Elements: View {
         
-        @State private var hasPresented: Set<UUID> = []
+        @State private var popping: UniqueID?
         
-        private func pushAmount(_ index: Int) -> Double {
-            guard elements.count > 1 else { return 0 }
-            
-            if index == elements.indices.last {
-                return 0
-            } else if gestureIsActive && elements.indices.last?.advanced(by: -1) == index {
-                return 1 - transitionFraction
-            } else {
-                return 1
-            }
-        }
-        
-        let size: CGSize
+        let size: CGSize?
+        let resolve: (PresentationValue<Metadata>) -> CGRect
         let root: Root
-        let elements: [PresentationValue<NavViewElementMetadata>]
-        @Binding var transitionFraction: Double
-        let gestureIsActive: Bool
-        let wrapWithBar: Bool
+        let rootID: UniqueID
+        let elements: [PresentationValue<Metadata>]
+        let elementsToAnimateRemoval: Set<UniqueID>
+        let elementsShouldBeWrappedByNavBarContainer: Bool
+        let elementWantsDisposal: (UniqueID) -> Void
         
-        @ViewBuilder private func view<V: View>(_ content: V, showBack: Bool) -> some View {
-            if wrapWithBar {
+        @ViewBuilder private func Subview(showBack: Bool, _ content: @escaping () -> some View) -> some View {
+            if elementsShouldBeWrappedByNavBarContainer {
                 NavBarContainer {
-                    content
-                        .navBar(showBack ? .leading : .none){
+                    content()
+                        .navBar(.leading, hidden: !showBack, priority: .max){
                             BackButton()
-                                .transition(.move(edge: .leading) + .opacity)
+                                .transition(.moveEdge(.leading) + .opacity)
                         }
                 }
             } else {
-                content
+                content()
             }
         }
         
         var body: some View {
-            var rootPushAmount: Double {
-                guard elements.count <= 1 else { return 1 }
-                
-                if elements.isEmpty {
-                    return 0
-                } else if gestureIsActive {
-                    return 1 - transitionFraction
-                } else {
-                    return 1
-                }
-            }
-            
-            var rootFrozen: FrozenState {
-                elements.count < 2 ? .thawed : elements.count > 1 ? .frozenInvisible : .frozen
-            }
+            let width: CGFloat = size?.width ?? .infinity
+            let hasPresented = Set(elements.map(\.id)).subtracting(elementsToAnimateRemoval)
+            let elementsVisible = elements.filter({
+                !elementsToAnimateRemoval.contains($0.id) && $0.id != popping
+            })
+
+            let rootThawed = elementsVisible.isEmpty
+            let rootIsPresented = !rootThawed//!elements.isEmpty || popping != nil && elements.count == 1
             
             ZStack(alignment: .leading) {
-                view(root, showBack: false)
-                    .accessibilityHidden(!elements.isEmpty)
-                    .releaseContainerSafeArea()
-                    .frozen(rootFrozen)
-                    .modifier(Transition(pushAmount: rootPushAmount))
-                    .zIndex(1)
-                    .environment(\.presentationDepth, elements.count)
-                    .isBeingPresentedOn(!elements.isEmpty && hasPresented.contains(elements.first!.id))
-                    .disableNavBarItems(!elements.isEmpty && hasPresented.contains(elements.first!.id))
-                    .disableOnPresentationWillDismiss(!elements.isEmpty)
-                    //.maskMatching(using: namespace, enabled: !elements.isEmpty)
-                    .frame(maxWidth: size.width, maxHeight: size.height)
-      
-                ForEach(elements, id: \.id){ element in
-                    let index = elements.firstIndex(of: element)!
-                    let isLast = index == elements.indices.last
-                    let isBeforeLast = index == elements.indices.last! - 1
-                    let shouldDisable = !isLast
-                    let shouldIgnore = index < (elements.count - 2)
-                    
-                    var frozenState: FrozenState {
-                        isLast || (isBeforeLast) ? .thawed : shouldIgnore ? .frozenInvisible : .frozen
+                Color.clear.overlay {
+                    Subview(showBack: false){
+                        root.navViewBreadcrumb(for: rootID, isActive: !hasPresented.isEmpty)
                     }
-                    
-                    view(element.view, showBack: true)
-                        .accessibilityHidden(!isLast)
-                        .releaseContainerSafeArea()
-                        .frozen(frozenState)
-                        .modifier(Transition(pushAmount: pushAmount(index)))
-                        //.maskMatchingSource(using: namespace, enabled: isLast)
-                        .offset(
-                            x: isLast ? (transitionFraction) * size.width : 0
-                        )
-                        .zIndex(Double(index) + 2.0)
-                        .environment(\._isBeingPresented, isLast && gestureIsActive ? false : true)
-                        .environment(\.presentationDepth, (elements.count - 1) - index)
-                        .isBeingPresentedOn(!isLast && hasPresented.contains(elements.last!.id))
-                        .disableNavBarItems(shouldDisable)
-                        .disableOnPresentationWillDismiss(!isLast)
-                        .transition(.offset([size.width + 50, 0]))
-                        //.maskMatching(using: namespace, enabled: !isLast)
-                        .frame(maxWidth: size.width, maxHeight: size.height)
-//                        .onDisappear{
-//                            transitionFraction = 0
-//                        }
-                        .onDisappear{ hasPresented.remove(element.id) }
-                        .onAppear{ hasPresented.insert(element.id) }
+                    .interactionFollower(Transition.self, enabled: elements.count == 1)
+                    .frozen(rootThawed ? .thawed : .frozenInvisible)
+                }
+                .zIndex(1)
+                .isNavigatedOn(rootIsPresented)
+                .isBeingPresentedOn(rootIsPresented)
+                .navBarItemsRemoved(!elementsVisible.isEmpty)
+                .geometryGroupIfAvailable()
+                
+                let poppingIndex = elements.firstIndex(where: { $0.id == popping })
+                
+                ForEach(elements){ element in
+                    let index = elements.firstIndex(of: element)!
+                    let isLast = element.id == elements.last?.id
+                    let isLastVisible = element.id == elementsVisible.last?.id
+                    let isPresentedOn = !isLast && (hasPresented.contains(elements.last!.id) || popping == element.id)
+                    //let isBeforeLast = elements.count > 1 ? index == elements.indices.last! - 1 : false
+                    let isBeforePopping = poppingIndex != nil ? index == poppingIndex! - 1 : false
+                    let isThawed = isBeforePopping || isLast
+    
+                    Color.clear.overlay {
+                        Subview(showBack: true){
+                            element.view.navViewBreadcrumb(for: element.id, isActive: !isLast)
+                        }
+                        .navBarItemsRemoved(!isLastVisible)
+                        .interactionFollower(Transition.self, enabled: isBeforePopping)
+                        .frozen(isThawed ? .thawed : .frozenInvisible)
+                    }
+                    .zIndex(Double(index) + 2.0)
+                    .interactionLeader(
+                        enabled: isLast,
+                        source: resolve(element),
+                        width: width,
+                        wantsRemoval: element.wantsDisposal || elementsToAnimateRemoval.contains(element.id)
+                    ){ state in
+                        switch state {
+                        case .interacting:
+                            popping = element.id
+                        case .willComplete:
+                            popping = element.id
+                        case let .didComplete(dest):
+                            popping = nil
+                            if dest == .disappear {
+                                elementWantsDisposal(element.id)
+                            }
+                        }
+                    }
+                    .geometryGroupIfAvailable()
+                    .environment(\._isBeingPresented, true)
+                    .isNavigatedOn(isPresentedOn)
+                    .isBeingPresentedOn(!isThawed)
                 }
             }
         }

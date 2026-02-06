@@ -17,25 +17,22 @@ public struct AxisStackExampleView : View {
                         .fill(.tint)
                         .opacity(Double(i + 1) / 5)
                         .background(.background, in: .rect)
+                        .animationDelay(Double(i) * 0.1)
                 }
             }
             .ignoresSafeArea()
-            .animation(.smooth, value: axis)
+            .animation(.bouncy, value: axis)
         } parameters: {
-            SegmentedPicker(selection: $axis.animation(.smooth), items: Axis.allCases){
-                Text("\($0)".capitalized)
-            }
-            .exampleParameterCell()
+            ExampleCell.Axis(axis: $axis.animation(.smooth))
+                .exampleParameterCell()
             
             VStack {
-                HStack {
-                    Text("Spacing")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
+                LabeledContent {
                     Text(spacing, format: .increment(0.1))
                         .font(.exampleParameterValue)
+                } label: {
+                    Text("Spacing")
+                        .font(.exampleParameterTitle)
                 }
                 
                 Slider(value: $spacing, in: 0...30)

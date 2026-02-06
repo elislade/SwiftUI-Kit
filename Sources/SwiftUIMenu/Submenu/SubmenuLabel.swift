@@ -24,18 +24,19 @@ struct SubmenuLabel<L: View> : View {
                 action()
             }
         } label: {
-            label()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .equalInsetItem()
-                .overlay(alignment: .trailing){
-                    Image(systemName: "chevron.right")
-                        .font(.body[.bold])
-                        .opacity(0.5)
-                        .rotationEffect(isExpanded ? .degrees(90 * layoutDirection.scaleFactor) : .zero)
-                        .layoutDirectionMirror()
-                        .padding(.horizontal, 12)
-                        .onGeometryChangePolyfill(of: \.size.width){ leadingWidth = $0 }
-                }
+            HStack(spacing: 0) {
+                label()
+
+                Image(systemName: "chevron.right")
+                    .resizable()
+                    .scaledToFit()
+                    .font(.body[.bold])
+                    .scaleEffect(0.5)
+                    .opacity(0.5)
+                    .rotationEffect(isExpanded ? .degrees(90 * layoutDirection.scaleFactor) : .zero)
+                    .layoutDirectionMirror()
+                    .frame(width: 22)
+            }
         }
         .buttonStyle(MenuButtonStyle(
             dismissWhenTriggered: false

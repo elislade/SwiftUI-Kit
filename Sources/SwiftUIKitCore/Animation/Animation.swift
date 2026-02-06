@@ -28,21 +28,25 @@ public extension Animation {
 }
 
 
-public extension View {
+extension View {
     
-    nonisolated func delayAnimation(_ delay: Double) -> some View {
+    nonisolated public func animationDelay(_ delay: Double) -> some View {
         transaction{
             $0.animation = $0.animation?.delay(delay)
         }
     }
     
-    nonisolated func disableAnimations(_ disabled: Bool = true) -> some View {
+    nonisolated public func animationDisabled(_ disabled: Bool = true) -> some View {
         transaction{
             if disabled {
                 $0.disablesAnimations = true
                 $0.animation = nil
             }
         }
+    }
+    
+    nonisolated public func disableAnimations(_ disabled: Bool = true) -> some View {
+        animationDisabled(disabled)
     }
     
 }

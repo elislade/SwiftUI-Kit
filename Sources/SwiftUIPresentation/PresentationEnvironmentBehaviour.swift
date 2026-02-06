@@ -1,18 +1,18 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
     
     /// - Parameter behaviour: The ``PresentationEnvironmentBehaviour`` to use when presenting views.
-    nonisolated func presentationEnvironmentBehaviour(_ behaviour: PresentationEnvironmentBehaviour) -> some View {
+    nonisolated public func presentationEnvironmentBehaviour(_ behaviour: PresentationEnvironmentBehaviour) -> some View {
         environment(\.presentationEnvironmentBehaviour, behaviour)
     }
     
 }
 
-public extension EnvironmentValues {
+extension EnvironmentValues {
     
-    @Entry var presentationEnvironmentBehaviour: PresentationEnvironmentBehaviour = .useContext
+    @Entry public var presentationEnvironmentBehaviour: PresentationEnvironmentBehaviour = .useContext
     
 }
 

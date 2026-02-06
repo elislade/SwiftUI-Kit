@@ -23,7 +23,6 @@ struct MenuLabelStyle: LabelStyle {
             
             configuration.title
                 .frame(maxWidth: .infinity, alignment: .leading)
-                //.font(.body[.semibold])
             
             //Spacer(minLength: style == .regular ? 0 : 10)
             
@@ -31,9 +30,9 @@ struct MenuLabelStyle: LabelStyle {
                 configuration.icon
             }
         }
+        //.frame(minHeight: iconSize)
         //.fixedSize(horizontal: true, vertical: false)
-        .font(.body[.semibold])
-        .equalInsetItem()
+        //.equalInsetItem()
     }
     
 }

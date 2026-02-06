@@ -2,47 +2,44 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-struct AnchorPresenter<PresentationView: View>: ViewModifier {
+struct AnchorPresenter<Value: ValuePresentable, PresentationView: View>: ViewModifier {
     
-    @Binding var isPresented: Bool
+    @Binding private var value: Value
+    @State private var sortDate = Date()
     
-    let anchor: AnchorAlignment
-    let presentation: @MainActor (AutoAnchorState) -> PresentationView
-    
-    nonisolated init(
-        isPresented: Binding<Bool>,
-        anchorMode: AnchorPresentationMetadata.AnchorMode,
-        @ViewBuilder presentation: @MainActor @escaping (AutoAnchorState) -> PresentationView
-    ) {
-        self._isPresented = isPresented
-        self.anchor = .init(anchorMode)
-        self.presentation = presentation
-    }
+    private let type: PresentedAnchorType
+    private let isLeader: Bool
+    private let presentation: @MainActor (Value.Presented) -> PresentationView
     
     nonisolated init(
-        isPresented: Binding<Bool>,
-        anchor: AnchorAlignment,
-        @ViewBuilder presentation: @MainActor @escaping (AutoAnchorState) -> PresentationView
+        value: Binding<Value>,
+        isLeader: Bool = false,
+        type: PresentedAnchorType,
+        @ViewBuilder presentation: @MainActor @escaping (Value.Presented) -> PresentationView
     ) {
-        self._isPresented = isPresented
-        self.anchor = anchor
+        self._value = value
+        self.type = type
+        self.isLeader = isLeader
         self.presentation = presentation
     }
     
     func body(content: Content) -> some View {
         content
             .presentationValue(
-                isPresented: $isPresented,
+                value: $value,
                 respondsToBoundsChange: true,
                 metadata: AnchorPresentationMetadata(
-                    anchorAlignment: anchor,
-                    view: { AnyView(presentation($0)) }
+                    sortDate: sortDate,
+                    type: type,
+                    alignmentMode: .keepUntilInvalid,
+                    isLeader: isLeader
                 ),
-                content: {
-                    // fallback center based anchor for presentation contexts that may use this other than AlignedContext.
-                    AnyView(presentation(.init(anchor: .center, edge: .bottom)))
-                }
+                content: presentation
             )
+            .onChangePolyfill(of: value.isPresented){
+                //guard value.isPresented else { return }
+                sortDate = Date()
+            }
     }
     
 }

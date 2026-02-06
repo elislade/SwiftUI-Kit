@@ -3,74 +3,113 @@ import SwiftUIKit
 
 public struct MenuExamples: View {
     
-    @State private var selection = "Option B"
     @State private var layoutDirection: LayoutDirection = .leftToRight
     @State private var alignment: Alignment = .center
     
     public init() {}
     
-    public var body: some View {
-        ExampleView(title: "Menu"){
-            ZStack(alignment: alignment) {
-                Color.clear
-            
+    struct Cell: View {
+        
+        @State private var selection = "Option A"
+        
+        let number: Int
+        
+        private var picker: some View {
+            MenuPicker(
+                selection: $selection,
+                data: ["Option A", "Option B", "Option C"]
+            ){ i in
+                Label { Text(i) } icon: {
+                    Image(systemName: "\(i.last!.lowercased()).circle.fill")
+                }
+            }
+        }
+        
+        var body: some View {
+            HStack {
+                Text("Cell \(number)")
+                    .font(.title[.bold])
+                
+                Spacer()
+                
                 Menu {
                     Menu{
-                        Button{ print("A") } label: {
-                            Text("A Item")
-                                .equalInsetItem()
-                        }
-                    } label: {
-                        Text("Item 1")
-                    }
-                    
-                    MenuGroupDivider()
-                    
-                    Menu{
-                        MenuPicker(
-                            selection: $selection,
-                            data: ["Option A", "Option B", "Option C"]
-                        ){ i in
-                            Label { Text(i) } icon: {
-                                Image(systemName: "\(i.last!.lowercased()).circle.fill")
+                        Menu{
+                            picker
+                        } label: {
+                            Label { Text("Submenu Options") } icon: {
+                                Image(systemName: "checklist")
                             }
                         }
                     } label: {
-                        Label { Text("Options") } icon: {
-                            Image(systemName: "car")
+                        Label { Text("Submenu Options") } icon: {
+                            Image(systemName: "checklist")
                         }
                     }
                     
                     MenuGroupDivider()
                     
-                    Button{ print("Three") } label: {
-                        Label("Item 3", systemImage: "3.circle.fill")
+                    HStack {
+                        Button{ print("1") } label: {
+                            VStack(spacing: 5) {
+                                Image(systemName: "1.circle.fill")
+                                    .font(.title2)
+                                
+                                Text("Item 1")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(6)
+                        }
+                        
+                        Button{ print("2") } label: {
+                            VStack(spacing: 5) {
+                                Image(systemName: "2.circle.fill")
+                                    .font(.title2)
+                                
+                                Text("Item 2")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(6)
+                        }
                     }
-                    
-                    Button{ print("Four") } label: {
-                        Label("Item 4", systemImage: "4.circle.fill")
-                    }
+                    .font(.callout[.semibold])
+                    .lineLimit(1)
                     
                     MenuGroupDivider()
-
-                    MenuPicker(
-                        selection: $selection,
-                        data: ["Option A", "Option B", "Option C"]
-                    ){
-                        Text($0)
-                    }
+                    
+                    picker
                 } label: {
                     Text(selection)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.3)
-                        .font(.title[.bold])
+                        .opacity(0.5)
                         .menuIndicatorStyle()
                 }
             }
+        }
+    }
+    
+    
+    public var body: some View {
+        ExampleView(title: "Menu"){
+            ScrollView{
+                VStack(spacing: 0) {
+                    ForEach(0..<20){ i in
+                        Cell(number: i + 1)
+                            .lineLimit(1)
+                            .padding()
+                            .padding(.vertical, 10)
+                            .background(alignment: .bottom){
+                                Divider().ignoresSafeArea()
+                            }
+                    }
+                }
+            }
             .environment(\.layoutDirection, layoutDirection)
+            .presentationContext()
+            .presentationEnvironmentBehaviour(.usePresentation)
+            .fontWidth(.expanded)
         } parameters: {
             ExampleCell.LayoutDirection(value: $layoutDirection)
-            ExampleCell.Alignment(value: $alignment)
+            //ExampleCell.Alignment(value: $alignment)
         }
     }
     
@@ -128,7 +167,7 @@ public struct MenuExamples: View {
         }
     }
     .submenuPresentationContext()
-    //.menuBackgroundStyle(.sample)
+    .previewSize()
 }
 
 

@@ -1,13 +1,13 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
     
-    func preferenceRelay<Key: PreferenceKey>(_ key: Key.Type) -> some View  where Key.Value : Equatable {
+    public func preferenceRelay<Key: PreferenceKey>(_ key: Key.Type) -> some View  where Key.Value : Equatable {
         modifier(PreferenceRelaySource<Key>())
     }
     
-    nonisolated func preferenceRelayReceiver<Key: PreferenceKey>(_ key: Key.Type) -> some View  where Key.Value : Equatable {
+    nonisolated public func preferenceRelayReceiver<Key: PreferenceKey>(_ key: Key.Type) -> some View  where Key.Value : Equatable {
         modifier(PreferenceRelay<Key>())
     }
     
@@ -31,7 +31,7 @@ struct PreferenceRelaySource<Key: PreferenceKey>: ViewModifier where Key.Value: 
         content
             .onPreferenceChange(Key.self){ relay(id, $0) }
             .onDisappear{ relay(id, Key.defaultValue) }
-            .resetPreference(Key.self)
+            .preferenceKeyReset(Key.self)
     }
     
 }

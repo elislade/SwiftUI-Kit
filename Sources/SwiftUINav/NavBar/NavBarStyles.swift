@@ -35,6 +35,7 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
         @Environment(\.controlSize) private var controlSize: ControlSize
         @Environment(\.controlRoundness) private var controlRoundness
         @Environment(\.isHighlighted) private var isHighlighted
+        @Environment(\.interactionGranularity) private var granularity
         
         @State private var isHovering = false
         private let overscroll: Double
@@ -52,13 +53,17 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
         
         private var size: CGFloat {
             switch controlSize {
-            case .mini: return 26
-            case .small: return 30
-            case .regular: return 36
-            case .large: return 40
-            case .extraLarge: return 46
-            @unknown default: return 36
+            case .mini: return 30
+            case .small: return 34
+            case .regular: return 40
+            case .large: return 44
+            case .extraLarge: return 48
+            @unknown default: return 40
             }
+        }
+        
+        private var interactionSize: CGFloat {
+            size + 15 - (30 * granularity)
         }
         
         private var shape: some InsettableShape {
@@ -80,9 +85,9 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
                 .font(fontStyle.weight(.semibold))
                 .blendMode(hasSelection ? .destinationOut : .normal)
                 .foregroundStyle(.tint)
-                .padding(size / 4)
-                .frame(height: size)
-                .frame(minWidth: size)
+                .padding(interactionSize / 4)
+                .frame(height: interactionSize)
+                .frame(minWidth: interactionSize)
                 .background(
                     ZStack {
                         if overscroll >= 1 {
@@ -94,14 +99,13 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
                                 ))
                                 .zIndex(1)
                         }
+
+                        Rectangle()
+                            .fill(.background)
+                            .opacity(0.5)
+                            .clipShape(shape)
+                            .zIndex(2)
                         
-                        OuterShadowMaterial(
-                            shape,
-                            fill: Color.black.opacity(0.1),
-                            radius: 3,
-                            y: 1
-                        )
-                        .zIndex(2)
                         
                         shape
                             .fill(.tint)
@@ -121,14 +125,20 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
                         EdgeHighlightSmallMaterial(shape)
                             .zIndex(4)
                     }
-                    .scaleEffect(pressing ? 1.2 : 1 + (overscroll * 0.2))
+                    .scaleEffect(pressing ? 1.1 : 1 + (overscroll * 0.2))
                     .animation(.smooth, value: pressing)
                     .animation(.bouncy, value: overscroll)
                 )
                 .compositingGroup()
+                .background {
+                    BlurEffectView(blurRadius: 4)
+                        .clipShape(shape)
+                        .shadow(color: .black.opacity(0.08), radius: 15)
+                        .scaleEffect(pressing ? 1.1 : 1 + (overscroll * 0.2))
+                }
                 .lineLimit(1)
                 .contentShape(shape)
-                .geometryGroupPolyfill()
+                .geometryGroupIfAvailable()
                 .opacity(isEnabled ? 1 : 0.4)
                 .animation(.smooth, value: hasSelection)
         }

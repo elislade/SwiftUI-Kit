@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.2
 
 import PackageDescription
 
@@ -30,8 +30,8 @@ let package = Package(
         .target(name: "SwiftUIFont", dependencies: ["SwiftUIKitCore"]),
         .target(name: "SwiftUIControls", dependencies: ["SwiftUIKitCore"]),
         .target(name: "SwiftUIPresentation", dependencies: ["SwiftUIKitCore"]),
-        .target(name: "SwiftUINav", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation"]),
+        .target(name: "SwiftUINav", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation", "SwiftUIMenu"]),
         .target(name: "SwiftUIMenu", dependencies: ["SwiftUIKitCore", "SwiftUIPresentation", "SwiftUIControls"]),
     ],
-    swiftLanguageVersions: [ .version("6") ]
+    swiftLanguageModes: [ .version("6.2") ]
 )

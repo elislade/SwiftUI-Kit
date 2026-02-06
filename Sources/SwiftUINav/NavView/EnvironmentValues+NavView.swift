@@ -1,17 +1,17 @@
 import SwiftUI
 import SwiftUIKitCore
 
-struct NavViewPendingDestinationValue: EnvironmentKey {
+extension EnvironmentValues {
     
-    static var defaultValue: NavViewDestinationValue? { nil }
+    @Entry public var isNavigatedOn: Bool = false
     
 }
 
-extension EnvironmentValues {
+
+extension View {
     
-    var destinationNavValue: NavViewDestinationValue? {
-        get { self[NavViewPendingDestinationValue.self] }
-        set { self[NavViewPendingDestinationValue.self] = newValue }
+    nonisolated func isNavigatedOn(_ flag: Bool) -> some View {
+        environment(\.isNavigatedOn, flag)
     }
     
 }

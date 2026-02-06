@@ -13,7 +13,7 @@ public struct AnimationThresholdChangeExample : View {
     
     public var body: some View {
         ExampleView(title: "Animation Threshold Change"){
-            let shape = RoundedRectangle(cornerRadius: 30)
+            let shape = ContainerRelativeShape()
             ZStack {
                 shape
                     .strokeBorder(lineWidth: 10)
@@ -55,7 +55,6 @@ public struct AnimationThresholdChangeExample : View {
             }
             .padding()
             .drawingGroup()
-            .aspectRatio(1, contentMode: .fit)
             .animation(.linear(duration: duration), value: animate)
         } parameters: {
             Toggle(isOn: $animate){

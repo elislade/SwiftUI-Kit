@@ -15,20 +15,23 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
         externalIsPresented ?? $internalIsPresented
     }
     
-    let edge: Edge
-    let tip: @MainActor () -> Tip
-
-    nonisolated private var sourceAnchor: UnitPoint {
-        UnitPoint(edge)
+    private var type: PresentedAnchorType {
+        switch axis {
+        case .vertical: .vertical(preferredAlignment: .center)
+        case .horizontal: .horizontal(preferredAlignment: .center)
+        }
     }
     
+    let axis: Axis
+    let tip: @MainActor () -> Tip
+    
     nonisolated init(
-        edge: Edge,
+        axis: Axis,
         isPresented: Binding<Bool>? = nil,
         content: @MainActor @escaping () -> Tip
     ) {
         self.externalIsPresented = isPresented
-        self.edge = edge
+        self.axis = axis
         self.tip = content
     }
     
@@ -37,12 +40,15 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
             .contentShape(Rectangle())
             .focused($isFocused)
             .onHoverPolyfill{ isHovering = $0 }
-            .task(id: shouldPresent, priority: .background) {
-                if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC) {
+            .task(id: shouldPresent, priority: .low) {
+                if let _ = try? await Task.sleep(for: .seconds(0.3)) {
                     isPresented.wrappedValue = shouldPresent
                 }
             }
-            .anchorOrthogonalToEdgePresentation(isPresented: isPresented, edge: edge){
+            .anchorPresentation(
+                isPresented: isPresented,
+                type: type
+            ){
                 tip()
                     #if !os(tvOS)
                     .onTapGesture { isPresented.wrappedValue = false }
@@ -61,17 +67,21 @@ extension View {
         .padding(3)
         .padding(.horizontal, 3)
         .background{
-            RoundedRectangle(cornerRadius: 6)
-                .fill(.background)
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.regularMaterial)
                 .shadow(color: .black.opacity(0.15), radius: 5, y: 3)
             
-            RoundedRectangle(cornerRadius: 6)
-                .inset(by: -1)
-                .strokeBorder()
+            RoundedRectangle(cornerRadius: 8)
+                .inset(by: -0.5)
+                .strokeBorder(.black, lineWidth: 0.5)
+                .opacity(0.4)
+            
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(.white)
                 .opacity(0.1)
         }
         .padding(2)
-        .transition((.scale(0.8) + .opacity).animation(.bouncy))
+        .transition((.scale(0.8, anchor: .topLeading) + .opacity).animation(.bouncy))
     }
     
 }

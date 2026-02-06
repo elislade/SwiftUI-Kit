@@ -1,9 +1,13 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
     
-    @ViewBuilder nonisolated func scrollClipDisabledPolyfill(_ disabled: Bool = true) -> some View {
+    nonisolated public func scrollClipDisabledPolyfill(_ disabled: Bool = true) -> some View {
+        scrollClipDisabledIfAvailable(disabled)
+    }
+    
+    @ViewBuilder nonisolated public func scrollClipDisabledIfAvailable(_ disabled: Bool = true) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollClipDisabled(disabled)
         } else {
@@ -11,7 +15,7 @@ public extension View {
         }
     }
 
-    @ViewBuilder nonisolated func scrollPositionPolyfill<V: Hashable>(id: Binding<V?>, anchor: UnitPoint? = nil) -> some View {
+    @ViewBuilder nonisolated public func scrollPositionPolyfill<V: Hashable>(id: Binding<V?>, anchor: UnitPoint? = nil) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollPosition(id: id, anchor: anchor)
         } else {
@@ -31,7 +35,23 @@ public extension View {
         }
     }
     
-    @ViewBuilder nonisolated func scrollTargetLayoutPolyfill(isEnabled: Bool = true) -> some View {
+    @ViewBuilder nonisolated public func scrollTargetPagingIfAvailable() -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            scrollTargetBehavior(.paging)
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder nonisolated public func scrollTargetViewAlignedIfAvailable() -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            scrollTargetBehavior(.viewAligned(limitBehavior: .always))
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder nonisolated public func scrollTargetLayoutIfAvailable(isEnabled: Bool = true) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             scrollTargetLayout(isEnabled: isEnabled)
         } else {
@@ -39,9 +59,17 @@ public extension View {
         }
     }
     
-    @ViewBuilder nonisolated func contentMarginsPolyfill(_ edges: Edge.Set = .all, _ length: Double) -> some View {
+    @ViewBuilder nonisolated public func contentMarginsIfAvailable(_ edges: Edge.Set = .all, _ length: Double) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             contentMargins(edges, length, for: .scrollIndicators)
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder nonisolated public func contentMarginsIfAvailable(_ length: Double) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            contentMargins(length, for: .scrollIndicators)
         } else {
             self
         }

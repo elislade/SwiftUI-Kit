@@ -2,17 +2,25 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-public extension View {
+extension View {
     
-    nonisolated func presentationMatchContext() -> some View {
+    nonisolated public func presentationMatchContext() -> some View {
         modifier(PresentationMatchContextModifier())
     }
     
-    func presentationMatch<ID: Hashable>(_ id: ID) -> some View {
-        modifier(PresentationMatchModifier(id: id, copy: { self }))
+    public func presentationMatch(_ id: some Hashable, active: Bool = true) -> some View {
+        modifier(PresentationMatchModifier(id: id, active: active, copy: { self }))
     }
     
-    nonisolated func presentationMatchCaptureMode(_ mode: PresentationMatchCaptureMode) -> some View {
+    nonisolated public func presentationMatchDisabled(_ disabled: Bool = true) -> some View {
+        transformEnvironment(\.isPresentationMatchEnabled){ value in
+            if disabled {
+                value = false
+            }
+        }
+    }
+    
+    nonisolated public func presentationMatchCaptureMode(_ mode: PresentationMatchCaptureMode) -> some View {
         environment(\.presentationMatchCaptureMode, mode)
     }
     
@@ -22,6 +30,8 @@ public extension View {
 extension EnvironmentValues {
     
     @Entry var presentationMatchCaptureMode: PresentationMatchCaptureMode = .newInstance
+    @Entry var isInPresentationMatch = false
+    @Entry var isPresentationMatchEnabled = true
     
 }
 
@@ -34,7 +44,7 @@ public enum PresentationMatchCaptureMode: Equatable, Sendable, BitwiseCopyable {
     case snapshot
     
     /// Use a new view instance as the match view.
-    /// - Note: Good if you care about performace and visual effects and not scroll position or any other ephemeral view state.
+    /// - Note: Good if you care about performance and visual effects and not scroll position or any other ephemeral view state.
     case newInstance
     
 }

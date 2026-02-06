@@ -21,7 +21,7 @@ extension CoordinatedDismissalModifier: ViewModifier {
         content.transformEnvironment(\.coordinatedDismiss) { value in
             // only set value if view is not being presented on
             if isPresentedOn == false {
-                value = .init(id: id, closure: action)
+                value = .init(closure: { _ in action() })
             }
         }
     }

@@ -7,44 +7,44 @@ extension CGSize : EmptyInitalizable {}
 extension CGRect : EmptyInitalizable {}
 extension CGFloat : EmptyInitalizable {}
 
-public extension CGSize {
+extension CGSize {
     
-    func dimension(for axis: Axis) -> CGFloat {
+    nonisolated public func dimension(for axis: Axis) -> CGFloat {
        self[axis]
     }
     
     /// Calls rounded on both `width` and `height` of the size.
     /// - Parameter rule: The rounding rule to use for both `width` and `height`.
     /// - Returns: A `CGSize` with `width` and `height` rounded.
-    func rounded(_ rule: FloatingPointRoundingRule) -> CGSize {
+    nonisolated public func rounded(_ rule: FloatingPointRoundingRule) -> CGSize {
         CGSize(width: width.rounded(rule), height: height.rounded(rule))
     }
     
-    func fits(_ size: CGSize) -> Bool {
+    nonisolated public func fits(_ size: CGSize) -> Bool {
         width >= size.width && height >= size.height
     }
     
-    func round(to place: CGFloat) -> CGSize {
+    nonisolated public func round(to place: CGFloat) -> CGSize {
         CGSizeMake(width.round(to: place), height.round(to: place))
     }
         
-    init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>) {
+    nonisolated public init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>) {
         self.init(width: Double(simd.x), height: Double(simd.y))
     }
     
-    init(_ point: CGPoint) {
+    nonisolated public init(_ point: CGPoint) {
         self.init(width: point.x, height: point.y)
     }
     
-    var smallestAxis: Axis {
+    nonisolated public var smallestAxis: Axis {
         width < height ? .horizontal : .vertical
     }
     
-    var largestAxis: Axis {
+    nonisolated public var largestAxis: Axis {
         width > height ? .horizontal : .vertical
     }
     
-    subscript(_ axis: Axis) -> CGFloat {
+    nonisolated public subscript(_ axis: Axis) -> CGFloat {
         get {
             switch axis {
             case .horizontal: width
@@ -58,11 +58,11 @@ public extension CGSize {
         }
     }
     
-    func scaleFitting(_ other: Self) -> Double {
+    nonisolated public func scaleFitting(_ other: Self) -> Double {
         scaleOfFitting(self, in: other)
     }
     
-    func rectByFitting(in other: CGSize) -> CGRect {
+    nonisolated public func rectByFitting(in other: CGSize) -> CGRect {
         let scale = scaleFitting(other)
         
         let scaledSize: SIMD2<Double> = [
@@ -81,39 +81,44 @@ public extension CGSize {
         )
     }
     
-    var simd: SIMD2<Double> { [width,height] }
+    nonisolated public var simd: SIMD2<Double> { [width,height] }
     
 }
 
-public func scaleOfFitting(_ size: CGSize, in other: CGSize) -> Double {
+nonisolated public func scaleOfFitting(_ size: CGSize, in other: CGSize) -> Double {
     let widthRatio = size.width / other.width
     let heightRatio = size.height / other.height
     return min(widthRatio, heightRatio)
 }
 
+nonisolated public func scaleOfFilling(_ size: CGSize, in other: CGSize) -> Double {
+    let widthRatio = size.width / other.width
+    let heightRatio = size.height / other.height
+    return max(widthRatio, heightRatio)
+}
 
-public extension SIMD2 where Scalar == Float {
+extension SIMD2 where Scalar == Float {
     
-    @inlinable init(_ point: CGPoint) {
+    @inlinable nonisolated public init(_ point: CGPoint) {
         self.init(Float(point.x), Float(point.y))
     }
     
 }
 
-public extension CGPoint {
+extension CGPoint {
     
     /// Calls rounded on both `x` and `y` of the point.
     /// - Parameter rule: The rounding rule to use for both `x` and `y`.
     /// - Returns: A `CGPoint` with `x` and `y` rounded.
-    nonisolated func rounded(_ rule: FloatingPointRoundingRule) -> CGPoint {
+    nonisolated public func rounded(_ rule: FloatingPointRoundingRule) -> CGPoint {
         CGPoint(x: x.rounded(rule), y: y.rounded(rule))
     }
     
-    nonisolated func distance(to point: CGPoint) -> CGFloat {
+    nonisolated public func distance(to point: CGPoint) -> CGFloat {
         hypot(x - point.x, y - point.y)
     }
     
-    nonisolated func distance(from rect: CGRect) -> CGFloat {
+    nonisolated public func distance(from rect: CGRect) -> CGFloat {
         var vd: CGFloat = 0
         var hd: CGFloat = 0
         
@@ -132,31 +137,31 @@ public extension CGPoint {
         return max(vd, hd)
     }
     
-    func translate(by point: CGPoint) -> CGPoint {
+    nonisolated public func translate(by point: CGPoint) -> CGPoint {
         .init(x: x + point.x, y: y + point.y)
     }
     
-    prefix static func -(point: CGPoint) -> CGPoint {
+    prefix static nonisolated public func -(point: CGPoint) -> CGPoint {
         .init(x: -point.x, y: -point.y)
     }
     
-    @inlinable init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>){
+    @inlinable nonisolated public init<F: BinaryFloatingPoint>(_ simd: SIMD2<F>){
         self.init(x: Double(simd.x), y: Double(simd.y))
     }
     
-    init(_ size: CGSize) {
+    nonisolated public init(_ size: CGSize) {
         self.init(x: size.width, y: size.height)
     }
     
-    var smallestAxis: Axis {
+    nonisolated public var smallestAxis: Axis {
         x < y ? .horizontal : .vertical
     }
     
-    var largestAxis: Axis {
+    nonisolated public var largestAxis: Axis {
         x > y ? .horizontal : .vertical
     }
     
-    subscript(_ axis: Axis) -> CGFloat {
+    nonisolated public subscript(_ axis: Axis) -> CGFloat {
         get {
             switch axis {
             case .horizontal: x
@@ -171,20 +176,21 @@ public extension CGPoint {
     }
     
     
-    var simd: SIMD2<Double> { [x,y] }
+    nonisolated public var simd: SIMD2<Double> { [x,y] }
+    
 }
 
 
-public extension CGRect {
+extension CGRect {
     
     /// Calls rounded on both `origin` and `size` of the rect.
     /// - Parameter rule: The rounding rule to use for both `origin` and `size`.
     /// - Returns: A `CGRect` with `origin` and `size` rounded.
-    func rounded(_ rule: FloatingPointRoundingRule) -> CGRect {
+    nonisolated public func rounded(_ rule: FloatingPointRoundingRule) -> CGRect {
         CGRect(origin: origin.rounded(rule), size: size.rounded(rule))
     }
     
-    func normalizedDimension(for edge: Edge, in container: CGSize) -> CGFloat {
+    nonisolated public func normalizedDimension(for edge: Edge, in container: CGSize) -> CGFloat {
         switch edge {
         case .top: origin.y
         case .leading: origin.x
@@ -193,32 +199,32 @@ public extension CGRect {
         }
     }
     
-    func min(_ axis: Axis) -> CGFloat {
+    nonisolated public func min(_ axis: Axis) -> CGFloat {
         switch axis {
         case .horizontal: minX
         case .vertical: minY
         }
     }
       
-    func mid(_ axis: Axis) -> CGFloat {
+    nonisolated public func mid(_ axis: Axis) -> CGFloat {
         switch axis {
         case .horizontal: midX
         case .vertical: midY
         }
     }
     
-    func max(_ axis: Axis) -> CGFloat {
+    nonisolated public func max(_ axis: Axis) -> CGFloat {
         switch axis {
         case .horizontal: maxX
         case .vertical: maxY
         }
     }
     
-    func inset(_ insets: EdgeInsets) -> CGRect {
+    nonisolated public func inset(_ insets: EdgeInsets) -> CGRect {
         CGRect(x: 0, y: 0, width: 0, height: 0)
     }
     
-    var simd: SIMD4<Double> {
+    nonisolated public var simd: SIMD4<Double> {
         [origin.x, origin.y, width, height]
     }
     
@@ -227,7 +233,7 @@ public extension CGRect {
 
 extension CGRect: @retroactive CustomStringConvertible {
     
-    public var description: String {
+    nonisolated public var description: String {
         "\(origin.x),\(origin.y),\(size.width),\(size.height)"
     }
     
@@ -235,7 +241,7 @@ extension CGRect: @retroactive CustomStringConvertible {
 
 extension CGRect: @retroactive LosslessStringConvertible {
     
-    public init?(_ description: String) {
+    nonisolated public init?(_ description: String) {
         let comps = description.split(separator: ",").compactMap{
             $0.trimmingCharacters(in: .whitespaces)
         }.compactMap{
@@ -254,7 +260,7 @@ extension CGFloat : ReplaceWhenFloatKeyIsTrueConformance {}
 
 extension CGPoint : ReplaceWhenFloatKeyIsTrueConformance {
     
-    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGPoint {
+    nonisolated public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGPoint {
         CGPoint(
             x: x.replace(key, with: replacement),
             y: y.replace(key, with: replacement)
@@ -266,7 +272,7 @@ extension CGPoint : ReplaceWhenFloatKeyIsTrueConformance {
 
 extension CGSize : ReplaceWhenFloatKeyIsTrueConformance {
     
-    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGSize {
+    nonisolated public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGSize {
         CGSize(
             width: width.replace(key, with: replacement),
             height: height.replace(key, with: replacement)
@@ -278,7 +284,7 @@ extension CGSize : ReplaceWhenFloatKeyIsTrueConformance {
 
 extension CGRect : ReplaceWhenFloatKeyIsTrueConformance {
 
-    public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGRect {
+    nonisolated public func replace(_ key: KeyPath<CGFloat, Bool>, with replacement: CGFloat) -> CGRect {
         CGRect(
             origin: origin.replace(key, with: replacement),
             size: size.replace(key, with: replacement)
@@ -343,6 +349,33 @@ extension SIMD where Scalar: BinaryFloatingPoint {
     
     nonisolated public func moveAwayFromZero(to epsilon: Scalar) -> Self {
         .init(indices.map{ self[$0].moveAwayFromZero(to: epsilon) })
+    }
+    
+}
+
+
+extension SIMD2: @retroactive ExpressibleByFloatLiteral where Scalar: BinaryFloatingPoint, FloatLiteralType == Scalar {
+
+    nonisolated public init(floatLiteral value: Scalar) {
+        self.init(x: value, y: value)
+    }
+    
+}
+
+
+extension CALayer {
+    
+    nonisolated public func enumerate(each: (CALayer) -> Bool) {
+        guard let sublayers else { return }
+        
+        for layer in sublayers {
+            let shouldStop = each(layer)
+            if shouldStop { return }
+        }
+        
+        for layer in sublayers {
+            layer.enumerate(each: each)
+        }
     }
     
 }

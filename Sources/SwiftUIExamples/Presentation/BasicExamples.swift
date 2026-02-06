@@ -4,19 +4,17 @@ import SwiftUIKit
 public struct BasicExamples: View {
     
     @State private var isPresented = false
-    @State private var anchor: UnitPoint = .bottom
-    
-    private var alignment: Alignment { .init(anchor) }
+    @State private var alignment: Alignment = .center
     
     private var transitions: [AnyTransition] {
-        var result: [AnyTransition] = [.opacity, .scale(anchor == .center ? 0 : 1)]
-        
+        var result: [AnyTransition] = [.opacity, .scale(alignment == .center ? 0 : 1)]
+
         if let verticalEdge = Edge(alignment.vertical){
-            result.append(.move(edge: verticalEdge))
+            result.append(.moveEdge(verticalEdge))
         }
         
         if let horizontalEdge = Edge(alignment.horizontal){
-            result.append(.move(edge: horizontalEdge))
+            result.append(.moveEdge(horizontalEdge))
         }
         
         return result
@@ -26,17 +24,27 @@ public struct BasicExamples: View {
     
     public var body: some View {
         ExampleView(title: "Basic Presentation"){
-            Button("Show Presented View"){
-                isPresented.toggle()
+            ZStack {
+                Color.clear.contentShape(Rectangle())
+                
+                Button("Show Presented View"){
+                    isPresented.toggle()
+                }
+                .presentation(isPresented: $isPresented, alignment: alignment){
+                    PresentedView()
+                        .frame(maxWidth: 300)
+                        .padding()
+                        .transition(
+                            .merge(transitions).animation(.bouncy(extraBounce: 0.1))
+                        )
+                        .geometryGroupIfAvailable()
+                        .presentationBackdrop(.changedPassthrough){
+                            Color.black.opacity(0.7)
+                        }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .presentation(isPresented: $isPresented, alignment: alignment){
-                PresentedView()
-                    .frame(maxWidth: 300)
-                    .padding()
-                    .transition(.merge(transitions))
-            }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .presentationContext()
         } parameters: {
             Toggle(isOn: $isPresented){
@@ -44,72 +52,47 @@ public struct BasicExamples: View {
                     .font(.exampleParameterTitle)
             }
             .exampleParameterCell()
+            .animation(.fastSpring, value: isPresented)
 
-            HStack {
-                Text("Vertical Alignment")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $anchor){
-                    Text("Top").tag(UnitPoint(x: anchor.x, y: 0))
-                    Text("Center").tag(UnitPoint(x: anchor.x, y: 0.5))
-                    Text("Bottom").tag(UnitPoint(x: anchor.x, y: 1))
-                }
-            }
-            .exampleParameterCell()
-            
-            HStack {
-                Text("Horizontal Alignment")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $anchor){
-                    Text("Leading").tag(UnitPoint(x: 0, y: anchor.y))
-                    Text("Center").tag(UnitPoint(x: 0.5, y: anchor.y))
-                    Text("Trailing").tag(UnitPoint(x: 1, y: anchor.y))
-                }
-            }
-            .exampleParameterCell()
+            ExampleCell.Alignment(value: $alignment)
         }
     }
     
     
     struct PresentedView: View {
         
-        @Environment(\.dismissPresentation) private var dismissPresentation
+        @Environment(\.dismissPresentation) private var dismiss
         
         var body: some View {
-            VStack(spacing: 16) {
-                HStack{
+            VStack(spacing: 10) {
+                HStack(spacing: 12){
                     Text("Presented View")
-                        .font(.title2.bold())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    Spacer(minLength: 12)
-                    
-                    Button(action: { dismissPresentation() }){
-                        Image(systemName: "xmark.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
+                    Button{ dismiss() } label: {
+                        Label{ Text("Close") } icon: {
+                            Image(systemName: "xmark.circle.fill")
+                        }
                     }
                     .buttonStyle(.tinted)
+                    .labelStyle(.iconOnly)
                 }
+                .font(.title[.bold])
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
                 .symbolRenderingMode(.hierarchical)
+                .padding(.leading, 6)
   
-                Color.random
+                ContainerRelativeShape()
+                    .fill(.tint)
                     .aspectRatio(2, contentMode: .fit)
-                    .clipShape(ContainerRelativeShape())
             }
-            .padding()
+            .padding(10)
             .background{
                 ContainerRelativeShape()
-                    .fill(.background)
+                    .fill(.regularMaterial)
             }
-            .containerShape(RoundedRectangle(cornerRadius: 28))
+            .containerShape(RoundedRectangle(cornerRadius: 24))
         }
     }
     

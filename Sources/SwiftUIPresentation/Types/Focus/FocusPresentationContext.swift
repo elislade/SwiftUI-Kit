@@ -1,121 +1,143 @@
 import SwiftUI
+import SwiftUIKitCore
 
 struct FocusPresentationContext: ViewModifier {
     
-    @Environment(\.layoutDirection) private var layoutDirection
+    typealias Metadata = FocusPresentationMetadata
+    
     @Namespace private var ns
+    @State private var isBeingPresentedOn = false
+    @State private var safeArea: EdgeInsets?
     
-    @State private var backdropPreference: BackdropPreference?
-    @State private var focused: PresentationValue<FocusPresentationMetadata>?
-    @State private var accessoryIsPresented = false
-    
-    nonisolated private var focusSizeIncrease: CGFloat { 0 }
-    nonisolated private var edgePadding: CGFloat { 16 }
-
     nonisolated init(){}
     
-    private func safeOffsets(for rect: CGRect, in size: CGSize) -> CGSize {
-        let additional = focusSizeIncrease + edgePadding
-        
-        let x = layoutDirection == .leftToRight ? rect.minX : size.width - rect.maxX
-        
-        return CGSize(
-            width: max(min(x, size.width - (rect.width + additional)), edgePadding),
-            height: max(min(rect.minY, size.height - (rect.height + additional)), edgePadding)
-        )
-    }
-    
-    private func safeSize(for rect: CGRect, in size: CGSize) -> CGSize {
-        let maxWidth = size.width - (edgePadding * 2)
-        let maxHeight = size.height - (edgePadding * 2)
-        
-        return CGSize(
-            width: min(rect.width, maxWidth),
-            height: min(rect.height, maxHeight)
-        )
-    }
-    
-    private func dismiss(_ value: PresentationValueConformable) {
-        focused = nil
-        
-        Task{
-            try await Task.sleep(nanoseconds: NSEC_PER_SEC/2)
-            value.dispose()
-        }
-    }
-
     func body(content: Content) -> some View {
         content
-            .isBeingPresentedOn(focused != nil)
-            .sensoryFeedbackPolyfill(.impact(style: .rigid, intensity: 1), value: focused == nil)
-            .overlayPreferenceValue(PresentationKey<FocusPresentationMetadata>.self){ value in
-                GeometryReader { proxy in
-                    if let value = value.last {
-                        ZStack(alignment: .topLeading) {
-                            BackdropView(preference: backdropPreference, dismiss: {
-                                if accessoryIsPresented {
-                                    accessoryIsPresented = false
-                                } else {
-                                    focused = nil
+            .isBeingPresentedOn(isBeingPresentedOn)
+            .onPresentationSafeAreaChange{ safeArea = $0 }
+            .presentationOverlay(Metadata.self){ value in
+                if let value = value.last {
+                    InnerView(presentation: value){
+                        isBeingPresentedOn = true
+                    }
+                    .onDisappear{ isBeingPresentedOn = false }
+                    .id(value.id)
+                    .ignoresSafeArea(edges: safeArea != nil ? .all : [])
+                }
+            }
+            .presentationNamespace(ns, active: isBeingPresentedOn)
+    }
+    
+    
+    struct InnerView: View {
+        
+        @Environment(\.layoutDirection) private var layoutDirection
+        
+        @State private var isFocused = false
+        @State private var backdropPreference: BackdropPreference?
+        @State private var accessoryIsPresented = false
+        
+        nonisolated private var focusSizeIncrease: CGFloat { 0 }
+        nonisolated private var edgePadding: CGFloat { 16 }
+        
+        let presentation: PresentationValue<Metadata>
+        let didPresent: () -> Void
+        
+        private func safeOffsets(for rect: CGRect, in size: CGSize) -> CGSize {
+            let additional = focusSizeIncrease + edgePadding
+            
+            let x = layoutDirection == .leftToRight ? rect.minX : size.width - rect.maxX
+            
+            return CGSize(
+                width: max(min(x, size.width - (rect.width + additional)), edgePadding),
+                height: max(min(rect.minY, size.height - (rect.height + additional)), edgePadding)
+            )
+        }
+        
+        private func safeSize(for rect: CGRect, in size: CGSize) -> CGSize {
+            CGSize(
+                width: min(rect.width, size.width - (edgePadding * 2)),
+                height: min(rect.height, size.height - (edgePadding * 2))
+            )
+        }
+        
+        private func dismiss() {
+            presentation.dispose()
+            isFocused = false
+        }
+        
+        var body: some View {
+            GeometryReader { proxy in
+                Color.clear.overlay(alignment: .topLeading) {
+                    let bounds = proxy[presentation.anchor]
+                    let safeSize = safeSize(for: bounds, in: proxy.size)
+                    
+                    if isFocused {
+                        presentation
+                            .view
+                            .environment(\.reduceMotion, true)
+                            .environment(\._isBeingPresented, true)
+                            .anchorPresentation(
+                                isPresented: $accessoryIsPresented,
+                                type: .vertical(preferredAlignment: .center)
+                            ){
+                                presentation
+                                    .accessory()
+                                    .transition(.scale(0.1).animation(.bouncy))
+                                    .presentationBackdrop(.disabled){ EmptyView() }
+                            }
+                            .transition((.opacity + .hitTestingDisabled).animation(.easeInOut.speed(1.3)))
+                            .matchedGeometryEffect(id: "Item", in: presentation.namespace)
+                            .frame(minWidth: safeSize.width, minHeight: safeSize.height)
+                            .offset(safeOffsets(for: bounds, in: proxy.size))
+                            .geometryGroupIfAvailable()
+                            .onAppear{
+                                accessoryIsPresented = presentation.accessory() != nil
+                            }
+                            .onChangePolyfill(of: accessoryIsPresented){
+                                if !accessoryIsPresented {
+                                    isFocused = false
                                 }
-                            })
-                            .zIndex(1)
-                            .opacity(focused != nil ? 1 : 0)
-                            
-                            let bounds = proxy[value.anchor]
-                            let safeSize = safeSize(for: bounds, in: proxy.size)
-                            
-                            if let focused {
-                                focused
-                                    .view
-                                    .environment(\.reduceMotion, true)
-                                    .environment(\._isBeingPresented, true)
-                                    .matchedGeometryEffect(id: "View", in: ns)
-                                    .zIndex(2)
-                                    .onBackdropPreferenceChange{ backdropPreference = $0 }
-                                    .anchorPresentation(isPresented: $accessoryIsPresented){ state in
-                                        value
-                                            .metadata.accessory(state)
-                                            .presentationBackdrop(.disabled){ EmptyView() }
-                                    }
-                                    .frame(width: safeSize.width, height: safeSize.height)
-                                    .offset(safeOffsets(for: bounds, in: proxy.size))
-                                    .shadow(color: .black.opacity(0.2), radius: 30, y: 5)
-                                    .onDisappear{
-                                        focused.dispose()
-                                    }
-                            } else {
-                                value
-                                    .metadata
-                                    .sourceView()
-                                    .environment(\.reduceMotion, true)
-                                    .zIndex(2)
-                                    .frame(width: bounds.width, height: bounds.height)
-                                    .matchedGeometryEffect(id: "View", in: ns)
-                                    .offset(
-                                        x: layoutDirection == .rightToLeft ? proxy.size.width - bounds.maxX : bounds.minX,
-                                        y: bounds.minY
-                                    )
                             }
-                        }
-                        .animation(.bouncy.speed(1.3), value: focused == nil)
-                        .animation(.bouncy.speed(1.3), value: accessoryIsPresented)
-                        .anchorPresentationContext()
-                        .onChangePolyfill(of: accessoryIsPresented){
-                            if !accessoryIsPresented {
-                                focused = nil
+                    } else {
+                        Color.clear
+                            .transition((.scale(0.999) + .hitTestingDisabled).animation(.bouncy.speed(1.3)))
+                            .onDisappear{
+                                if isFocused {
+                                    didPresent()
+                                }
                             }
-                        }
-                        .onAppear {
-                            focused = value
-                            // use stub state to initially find out if the closure returns a view or not.
-                            let stubState = AutoAnchorState(anchor: .bottom, edge: .bottom)
-                            accessoryIsPresented = value.metadata.accessory(stubState) != nil
-                        }
+                    }
+                }
+                .onPresentationBackdropChange{ backdropPreference = $0 }
+                .animation(.bouncy.speed(1.3), value: isFocused)
+                .onChangePolyfill(of: isFocused){
+                    if !isFocused {
+                        dismiss()
+                        //accessoryIsPresented = false
                     }
                 }
             }
-            .resetPreference(PresentationKey<FocusPresentationMetadata>.self)
+            .presentationDismissHandler {
+                dismiss()
+            }
+            .anchorPresentationContext()
+            .background{
+                if isFocused {
+                    BackdropView(
+                        preference: backdropPreference,
+                        dismiss: {
+                            dismiss()
+                            accessoryIsPresented = false
+                        }
+                    )
+                    .transition((.opacity + .hitTestingDisabled).animation(.smooth.speed(1.3)))
+                }
+            }
+            .onAppear {
+                isFocused = true
+            }
+        }
     }
     
 }

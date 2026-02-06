@@ -3,7 +3,6 @@ import SwiftUIPresentation
 
 struct SubmenuPresenter<Label: View, Content: View>: View {
     
-    @State private var id = UUID()
     @State private var isPresented = false
     
     @ViewBuilder let label: @MainActor() -> Label
@@ -20,24 +19,16 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
             label: label
         )
         .opacity(isPresented ? 0 : 1)
-        .anchorPreference(key: SubmenuPresentationKey.self, value: .bounds){ anchor in
-            isPresented ? [
-                .init(
-                    id: id,
-                    anchor: anchor,
-                    menu: {
-                        AnyView(SubmenuContainer(
-                            content: content,
-                            label: label
-                        ))
-                    },
-                    dismiss: {
-                        Task{ @MainActor in
-                            isPresented = false
-                        }
-                    }
-                )
-            ] : []
+        .animation(.smooth, value: isPresented)
+        .presentationValue(
+            isPresented: $isPresented,
+            respondsToBoundsChange: true,
+            metadata: SubmenuMetadata()
+        ){
+            SubmenuContainer(
+                content: content,
+                label: label
+            )
         }
     }
     

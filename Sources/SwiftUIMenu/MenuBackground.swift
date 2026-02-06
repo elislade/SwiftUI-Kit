@@ -8,14 +8,9 @@ extension EnvironmentValues {
     
 }
 
-public extension View {
+extension View {
     
-    //TODO: Depricated use menuBackgroundStyle instead.
-    func menuBackground<Content: View>(@ViewBuilder content: @escaping () -> Content) -> Self {
-        self
-    }
-    
-    func menuBackgroundStyle(_ style: some MaterialStyle) -> some View {
+    nonisolated public func menuBackgroundStyle(_ style: some MaterialStyle) -> some View {
         environment(\.menuBackgroundStyle, AnyMaterialStyle(style))
     }
     
@@ -32,6 +27,8 @@ struct MenuBackground: View {
             if let backgroundStyle {
                 backgroundStyle.makeBody(ContainerRelativeShape())
             } else {
+//                VisualEffectView()
+//                    .clipShape( ContainerRelativeShape())
                 ContainerRelativeShape()
                     .fill(.regularMaterial)
                     .shadow(
@@ -39,13 +36,24 @@ struct MenuBackground: View {
                         radius: 20 * visualDepth,
                         y: 20 * visualDepth
                     )
-                    .zIndex(1)
-                
+//                OuterShadowMaterial(
+//                    ContainerRelativeShape(),
+//                    fill: .black.opacity(0.2),
+//                    radius: 20 * visualDepth,
+//                    y: 20 * visualDepth
+//                )
+
                 InteractionGlowMaterial(ContainerRelativeShape())
                     .zIndex(2)
+                    //.blendMode(.overlay)
                 
                 EdgeHighlightMaterial(ContainerRelativeShape())
                     .zIndex(3)
+                    .blendMode(.overlay)
+                
+                EdgeHighlightMaterial(ContainerRelativeShape())
+                    .zIndex(3)
+                    .blendMode(.overlay)
             }
         }
         .opacity(visualDepth)

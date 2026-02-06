@@ -1,34 +1,66 @@
 import SwiftUI
 import SwiftUIKitCore
 
-public protocol PresentationValueConformable {
-    var id: UUID { get }
-    var tag: String? { get }
-    var anchor: Anchor<CGRect> { get }
-    var includeAnchorInEquatance: Bool { get }
-    var view: AnyView { get }
-    var dispose: @MainActor () -> Void { get }
-    var envProxy: MainActorClosureKeyPath<EnvironmentValues> { get }
-}
-
-
-public extension PresentationValueConformable {
+@dynamicMemberLookup public struct PresentationValue<Metadata>: Identifiable {
     
-    // depricated support for closure based view.
-    func view() -> AnyView { view }
+    internal let includeAnchorInEquatance: Bool
+    
+    public let id: UniqueID
+    public let metadata: Metadata
+    public let anchor: Anchor<CGRect>
+    public let view: AnyView
+    public let dispose: @MainActor () -> Void
+    public let wantsDisposal: Bool
+    public let environment: MainActorClosureKeyPath<EnvironmentValues>
+    
+    /// Initializes instance
+    /// - Parameters:
+    ///   - id: The unique ID of this presentation.
+    ///   - metadata: Specific presentation metadata.
+    ///   - anchor: The Geometry Anchor of the view that is hoisting this presentation.
+    ///   - includeAnchorInEquatance: `Bool` indicating whether to use the anchors value in equatance. Defaults to `true`.
+    ///   - view: The View that should be presented.
+    ///   - wantsDisposal: `Bool` indicating to the context to dispose of internal state for this presentation. Defaults to `false`.
+    ///   - dispose: A closure that tells the presenter it should be disposed of, allowing it to update internal state.
+    ///   - environment: An environment reference from the point of view of the presenter.
+    public init(
+        id: UniqueID,
+        metadata: Metadata,
+        anchor: Anchor<CGRect>,
+        includeAnchorInEquatance: Bool = true,
+        view: some View,
+        wantsDisposal: Bool = false,
+        dispose: @MainActor @escaping () -> Void,
+        environment: MainActorClosureKeyPath<EnvironmentValues>
+    ) {
+        self.id = id
+        self.metadata = metadata
+        self.anchor = anchor
+        self.includeAnchorInEquatance = includeAnchorInEquatance
+        self.view = AnyView(view)
+        self.dispose = dispose
+        self.wantsDisposal = wantsDisposal
+        self.environment = environment
+    }
+    
+    public subscript<Subject>(dynamicMember path: KeyPath<Metadata, Subject>) -> Subject {
+        metadata[keyPath: path]
+    }
+    
+    @MainActor public subscript<Subject>(dynamicMember path: KeyPath<EnvironmentValues, Subject>) -> Subject {
+        environment[path]
+    }
     
 }
 
-public protocol Translatable {
-    associatedtype Translation
-    func translate() -> Translation
-}
 
-
-@dynamicMemberLookup public struct PresentationValue<Metadata: Equatable>: Equatable, PresentationValueConformable {
+extension PresentationValue: Equatable where Metadata: Equatable {
     
     public static func == (lhs: PresentationValue, rhs: PresentationValue) -> Bool {
-        let base = lhs.id == rhs.id && lhs.tag == rhs.tag && lhs.metadata == rhs.metadata
+        let base = lhs.id == rhs.id
+        && lhs.metadata == rhs.metadata
+        && lhs.wantsDisposal == rhs.wantsDisposal
+        
         if lhs.includeAnchorInEquatance && rhs.includeAnchorInEquatance {
             return base && lhs.anchor == rhs.anchor
         } else {
@@ -36,118 +68,36 @@ public protocol Translatable {
         }
     }
     
-    public let id: UUID
-    public let tag: String?
-    public let metadata: Metadata
-    public let anchor: Anchor<CGRect>
-    public let includeAnchorInEquatance: Bool
-    public let view: AnyView
-    public let dispose: @MainActor () -> Void
-    public let envProxy: MainActorClosureKeyPath<EnvironmentValues>
+}
+
+
+extension View {
     
-    init(
-        id: UUID,
-        tag: String?,
+    public func presentationValue<Metadata>(
+        isPresented: Binding<Bool>,
+        respondsToBoundsChange: Bool = false,
         metadata: Metadata,
-        anchor: Anchor<CGRect>,
-        includeAnchorInEquatance: Bool = true,
-        view: AnyView,
-        dispose: @MainActor @escaping () -> Void,
-        envProxy: MainActorClosureKeyPath<EnvironmentValues>
-    ) {
-        self.id = id
-        self.tag = tag
-        self.metadata = metadata
-        self.anchor = anchor
-        self.includeAnchorInEquatance = includeAnchorInEquatance
-        self.view = view
-        self.dispose = dispose
-        self.envProxy = envProxy
-    }
-    
-    public init(other: PresentationValueConformable, metadata: Metadata) {
-        self.id = other.id
-        self.tag = other.tag
-        self.metadata = metadata
-        self.anchor = other.anchor
-        self.includeAnchorInEquatance = other.includeAnchorInEquatance
-        self.view = other.view
-        self.dispose = other.dispose
-        self.envProxy = other.envProxy
-    }
-    
-    public subscript<V: Sendable>(dynamicMember path: KeyPath<Metadata, V>) -> V {
-        metadata[keyPath: path]
-    }
-    
-    @MainActor public subscript<V: Sendable>(dynamicMember path: KeyPath<EnvironmentValues, V>) -> V {
-        envProxy[path]
-    }
-    
-}
-
-
-public extension PresentationValue where Metadata: EmptyInitalizable {
-    
-    init(_ other: PresentationValueConformable) {
-        self.init(other: other, metadata: .init())
-    }
-    
-}
-
-
-public extension PresentationValue {
-    
-    init<T: Translatable>(_ other: PresentationValue<T>) where T.Translation == Metadata {
-        self.init(
-            id: other.id,
-            tag: other.tag,
-            metadata: other.metadata.translate(),
-            anchor: other.anchor,
-            includeAnchorInEquatance: other.includeAnchorInEquatance,
-            view: other.view,
-            dispose: other.dispose,
-            envProxy: other.envProxy
+        @ViewBuilder content: @MainActor @escaping () -> some View
+    ) -> some View {
+        presentationValue(
+            value: isPresented,
+            respondsToBoundsChange: respondsToBoundsChange,
+            metadata: metadata,
+            content: { _ in content() }
         )
     }
     
-}
-
-public extension View {
-    
-    func presentationValue<Metadata: Equatable, Content: View>(
-        isPresented: Binding<Bool>,
-        tag: String? = nil,
+    public func presentationValue<Value: ValuePresentable, Metadata>(
+        value: Binding<Value>,
         respondsToBoundsChange: Bool = false,
         metadata: Metadata,
-        @ViewBuilder content: @MainActor @escaping () -> Content
-    ) -> some View {
-        modifier(EnvironmentModifierWrap { environment in
-            PresentationValueBoolPresenter(
-                environmentRef: MainActorClosureKeyPath(environment),
-                isPresented: isPresented,
-                tag: tag,
-                presentationRespondsToBoundsChange: respondsToBoundsChange,
-                metadata: metadata,
-                presentation: content
-            )
-        })
-        .routeRelayReceiver()
-    }
-    
-    func presentationValue<Value: Hashable, Metadata: Equatable, Content: View>(
-        value: Binding<Value?>,
-        tag: String? = nil,
-        respondsToBoundsChange: Bool = false,
-        metadata: Metadata,
-        @ViewBuilder content: @MainActor @escaping (Value) -> Content
+        @ViewBuilder content: @MainActor @escaping (Value.Presented) -> some View
     ) -> some View {
         modifier(EnvironmentModifierWrap{ environment in
-            PresentationValueOptionalPresenter(
-                environmentRef: MainActorClosureKeyPath(environment),
+            PresentationValuePresenter(
+                environment: MainActorClosureKeyPath(environment),
+                updatesOnBoundsChange: respondsToBoundsChange,
                 value: value,
-                tag: tag,
-                presentationRespondsToBoundsChange: respondsToBoundsChange,
                 metadata: metadata,
                 presentation: content
             )
@@ -155,13 +105,34 @@ public extension View {
         .routeRelayReceiver()
     }
     
+    nonisolated public func presentationHandler<Metadata: Equatable>(
+        _ meta: Metadata.Type = Metadata.self,
+        active: Bool = true,
+        perform action: @escaping ([PresentationValue<Metadata>]) -> ()
+    ) -> some View {
+        onPreferenceChange(PresentationKey<Metadata>.self){
+            if active { action($0) }
+        }
+        .preferenceKeyReset(PresentationKey<Metadata>.self, reset: active)
+    }
+    
+    nonisolated public func presentationOverlay<Metadata>(
+        _ meta: Metadata.Type = Metadata.self,
+        @ViewBuilder content: @escaping ([PresentationValue<Metadata>]) -> some View
+    ) -> some View {
+        overlayPreferenceValue(PresentationKey<Metadata>.self, content)
+            .preferenceKeyReset(PresentationKey<Metadata>.self)
+    }
+        
 }
 
-public struct PresentationKey<Metadata: Equatable>: PreferenceKey {
+public struct PresentationKey<Metadata>: PreferenceKey {
     
-    public static var defaultValue: [PresentationValue<Metadata>] { [] }
+    public typealias Value = [PresentationValue<Metadata>]
     
-    public static func reduce(value: inout [PresentationValue<Metadata>], nextValue: () -> [PresentationValue<Metadata>]) {
+    public static var defaultValue: Value { [] }
+    
+    public static func reduce(value: inout Value, nextValue: () -> Value) {
         value.append(contentsOf: nextValue())
     }
     

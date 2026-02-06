@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BasicPresentationMetadata: Equatable {
+public struct BasicPresentationMetadata: Equatable {
     
     let alignment: Alignment
     

@@ -31,31 +31,28 @@ struct ExampleControl {
                     .blendMode(.hardLight)
                     .opacity(isEnabled ? 1 : 0.5)
             }
-            .aspectRatio(1, contentMode: .fit)
         }
         
         
         struct Dots: View {
             
             var anchor: UnitPoint = .center
+            var spacing: Double = 15 // distance between dots
             
             var body: some View {
                 Canvas { ctx, size in
-                    let anchorLocation = CGPoint(
-                        x: size.width * anchor.x,
-                        y: size.height * anchor.y
-                    )
+                    let itemSize = spacing / 2
                     
-                    let numberOfItems = 10
-                    let itemSize = size.width / (Double(numberOfItems) * 2)
-                    
-                    for i in 0...numberOfItems {
-                        for j in 0...numberOfItems {
-                            let x = Double(j) * itemSize * 2, y = Double(i) * itemSize * 2
-                            let distanceToAnchor = hypot(x - anchorLocation.x, y - anchorLocation.y)
-                            let m = distanceToAnchor / (size.width / 4)
+                    for row in 0...Int(size.height / spacing) {
+                        for col in 0...Int(size.width / spacing) {
+                            let x = Double(col) * spacing, y = Double(row) * spacing
+                            let relativeLocation = (x: x / size.width, y: y / size.height)
+                            let relativeDistanceToAnchor = 1.0 - (0.8 * hypot(relativeLocation.x - anchor.x, relativeLocation.y - anchor.y))
                             let location = CGPoint(x: x + (itemSize/2), y: y + (itemSize/2))
-                            let size = CGSize(width: itemSize - m, height: itemSize - m)
+                            let size = CGSize(
+                                width: itemSize * relativeDistanceToAnchor,
+                                height: itemSize * relativeDistanceToAnchor
+                            )
                             let rect = CGRect(origin: location, size: size)
                             
                             let path = Circle().path(in: rect)
@@ -74,7 +71,6 @@ struct ExampleControl {
 #Preview{
     InlineBinding(UnitPoint()){
         ExampleControl.Anchor(value: $0)
-            .frame(width: 100)
             .padding()
     }
 }

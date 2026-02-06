@@ -19,7 +19,7 @@ struct MenuToggleStyle: ToggleStyle {
                 FormToggle(isOn: configuration.$isOn, exclusivity: exclusivity)
                     .controlSize(.small)
             }
-            .equalInsetItem()
+           // .equalInsetItem()
 //            .overlay(alignment: .leading) {
 //                Image(systemName: "checkmark")
 //                    .opacity(configuration.isOn ? 1 : 0)

@@ -11,7 +11,7 @@ public struct NavBarDefaultMaterial : View {
     
     public var body: some View {
         ZStack(alignment: .bottom) {
-            VisualEffectView()
+            BlurEffectView()
             if showDivider {
                 Divider().ignoresSafeArea()
             }

@@ -2,11 +2,11 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-public extension View {
+extension View {
     
-    func presentationBackdrop<C: View>(
-        _ interaction: BackdropInteraction = .touchEndedDismiss,
-        @ViewBuilder content: @escaping () -> C)
+    nonisolated public func presentationBackdrop(
+        _ interaction: BackdropInteraction? = .touchEndedDismiss,
+        @ViewBuilder content: @MainActor @escaping () -> some View)
     -> some View {
         InlineState(UUID()){ id in
             self.preference(
@@ -18,7 +18,7 @@ public extension View {
         }
     }
     
-    func presentationBackdrop(_ interaction: BackdropInteraction) -> some View {
+    nonisolated public func presentationBackdrop(_ interaction: BackdropInteraction?) -> some View {
         InlineState(UUID()){ id in
             self.preference(
                 key: BackdropPreferenceKey.self,
@@ -27,9 +27,9 @@ public extension View {
         }
     }
     
-    func onBackdropPreferenceChange(perform action: @escaping (BackdropPreference?) -> Void) -> some View {
+    nonisolated public func onPresentationBackdropChange(perform action: @escaping (BackdropPreference?) -> Void) -> some View {
         onPreferenceChange(BackdropPreferenceKey.self, perform: action)
-            .onDisappear{ action(nil) }
+            .preferenceKeyReset(BackdropPreferenceKey.self)
     }
     
 }

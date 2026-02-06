@@ -10,6 +10,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>{
     
     var presentedBinding: Binding<Bool>?
     let source: Source
+    
     @ViewBuilder let presentedView: Presented
     @ViewBuilder let content: Content
     
@@ -18,10 +19,7 @@ struct ContextMenuPresenter<Source: View, Content: View, Presented: View>{
     }
     
     private var ctxMenuBG: some View {
-        ZStack {
-            VisualEffectView(disableFilters: [.luminanceCurveMap], blurRadius: 1)
-            Color.black.opacity(0.3)
-        }
+        Color.black.opacity(0.3)
     }
     
 }
@@ -39,9 +37,11 @@ extension ContextMenuPresenter: View {
         .background{
             Color.clear
                 .frame(width: 1, height: 1)
-                .anchorOrthogonalToEdgePresentation(isPresented: binding, edge: .trailing){
+                .anchorPresentation(isPresented: binding, type: .vertical(preferredAlignment: .leading)){ //_ in
                     MenuContainer{ content }
                         .presentationBackdrop{ Color.clear }
+                        .submenuPresentationContext()
+                        .transition((.scale(0.8) + .opacity).animation(.bouncy.speed(1.6)))
                 }
                 .position(mouseLocation)
         }
@@ -59,7 +59,8 @@ extension ContextMenuPresenter: View {
     #else
     
     var body: some View {
-        source.focusPresentation(
+        source
+            .focusPresentation(
             isPresented: binding,
             focus: {
                 Group {
@@ -71,22 +72,20 @@ extension ContextMenuPresenter: View {
                 }
                 .presentationBackdrop { ctxMenuBG }
                 .windowInteractionEffects([.parallax()])
+                //.transition(.scale(0.8).animation(.bouncy.speed(1.6)))
             },
-            accessory: { state in
+            accessory: {
                 MenuContainer{ content }
                     .submenuPresentationContext()
-                    .windowInteractionEffects([.scale(anchor: state.anchor)])
-                    .padding(.init(state.edge))
+                    .windowInteractionEffects([.scale(anchor: .center)])
+                    .anchorLayoutPadding(10)
+                    .transition(
+                        .squish + .hitTestingDisabled
+                    )
             }
         )
         .simultaneousLongPress {
             binding.wrappedValue = true
-        }
-        .accessibilityRepresentation{
-            VStack {
-                source
-                content
-            }
         }
     }
     

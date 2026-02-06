@@ -82,15 +82,15 @@ public func compare<T: Comparable>(_ lhs: T, _ type: CompareType, _ rhs: T) -> B
     
     private let closure: @MainActor () -> T
     
-    public init(_ closure: @MainActor @autoclosure @escaping () -> T) {
+    nonisolated public init(_ closure: @MainActor @autoclosure @escaping () -> T) {
         self.closure = closure
     }
     
-    @MainActor public subscript<V: Sendable>(key: KeyPath<T, V>) -> V {
+    @MainActor public subscript<Subject>(key: KeyPath<T, Subject>) -> Subject {
         closure()[keyPath: key]
     }
     
-    @MainActor public subscript<V: Sendable>(dynamicMember key: KeyPath<T, V>) -> V {
+    @MainActor public subscript<Subject>(dynamicMember key: KeyPath<T, Subject>) -> Subject {
         closure()[keyPath: key]
     }
     
@@ -123,9 +123,9 @@ public extension ClosedRange where Bound : BinaryFloatingPoint {
         return ((upperBound - lowerBound) * clampedPercent) + lowerBound
     }
     
-    func fraction(from value: Bound) -> Bound {
-        let clampedValue = value.clamped(to: self)
-        return (clampedValue - lowerBound) / (upperBound - lowerBound)
+    func fraction(from value: Bound, clamp: Bool = true) -> Bound {
+        let value = clamp ? value.clamped(to: self) : value
+        return (value - lowerBound) / (upperBound - lowerBound)
     }
     
     func clamp(_ value: Bound) -> Bound {
@@ -146,8 +146,8 @@ public extension ClosedRange where Bound : BinaryFloatingPoint, Bound.Stride : B
 
 public extension BinaryFloatingPoint {
     
-    func fraction(in bounds: ClosedRange<Self>) -> Self {
-        bounds.fraction(from: self)
+    func fraction(in bounds: ClosedRange<Self>, clamp: Bool = true) -> Self {
+        bounds.fraction(from: self, clamp: clamp)
     }
     
     func clamped(to bounds: ClosedRange<Self>) -> Self {

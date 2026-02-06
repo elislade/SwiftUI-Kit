@@ -3,45 +3,57 @@ import SwiftUIKitCore
 import SwiftUIPresentation
 
 
-public extension View {
+extension View {
     
-    func navBar<V: View>(
+    nonisolated internal func navBar(
         _ placement: NavBarItemMetadata.Placement,
-        @ViewBuilder view: @MainActor @escaping () -> V
+        hidden: Bool = false,
+        priority: UInt8,
+        @ViewBuilder view: @MainActor @escaping () -> some View
     ) -> some View {
-        presentationValue(
-            isPresented: .constant(true),
-            metadata: NavBarItemMetadata(placement: placement),
-            content: view
-        )
+        modifier(NavBarPresenter(
+            meta: .init(placement: placement, hidden: hidden, priority: priority),
+            label: view
+        ))
     }
     
-    func navBarTitle(_ text: Text) -> some View {
+    nonisolated public func navBar(
+        _ placement: NavBarItemMetadata.Placement,
+        hidden: Bool = false,
+        @ViewBuilder view: @MainActor @escaping () -> some View
+    ) -> some View {
+        modifier(NavBarPresenter(
+            meta: .init(placement: placement, hidden: hidden, priority: 1),
+            label: view
+        ))
+    }
+    
+    nonisolated public func navBarTitle(hidden: Bool = false, _ text: Text) -> some View {
         navBar(.title){ text.font(.title2[.semibold]) }
     }
     
-    func navBarTitle<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        navBar(.title, view: view)
+    nonisolated public func navBarTitle(hidden: Bool = false, @ViewBuilder view: @MainActor @escaping () -> some View) -> some View {
+        navBar(.title, hidden: hidden, view: view)
     }
     
-    func navBarLeading<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        navBar(.leading, view: view)
+    nonisolated public func navBarLeading(hidden: Bool = false, @ViewBuilder view: @MainActor @escaping () -> some View) -> some View {
+        navBar(.leading, hidden: hidden, view: view)
     }
     
-    func navBarTrailing<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        navBar(.trailing, view: view)
+    nonisolated public func navBarTrailing(hidden: Bool = false, @ViewBuilder view: @MainActor @escaping () -> some View) -> some View {
+        navBar(.trailing, hidden: hidden, view: view)
     }
     
-    func navBarAccessory<V: View>(@ViewBuilder view: @MainActor @escaping () -> V) -> some View {
-        navBar(.accessory, view: view)
+    nonisolated public func navBarAccessory(hidden: Bool = false, @ViewBuilder view: @MainActor @escaping () -> some View) -> some View {
+        navBar(.accessory, hidden: hidden, view: view)
     }
     
-    func navBarMaterial<V: View>(@ViewBuilder view: @escaping () -> V) -> some View {
+    nonisolated public func navBarMaterial(@ViewBuilder view: @MainActor @escaping () -> some View) -> some View {
         modifier(NavBarMaterialModifier(view: view))
     }
 
-    func navBarHidden(_ bool: Bool) -> some View {
-        preference(key: NavBarHiddenKey.self, value: bool)
+    nonisolated public func navBarHidden(_ hidden: Bool = true) -> some View {
+        preference(key: NavBarHiddenKey.self, value: hidden)
     }
 
 }
@@ -49,13 +61,35 @@ public extension View {
 
 extension View {
     
-    func disableNavBarItems(_ disabled: Bool = true) -> some View {
-        resetPreference(PresentationKey<NavBarItemMetadata>.self, reset: disabled)
+    nonisolated func navBarItemsRemoved(_ removed: Bool = true) -> some View {
+        preferenceKeyReset(PresentationKey<NavBarItemMetadata>.self, reset: removed)
     }
     
-    func disableNavBarPreferences(_ disabled: Bool = true) -> some View {
-        resetPreference(NavBarHiddenKey.self, reset: disabled)
-            .resetPreference(PresentationKey<NavBarItemMetadata>.self, reset: disabled)
+    nonisolated func navBarRemoved(_ removed: Bool = true) -> some View {
+        preferenceKeyReset(NavBarHiddenKey.self, reset: removed)
+            .preferenceKeyReset(PresentationKey<NavBarItemMetadata>.self, reset: removed)
+    }
+    
+}
+
+struct NavBarPresenter<Label: View> {
+    
+    @State private var isPresented: Bool = true
+    
+    let meta: NavBarItemMetadata
+    let label: @MainActor () -> Label
+    
+}
+
+
+extension NavBarPresenter : ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content.presentationValue(
+            isPresented: $isPresented,
+            metadata: meta,
+            content: label
+        )
     }
     
 }

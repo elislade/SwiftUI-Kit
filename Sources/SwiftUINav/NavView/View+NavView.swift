@@ -1,42 +1,40 @@
 import SwiftUI
+import SwiftUIPresentation
 
-
-public extension View {
+extension View {
     
-    func navDestination<Value: Hashable, Destination: View>(
-        for valueType: Value.Type,
-        @ViewBuilder content: @MainActor @escaping (Value) -> Destination
-    ) -> some View {
-        modifier(NavViewDestinationValueModifier(destination: content))
-    }
+//    nonisolated public func navDestination<Value: Hashable>(
+//        for valueType: Value.Type,
+//        @ViewBuilder content: @MainActor @escaping (Value) -> some View
+//    ) -> some View {
+//        modifier(NavViewDestinationValueModifier(destination: content))
+//    }
     
-    func navDestination<Element: Identifiable, Destination: View>(
-        presentedElements: Binding<Array<Element>>,
-        @ViewBuilder content: @MainActor @escaping (Element) -> Destination
-    ) -> some View {
-        modifier(NavViewPresentingStackModifier(
-            data: presentedElements,
+    nonisolated public func navDestination<Data: RangeReplaceableCollection>(
+        data: Binding<Data>,
+        @ViewBuilder content: @MainActor @escaping (Data.Element) -> some View
+    ) -> some View where Data.Indices == Range<Int> {
+        modifier(NavViewStackPresenter(
+            data: data,
             destination: content
         ))
     }
-
     
-    func navDestination<Destination: View>(
+    nonisolated public func navDestination(
         isPresented: Binding<Bool>,
-        @ViewBuilder content: @MainActor @escaping () -> Destination
+        @ViewBuilder content: @MainActor @escaping () -> some View
     ) -> some View {
-        modifier(NavViewPresentingModifier(
-            isPresented: isPresented,
-            destination: content
+        modifier(NavViewPresenter(
+            value: isPresented,
+            destination: { _ in content() }
         ))
     }
     
-    
-    func navDestination<Value: Hashable, C: View>(
-        value: Binding<Value?>,
-        @ViewBuilder destination: @MainActor @escaping (Value) -> C) -> some View
+    nonisolated public func navDestination<Value: ValuePresentable>(
+        value: Binding<Value>,
+        @ViewBuilder destination: @MainActor @escaping (Value.Presented) -> some View) -> some View
     {
-        modifier(NavViewPresentingOptionalModifier(
+        modifier(NavViewPresenter(
             value: value,
             destination: destination
         ))

@@ -11,10 +11,18 @@ public protocol TransitionModifier: ViewModifier {
     
 }
 
+public struct EmptyTransition: TransitionModifier {
+    
+    public init(pushAmount: Double) {}
+    
+    public func body(content: Content) -> some View {
+        content
+    }
+    
+}
 
 public struct DefaultNavTransitionModifier: TransitionModifier {
 
-    @Environment(\.presentationDepth) private var depth: Int
     @Environment(\.reduceMotion) private var reduceMotion: Bool
     
     let pushAmount: Double
@@ -24,13 +32,18 @@ public struct DefaultNavTransitionModifier: TransitionModifier {
     }
     
     public func body(content: Content) -> some View {
-        content
-            .opacity(depth < 2 ? 1 - (pushAmount * 0.7) : 0)
-            .scaleEffect(1 - (pushAmount * 0.2), anchor: .leading)
+        let scale: Double = (1 - (pushAmount * 0.1))
+        return content
+            .mask {
+                ContainerRelativeShape()
+                    .ignoresSafeArea()
+            }
+            .scaleIgnoredByLayout(uniform: scale, anchor: .leading)
             .overlay {
                 Color.black
-                    .opacity(depth < 2 ? pushAmount / 4 : 0)
+                    .opacity(pushAmount / 3)
                     .allowsHitTesting(false)
+                    .ignoresSafeArea()
             }
     }
     

@@ -4,23 +4,25 @@ import SwiftUIKit
 public struct ToolTipExamples: View {
         
     @State private var isPresented = false
-    @State private var edge: Edge = .top
+    @State private var axis: Axis = .vertical
+    @State private var position: CGPoint = .zero
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Tool Tip"){
-            ZStack {
-                Color.clear
-                
+            Color.clear.overlay{
                 Image(systemName: "car")
-                    .scaleEffect(isPresented ? 1.2 : 1)
                     .font(.title)
-                    .toolTip(edge: edge, isPresented: $isPresented){
+                    .toolTip(axis: axis, isPresented: $isPresented){
                         Text("Car go vroom vroom! 🚗")
                             .font(.caption)
                             .padding(5)
                     }
+                    .offset(position)
+                    .gesture(DragGesture().onChanged{
+                        position = $0.location
+                    })
             }
             .animation(.bouncy, value: isPresented)
             .toolTipContext()
@@ -31,19 +33,8 @@ public struct ToolTipExamples: View {
             }
             .exampleParameterCell()
             
-            HStack {
-                Text("Edge")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $edge){
-                    ForEach(Edge.allCases, id: \.self){
-                        Text("\($0)".capitalized).tag($0)
-                    }
-                }
-            }
-            .exampleParameterCell()
+            ExampleCell.Axis(axis: $axis.animation(.bouncy))
+                .exampleParameterCell()
         }
     }
     

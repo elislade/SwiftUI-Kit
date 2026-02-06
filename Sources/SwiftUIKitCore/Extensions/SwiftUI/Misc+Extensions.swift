@@ -1,14 +1,14 @@
 import SwiftUI
 
 
-public extension Image {
+extension Image {
     
 #if canImport(UIKit)
-    init(osImage: UIImage){
+    nonisolated public init(osImage: UIImage){
         self.init(uiImage: osImage)
     }
 #elseif canImport(AppKit)
-    init(osImage: NSImage){
+    public init(osImage: NSImage){
         self.init(nsImage: osImage)
     }
 #endif
@@ -16,11 +16,11 @@ public extension Image {
 }
 
 
-public extension ColorScheme {
+extension ColorScheme {
     
     /// Computes the inverse of the current `ColorScheme`.
     /// - Note: This may be unwise to rely on as ColorScheme's may not always have an inverse equivalent in the future. Under these circumstances it will just return self as the inverse.
-    var inverse: ColorScheme {
+    nonisolated public var inverse: ColorScheme {
         switch self {
         case .light: .dark
         case .dark: .light
@@ -31,16 +31,20 @@ public extension ColorScheme {
 }
 
 
-public extension Axis {
+extension Axis {
     
-    var inverse: Axis {
+    nonisolated public func inverse(_ enabled: Bool = true) -> Axis {
+        enabled ? inverse : self
+    }
+    
+    nonisolated public var inverse: Axis {
         switch self {
         case .horizontal: .vertical
         case .vertical: .horizontal
         }
     }
 
-    var asSet: Axis.Set {
+    nonisolated public var asSet: Axis.Set {
         switch self {
         case .horizontal: .horizontal
         case .vertical: .vertical
@@ -50,7 +54,7 @@ public extension Axis {
     /// Initializes an `Axis` from an `Edge`.
     /// - Note: The `Edge` used is contained on the `Axis`.  Eg. The top `Edge` is having to do with y vertical geometry, so its `Axis` is vertical.
     /// - Parameter edge: An Edge.
-    init(orthogonalTo edge: Edge) {
+    nonisolated public init(orthogonalTo edge: Edge) {
         switch edge {
         case .top, .bottom: self = .vertical
         case .leading, .trailing: self = .horizontal
@@ -60,22 +64,22 @@ public extension Axis {
 }
 
 
-public extension Angle {
+extension Angle {
     
-    init(rise: Float, run: Float) {
-        self.init(radians: Double(atan2(rise, run)))
+    nonisolated public init<Value: BinaryFloatingPoint>(rise: Value, run: Value) {
+        self.init(radians: atan2(Double(rise), Double(run)))
     }
     
-    init(_ vector: SIMD2<Float>) {
+    nonisolated public init(_ vector: SIMD2<some BinaryFloatingPoint>) {
         self.init(rise: vector.y, run: vector.x)
     }
     
 }
 
-public extension SIMD2 where Scalar == Float {
+extension SIMD2 where Scalar == Float {
     
     /// The orthogonal angle to the relative tangent of y and x.
-    var angle: Angle {
+    nonisolated public var angle: Angle {
         Angle(radians: Double(atan2(y, x)))
     }
     
@@ -105,16 +109,16 @@ public enum ControlSize: Hashable, CaseIterable, Sendable, BitwiseCopyable {
     case extraLarge
 }
 
-public extension EnvironmentValues {
+extension EnvironmentValues {
 
-    @Entry var controlSize: ControlSize = .regular
+    @Entry public var controlSize: ControlSize = .regular
     
 }
 
 
-public extension View {
+extension View {
     
-    func controlSize(_ size: ControlSize) -> some View {
+    nonisolated public func controlSize(_ size: ControlSize) -> some View {
         environment(\.controlSize, size)
     }
     

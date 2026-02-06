@@ -56,34 +56,61 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
 
 
 #Preview {
-    InlineBinding("A"){ binding in
+    InlineBinding("Option A"){ binding in
         MenuContainer{
-            VStack(spacing: nil) {
-                Image(systemName: "xbox.logo")
+            VStack(spacing: 12) {
+                Image(systemName: "book.fill")
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 40)
-                    .opacity(0.1)
+                    .frame(maxHeight: 40)
+                    .background{
+                        Image(systemName: "book.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .blur(radius: 40)
+                            .opacity(0.3)
+                    }
+                    .foregroundStyle(.tint)
+                    .accessibilityHidden(true)
                 
-                Text("Is this an XBox?")
+                Text("What's your favourite option?")
                     .font(.system(.title2, design: .serif)[.bold])
+                    .accessibilityHeading(.h1)
                 
-                Text("Pick it now!!!")
+                Text("You can only pick one.")
                     .font(.system(.body, design: .serif).italic())
+                    .accessibilityHeading(.h2)
                     .opacity(0.5)
             }
+            .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding()
+            .padding(.vertical)
             .fixedSize(horizontal: false, vertical: true)
             
-            MenuGroupDivider()
-            
-            MenuPicker(selection: binding, data: ["No", "Yes", "Everything is an xbox."]){ ele in
-                Text(ele)
-                    .font(.headline)
+            MenuPicker(
+                selection: binding,
+                data: ["Option A", "Option B", "Option C"]
+            ){ ele in
+                Label {
+                    Text(ele)
+                        .font(.system(.headline, design: .serif))
+                } icon: { EmptyView() }
             }
         }
-        .padding()
-        .tint(.pink)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background{
+            Rectangle()
+                .fill(.tint)
+                .mask{
+                    LinearGradient(
+                        colors: [.black.opacity(0.6), .black.opacity(0.1)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+        }
+        .tint(.brown)
+        .ignoresSafeArea()
     }
 }

@@ -4,51 +4,50 @@ import SwiftUIKitCore
 
 struct PresentationMatchContextModifier: ViewModifier {
     
-    @State private var indexWantsTop: Int?
-    
     func body(content: Content) -> some View {
         content.overlayPreferenceValue(PresentationMatchKey.self){ groups in
             ZStack{
                 ForEach(groups, id: \.id) { group in
                     let index = groups.firstIndex(where: { $0.id == group.id })!
-                    GroupView(group: group){
-                        indexWantsTop = index
-                    }
-                    .zIndex(Double(indexWantsTop == index ? groups.count + 1 : index))
+                    GroupView(group: group)
+                        .zIndex(Double(index))
                 }
             }
+            .preferenceKeyReset(PresentationKey<BasicPresentationMetadata>.self)
+            .preferenceKeyReset(PresentationKey<AnchorPresentationMetadata>.self)
+            .preferenceKeyReset(PresentationKey<FocusPresentationMetadata>.self)
+            .preferenceKeyReset(BackdropPreferenceKey.self)
         }
+        .preferenceKeyReset(PresentationMatchKey.self)
     }
     
     
     struct GroupView: View {
         
         enum Direction: Equatable {
-            case opening
-            case closeing
+            case appearing
+            case disappearing
             
-            var isOpening: Bool { self == .opening }
-            var isClosing: Bool { self == .closeing }
+            var isAppearing: Bool { self == .appearing }
+            var isDisappearing: Bool { self == .disappearing }
         }
         
         let group: MatchGroup
-        let requestTopIndex: () -> Void
         
         @State private var activeDestination: MatchGroup.Element?
-        @State private var direction: Direction = .opening
+        @State private var direction: Direction = .appearing
         @State private var isAwaitingRemoval = false
         
         var body: some View {
-            ZStack {
-                Color.clear
+            Color.clear.overlay{
                 if let activeDestination {
                     Content(
-                        showViews: direction.isClosing,
+                        showViews: direction.isDisappearing,
                         source: group.source,
                         destination: activeDestination,
                         direction: direction,
                     ){
-                        if direction == .opening {
+                        if direction == .appearing {
                             isAwaitingRemoval = true
                         } else {
                             isAwaitingRemoval = false
@@ -62,22 +61,17 @@ struct PresentationMatchContextModifier: ViewModifier {
             .onChangePolyfill(of: group.destination, initial: true){ old, new in
                 if isAwaitingRemoval {
                     if old != nil, new == nil {
-                        direction = .closeing
-                        requestTopIndex()
+                        direction = .disappearing
                         activeDestination = old
                     }
                     return
                 }
-                
+               
                 if let new {
-                    direction = .opening
-                    if activeDestination == nil {
-                        requestTopIndex()
-                    }
+                    direction = .appearing
                     activeDestination = new
                 } else {
-                    requestTopIndex()
-                    direction = .closeing
+                    direction = .disappearing
                 }
             }
         }
@@ -85,7 +79,7 @@ struct PresentationMatchContextModifier: ViewModifier {
         
         struct Content: View {
             
-            @State private var sourceOrigin: SIMD2<Double> = .zero
+            //@State private var sourceOrigin: SIMD2<Double> = .zero
             @State var showViews = false
             
             let source: MatchGroup.Element
@@ -111,7 +105,7 @@ struct PresentationMatchContextModifier: ViewModifier {
                                 .onDisappear{
                                     destination.isVisible = true
                                     
-                                    if direction == .closeing {
+                                    if direction == .disappearing {
                                         source.isVisible = true
                                         finished()
                                     }
@@ -129,10 +123,7 @@ struct PresentationMatchContextModifier: ViewModifier {
                                         anchor: .topLeading
                                     )
                                     +
-                                    .offsetBinding(
-                                        $sourceOrigin,
-                                        identity: .constant(dst.origin.simd)
-                                    )
+                                    .offset(src.origin.simd, identity: dst.origin.simd)
                                     +
                                     .opacity(1, identity: 0)
                                 )
@@ -148,27 +139,24 @@ struct PresentationMatchContextModifier: ViewModifier {
                                         anchor: .topLeading
                                     )
                                     +
-                                    .offsetBinding(
-                                        $sourceOrigin,
-                                        identity: .constant(dst.origin.simd)
-                                    )
+                                    .offset(src.origin.simd, identity: dst.origin.simd)
                                     +
                                     .opacity(0, identity: 1)
                                 )
                         } else {
                             Color.clear.onDisappear{
-                                if direction == .opening {
+                                if direction == .appearing {
                                     finished()
                                 }
                             }
                         }
                     }
                     .animation(.fastSpring, value: showViews)
-                    .onChangePolyfill(of: src.origin, initial: true){
-                        sourceOrigin = src.origin.simd
-                    }
+//                    .onChangePolyfill(of: src.origin, initial: true){
+//                        sourceOrigin = src.origin.simd
+//                    }
                     .onChangePolyfill(of: direction, initial: true){
-                        if direction == .closeing {
+                        if direction == .disappearing {
                             showViews = false
                         } else {
                             showViews = true

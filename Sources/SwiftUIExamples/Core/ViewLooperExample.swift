@@ -4,109 +4,71 @@ import SwiftUIKit
 public struct ViewLooperExample: View {
     
     @State private var axis: Axis = .horizontal
+    @State private var spacing: Double = 10
     @State private var edgeFadeAmount: Double = 12
-    @State private var durationSpan: TimeSpanMode = .relative
-    @State private var duration: Double = 5
-    @State private var wait: Double = 3
-    
-    enum TimeSpanMode: Sendable {
-        case relative
-        case absolute
-        
-        nonisolated var isRelative: Bool {
-            self == .relative
-        }
-    }
-    
-    private var durationEnum: TimeSpan {
-        switch durationSpan {
-        case .relative: .millisecondsPerPoint(duration)
-        case .absolute: .seconds(duration)
-        }
-    }
+    @State private var speed: Double = 1
+    @State private var delay: Double = 0.3
+    @State private var tapped: Int?
     
     public nonisolated init() {}
     
     public var body: some View {
         ExampleView(title: "View Looper"){
-            HStack(spacing: max(12, edgeFadeAmount)) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.tint)
-                    .aspectRatio(1, contentMode: .fit)
-                    .frame(width: 60)
-                
-                VStack(alignment: .leading) {
-                    Text("Not Looping")
-                    ViewLooper(
-                        axis,
-                        duration: durationEnum,
-                        wait: wait,
-                        edgeFadeAmount: edgeFadeAmount
-                    ) {
-                        Text("Supercalifragilisticexpialidocious")
-                            .font(.system(size: 18, design: .serif).bold().italic())
-                            .lineLimit(1)
+            ViewLooper(
+                axis,
+                spacing: spacing,
+                animation: .dynamic{ dimension in
+                    .easeInOut(duration: dimension * (5 / 1000))
+                    .speed(speed)
+                    .delay(delay)
+                },
+                edgeFadeAmount: edgeFadeAmount
+            ) {
+                AxisStack(axis, spacing: 10) {
+                    ForEach(1..<5){ i in
+                        Button { tapped = i } label: {
+                            ExampleTile(i)
+                                .aspectRatio(1, contentMode: .fit)
+                        }
                     }
                 }
             }
+            .buttonStyle(.tinted)
+            .id(speed).id(delay).id(axis).id(spacing)
+            .frame(
+                width: axis == .vertical ? 70 : nil,
+                height: axis == .horizontal ? 70 : nil
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: axis == .horizontal ? .top : .leading) {
+                if let tapped {
+                    Text(tapped, format: .number)
+                        .font(.title2[.bold].monospacedDigit())
+                }
+            }
+            .padding()
         } parameters: {
-            HStack {
-                Text("Axis")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(selection: $axis.animation(.smooth), items: Axis.allCases){
-                    Text("\($0)".capitalized)
-                }
-                .frame(maxWidth: 200)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack(spacing: 0) {
-                    Text("Duration")
-                        .font(.exampleParameterTitle)
-
-                    Spacer(minLength: 10)
-                    
-                    Text(duration, format: .increment(0.01))
-                        .font(.exampleParameterValue)
-                    
-                    Picker("", selection: $durationSpan){
-                        Text("ms/pt").tag(TimeSpanMode.relative)
-                        Text("seconds").tag(TimeSpanMode.absolute)
-                    }
-                }
-                
-                Slider(value: $duration, in: 0.1...20)
-            }
-            .exampleParameterCell()
+            ExampleCell.Axis(axis: $axis.animation(.smooth))
+                .exampleParameterCell()
             
             VStack {
                 HStack {
-                    Text("Wait")
+                    Text("Spacing")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-        
-                    Text(wait, format: .increment(0.1))
+                    Text(spacing, format: .increment(0.1))
                         .font(.exampleParameterValue)
-                    +
-                    
-                    Text(" Seconds")
-                        .font(.caption2)
-                        .foregroundColor(.primary.opacity(0.5))
                 }
                 
-                Slider(value: $wait, in: 0...10)
+                Slider(value: $spacing, in: 0...20)
             }
             .exampleParameterCell()
-          
+            
             VStack {
                 HStack {
-                    Text("Edge Fade Amount")
+                    Text("Edge Fade")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
@@ -118,6 +80,43 @@ public struct ViewLooperExample: View {
                 Slider(value: $edgeFadeAmount, in: 0...24)
             }
             .exampleParameterCell()
+            
+            ExampleSection("Animation", isExpanded: true){
+                VStack {
+                    HStack(spacing: 0) {
+                        Text("Speed")
+                            .font(.exampleParameterTitle)
+                        
+                        Spacer(minLength: 10)
+                        
+                        Text(speed, format: .increment(0.1))
+                            .font(.exampleParameterValue)
+                    }
+                    
+                    Slider(value: $speed, in: 0...2)
+                }
+                .exampleParameterCell()
+                
+                VStack {
+                    HStack {
+                        Text("Delay")
+                            .font(.exampleParameterTitle)
+                        
+                        Spacer()
+                        
+                        Text(delay, format: .increment(0.1))
+                            .font(.exampleParameterValue)
+                        +
+                        
+                        Text(" Seconds")
+                            .font(.caption2)
+                            .foregroundColor(.primary.opacity(0.5))
+                    }
+                    
+                    Slider(value: $delay, in: 0...10)
+                }
+                .exampleParameterCell()
+            }
         }
     }
 }

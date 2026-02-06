@@ -1,113 +1,75 @@
 import SwiftUIKit
 
 
-struct ExampleView<E: View, P: View>: View {
+struct ExampleView<Example: View, Parameters: View>: View {
     
-    @Environment(\.deviceOrientation) private var orientation
-    
-    @State private var panelSize = CGSize.zero
-    @State private var color = Color(
-        hue: .random(in: 0...1),
-        saturation: 0.9,
-        brightness: 0.9
-    )
+    @State private var color: Color = .systemAllWithHue.randomElement()!
     
     let title: String
-    @ViewBuilder let example: E
-    @ViewBuilder let parameters: P
+    @ViewBuilder let example: Example
+    @ViewBuilder let parameters: Parameters
     
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let maxHeight = (size.height / 1.8) - 75
+            //let maxHeight = (size.height / 1.8) - 75
             let isLandscape = size.width > size.height * 1.2
-            Color.clear.overlay {
-                example
-            }
-            .releaseContainerSafeArea(edges: [.top, .leading])
-            .safeAreaInsets(
-                isLandscape ? .trailing : .bottom,
-                isLandscape ? panelSize.width : panelSize.height
-            )
-            .overlay(alignment: .bottomTrailing) {
-                VStack(spacing: 0) {
-                    ExampleTitle(title)
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
+            Color.black
+                .ignoresSafeArea()
+                .overlay {
+                    AxisStack(
+                        isLandscape ? .horizontal : .vertical,
+                        alignment: .topLeading,
+                        spacing:  isLandscape ? 10 : 0
+                    ) {
+                        Color.clear.contentShape(Rectangle()).overlay {
+                            example
+                        }
+                        .contentMarginsIfAvailable(.bottom, 28.0)
+                        .background(.secondary.opacity(0.15))
+                        .background(.background)
+                        .mask {
+                            ContainerRelativeShape()
+                                .ignoresSafeArea()
+                        }
+                        .containerShape(RoundedRectangle(cornerRadius: 28))
+                        .zIndex(2)
                     
-                    if !(parameters is EmptyView) {
                         ViewThatFits(in: .vertical) {
                             VStack(spacing: 0) {
+                                ExampleTitle(title)
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 8)
+                                
                                 parameters
                             }
                             
                             ScrollView {
                                 VStack(spacing: 0) {
+                                    ExampleTitle(title)
+                                        .padding(.horizontal)
+                                        .padding(.vertical, 8)
+                                    
                                     parameters
                                 }
                             }
-                            .stickyContext()
                         }
-                        .overlay(alignment: .top) {
-                            Divider().ignoresSafeArea()
-                        }
-                    }
+                        .environment(\.colorScheme, .dark)
+                        .frame(
+                            maxWidth: isLandscape ? min(proxy.size.width / 2.5, 400) : nil
+                        )
+                        .zIndex(1)
                 }
-                .frame(
-                    maxHeight: isLandscape ? .infinity : panelSize.height < maxHeight ? nil : maxHeight,
-                    alignment: .top
-                )
-                .examplePanelBG()
-                .padding(10)
-                .onGeometryChangePolyfill(of: \.size){ panelSize = $0 }
-                .frame(maxWidth: isLandscape ? 400 : nil)
-            }
-            .background{
-                ExampleBackground()
-                    .ignoresSafeArea()
             }
         }
-        .presentationContext()
         #if os(macOS)
         .containerShape(RoundedRectangle(cornerRadius: 16))
         #else
         .containerShape(RoundedRectangle(cornerRadius: 64))
         #endif
-        .tint(color)
-        .captureContainerSafeArea(edges: .vertical)
-        .ignoresSafeAreaOppositeNotch()
         .persistentSystemOverlays(.hidden)
-    }
-    
-}
-
-extension View {
-    
-    @ViewBuilder func examplePanelBG() -> some View {
-        if #available(iOS 26.0, macOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *) {
-            clipShape(ContainerRelativeShape())
-                .background{
-                    Color.clear.glassEffect(in: .containerRelative)
-                }
-        } else {
-            background {
-               ContainerRelativeShape()
-                    .fill(.bar)
-                    .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
-            }
-            .overlay {
-                EdgeHighlightMaterial(ContainerRelativeShape())
-            }
-            .clipShape(ContainerRelativeShape())
-            .background{
-                OuterShadowMaterial(
-                    ContainerRelativeShape(),
-                    fill: .black.opacity(0.1),
-                    radius: 15,
-                    y: 8
-                )
-            }
-        }
+        .presentationContext()
+        .tint(color)
     }
     
 }
@@ -127,9 +89,9 @@ struct ExampleBackground: View {
     
 }
 
-extension ExampleView where P == EmptyView {
+extension ExampleView where Parameters == EmptyView {
     
-    init(_ title: String, @ViewBuilder content: @escaping () -> E) {
+    init(_ title: String, @ViewBuilder content: @escaping () -> Example) {
         self.title = title
         self.example = content()
         self.parameters = EmptyView()
@@ -155,7 +117,15 @@ extension ExampleView where P == EmptyView {
     .previewSize()
 }
 
-
+extension Color {
+    
+    static let systemAllWithHue: Set<Color> = [
+        .red, .orange, .brown, .yellow,
+        .green, .mint, .teal, .cyan,
+        .blue, .indigo, .purple, .pink
+    ]
+    
+}
 
 extension View {
     
@@ -178,6 +148,9 @@ extension View {
         }
         .resetActionContext()
         .listenForDeviceOrientation()
+        #if targetEnvironment(macCatalyst)
+        .padding(.top, 36)
+        #endif
     }
 #endif
     

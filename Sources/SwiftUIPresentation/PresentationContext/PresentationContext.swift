@@ -1,9 +1,9 @@
 import SwiftUI
+import SwiftUIKitCore
 
+extension View {
 
-public extension View {
-
-    nonisolated func presentationContext() -> some View {
+    nonisolated public func presentationContext() -> some View {
         basicPresentationContext()
             .focusPresentationContext()
             .anchorPresentationContext()

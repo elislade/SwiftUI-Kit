@@ -5,19 +5,26 @@ import SwiftUIPresentation
 
 public struct NavBarContainer<Content: View> : View {
     
+    typealias Metadata = NavBarItemMetadata
+    
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.interactionGranularity) private var interactionGranularity
     @Environment(\.reduceMotion) private var reduceMotion
 
+    @State private var topInset: CGFloat = 0
+    @State private var leadingInset: CGFloat = 0
     @State private var barIsHidden = false
-    @State private var items: [PresentationValue<NavBarItemMetadata>] = []
+    @State private var items: [PresentationValue<Metadata>] = []
     @State private var bgMaterial: [NavBarMaterialValue] = []
     
+    private var scale: Double { verticalSizeClass == .compact ? 0.75 : 1.0 }
+    
     private var padding: CGFloat {
-        16 - (8 * interactionGranularity)
+        (16 - (8 * interactionGranularity)) * scale
     }
     
     private var minHeight: CGFloat {
-        80 - (28 * interactionGranularity)
+        (80 - (28 * interactionGranularity)) * scale
     }
     
     private let content: () -> Content
@@ -31,30 +38,56 @@ public struct NavBarContainer<Content: View> : View {
     
     public var body: some View {
         content()
+            .presentationSafeAreaContext()
             .safeAreaInset(edge: .top, spacing: 0){
                 if barIsHidden == false {
-                    Bar(items: items)
-                        .padding(padding)
-                        .frame(maxWidth: .infinity, minHeight: minHeight)
-                        .background {
-                            if bgMaterial.isEmpty {
-                                NavBarDefaultMaterial().ignoresSafeArea()
-                            } else {
-                                bgMaterial.last?.view().ignoresSafeArea()
-                            }
+                    Bar(
+                        isCompact: verticalSizeClass == .compact,
+                        items: items
+                    )
+                    .padding(.horizontal, padding)
+                    .padding(.vertical, 12)
+                    .padding(.leading, leadingInset)
+                    .padding(.top, -topInset)
+                    .background {
+                        if bgMaterial.isEmpty {
+                            NavBarDefaultMaterial()
+                                .windowDraggable()
+                                .ignoresSafeArea()
+                        } else {
+                            bgMaterial.last?.view()
+                                .windowDraggable()
+                                .ignoresSafeArea()
                         }
-                        .windowDraggable()
-                        .transitions(.move(edge: .top), .offset(y: -120))
+                        
+                        // compensate for iPadOS 26 TrafficLights / Window controls
+                        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
+                            GeometryReader { proxy in
+                                let width: CGFloat = proxy.containerCornerInsets.topLeading.width
+                                Color.clear.onChangePolyfill(of: width, initial: true){
+                                    leadingInset = width
+                                }
+                            }
+                            
+                            GeometryReader { proxy in
+                                let height: CGFloat = proxy.containerCornerInsets.topLeading.height
+                                Color.clear.onChangePolyfill(of: height, initial: true){
+                                    topInset = height != 0 ? 20 : 0
+                                }
+                            }
+                            .ignoresSafeArea()
+                        }
+                    }
+                    .transition(
+                        (.moveEdge(.top) + .offset([0, -120])).animation(.fastSpringInterpolating)
+                    )
                 }
             }
-            .geometryGroupPolyfill()
+            .geometryGroupIfAvailable()
             .animation(.fastSpringInterpolating, value: barIsHidden)
-            .onPreferenceChange(NavBarMaterialKey.self){ bgMaterial = $0 }
-            .onPreferenceChange(PresentationKey.self){ items = $0 }
-            .onPreferenceChange(NavBarHiddenKey.self){ barIsHidden = $0 }
-            .resetPreference(NavBarMaterialKey.self)
-            .resetPreference(NavBarHiddenKey.self)
-            .resetPreference(PresentationKey<NavBarItemMetadata>.self)
+            .presentationHandler{ items = $0.filter({ !$0.hidden }) }
+            .preferenceChangeConsumer(NavBarMaterialKey.self){ bgMaterial = $0  }
+            .preferenceChangeConsumer(NavBarHiddenKey.self){ barIsHidden = $0 }
     }
     
     
@@ -62,7 +95,8 @@ public struct NavBarContainer<Content: View> : View {
         
         @Environment(\.reduceMotion) private var reduceMotion
         
-        let items: [PresentationValue<NavBarItemMetadata>]
+        let isCompact: Bool
+        let items: [PresentationValue<Metadata>]
         
         private var titleTransition: AnyTransition {
             reduceMotion ? .opacity : .scale(0.9) + .opacity
@@ -72,18 +106,40 @@ public struct NavBarContainer<Content: View> : View {
             reduceMotion ? .opacity : .scale(0.8, anchor: .top) + .opacity
         }
         
+        private var minHeight: Double {
+            let multiplier = isCompact ? 0.8 : 1.0
+            #if canImport(AppKit)
+            return 34 * multiplier
+            #else
+            return 44 * multiplier
+            #endif
+        }
+        
         var body: some View {
             VStack(spacing: 10) {
-                if !items.isEmpty {
+                let itemGroupA = items.filter({
+                    $0.placement == .leading || $0.placement == .title || $0.placement == .trailing
+                })
+                
+                if !itemGroupA.isEmpty  {
                     HStack(spacing: 12) {
-                        ForEach(items.filter({ $0.metadata.placement == .leading }), id: \.id) { item in
+                        let leading = itemGroupA
+                            .filter({ $0.placement == .leading })
+                            .sorted(by: { $0.priority > $1.priority })
+                        
+                        ForEach(leading) { item in
                             item
                                 .view
                                 .transition(actionsTransition.animation(.bouncy))
                                 .id(item.id)
                         }
+                        .labelStyle(.iconOnly)
                         
-                        if let title = items.filter({ $0.metadata.placement == .title }).last {
+                        if let title = itemGroupA
+                            .filter({ $0.placement == .title })
+                            .sorted(by: { $0.priority < $1.priority })
+                            .last
+                        {
                             title
                                 .view
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -95,34 +151,35 @@ public struct NavBarContainer<Content: View> : View {
                             Spacer(minLength: 0)
                         }
  
-                        ForEach(items.filter({ $0.metadata.placement == .trailing }), id: \.id) { item in
+                        let trailing = itemGroupA
+                            .filter({ $0.placement == .trailing })
+                            .sorted(by: { $0.priority < $1.priority })
+                        
+                        ForEach(trailing) { item in
                             item
                                 .view
                                 .transition(actionsTransition.animation(.bouncy))
                                 .id(item.id)
                         }
+                        .labelStyle(.iconOnly)
                     }
                     .overscrollGroup()
-                    #if canImport(AppKit)
-                    .frame(minHeight: 34)
-                    #else
-                    .frame(minHeight: 44)
-                    #endif
+                    .frame(minHeight: minHeight)
                 }
                 
-                ForEach(items.filter({ $0.metadata.placement == .accessory }), id: \.id) { item in
+                let accessories = items.filter({ $0.placement == .accessory }).sorted(by: { $0.priority < $1.priority })
+                ForEach(accessories) { item in
                     item
                         .view
-                        .transition(actionsTransition)
+                        .transition(actionsTransition.animation(.bouncy))
                 }
             }
             .animation(.fastSpringInterpolating, value: items)
             .buttonStyle(.bar)
             .toggleStyle(.bar)
-            .labelStyle(.viewThatFits(preferring: \.title))
             .environment(\.isInNavBar, true)
             .accessibility(addTraits: .isHeader)
-            .geometryGroupPolyfill()
+            .geometryGroupIfAvailable()
         }
     }
     

@@ -32,18 +32,7 @@ public struct NavViewExamples: View {
                         }
                     }
                 }
-                .background{
-                    ZStack {
-                        Rectangle()
-                            .fill(.background)
-                        
-                        Rectangle()
-                            .fill(.tint)
-                            .opacity(0.1)
-                    }
-                    .ignoresSafeArea()
-                }
-                .fontResource(.system(design: .serif))
+                .presentationContext()
                 .environment(\.layoutDirection, layout)
             } parameters: {
                 Toggle(isOn: $useCustomTransition){
@@ -66,7 +55,6 @@ public struct NavViewExamples: View {
                     } label: {
                         EmptyView()
                     }
-                    
                 }
                 .exampleParameterCell()
                 
@@ -107,37 +95,30 @@ public struct NavViewExamples: View {
     
     struct Destination: View {
         
-        @State private var showDetail = false
+        @State private var showTrailingDetail = false
         
         let count: Int
         
         var body: some View {
             ReadableScrollView {
-                VStack(spacing: 0) {
+                LazyVStack(spacing: 0) {
                     Text(count, format: .number)
                         .font(.largeTitle[.heavy])
                         .padding()
                     
-                    Button("Next"){
-                        showDetail = true
-                    }
-                    .buttonStyle(.bar)
-                    .padding()
-                    
                     ForEach(1...10){ s in
                         Section {
                             ScrollView(.horizontal, showsIndicators: false){
-                                LazyHStack(spacing: 16){
+                                LazyHStack(alignment: .bottom, spacing: 16){
                                     ForEach(0..<10){ i in
-                                        Button{ showDetail = true } label: {
-                                            Cell(index: i)
-                                        }
-                                        .frame(width: 150)
+                                        Cell(index: i)
+                                            .frame(width: 150)
                                     }
                                 }
                                 .padding()
                             }
                             .padding(.bottom, 40)
+                            .foregroundStyle(.tint.opacity(Double(s) / 11))
                         } header: {
                             Text("Section \(s)")
                                 .font(.title2[.bold])
@@ -148,13 +129,12 @@ public struct NavViewExamples: View {
                     
                     Section {
                         LazyVGrid(
-                            columns: [.init(.adaptive(minimum: 150), spacing: 16)],
+                            columns: [.init(.adaptive(minimum: 150), spacing: 16, alignment: .bottom)],
                             spacing: 16
                         ){
-                            ForEach(0...180){ i in
-                                Button{ showDetail = true } label: {
-                                    Cell(index: i)
-                                }
+                            ForEach(0...100){ i in
+                                Cell(index: i)
+                                    .foregroundStyle(.tint.opacity(Double(i) / 101))
                             }
                         }
                         .padding()
@@ -168,88 +148,98 @@ public struct NavViewExamples: View {
                 .buttonStyle(.plain)
             }
             .background{
-                ZStack {
-                    Rectangle()
-                        .fill(.background)
-                    
-                    Rectangle()
-                        .fill(.tint)
-                        .opacity(0.1)
-                }
-                .ignoresSafeArea()
+                ExampleBackground()
+                    .ignoresSafeArea()
             }
-            .navDestination(isPresented: $showDetail){
-                Destination(count: count + 1)
-            }
+            .scrollClipDisabledIfAvailable()
             .navBarTitle(Text(verbatim: "Number \(count)"))
             .navBarTrailing{
-                TrailingActions()
+                TrailingActions(showB: $showTrailingDetail)
             }
         }
         
         
         struct TrailingActions: View {
             
-            @State private var test = false
+            @Binding var showB: Bool
+            @State private var showA = Bool.random()
             
             var body: some View {
-                if Bool.random() {
+                if showA {
                     Button{ print("A") } label: { Text("A") }
                 }
                 
-                Toggle(isOn: $test){ Text("B") }
-                    .navDestination(isPresented: $test){
-                        Destination(count: 69)
+                Toggle(isOn: $showB){ Text("B") }
+                    .presentation(isPresented: $showB){
+                        NavView{
+                            Destination(count: 0)
+                        }
+                        .frame(height: 400)
+                        .transition(
+                            .moveEdgeIgnoredByLayout(.bottom)
+                            .animation(.smooth.speed(1.5))
+                        )
                     }
-                
-                if Bool.random() {
-                    Button{ print("C") } label: { Text("C") }
-                }
             }
+            
         }
         
         
         struct Cell: View {
             
             @State private var useImage: Bool = .random()
-            @Environment(\.fontParameters) private var fontParameters
+            @State private var image: Image?
+            @State private var show = false
             
             let index: Int
             
             let url = URL(
                 string: "https://puzzlemania-154aa.kxcdn.com/products/2024/puzzle-schmidt-1000-pieces-random-galaxy.webp"
-            )
+            )!
             
             private var placeholder: some View {
                 RoundedRectangle(cornerRadius: 26)
-                    .fill(
-                        Color(
-                            hue: Double(index * 2) / 360,
-                            saturation: 0.7,
-                            brightness: 1
-                        )
-                    )
-                    .opacity(0.5)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 26)
+                            .strokeBorder(.tint.opacity(0.3))
+                    }
             }
             
             var body: some View {
-                VStack(alignment: .leading) {
-                    if useImage {
-                        AsyncImage(url: url){ image in
-                            image.resizable()
-                        } placeholder: {
+                Button{ show = true } label: {
+                    VStack(alignment: .leading) {
+                        if useImage {
                             placeholder
+                                .overlay { image?.resizable() }
+                                .clipShape(RoundedRectangle(cornerRadius: 26))
+                                .aspectRatio(2, contentMode: .fit)
+                                .coordinateTask{
+                                    try await URLSession.shared.data(for: .init(url: url))
+                                } succeeded: { result in
+                                    self.image = Image(osImage: .init(data: result.0)!)
+                                }
+                        } else {
+                            placeholder
+                                .aspectRatio(1, contentMode: .fit)
                         }
-                        .clipShape(RoundedRectangle(cornerRadius: 26))
-                        .aspectRatio(1, contentMode: .fit)
-                    } else {
-                        placeholder
-                            .aspectRatio(1, contentMode: .fit)
+                        
+                        Text("Item \(index)")
+                            .padding(.leading)
+                            .font(.system(.body, design: .serif))
+                            .foregroundStyle(Color.primary)
                     }
-                    
-                    Text("Item \(index)")
-                        .padding(.leading)
-                        .font(fontParameters[.italic])
+                    .contextMenuX{
+                        Button("Test", systemImage: "flask"){
+                            print("Test")
+                        }
+                        
+                        ContainerRelativeShape()
+                            .aspectRatio(1.5, contentMode: .fit)
+                            .padding([.bottom, .horizontal], 10)
+                    }
+                }
+                .navDestination(isPresented: $show){
+                    Destination(count: index)
                 }
             }
         }
@@ -275,10 +265,11 @@ struct CustomTransition : TransitionModifier {
     }
     
     func body(content: Content) -> some View {
+        let scale: Double = 1 - (0.1 * pushAmount)
         content
             .blur(radius: pushAmount * 20)
             .opacity(1 - pushAmount)
-            .scaleEffect(1 - (0.1 * pushAmount), anchor: .top)
+            .scaleIgnoredByLayout([scale, scale], anchor: .top)
     }
         
 }

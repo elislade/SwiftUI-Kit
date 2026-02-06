@@ -23,12 +23,17 @@ extension View {
     
     #endif
     
-    public nonisolated func disableWindowDrag(_ disabled: Bool = true) -> some View {
+    public nonisolated func windowDragDisabled(_ disabled: Bool = true) -> some View {
         transformEnvironment(\.windowDragEnabled){ isEnabled in
             if disabled {
                 isEnabled = false
             }
         }
+    }
+    
+    @available(*, deprecated, renamed: "windowDragDisabled()")
+    public nonisolated func disableWindowDrag(_ disabled: Bool = true) -> some View {
+        windowDragDisabled(disabled)
     }
     
 }

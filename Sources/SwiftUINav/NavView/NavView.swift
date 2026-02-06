@@ -5,20 +5,21 @@ import SwiftUIPresentation
 
 public struct NavView<Root: View, Transition: TransitionModifier> : View {
 
+    typealias Metadata = NavViewElementMetadata
+    
+    @FocusedValue(\.resign) private var resignFocus
     @Namespace private var namespace
-    @Environment(\.layoutDirection) private var layoutDirection
+
+    @State private var rootID = UniqueID()
+    @State private var elementsRemovalSnapshot: [PresentationValue<Metadata>]?
+    @State private var elements: [PresentationValue<Metadata>] = []
     
     private let barMode: NavViewBarMode
     private let root: Root
     
-    @State private var elements: [PresentationValue<NavViewElementMetadata>] = []
-    @State private var scrollGestureTotal: Double = 0
-    @State private var updatingStack = false
-    
-    @GestureState(resetTransaction: .init(animation: .smooth.speed(1.8))) private var gestureIsActive = false
-    @FocusedValue(\.resign) private var resignFocus
-    
-    @State private var transitionFraction: Double = 0
+    private var elementsNotRemoving: [PresentationValue<Metadata>] {
+        elementsRemovalSnapshot ?? elements
+    }
     
     /// - Parameters:
     ///   - transition: The ``Transition`` to use for push/pop transitions.
@@ -33,156 +34,108 @@ public struct NavView<Root: View, Transition: TransitionModifier> : View {
         self.root = content()
     }
     
-    private func popElement() {
-        guard let last = elements.last else { return }
-        last.dispose()
-    }
-    
-    private func commitTransition(at value: Double) {
-        if value > 150 {
-            // user dragged enough, pop element
-            popElement()
-        }
-        else {
-            withAnimation(.smooth.speed(1.8)){
-                transitionFraction = 0
+    private func pop(to element: UniqueID) {
+        let elements = elementsNotRemoving
+        guard !elements.isEmpty, element != elements.last?.id else { return }
+        
+        var snap: [PresentationValue<Metadata>] = []
+        
+        if element == rootID {
+            for element in elements {
+                if element.id == elements.last?.id {
+                    snap.append(element)
+                }
+                element.dispose()
+            }
+        } else if let index = elements.firstIndex(where: { $0.id == element }) {
+            for (idx, element) in elements.enumerated() {
+                if idx <= index || element.id == elements.last?.id {
+                    snap.append(element)
+                }
+                  
+                if idx > index {
+                    element.dispose()
+                }
             }
         }
+        
+        if !snap.isEmpty { elementsRemovalSnapshot = snap }
     }
     
+    private func popLast() {
+        pop(to: elementsNotRemoving.dropLast().last?.id ?? rootID)
+    }
+
     private var content: some View {
         GeometryReader { proxy in
-            let size = proxy.size
+            let insets = proxy.safeAreaInsets
+            let size = CGSizeMake(
+                proxy.size.width + insets.leading + insets.trailing,
+                proxy.size.height + insets.bottom + insets.top
+            )
+            
             Elements(
                 size: size,
+                resolve: { proxy[$0.source ?? $0.anchor] },
                 root: root,
-                elements: elements,
-                transitionFraction: $transitionFraction,
-                gestureIsActive: gestureIsActive,
-                wrapWithBar: barMode == .element
-            )
-            .animation(.smooth.speed(1.8), value: elements)
+                rootID: rootID,
+                elements: elementsRemovalSnapshot ?? elements,
+                elementsToAnimateRemoval: Set([elementsRemovalSnapshot?.last].compactMap{ $0?.id }),
+                elementsShouldBeWrappedByNavBarContainer: barMode == .element
+            ){ elementToRemove in
+                elements.removeAll(where: { $0.id == elementToRemove })
+                elementsRemovalSnapshot = nil
+            }
             .resetActionContainer(active: !elements.isEmpty){ @MainActor in
-                while !elements.isEmpty {
-                    popElement()
-                    try? await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)
-                }
+                pop(to: rootID)
             }
-            #if !os(tvOS)
-            .overlay{
-                GeometryReader { proxy in
-                    Rectangle()
-                        .frame(width: 14 + proxy.safeAreaInsets.leading)
-                        .opacity(0)
-                        .contentShape(Rectangle())
-                        .highPriorityGesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged{ gesture in
-                                    var transaction = Transaction()
-                                    transaction.isContinuous = true
-                                    transaction.animation = nil
-                                    withTransaction(transaction){
-                                        transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
-                                    }
-                                    //transitionFraction = max(gesture.translation.width * layoutDirection.scaleFactor, 0) / size.width
-                                }
-                                .onEnded({ g in
-                                    commitTransition(at: g.predictedEndTranslation.width * layoutDirection.scaleFactor)
-                                })
-                                .updating($gestureIsActive){ _, state, transaction in
-                                    transaction.animation = nil
-                                    state = true
-                                }
-                        )
-                        .allowsHitTesting(!elements.isEmpty)
-                        .defersSystemGesturesPolyfill(on: .leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .ignoresSafeArea()
-                }
-                .releaseContainerSafeArea()
-            }
-            #endif
-            .navBar(elements.isEmpty || barMode != .container ? .none : .leading){
+            .navBar(.leading, hidden: elements.isEmpty || barMode != .container, priority: .max){
                 BackButton()
-                    .transition(.move(edge: .leading) + .opacity)
-                    .handleDismissPresentation(popElement)
+                    .transition(
+                        .moveEdge(.leading).animation(.bouncy)
+                        + .opacity.animation(.linear(duration: 0.25))
+                    )
+                    .presentationDismissHandler(perform: popLast)
             }
-//            .indirectGesture(IndirectScrollGesture(useMomentum: false, mask: .horizontal).onChanged{ g in
-//                scrollGestureTotal += g.delta.x
-//                isUpdatingTransition = true
-//                transitionFraction = max(scrollGestureTotal * layoutDirection.scaleFactor, 0) / size.width
-//            }.onEnded{ g in
-//                commitTransition(at: scrollGestureTotal * layoutDirection.scaleFactor)
-//                scrollGestureTotal = 0
-//            })
-            .handleDismissPresentation(popElement)
-        }
-        .geometryGroupPolyfill()
-        .clipped()
-        .captureContainerSafeArea()
-        .resetPreference(PresentationWillDismissPreferenceKey.self)
-//        .onAnimationComplete(when: transitionFraction == 0){
-//            isUpdatingTransition = false
-//        }
-        .onChangePolyfill(of: gestureIsActive){ old, new in
-            if old && !new {
-                transitionFraction = 0
-            }
+            .presentationDismissHandler(.context, enabled: !elements.isEmpty, perform: popLast)
         }
     }
     
     
     public var body: some View {
-        Group {
+        ZStack {
             if barMode == .container {
                 NavBarContainer{
                     content
                 }
             } else {
-                content
-                    .disableNavBarPreferences()
+                content.navBarRemoved()
             }
+        }
+        .environment(\.navViewBreadcrumbs, from: NavViewBreadcrumbs.self)
+        .environment(\.navViewDismissAction){ targetID in
+            pop(to: targetID)
         }
         .scrollPassthroughContext()
-        .onPreferenceChange(PresentationKey<NavViewElementMetadata>.self){ new in
-            guard elements != new else { return }
-            print("UPDATE", new.map(\.id))
-            let difference = new.difference(from: elements, by: { $0.id == $1.id })
-            if let newElements = elements.applying(difference) {
-                
-                if newElements.last?.id != self.elements.last?.id {
-                    resignFocus?()
-                }
-                
-                transitionFraction = 0
-                elements = newElements
+        .interactionContext()
+        .presentationHandler(Metadata.self){ values in
+            let new = values.sorted(by: { $0.sortDate < $1.sortDate })
+            
+            // If the last element on the stack is different we are either poping or pushing a new element so resignFocus/firstResponder
+            // This allows the keyboard to dismiss while the transition is happening instead of after.
+            if new.last?.id != self.elements.last?.id {
+                resignFocus?()
             }
-        }
-        .resetPreference(PresentationKey<NavViewElementMetadata>.self)
-    }
-    
-    
-    struct BackButton: View {
-        
-        @Environment(\.dismissPresentation) private var dismissPresentation
-        
-        var body: some View {
-            Button{ dismissPresentation() } label: {
-                Label { Text("Go Back") } icon: {
-                    Image(systemName: "arrow.left")
-                        .layoutDirectionMirror()
-                }
-            }
-            .keyboardShortcut(SwiftUIKitCore.KeyEquivalent.escape, modifiers: [])
-            .labelStyle(.iconOnly)
+
+            self.elements = new
         }
     }
     
 }
 
-public extension NavView where Transition == DefaultNavTransitionModifier {
+extension NavView where Transition == DefaultNavTransitionModifier {
     
-    init(
+    public init(
         barMode: NavViewBarMode = .container,
         @ViewBuilder content: @escaping () -> Root
     ){
@@ -192,30 +145,6 @@ public extension NavView where Transition == DefaultNavTransitionModifier {
             content: content
         )
     }
-    
-}
-
-
-struct NavViewDestinationValueKey: PreferenceKey {
-    
-    static var defaultValue: [NavViewDestinationValue] { [] }
-    
-    static func reduce(value: inout [NavViewDestinationValue], nextValue: () -> [NavViewDestinationValue]) {
-        value.append(contentsOf: nextValue())
-    }
-    
-}
-
-
-struct NavViewDestinationValue: Equatable {
-    
-    static func == (lhs: NavViewDestinationValue, rhs: NavViewDestinationValue) -> Bool {
-        lhs.id == rhs.id && lhs.value == rhs.value
-    }
-    
-    let id: UUID
-    let value: AnyHashable
-    let dispose: () -> Void
     
 }
 

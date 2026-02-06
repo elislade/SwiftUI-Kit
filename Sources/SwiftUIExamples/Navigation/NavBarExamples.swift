@@ -22,24 +22,24 @@ public struct NavBarExamples: View {
                                 endPoint: .bottom
                             )
                         }
+                        .ignoresSafeArea()
                         .frame(height: 1000)
                 }
-                .ignoresSafeArea(edges: [.horizontal, .bottom])
-                .navBar(placements.contains(.trailing) ? .trailing : .none) {
+                .navBar(.trailing, hidden: !placements.contains(.trailing)) {
                     TrailingView()
                         .minimumScaleFactor(0.5)
                 }
-                .navBar(placements.contains(.leading) ? .leading : .none) {
+                .navBar(.leading, hidden: !placements.contains(.leading)) {
                     LeadingView(selection: $selection.animation(.bouncy))
                         .minimumScaleFactor(0.5)
                 }
-                .navBar(placements.contains(.title) ? .title : .none) {
+                .navBar(.title, hidden: !placements.contains(.title)) {
                     Text("Title")
                         .font(.title2[.bold])
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
-                .navBar(placements.contains(.accessory) ? .accessory : .none){
+                .navBar(.accessory, hidden: !placements.contains(.accessory)){
                     AccessoryView(selection: $selection)
                         .minimumScaleFactor(0.5)
                         .transition(
@@ -61,13 +61,11 @@ public struct NavBarExamples: View {
             
             ExampleSection("Placements", isExpanded: true){
                 ForEach(NavBarItemMetadata.Placement.allCases, id: \.rawValue){ placement in
-                    if placement != .none {
-                        Toggle(isOn: Binding($placements, contains: placement)){
-                            Text(verbatim: "Show \(placement)")
-                                .font(.exampleParameterTitle)
-                        }
-                        .exampleParameterCell()
+                    Toggle(isOn: Binding($placements, contains: placement)){
+                        Text(verbatim: "Show \(placement)")
+                            .font(.exampleParameterTitle)
                     }
+                    .exampleParameterCell()
                 }
             }
             .disabled(barHidden)

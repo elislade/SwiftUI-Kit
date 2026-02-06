@@ -1,17 +1,18 @@
 import SwiftUI
+import SwiftUIKitCore
 import SwiftUIPresentation
 
 
 
-public struct NavBarMaterialModifier<V: View> : ViewModifier {
+struct NavBarMaterialModifier<V: View> : ViewModifier {
     
-    @State private var id = UUID()
-    @ViewBuilder let view: () -> V
+    @State private var id = UniqueID()
+    @ViewBuilder let view: @MainActor () -> V
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         content.preference(
             key: NavBarMaterialKey.self,
-            value: [.init(id: .init(), view: { AnyView(view()) })]
+            value: [.init(id: id, view: { AnyView(view()) })]
         )
     }
     
@@ -54,7 +55,7 @@ public struct NavBarMaterialValue: Equatable, Sendable {
         lhs.id == rhs.id
     }
     
-    let id: UUID
+    let id: UniqueID
     let view: @MainActor () -> AnyView
     
 }

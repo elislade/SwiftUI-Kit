@@ -10,16 +10,22 @@ struct HitTestingModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content.allowsHitTesting(enabled)
+        content
+            .allowsHitTesting(enabled)
+            .windowDragDisabled(!enabled)
     }
+    
 }
 
 
-public extension AnyTransition {
+extension AnyTransition {
     
-    /// NoHitTesting Transition allows any transition combined with it to not hit test when transition to allow events through immediately instead of waiting for transition to end.
+    @available(*, deprecated, renamed: "hitTestingDisabled")
+    static public var noHitTesting: Self { .hitTestingDisabled }
+    
+    /// Allows any transition combined with it to not hit test when transitioning, to allow events through immediately instead of waiting for transition to end.
     /// - Note: Useful for transitions that block interactive elements that need to be responsive asap upon removal.
-    static var noHitTesting: Self {
+    static public var hitTestingDisabled: Self {
         AnyTransition.modifier(
             active: HitTestingModifier(enabled: false),
             identity: HitTestingModifier(enabled: true)

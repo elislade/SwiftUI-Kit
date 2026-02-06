@@ -1,11 +1,12 @@
 import SwiftUI
+import SwiftUIKitCore
 
-public extension View {
+extension View {
     
     
     /// Defines the context for which to present children `focusPresentations` in.
     /// - Returns: A view that sets the focus presentation context.
-    nonisolated func focusPresentationContext() -> some View {
+    nonisolated public func focusPresentationContext() -> some View {
         modifier(FocusPresentationContext())
     }
     
@@ -13,12 +14,11 @@ public extension View {
     /// Focuses this current view in the first parent focusPresentationContext available.
     /// - Parameter isPresented: A binding to the presentation for programatic presentation and dismissal.
     /// - Returns: A view that presents this view for focus presentation.
-    func focusPresentation(isPresented: Binding<Bool>) -> some View {
-        return FocusPresenter(
-            isPresented: isPresented,
-            content: { self },
-            focusView: { AnyView(self) }
-        )
+    public func focusPresentation(isPresented: Binding<Bool>) -> some View {
+        modifier(FocusPresenter(
+            value: isPresented,
+            focusView: { _ in self }
+        ))
     }
     
     /// Focuses this current view in the first parent focusPresentationContext available.
@@ -26,15 +26,14 @@ public extension View {
     ///   - isPresented: A binding to the presentation for programatic presentation and dismissal.
     ///   - focus: A ViewBuilder for the focused view that will replace this current view when focusing
     /// - Returns: A view that presents the focus view for presentation.
-    func focusPresentation<Focus: View>(
+    nonisolated public func focusPresentation(
         isPresented: Binding<Bool>,
-        @ViewBuilder focus: @MainActor @escaping () -> Focus
+        @ViewBuilder focus: @MainActor @escaping () -> some View
     ) -> some View {
-        FocusPresenter(
-            isPresented: isPresented,
-            content: { self },
-            focusView: { AnyView(focus()) }
-        )
+        modifier(FocusPresenter(
+            value: isPresented,
+            focusView: { _ in focus() }
+        ))
     }
     
     /// Focuses this current view in the first parent focusPresentationContext available.
@@ -42,15 +41,14 @@ public extension View {
     ///   - value: A binding to the presentation for programatic presentation and dismissal.
     ///   - focus: A ViewBuilder for the focused view that will replace this current view when focusing
     /// - Returns: A view that presents the focus view for presentation.
-    func focusPresentation<Value: Hashable, Focus: View>(
-        value: Binding<Value?>,
-        @ViewBuilder focus: @MainActor @escaping (Value) -> Focus
+    nonisolated public func focusPresentation<Value: ValuePresentable>(
+        value: Binding<Value>,
+        @ViewBuilder focus: @MainActor @escaping (Value.Presented) -> some View
     ) -> some View {
-        FocusOptionalPresenter(
+        modifier(FocusPresenter(
             value: value,
-            content: { self },
-            focusView: { AnyView(focus($0)) }
-        )
+            focusView: focus
+        ))
     }
     
     
@@ -60,17 +58,16 @@ public extension View {
     ///   - focus: A ViewBuilder for the focused view that will replace this current view when focusing
     ///   - accessory: A ViewBuilder that will show alongside the presented view with auto aligned behaviour.
     /// - Returns: A view that presents the focus view for presentation.
-    func focusPresentation<Focus: View, Accessory: View>(
+    nonisolated public func focusPresentation(
         isPresented: Binding<Bool>,
-        @ViewBuilder focus: @MainActor @escaping () -> Focus,
-        @ViewBuilder accessory: @MainActor @escaping (AutoAnchorState) -> Accessory
+        @ViewBuilder focus: @MainActor @escaping () -> some View,
+        @ViewBuilder accessory: @MainActor @escaping () -> some View
     ) -> some View {
-        FocusPresenter(
-            isPresented: isPresented,
-            content: { self },
-            focusView: { AnyView(focus()) },
-            accessory: { AnyView(accessory($0)) }
-        )
+        modifier(FocusPresenter(
+            value: isPresented,
+            focusView: { _ in focus() },
+            accessory: { AnyView(accessory()) }
+        ))
     }
     
     
@@ -79,16 +76,15 @@ public extension View {
     ///   - isPresented: A binding to the presentation for programatic presentation and dismissal.
     ///   - accessory: A ViewBuilder that will show alongside the presented view with auto aligned behaviour.
     /// - Returns: A view that presents this view for focus presentation.
-    func focusPresentation<Accessory: View>(
+    public func focusPresentation(
         isPresented: Binding<Bool>,
-        @ViewBuilder accessory: @MainActor @escaping (AutoAnchorState) -> Accessory
+        @ViewBuilder accessory: @MainActor @escaping () -> some View
     ) -> some View {
-        FocusPresenter(
-            isPresented: isPresented,
-            content: { self },
-            focusView: { AnyView(self) },
-            accessory: { AnyView(accessory($0)) }
-        )
+        modifier(FocusPresenter(
+            value: isPresented,
+            focusView: { _ in self },
+            accessory: { AnyView(accessory()) }
+        ))
     }
     
 }

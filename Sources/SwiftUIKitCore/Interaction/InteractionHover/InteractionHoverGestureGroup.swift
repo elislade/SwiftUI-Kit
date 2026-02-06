@@ -24,8 +24,9 @@ extension InteractionHoverGestureGroup: ViewModifier {
         content
             .coordinateSpace(name: id)
             .environment(\.interactionGroupCoordinateSpace, .named(id))
-            .onPreferenceChange(InteractionHoverElementPreference.self){ elements = $0 }
-            .resetPreference(InteractionHoverElementPreference.self)
+            .preferenceChangeConsumer(InteractionHoverElementPreference.self){
+                elements = $0
+            }
             .onChangePolyfill(of: isActive){
                 if !isActive {
                     if let previousIndex = elements.firstIndex(where: { $0.id == previousID }) {
@@ -37,7 +38,7 @@ extension InteractionHoverGestureGroup: ViewModifier {
                 }
             }
             .gesture(
-                enabled ? priority : .none,
+                enabled && !elements.isEmpty ? priority : .none,
                 LongPressGesture(
                     minimumDuration: delay.seconds,
                     maximumDistance: 3

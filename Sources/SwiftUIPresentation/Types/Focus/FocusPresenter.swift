@@ -1,82 +1,69 @@
 import SwiftUI
+import SwiftUIKitCore
 
-
-struct FocusPresenter<Content: View>: View {
+struct FocusPresenter<Value: ValuePresentable, Focus: View>: ViewModifier {
     
-    @Binding var isPresented: Bool
-    let content: @MainActor () -> Content
-    let focusView: @MainActor () -> AnyView
-    let accessory: @MainActor (AutoAnchorState) -> AnyView?
+    @Namespace private var ns
+    
+    @State private var active = false
+    @State private var showMatch = true
+    
+    @Binding private var value: Value
+
+    let focusView: @MainActor (Value.Presented) -> Focus
+    let accessory: @MainActor () -> AnyView?
     
     nonisolated init(
-        isPresented: Binding<Bool>,
-        @ViewBuilder content: @MainActor @escaping () -> Content,
-        focusView: @MainActor @escaping () -> AnyView,
-        accessory: @MainActor @escaping (AutoAnchorState) -> AnyView? = { _ in nil }
-    ) {
-        self._isPresented = isPresented
-        self.content = content
-        self.focusView = focusView
-        self.accessory = accessory
-    }
-    
-    var body: some View {
-        content()
-            .allowsHitTesting(!isPresented)
-            .disabled(isPresented)
-            .opacity(isPresented ? 0 : 1)
-            .presentationValue(
-                isPresented: $isPresented,
-                metadata: FocusPresentationMetadata(
-                    sourceView: { AnyView(content()) },
-                    accessory: accessory
-                )
-            ){
-                focusView()
-            }
-    }
-    
-}
-
-
-struct FocusOptionalPresenter<Value : Hashable, Content: View> {
-    
-    @Binding var value: Value?
-    let content: @MainActor () -> Content
-    let focusView: @MainActor (Value) -> AnyView
-    let accessory: @MainActor (AutoAnchorState) -> AnyView?
-    
-    nonisolated init(
-        value: Binding<Value?>,
-        @ViewBuilder content: @MainActor @escaping () -> Content,
-        focusView: @MainActor @escaping (Value) -> AnyView,
-        accessory: @MainActor @escaping (AutoAnchorState) -> AnyView? = { _ in nil }
+        value: Binding<Value>,
+        focusView: @MainActor @escaping (Value.Presented) -> Focus,
+        accessory: @MainActor @escaping () -> AnyView? = { nil }
     ) {
         self._value = value
-        self.content = content
         self.focusView = focusView
         self.accessory = accessory
     }
     
-}
-
-
-extension FocusOptionalPresenter: View {
-    
-    var body: some View {
-        content()
-            .allowsHitTesting(value == nil)
-            .disabled(value != nil)
-            .opacity(value != nil ? 0 : 1)
+    func body(content: Content) -> some View {
+        content
+            .allowsHitTesting(!value.isPresented)
+            .disabled(value.isPresented)
+            .opacity(active ? 0 : 1)
+            .animation(.none, value: active)
+            .overlay {
+                ZStack {
+                    if active {
+                        ZStack {
+                            if showMatch {
+                                content
+                                    .matchedGeometryEffect(id: "Item", in: ns)
+                                    .transition((.scale(0.9) + .opacity).animation(.bouncy))
+                            } else {
+                                Color.clear.onDisappear{ active = false }
+                            }
+                        }
+                        .onAppear{ showMatch = false }
+                        .animation(.smooth.speed(1.3), value: showMatch)
+                        .transition(.identity)
+                    }
+                }
+                .onDisappear{ showMatch = true }
+            }
+            .onChangePolyfill(of: value.isPresented){
+                if value.isPresented {
+                    active = true
+                } else {
+                    active = true
+                    showMatch = true
+                }
+            }
             .presentationValue(
                 value: $value,
                 metadata: FocusPresentationMetadata(
-                    sourceView: { AnyView(content()) },
+                    namespace: ns,
                     accessory: accessory
-                )
-            ){
-                focusView($0)
-            }
+                ),
+                content: focusView
+            )
     }
     
 }

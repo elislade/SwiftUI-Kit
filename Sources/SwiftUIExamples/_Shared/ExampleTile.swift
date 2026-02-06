@@ -14,20 +14,19 @@ struct ExampleTile: View {
     }
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 18)
-            .overlay {
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(lineWidth: 1)
-                    .colorInvert()
-                
-                Text(string)
-                    .font(.system(.title, design: .rounded)[.black][.monospacedDigit])
-                    .colorInvert()
-                    .padding(5)
-            }
-            .drawingGroup()
+        Text(string)
+            .font(.system(.title, design: .rounded)[.black][.monospacedDigit])
+            .padding(5)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .lineLimit(1)
             .minimumScaleFactor(0.2)
+            .background {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(.background)
+                
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(lineWidth: 1)
+            }
     }
 }
 

@@ -2,72 +2,59 @@ import SwiftUI
 
 #if canImport(UIKit) && !os(watchOS)
 
-extension VisualEffectView : UIViewRepresentable {
+extension BlurEffectView : UIViewRepresentable {
     
-    @MainActor func sync(_ v: CustomVisualEffectView) {
-        if blurRadius != v.blurRadius {
-            v.blurRadius = blurRadius
+    @MainActor func sync(_ native: NativeBlurEffectView) {
+        var needsUpdate = false
+        
+        if native.blurRadius != blurRadius {
+            native.blurRadius = blurRadius
+            needsUpdate = true
         }
         
-        if v.disableFilters != disableFilters {
-            v.disableFilters = disableFilters
+        if native.filtersDisabled != filtersDisabled {
+            native.filtersDisabled = filtersDisabled
+            needsUpdate = true
+        }
+        
+        if needsUpdate {
+            native.updateFilters()
         }
     }
     
-    public func makeUIView(context: Context) -> CustomVisualEffectView {
-        #if os(tvOS)
-        let v = CustomVisualEffectView(effect: UIBlurEffect(style: .regular))
-        #else
-        let v = CustomVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-        #endif
-        sync(v)
-        return v
+    public func makeUIView(context: Context) -> NativeBlurEffectView {
+        NativeBlurEffectView(filtersDisabled: filtersDisabled, blurRadius: blurRadius)
     }
     
-    public func updateUIView(_ uiView: CustomVisualEffectView, context: Context) {
+    public func updateUIView(_ uiView: NativeBlurEffectView, context: Context) {
         sync(uiView)
     }
     
 }
 
-public final class CustomVisualEffectView: UIVisualEffectView {
+public final class NativeBlurEffectView : UIVisualEffectView {
     
-    var disableFilters: Set<VisualEffectView.Filter> = [] {
-        didSet { updateFilters() }
-    }
-    
-    var blurRadius: Double? {
-        didSet { updateFilters() }
-    }
-    
-    private func updateFilters() {
-        contentView.backgroundColor = .clear
-
-        #if targetEnvironment(macCatalyst)
-        guard let caFilters = layer.sublayers?[0].sublayers?[0].sublayers?[0].filters as? [NSObject]
-        else {
-            return
-        }
-        
+    convenience init(filtersDisabled: BlurEffectView.Filters, blurRadius: Double?) {
+        #if os(tvOS)
+        self.init(effect: UIBlurEffect(style: .regular))
         #else
-        
-        guard let layers = layer.sublayers, let caFilters = layers[0].filters as? [NSObject]
-        else {
-            return
-        }
-        
+        self.init(effect: UIBlurEffect(style: .systemMaterial))
         #endif
-
-        caFilters.forEach {
-            let name = $0.value(forKey: "name") as! String
-            
-            if let filter = VisualEffectView.Filter(name) {
-                $0.setValue(!disableFilters.contains(filter), forKey: "enabled")
-                
-                if filter == .gaussianBlur {
-                    $0.setValue(blurRadius ?? 29.5, forKey: "inputRadius")
-                }
+        
+        self.filtersDisabled = filtersDisabled
+        self.blurRadius = blurRadius
+    }
+    
+    var filtersDisabled: BlurEffectView.Filters = []
+    var blurRadius: Double?
+    
+    func updateFilters() {
+        layer.enumerate{ layer in
+            layer.backgroundColor = .none
+            if let filters = layer.filters, let caFilters = filters as? [NSObject], !caFilters.isEmpty {
+                filtersDisabled.update(filters: caFilters, blurRadius: blurRadius)
             }
+            return false
         }
     }
     
