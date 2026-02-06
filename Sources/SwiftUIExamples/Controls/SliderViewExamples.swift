@@ -176,14 +176,14 @@ public struct SliderViewExamples : View {
                         ){
                             handle
                                 .frame(width: size * 3, height: size * 2)
-                                .geometryGroupPolyfill()
+                                .geometryGroupIfAvailable()
                         }
                         .background{ bg }
                         
                         SliderView(x: $x, hitTestHandle: hitTestHandle){
                             handle
                                 .frame(width: size, height: size)
-                                .geometryGroupPolyfill()
+                                .geometryGroupIfAvailable()
                         }
                         .background{ bg }
                         .frame(height: size)
@@ -192,7 +192,7 @@ public struct SliderViewExamples : View {
                     SliderView(y: $y, hitTestHandle: hitTestHandle){
                         handle
                             .frame(width: size, height: size)
-                            .geometryGroupPolyfill()
+                            .geometryGroupIfAvailable()
                     }
                     .background{ bg }
                     .frame(width: size)

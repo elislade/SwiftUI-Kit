@@ -30,18 +30,8 @@ public struct LineShapeExample: View {
             }
             .exampleParameterCell()
             
-            HStack {
-                Text("Axis")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $axis){
-                    Text("Horizontal").tag(Axis.horizontal)
-                    Text("Vertical").tag(Axis.vertical)
-                }
-            }
-            .exampleParameterCell()
+            ExampleCell.Axis(axis: $axis.animation(.bouncy))
+                .exampleParameterCell()
 
             if axis == .vertical {
                 VStack {

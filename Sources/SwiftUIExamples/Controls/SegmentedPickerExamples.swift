@@ -33,7 +33,7 @@ public struct SegmentedPickerExamples : View {
                 #if !os(watchOS)
                 ExampleCard(title: "SwiftUI") {
                     Picker("", selection: $selection){
-                        ForEach(options){
+                        ForEach(options, id: \.self){
                             Label(
                                 "Item " + $0,
                                 systemImage: $0.lowercased() + ".circle\(selection == $0 ? ".fill" : "")"
@@ -54,11 +54,11 @@ public struct SegmentedPickerExamples : View {
                             systemImage: $0.lowercased() + ".circle\(selection == $0 ? ".fill" : "")"
                         )
                     }
+                    .animation(.bouncy, value: selection)
                 }
                 .labelStyle(.iconOnly)
             }
             .animation(.bouncy, value: suggetion)
-            .animation(.bouncy, value: selection)
             .controlRoundness(controlRoundness)
             //.interactionGranularity(1)
             .controlSize(controlSize)

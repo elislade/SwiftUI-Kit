@@ -25,7 +25,7 @@ public struct MouseEventExamples: View {
     public init(){ }
     
     public var body: some View {
-        VStack(spacing: 0) {
+        ExampleView(title: "Mouse Events"){
             ZStack {
                 Color.clear
                     .contentShape(Rectangle())
@@ -67,17 +67,11 @@ public struct MouseEventExamples: View {
                     events.insert(.click($0), at: 0)
                 }
             }
-            
-            Divider()
-            
-            ExampleTitle("Mouse Events")
-                .padding()
-            
+        } parameters: {
             Toggle(isOn: $enabled){
                 Text("Enabled")
                     .font(.exampleParameterTitle)
             }
-            .toggleStyle(.swiftUIKitSwitch)
             .exampleParameterCell()
         }
     }

@@ -18,7 +18,7 @@ public struct LabelThatFitsExample: View {
                 width.bounds = (size.width / 10)...size.width
             }
             .overlay {
-                Rectangle()
+                RoundedRectangle(cornerRadius: 30)
                     .fill(.tint)
                     .frame(width: width.value, height: height.value)
                 
@@ -50,20 +50,18 @@ public struct LabelThatFitsExample: View {
             )
         } parameters: {
             VStack {
-                HStack {
-                    Text("Size")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer(minLength: 0)
-                    
+                LabeledContent {
                     Group {
                         Text(width.value, format: .increment(1)) +
                         Text(" , ") +
                         Text(height.value, format: .increment(1))
                     }
                     .font(.exampleParameterValue)
+                } label: {
+                    Text("Size")
+                        .font(.exampleParameterTitle)
                 }
-                
+
                 HStack {
                     Slider($width)
                     Slider($height)

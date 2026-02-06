@@ -4,7 +4,7 @@ public struct KeyPressExample: View {
     
     public init(){}
     
-    enum MaskType: Hashable {
+    enum MaskType: Hashable, CaseIterable {
         case none
         case chars
         case equivalence
@@ -125,27 +125,74 @@ public struct KeyPressExample: View {
                     
                     Spacer()
                     
-                    Picker("", selection: $mask){
-                        Text("None").tag(MaskType.none)
-                        Text("Character Set").tag(MaskType.chars)
-                        Text("Key Equivalence").tag(MaskType.equivalence)
+                    Menu {
+                        MenuPicker(selection: $mask, data: MaskType.allCases){ mask in
+                            MaskTypeLabel(mask)
+                        }
+                    } label: {
+                        MaskTypeLabel(mask)
+                            .foregroundStyle(.tint)
+                            .menuIndicatorStyle()
                     }
                 }
                 .exampleParameterCell()
                 
-                switch mask {
-                case .none:
-                    EmptyView()
-                case .chars:
-                    CharacterSetMaskView(set: $characters)
-                case .equivalence:
-                    KeyEquivalentMaskView(keys: $keys)
+                VStack(spacing: 4) {
+                    switch mask {
+                    case .none:
+                        EmptyView()
+                    case .chars:
+                        CharacterSetMaskView(set: $characters)
+                    case .equivalence:
+                        KeyEquivalentMaskView(keys: $keys)
+                    }
                 }
+                .labelStyle(MaskCellLabelStyle())
+                .equalSizeContext{ $0.width > $1.width }
             }
             .symbolRenderingMode(.hierarchical)
         }
     }
     
+    struct MaskCellLabelStyle: LabelStyle {
+        
+        func makeBody(configuration: Configuration) -> some View {
+            HStack(spacing: 14) {
+                configuration.icon
+                    .font(.callout[.bold])
+                    .equalSize(axes: .horizontal)
+                    .padding(4)
+                    .background{
+                        RoundedRectangle(cornerRadius: 12)
+                            .opacity(0.1)
+                            .aspectRatio(1, contentMode: .fill)
+                    }
+                
+                configuration.title
+            }
+        }
+    }
+    
+    struct MaskTypeLabel: View {
+        
+        let mask: MaskType
+        
+        init(_ mask: MaskType) {
+            self.mask = mask
+        }
+        
+        var body: some View {
+            switch mask {
+            case .none:
+                Label{ Text("None") } icon: {}
+            case .chars:
+                Label{ Text("Character Set") } icon: {}
+            case .equivalence:
+                Label{ Text("Key Equivalence") } icon: {}
+            }
+        }
+        
+    }
     
     struct KeyEquivalentMaskView: View {
         
@@ -173,14 +220,14 @@ public struct KeyPressExample: View {
         
         @Binding var set: CharacterSet
         
-        private let setOrder: [(name: String, set: CharacterSet)] = [
+        private static let setOrder: [(name: LocalizedStringKey, set: CharacterSet)] = [
             ("Letters", .letters), ("Digits", .decimalDigits),
             ("Newlines", .newlines), ("Whitespace", .whitespaces),
             ("Punctuation", .punctuationCharacters)
         ]
         
         var body: some View {
-            ForEach(setOrder, id: \.name){ item in
+            ForEach(Self.setOrder, id: \.set){ item in
                 Toggle(isOn: Binding($set, subset: item.set)) {
                     Text(item.name)
                         .font(.exampleParameterTitle)

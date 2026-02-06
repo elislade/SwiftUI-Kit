@@ -16,9 +16,11 @@ public struct InteractionHoverExample: View  {
                 GroupEventLog(events: groupEvents)
                     .padding(.top)
                 
+                Divider()
+                    .ignoresSafeArea()
+                
                 if showContent || priority != .window {
                     Content()
-                        .padding()
                         .interactionHoverGroup(
                             priority: priority,
                             delay: .milliseconds(delayInMilliseconds)
@@ -29,7 +31,7 @@ public struct InteractionHoverExample: View  {
                                 showContent = false
                             }
                         }
-                        .geometryGroupPolyfill()
+                        .geometryGroupIfAvailable()
                         .transition(.move(edge: .bottom) + .opacity)
                 } else {
                     Text("Press down then drag to select content.")
@@ -84,22 +86,27 @@ public struct InteractionHoverExample: View  {
     
     struct Content: View {
         
-        var spacing: Double = 10
+        var spacing: Double = 16
         var columns: Int = 3
-        var rows: Int = 2
+        var rows: Int = 4
         
         var body: some View {
-            VStack(spacing: spacing) {
-                ForEach(0..<rows, id: \.self) { row in
-                    HStack(spacing: spacing) {
-                        ForEach(0..<columns, id: \.self) { _ in
-                            Element(wrappedWithButton: row.isMultiple(of: 2))
-                        }
+            VStack(spacing: 0) {
+                VStack(spacing: spacing) {
+                    ForEach(0..<rows, id: \.self) { row in
+                        Element(wrappedWithButton: row.isMultiple(of: 2))
                     }
-                    
-                    PercentageRoundedRectangle(.vertical, percentage: 1)
-                        .opacity(0.05)
                 }
+                .padding()
+                
+                Text("Interaction Breathing Room")
+                    .opacity(0.6)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background{
+                        Rectangle()
+                            .fill(.secondary.opacity(0.1))
+                            .ignoresSafeArea()
+                    }
             }
         }
         
@@ -114,36 +121,46 @@ public struct InteractionHoverExample: View  {
         var wrappedWithButton: Bool = true
         
         private var content: some View {
-            RoundedRectangle(cornerRadius: 30)
-                .fill(.tint)
-                .opacity(phase == .entered || phase == .ended ? 1 : 0.2)
-                .overlay {
-                    if let phase {
-                        ElementPhaseLabel(phase)
-                            .foregroundStyle(.background)
-                            .font(.largeTitle.weight(.bold))
-                            .minimumScaleFactor(0.5)
-                            .labelStyle(.iconOnly)
-                            .id(phase)
-                            .transition(.blur(radius: 5) + .scale(0.6) + .opacity)
+            HStack {
+                Text("Element")
+                    .font(.title[.bold])
+                
+                if wrappedWithButton {
+                    LabeledContent{
+                        Text(tapCount, format: .number)
+                    } label: {
+                        Text("Taps")
                     }
                 }
-                .animation(.bouncy, value: phase)
+                
+                Spacer()
+                
+                if let phase, phase == .ended {
+                    ElementPhaseLabel(phase)
+                        .foregroundStyle(.white)
+                        .font(.title[.bold])
+                        .minimumScaleFactor(0.5)
+                        .labelStyle(.iconOnly)
+                        .id(phase)
+                        .transition(.scale(0.6) + .opacity)
+                }
+            }
+            .padding()
+            .foregroundStyle(phase == .ended ? .white : .primary)
+            .background{
+                ContainerRelativeShape()
+                    .fill(.tint)
+                    .opacity(phase == .entered || phase == .ended ? 1 : 0.2)
+            }
+            .scaleEffect(phase == .entered ? 1.05 : 1)
+            .animation(.smooth.speed(1.6), value: phase)
         }
         
         var body: some View {
             Group {
                 if wrappedWithButton {
                     Button{ tapCount += 1 } label: {
-                        VStack {
-                            content
-                            LabeledContent{
-                                Text(tapCount, format: .number)
-                            } label: {
-                                Text("Taps")
-                            }
-                            .padding(.horizontal, 8)
-                        }
+                        content
                     }
                     .buttonStyle(.plain)
                 } else {
@@ -244,32 +261,31 @@ public struct InteractionHoverExample: View  {
                                 GroupEventPhaseLabel(event.phase)
                                     .padding()
                                     .padding(.horizontal, 10)
-                                    .id(event.date)
-                                    .background(.background, in: .capsule)
-                                    .overlay{
-                                        Capsule()
+                                    .background{
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.background)
+                                        
+                                        RoundedRectangle(cornerRadius: 12)
                                             .strokeBorder()
                                             .opacity(0.1)
                                     }
-                                    .shadow(color: .init(.sRGBLinear, white: 0, opacity: 0.08), radius: 5, y: 2)
-                                    .transition((.scale(0.8) + .opacity))
+                                    .transition(.scale(0.8) + .opacity)
+                                    .onAppear{
+                                        withAnimation(.smooth){
+                                            proxy.scrollTo(event.date, anchor: .center)
+                                        }
+                                    }
                             }
                         }
                         .padding()
                         .animation(.bouncy, value: events)
-                        .onChangePolyfill(of: events.last){
-                            withAnimation(.smooth){
-                                proxy.scrollTo(events.last?.date, anchor: .center)
-                            }
-                        }
                     }
                 }
                 .scrollClipDisabledPolyfill()
                 .frame(height: 70)
                 .overlay {
                     if events.isEmpty {
-                        Text("No Events.")
-                            .font(.caption)
+                        Text("No Events")
                             .opacity(0.5)
                             .padding()
                             .frame(maxWidth: .infinity)

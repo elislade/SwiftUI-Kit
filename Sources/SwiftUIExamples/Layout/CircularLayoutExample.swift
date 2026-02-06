@@ -3,7 +3,10 @@ import SwiftUIKit
 
 public struct CircularLayoutExample : View {
 
-    @State private var items: [Color] = [.random, .random, .random]
+    @State private var elements: [Double] = [
+        .random(in: 0.1...1), .random(in: 0.1...1),  .random(in: 0.1...1)
+    ]
+    
     @State private var radius: Double = 100
     @State private var rangeLower: Angle = .zero
     @State private var rangeUpper: Angle = .degrees(360)
@@ -21,22 +24,26 @@ public struct CircularLayoutExample : View {
     
     public init() {}
     
+    private func add() {
+        elements.append(.random(in: 0.1...1))
+    }
+    
+    private func remove() {
+        elements.removeLast()
+    }
+    
     public var body: some View {
         ExampleView(title: "Circular Layout"){
-            ZStackCollectionLayout(layout, data: items) { color in
-                SunkenControlMaterial(RoundedRectangle(cornerRadius: 10), isTinted: true)
-                    .tint(color)
+            ZStackCollectionLayout(layout, data: elements.indices) { idx in
+                SunkenControlMaterial(RoundedRectangle(cornerRadius: 16), isTinted: true)
+                    .opacity(Double(idx) / Double(elements.count))
+                    .background(in: RoundedRectangle(cornerRadius: 16))
                     .frame(width: 60, height: 60)
-                    .drawingGroup()
-                    .transitions(.scale)
-                    #if !os(tvOS)
-                    .onTapGesture {
-                        items.removeAll(where: { $0 == color })
-                    }
-                    #endif
+                    .transition(.scale)
             }
+            .drawingGroup()
             .animation(.fastSpring, value: compensateForRotation)
-            .animation(.bouncy, value: items)
+            .animation(.bouncy, value: elements)
         } parameters: {
             HStack {
                 Text("Number of Items")
@@ -44,14 +51,12 @@ public struct CircularLayoutExample : View {
                 
                 Spacer()
                 
-                Text(items.count, format: .number)
+                Text(elements.count, format: .number)
                     .font(.exampleParameterValue)
                 
                 Stepper(
-                    onIncrement: { items.append(.random) },
-                    onDecrement: items.isEmpty ? nil : {
-                        items.removeLast()
-                    }
+                    onIncrement: { add() },
+                    onDecrement: elements.isEmpty ? nil : { remove() }
                 )
             }
             .exampleParameterCell()

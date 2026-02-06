@@ -3,21 +3,22 @@ import SwiftUIKit
 
 public struct InlineStateExample: View {
     
-    @State private var changeIdentity = 0
+    @State private var identity = false
     
     public init() {}
     
     public var body: some View {
         ExampleView(title: "Inline State"){
-            InlineState(UUID()){ id in
-                ZStack {
-                    Color.random.ignoresSafeArea()
-                    Text(id.uuidString)
-                        .foregroundStyle(Color.white)
-                        .blendMode(.exclusion)
+            Rectangle()
+                .fill(.tint)
+                .ignoresSafeArea()
+                .overlay {
+                    InlineState(Int.random(in: 0...1_000)){ value in
+                        Text(value, format: .number)
+                            .font(.largeTitle[.heavy].monospacedDigit())
+                    }
+                    .id(identity)
                 }
-                .id(changeIdentity)
-            }
         } parameters: {
             HStack {
                 Text("Actions")
@@ -25,7 +26,9 @@ public struct InlineStateExample: View {
                 
                 Spacer()
                 
-                Button("Change Identity") { changeIdentity += 1 }
+                Button("Change Identity"){
+                    identity.toggle()
+                }
             }
             .exampleParameterCell()
         }

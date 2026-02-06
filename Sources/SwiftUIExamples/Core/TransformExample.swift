@@ -69,6 +69,7 @@ public struct TransformExample: View {
                 }
             }
             .exampleParameterCell()
+            .disabled(disableMask.contains(.translation))
             
             VStack {
                 HStack {
@@ -90,6 +91,7 @@ public struct TransformExample: View {
                 }
             }
             .exampleParameterCell()
+            .disabled(disableMask.contains(.shear))
             
             VStack {
                 HStack {
@@ -119,6 +121,7 @@ public struct TransformExample: View {
                     Slider(value: $transform.scale.y, in: -1...1)
                 }
             }
+            .disabled(disableMask.contains(.scale))
             .exampleParameterCell()
             .onChangePolyfill(of: transform.scale.x){
                 if syncedScale {
@@ -147,6 +150,7 @@ public struct TransformExample: View {
                 Slider(value: $transform.rotation.degrees, in: -80...80)
             }
             .exampleParameterCell()
+            .disabled(disableMask.contains(.rotation))
             
             VStack {
                 HStack {

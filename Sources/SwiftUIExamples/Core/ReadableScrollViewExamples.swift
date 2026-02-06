@@ -47,9 +47,9 @@ struct ReadableScrollViewExample : View {
                         )
                     }
                 }
+                .ignoresSafeArea()
             }
-            .ignoresSafeArea()
-            .overlay(alignment: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 0){
                 HStack {
                     Image(systemName: "arrow.left.and.right.circle.fill")
                     Text(offset.x, format: .increment(0.1))
@@ -63,7 +63,6 @@ struct ReadableScrollViewExample : View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.3)
             }
-            //.resetActionsChanged{ _resetAction.wrappedValue = $0 }
         } parameters: {
             Toggle(isOn: Binding($axis, contains: .horizontal)){
                 Text("Horizontal Axis")

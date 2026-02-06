@@ -51,18 +51,8 @@ struct PercentageRoundedRectangleExample: View {
             }
             .exampleParameterCell()
             
-            HStack {
-                Text("Axis")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(selection: $axis.animation(.bouncy), items: Axis.allCases){
-                    Text("\($0)".capitalized)
-                }
-                .frame(maxWidth: 200)
-            }
-            .exampleParameterCell()
+            ExampleCell.Axis(axis: $axis.animation(.bouncy))
+                .exampleParameterCell()
         }
     }
 }

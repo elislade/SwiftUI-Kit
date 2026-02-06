@@ -3,26 +3,32 @@ import SwiftUIKit
 
 public struct AlignmentGuideGridLayoutExample : View {
     
-    @State private var colors = Array(repeating: 0, count: 3).map{ _ in Color.random }
-    @State private var spacing = 0.0
-    @State private var columns = 4
-    
-    private func add(){
-        withAnimation(.fastSpring){
-            colors.append(Color.random)
+    struct Element<Value>: Identifiable {
+        let id: UniqueID
+        let value: Value
+        
+        init(_ value: Value) {
+            self.id = .init()
+            self.value = value
         }
     }
     
-    private func remove(_ color: Color? = nil){
-        guard !colors.isEmpty else { return }
-        withAnimation(.fastSpring){
-            guard let color else {
-                colors.removeLast()
-                return
-            }
-            
-            colors.removeAll(where: { $0 == color })
-        }
+    @State private var elements: [Element<Double>] = (0..<3).map{ _ in
+        .init(.random(in: 0...1))
+    }
+    
+    @State private var spacing: Double = 5
+    @State private var columns: Int = 4
+    
+    public init() {}
+    
+    private func add(){
+        elements.append(.init(.random(in: 0...1)))
+    }
+    
+    private func remove(){
+        guard !elements.isEmpty else { return }
+        elements.removeLast()
     }
     
     private var layout: some RelativeCollectionLayoutModifier {
@@ -31,29 +37,38 @@ public struct AlignmentGuideGridLayoutExample : View {
     
     private var grid: some View {
         ScrollView([.horizontal, .vertical]){
-            ZStackCollectionLayout(layout, data: colors){ color in
-                Button(action: { remove(color) }){
-                    color.frame(width: 70, height: 70)
+            ZStackCollectionLayout(layout, data: elements){ element in
+                Button {
+                    elements.removeAll(where: { $0.id == element.id })
+                } label: {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.tint)
+                        .opacity(element.value)
+                        .background{
+                            RoundedRectangle(cornerRadius: 16)
+                        }
+                        .frame(width: 70, height: 70)
                 }
                 .buttonStyle(.plain)
-                .transitions(
+                .transition(
                     .insertion(
                         .scale(0.5),
                         .rotation3D(axis: .y),
                         .offset(x: 400),
-                        .blur()
-                    ),
-                    .removal(.hinge(.random()))
+                        .blur(radius: 10).animation(.linear)
+                    )
+                    + .removal(.hinge(.random()))
+                    + .opacity.animation(.linear)
                 )
             }
         }
     }
     
-    public init() {}
-    
     public var body: some View {
         ExampleView(title: "AlignmentGuide Grid Layout"){
-            grid.animation(.bouncy, value: columns)
+            grid
+                .animation(.bouncy, value: elements.count)
+                .animation(.bouncy, value: columns)
         } parameters: {
             HStack {
                 Text("Columns").font(.exampleParameterTitle)
@@ -71,13 +86,13 @@ public struct AlignmentGuideGridLayoutExample : View {
                 
                 Spacer()
                 
-                Text("\(colors.count)")
+                Text(elements.count, format: .number)
                     .font(.exampleParameterValue)
                     .foregroundStyle(.secondary)
                 
                 Stepper(
                     onIncrement: add,
-                    onDecrement: !colors.isEmpty ? { remove() } : nil
+                    onDecrement: !elements.isEmpty ? { remove() } : nil
                 )
             }
             .exampleParameterCell()
@@ -98,11 +113,10 @@ public struct AlignmentGuideGridLayoutExample : View {
             .exampleParameterCell()
         }
         .contentTransitionNumericText()
-        .onAppear{
-            for i in 0...10 {
-                withAnimation(.bouncy.delay(Double(i) / 10)){
-                    colors.append(Color.random)
-                }
+        .task{ @MainActor in
+            for _ in 0...10 {
+                try? await Task.sleep(for: .seconds(0.05))
+                add()
             }
         }
     }

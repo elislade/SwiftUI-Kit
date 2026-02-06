@@ -10,20 +10,41 @@ public struct SafeAreaCaptureExample: View {
     
     public var body: some View {
         ExampleView(title: "Safe Area Capture") {
-            VStack(spacing: 10) {
-                Image(systemName: "chevron.compact.up")
+            HStack(spacing: 0) {
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 5, height: 100)
                 
-                Text("Drag Me!")
-                    .opacity(0.5)
-                    .padding(.bottom, 5)
+                VStack(spacing: 0) {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 100, height: 5)
+                    
+                    VStack(alignment: .leading) {
+                        Text("Pan around.")
+                            .font(.title[.bold])
+                        
+                        Text("Notice how the background interacts with the safearea.")
+                            .font(.title3[.bold])
+                            .opacity(0.5)
+                    }
+                    .frame(maxWidth: 320)
+                    .padding(24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 100, height: 5)
+                }
                 
-                Image(systemName: "chevron.compact.down")
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 5, height: 100)
             }
-            .font(.title[.bold])
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(5)
             .releaseContainerSafeArea()
             .background{
-                RoundedRectangle(cornerRadius: 60)
+                ContainerRelativeShape()
                     .fill(.tint)
                     .ignoresSafeArea(edges: captureEnabled ? [] : .all)
             }
