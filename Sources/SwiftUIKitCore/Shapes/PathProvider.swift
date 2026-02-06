@@ -43,3 +43,4 @@ extension ContainerRelativeShape: PathProvider {}
 extension Ellipse: PathProvider {}
 
 extension AnyShape: PathProvider {}
+extension Path: PathProvider { }
