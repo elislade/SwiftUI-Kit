@@ -11,11 +11,10 @@ public struct AppearAfterInitialRender<Content: View>: View {
     }
     
     public var body: some View {
-        ZStack{
-            if show { content }
-        }
-        .onAppear{
-            show = true
+        if show { content } else {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .onAppear{ show = true }
         }
     }
     
