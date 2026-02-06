@@ -62,7 +62,7 @@ extension SwipeActionsModifier {
             func makeBody(configuration: Configuration) -> some View {
                 let isPressed = configuration.isPressed || isHovering
                 configuration.label
-                    .symbolEffectBounce(value: isPressed)
+                    .symbolEffectBounceIfAvailable(value: isPressed)
                     .foregroundStyle(Color.white)
                     .padding(12)
                     .padding(.horizontal, 6)

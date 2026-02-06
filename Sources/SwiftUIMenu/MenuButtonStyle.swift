@@ -56,7 +56,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                     ))
             }
         }
-        .symbolEffectBounce(value: bounce, grouping: .byLayer)
+        .symbolEffectBounceIfAvailable(value: bounce, grouping: .byLayer)
         .accessibilityAction {
             configuration.trigger()
             

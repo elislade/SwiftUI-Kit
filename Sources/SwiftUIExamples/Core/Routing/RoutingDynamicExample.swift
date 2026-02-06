@@ -225,7 +225,7 @@ public struct RoutingDynamicExample: View {
                         } label: {
                             PresentationStyleLabel(element.style)
                                 .foregroundStyle(.tint)
-                                .symbolEffectBounce(value: element.style)
+                                .symbolEffectBounceIfAvailable(value: element.style)
                         }
                         .transition(.scale)
                     }
