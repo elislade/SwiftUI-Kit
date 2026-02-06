@@ -1,15 +1,20 @@
 import SwiftUI
 
-public extension View {
+extension View {
     
 #if os(iOS)
-    nonisolated func listenForDeviceOrientation() -> some View {
+    nonisolated public func deviceOrientationListener() -> some View {
         modifier(DeviceOrientationModifier())
     }
 #else
-    nonisolated func listenForDeviceOrientation() -> Self {
+    nonisolated public func deviceOrientationListener() -> Self {
         self
     }
 #endif
+    
+    @available(*, deprecated, renamed: "deviceOrientationListener()")
+    nonisolated public func listenForDeviceOrientation() -> some View {
+        deviceOrientationListener()
+    }
     
 }

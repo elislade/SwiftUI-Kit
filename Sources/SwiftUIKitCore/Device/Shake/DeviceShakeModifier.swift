@@ -21,7 +21,7 @@ extension UIWindow {
 
 struct DeviceShakeViewModifier {
     
-    @Environment(\.deviceShakeEnabled) private var isEnabled
+    @Environment(\.isDeviceShakeEnabled) private var isEnabled
     let action: () -> Void
     
 }
