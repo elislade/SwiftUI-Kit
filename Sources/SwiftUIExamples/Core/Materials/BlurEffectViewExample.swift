@@ -83,3 +83,59 @@ public struct VisualEffectViewExamples : View {
     VisualEffectViewExamples()
         .previewSize()
 }
+
+
+struct PushPillToggleStyle: ToggleStyle {
+    
+    var progress: Double? = nil
+    
+    func makeBody(configuration: Configuration) -> some View {
+        let isOn = configuration.isOn
+        VStack(alignment: .leading, spacing: 0) {
+            configuration.label
+                .font(.exampleParameterValue)
+                .lineLimit(2)
+                .opacity(0.6)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer(minLength: 5)
+            
+            HStack {
+                Text(isOn ? "Disabled" : "Available")
+                    .font(.exampleParameterTitle)
+                    .fontWeight(.bold)
+                    .contentTransitionNumericText()
+                    .lineLimit(1)
+                
+                Spacer()
+            }
+        }
+        .minimumScaleFactor(0.8)
+        .frame(height: 80)
+        .padding(14)
+        .background{
+           // SunkenControlMaterial(RoundedRectangle(cornerRadius: 24))
+            Rectangle()
+                .opacity(0.1)
+            
+            if let progress {
+                Rectangle()
+                    .fill(.tint)
+                    .scaleEffect(x: isOn ? 1 : progress, anchor: .leading)
+                    .opacity(0.5)
+                    .transition(.moveEdge(.leading))
+            } else if isOn {
+                Rectangle()
+                    .fill(.tint)
+                    .opacity(0.5)
+                    .transition(.moveEdge(.leading))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .animation(.smooth.speed(1.6), value: isOn)
+        .onTapGesture {
+            configuration.isOn.toggle()
+        }
+    }
+    
+}
