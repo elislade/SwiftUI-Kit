@@ -12,7 +12,7 @@ public struct Rotation3DTransitionExample: View {
     
     struct Parameters: TransitionProviderView {
         
-        static var name: String = "Rotation 3D Transition"
+        static let name = "Rotation 3D Transition"
         
         var update: (_ normal: AnyTransition, _ inverse: AnyTransition?) -> Void = { _, _ in }
         
@@ -20,14 +20,13 @@ public struct Rotation3DTransitionExample: View {
         @State private var anchor: UnitPoint = .center
         @State private var depth: Double = 0
         
-        private var axis: Axis3D {
-            Axis3D(x: rot.x, y: rot.y, z: rot.z)
-        }
-        
         private var transition: AnyTransition {
-            .rotation3D(
-                angle: .degrees(360),
-                axis: axis,
+            let deg = [rot.x, rot.y, rot.z].sorted(by: {
+                $0.magnitude < $1.magnitude
+            }).last!
+            return .rotation3D(
+                angle: .degrees(deg),
+                axis: Axis3D(x: rot.x / deg, y: rot.y / deg, z: rot.z / deg),
                 anchor: anchor,
                 depth: depth
             )
@@ -42,13 +41,13 @@ public struct Rotation3DTransitionExample: View {
                     Spacer()
                     
                     Text(
-                        Measurement<UnitAngle>(value: rot.x * 360, unit: .degrees),
+                        Measurement<UnitAngle>(value: rot.x, unit: .degrees),
                         format: .measurement(width: .abbreviated)
                     )
                     .font(.exampleParameterValue)
                 }
                 
-                Slider(value: $rot.x, in : -1...1, step: 1/360)
+                Slider(value: $rot.x, in : -360...360, step: 1)
             }
             .exampleParameterCell()
             .onChangePolyfill(of: rot){ update(transition, nil) }
@@ -62,13 +61,13 @@ public struct Rotation3DTransitionExample: View {
                     Spacer()
                     
                     Text(
-                        Measurement<UnitAngle>(value: rot.y * 360, unit: .degrees),
+                        Measurement<UnitAngle>(value: rot.y, unit: .degrees),
                         format: .measurement(width: .abbreviated)
                     )
                     .font(.exampleParameterValue)
                 }
                 
-                Slider(value: $rot.y, in : -1...1, step: 1/360)
+                Slider(value: $rot.y, in : -360...360, step: 1)
             }
             .exampleParameterCell()
             
@@ -80,13 +79,13 @@ public struct Rotation3DTransitionExample: View {
                     Spacer()
                     
                     Text(
-                        Measurement<UnitAngle>(value: rot.z * 360, unit: .degrees),
+                        Measurement<UnitAngle>(value: rot.z, unit: .degrees),
                         format: .measurement(width: .abbreviated)
                     )
                     .font(.exampleParameterValue)
                 }
                 
-                Slider(value: $rot.z, in : -1...1, step: 1/360)
+                Slider(value: $rot.z, in : -360...360, step: 1)
             }
             .exampleParameterCell()
             
@@ -110,6 +109,8 @@ public struct Rotation3DTransitionExample: View {
                 VStack(alignment: .leading) {
                     Text("Anchor")
                         .font(.exampleParameterTitle)
+                    
+                    Spacer()
                     
                     Group {
                         Text("X: ") + Text(anchor.x, format: .increment(0.1))
