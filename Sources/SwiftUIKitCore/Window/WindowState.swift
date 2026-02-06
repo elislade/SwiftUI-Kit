@@ -138,16 +138,18 @@ extension WindowState : NSWindowDelegate {
     }
     
     public func windowDidResize(_ notification: Notification) {
-        windowFrameTask = Task {
-            if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 2) {
+        windowFrameTask?.cancel()
+        windowFrameTask = Task(priority: .low) {
+            if let _ = try? await Task.sleep(for: .seconds(2)) {
                 UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
             }
         }
     }
     
     func windowDidMove(_ notification: Notification) {
-        windowFrameTask = Task {
-            if let _ = try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 2) {
+        windowFrameTask?.cancel()
+        windowFrameTask = Task(priority: .low) {
+            if let _ = try? await Task.sleep(for: .seconds(2)) {
                 UserDefaults.standard.set(window.frame.description, forKey: self.persistanceFrameKey)
             }
         }
