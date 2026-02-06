@@ -14,11 +14,11 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
                 Color.clear
                 
                 if show {
-                    RoundedRectangle(cornerRadius: 30)
+                    ContainerRelativeShape()
                         .fill(.tint)
                         .transition(transition)
                 } else if let inverse {
-                    RoundedRectangle(cornerRadius: 30)
+                    ContainerRelativeShape()
                         .fill(.tint)
                         .transition(inverse)
                 }

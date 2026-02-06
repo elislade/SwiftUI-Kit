@@ -24,28 +24,21 @@ public struct CompositeTransitionExamples: View {
     
     public var body: some View {
         ExampleView(title: "Composite Transition"){
-            VStack(spacing: 0) {
-                ZStack {
-                    Color.clear
-                    
-                    if show {
-                        ContainerRelativeShape()
-                            .padding(8)
-                            .transitions(orderedTransitions)
-                    }
+            Color.clear.overlay {
+                if show {
+                    ContainerRelativeShape()
+                        .transitions(orderedTransitions)
                 }
-                
-                LoadingLine(state: .progress(show ? 1 : 0))
-                    .frame(height: 4)
-                    .padding(.horizontal)
             }
-            .animation(.smooth(extraBounce: 0.5), value: show)
             .overlay(alignment: .bottom){
                 HStack(spacing: 0) {
                     Button(show ? "Hide" : "Show", systemImage: show ? "backward.end" : "forward.end"){
                         show.toggle()
                     }
                     .contentTransitionSymbolEffect()
+                    .overlay {
+                        LoadingCircle(state: .progress(show ? 1 : 0))
+                    }
                     
                     Spacer()
                     
@@ -55,9 +48,11 @@ public struct CompositeTransitionExamples: View {
                 }
                 .disabled(orderedTransitions.isEmpty)
                 .symbolVariant(.circle.fill)
-                .padding()
+                // .padding()
                 .font(.largeTitle)
             }
+            .padding()
+            .animation(.smooth(extraBounce: 0.2), value: show)
         } parameters: {
             ForEach(order){ o in
                 let i = order.firstIndex(of: o)!
@@ -141,13 +136,13 @@ public struct CompositeTransitionExamples: View {
                     add = false
                 }
                 .background{
-                    AsymmetricRoundedRectangle(values: .init(top: 20))
+                    AsymmetricRoundedRectangle(values: .init(top: 30))
                         .fill(.regularMaterial)
-                        .ignoresSafeArea(edges: .bottom)
+                        .ignoresSafeArea()
                 }
-                .transitions(
-                    (.opacity + .blur(radius: 10) + .offset([0, 500]))
-                        .animation(.fastSpringInterpolating)
+                .transition(
+                    .offset([0, 60]).animation(.fastSpringInterpolating)
+                    + .moveEdgeIgnoredByLayout(.bottom).animation(.fastSpringInterpolating)
                 )
             }
         }
@@ -155,19 +150,28 @@ public struct CompositeTransitionExamples: View {
     
     
     struct AddParameters<Provider: TransitionProviderView>: View {
-        let add: (AnyTransition) -> Void
         
+        @Environment(\.verticalSizeClass) private var verticalSizeClass
+        @Environment(\.dismissPresentation) private var dismiss
         @State private var transition: AnyTransition?
+        
+        let add: (AnyTransition) -> Void
         
         var body: some View {
             VStack(spacing: 0) {
-                HStack(spacing: 0) {
+                HStack(alignment:. top, spacing: 10) {
+                    if verticalSizeClass == .compact {
+                        Button("Close", systemImage: "xmark.circle.fill"){
+                            dismiss()
+                        }
+                        .font(.title)
+                    }
+                    
                     Text(Provider.name)
                         .font(.exampleSectionTitle)
                         .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                    
-                    Spacer(minLength: 10)
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
                     Button("Add", systemImage: "plus.circle.fill"){
                         if let transition {
@@ -178,49 +182,26 @@ public struct CompositeTransitionExamples: View {
                     .font(.title)
                 }
                 .padding()
+                .fixedSize(horizontal: false, vertical: true)
                 
                 Divider()
+                    .ignoresSafeArea()
                 
-                ScrollView {
+                ViewThatFits(in: .vertical){
                     VStack(spacing: 0) {
                         Provider{ t, u in transition = t }
                     }
-                }
-                .frame(maxHeight: 360)
-            }
-        }
-        
-    }
-    
-    
-    struct ClipRoundedRect: View {
-        
-        let add: (AnyTransition) -> Void
-        
-        @State private var width: Double = 1
-        @State private var anchor = UnitPoint.center
-        
-        var body: some View {
-            VStack {
-                HStack {
-                    Text("Clip Rounded Rect").font(.exampleParameterTitle)
-                    Text(width, format: .number)
-                        .font(.exampleParameterValue)
-                        .foregroundStyle(.secondary)
                     
-                    Spacer()
-                    
-                    Button("Add", systemImage: "plus.circle.fill"){
-                        add(.clipRoundedRectangle(
-                            RoundedRectangle(cornerRadius: width)
-                        ))
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Provider{ t, u in transition = t }
+                        }
                     }
-                    .font(.title)
+                    .frame(maxHeight: 460)
                 }
-                
-                Slider(value: $width, in : 0...100, step: 1)
             }
         }
+        
     }
 
 }

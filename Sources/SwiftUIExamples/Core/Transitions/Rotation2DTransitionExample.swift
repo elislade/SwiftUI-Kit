@@ -48,6 +48,8 @@ public struct Rotation2DTransitionExample: View {
                 VStack(alignment: .leading) {
                     Text("Anchor").font(.exampleParameterTitle)
                     
+                    Spacer()
+                    
                     Group {
                         Text("X: ") + Text(anchor.x, format: .increment(0.01))
                         Text("Y: ") + Text(anchor.y, format: .increment(0.01))
