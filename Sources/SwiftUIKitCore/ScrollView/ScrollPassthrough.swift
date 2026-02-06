@@ -57,12 +57,12 @@ public struct ScrollPassthrough {
             .eraseToAnyPublisher()
     }
     
-    public var verticalOverscrollCompensation: AnyPublisher<CGFloat, Never> {
+    public func overscrollCompensation(_ axis: Axis) -> AnyPublisher<CGFloat, Never> {
         contentOffset
-            .map(\.y)
+            .map{ $0[axis] }
             .combineLatest(
-                contentSize.map(\.height),
-                size.map(\.height)
+                contentSize.map{ $0[axis] },
+                size.map{ $0[axis] }
             )
             .map{ offset, contentDimension, coordinateDimension in
                 if offset > 0 {
@@ -79,26 +79,12 @@ public struct ScrollPassthrough {
             .eraseToAnyPublisher()
     }
     
+    public var verticalOverscrollCompensation: AnyPublisher<CGFloat, Never> {
+        overscrollCompensation(.vertical)
+    }
+    
     public var horizontalOverscrollCompensation: AnyPublisher<CGFloat, Never> {
-        contentOffset
-            .map(\.x)
-            .combineLatest(
-                contentSize.map(\.width),
-                size.map(\.width)
-            )
-            .map{ offset, contentDimension, coordinateDimension in
-                if offset > 0 {
-                    return offset * -1
-                }
-                
-                let insetFromEnd = (coordinateDimension - contentDimension)
-
-                if offset < insetFromEnd {
-                    return (offset - insetFromEnd) * -1
-                }
-                return 0
-            }
-            .eraseToAnyPublisher()
+        overscrollCompensation(.horizontal)
     }
     
 }
