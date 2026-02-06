@@ -5,19 +5,19 @@ public struct AnyInsettableShape: InsettableShape {
     
     let shape: any InsettableShape
     
-    public init<S: InsettableShape>(_ shape: S) {
+    nonisolated public init(_ shape: some InsettableShape) {
         self.shape = shape
     }
     
-    public func path(in rect: CGRect) -> Path {
+    nonisolated public func path(in rect: CGRect) -> Path {
         shape.path(in: rect)
     }
     
-    public func inset(by amount: CGFloat) -> AnyInsettableShape {
+    nonisolated public func inset(by amount: CGFloat) -> AnyInsettableShape {
         AnyInsettableShape(shape.inset(by: amount))
     }
     
-    public nonisolated func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
+    nonisolated public func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         shape.sizeThatFits(proposal)
     }
     
