@@ -8,7 +8,7 @@ public struct FontExamples: View {
         case coreText
     }
     
-    @State private var resource: FontResource?
+    @State private var resource: FontResource = .system(design: .default)
     @State private var parameters = FontParameters.identity
     @State private var ctResolver = FontCacheResolver(CTFontResolver())
     @State private var swiftResolver = FontCacheResolver(SwiftUIFontResolver())
@@ -27,8 +27,11 @@ public struct FontExamples: View {
     
     public var body: some View {
         ExampleView(title: "Font"){
-            Preview(resource: $resource, parameters: $parameters)
-                .dynamicTypeSize(dynamicSize)
+            Preview(
+                resource: $resource,
+                parameters: $parameters,
+                dynamicSize: dynamicSize
+            )
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
                 HStack {
@@ -74,7 +77,7 @@ public struct FontExamples: View {
     
     struct ResourcePicker : View {
         
-        @Binding var resource: FontResource?
+        @Binding var resource: FontResource
         
         private func name(for design: Font.Design) -> String {
             switch design {
@@ -87,20 +90,56 @@ public struct FontExamples: View {
         }
         
         var body: some View {
-            Picker("", selection: $resource){
+//            Menu{
+//                Text("Design")
+//                    .font(.caption[.medium])
+//                    .opacity(0.5)
+//                    .equalInsetItem()
+//                    //.scrollPosition(<#T##position: Binding<ScrollPosition>##Binding<ScrollPosition>#>)
+//                
+//                ForEach(Font.Design.allCases){ item in
+//                    Button { resource = .system(design: item) } label: {
+//                        Label{ Text(name(for: item)) } icon: {
+//                            Image(systemName: "checkmark")
+//                                .opacity(0)
+//                        }
+//                    }
+//                }
+//                
+//                Text("Library")
+//                    .font(.caption[.medium])
+//                    .opacity(0.5)
+//                    .equalInsetItem()
+//        
+//                ForEach(AvailableFont.fontFamilies, id: \.self){ f in
+//                    let r = FontResource.library(familyName: f)
+//                    Button { resource = r } label: {
+//                        Label{ Text(f) } icon: {
+//                            Image(systemName: "checkmark")
+//                                .opacity(resource == r ? 1 : 0)
+//                        }
+//                    }
+//                }
+//            } label: {
+//                Text(resource.description)
+//                    .menuIndicatorStyle()
+//            }
+            Picker(selection: $resource){
                 Section("Design"){
                     ForEach(Font.Design.allCases){
                         Text(name(for: $0))
-                            .tag(Optional(FontResource.system(design: $0)))
+                            .tag(FontResource.system(design: $0))
                     }
                 }
                 
                 Section("Library"){
                     ForEach(AvailableFont.fontFamilies, id: \.self){
                         Text($0)
-                            .tag(Optional(FontResource.library(familyName: $0)))
+                            .tag(FontResource.library(familyName: $0))
                     }
                 }
+            } label: {
+                EmptyView()
             }
         }
     }
@@ -257,31 +296,34 @@ public struct FontExamples: View {
         @State private var mode: Mode = .paragraph
         @State private var sample = "Hello, World!"
         
-        @Binding var resource: FontResource?
+        @Binding var resource: FontResource
         @Binding var parameters: FontParameters
+        let dynamicSize: DynamicTypeSize
         
         var body: some View {
-            VStack(spacing: 0) {
-                ZStack {
-                    Color.clear
-                    switch mode {
-                    case .chars:
-                        Chars()
-                    case .text:
-                        SwiftUI.TextField("Example Text", text: $sample)
-                            .multilineTextAlignment(.center)
-                            .resolveFont()
-                            .padding(.horizontal)
-                            .textFieldStyle(.plain)
-                    case .paragraph:
-                        Text("The quick brown fox jumps over the lazy dog, scaring the Cup to run away with the Spoon and get Hepatitis TEA.")
-                            .multilineTextAlignment(.center)
-                            .resolveFont()
-                            .padding(.horizontal)
-                    }
+            Color.clear.overlay{
+                switch mode {
+                case .chars:
+                    Chars()
+                case .text:
+                    SwiftUI.TextField("Example Text", text: $sample)
+                        .multilineTextAlignment(.center)
+                        .resolveFont()
+                        .padding(.horizontal)
+                        .textFieldStyle(.plain)
+                        .transition(.scale(0.5) + .opacity)
+                case .paragraph:
+                    Text("The quick brown fox jumps over the lazy dog, scaring the Cup to run away with the Spoon and get Hepatitis TEA.")
+                        .multilineTextAlignment(.center)
+                        .resolveFont()
+                        .padding(.horizontal)
+                        .transition(.scale(0.5) + .opacity)
                 }
-                .animation(.smooth, value: parameters)
-                
+            }
+            .animation(.smooth, value: parameters)
+            .presentationContext()
+            .dynamicTypeSize(dynamicSize)
+            .safeAreaInset(edge: .bottom, spacing: 0){
                 HStack(spacing: 0) {
                     ResourcePicker(resource: $resource)
                     
@@ -298,18 +340,33 @@ public struct FontExamples: View {
                         .controlRoundness(1)
                         .frame(width: 140)
                         
-                        Button("Reset", systemImage: "arrow.clockwise.circle.fill"){
+                        Button("Reset", systemImage: "arrow.clockwise"){
                             parameters = .identity
                         }
-                        .font(.title)
+                        .font(.title[.bold])
                         .labelStyle(.iconOnly)
                         .symbolRenderingMode(.hierarchical)
                         .disabled(parameters == .identity)
-                        .buttonStyle(.tinted)
                     }
                 }
+                .buttonStyle(.bar)
                 .padding()
+                .background{
+                    Rectangle()
+                        .fill(.background)
+                        .mask {
+                            LinearGradient(
+                                colors: [
+                                    .white.opacity(0), .white.opacity(0.9), .white
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
+                        .ignoresSafeArea()
+                }
             }
+            .ignoresSafeArea(.container, edges: .bottom)
         }
     }
     
@@ -350,13 +407,13 @@ public struct FontExamples: View {
         }
 
         var body: some View {
-            ExampleSection("Info", isExpanded: true) {
+            ExampleSection("Info", isExpanded: false) {
                 Info(info: resolved.info)
             }
            
             Divider()
             
-            ExampleSection("Metrics", isExpanded: true) {
+            ExampleSection("Metrics", isExpanded: false) {
                 Metrics(metrics: resolved.metrics)
             }
         }
@@ -405,9 +462,6 @@ public struct FontExamples: View {
                         
                         if let url = info.licenseURL {
                             Button("License"){ openURL(url) }
-                                .toolTip(edge: .top){
-                                    Text(url.absoluteString)
-                                }
                         }
                         
                         if let url = info.vendorURL {
@@ -417,9 +471,6 @@ public struct FontExamples: View {
                             }
                             
                             Button("Vendor"){ openURL(url) }
-                                .toolTip(edge: .top){
-                                    Text(url.absoluteString)
-                                }
                         }
                     }
                     .buttonStyle(.tinted)
@@ -490,9 +541,7 @@ public struct FontExamples: View {
     
     struct Chars: View {
         
-        @Environment(\.fontResource) private var fa
         @Environment(\.resolvedFont) private var resolved
-        @Namespace private var ns
         
         private var set: CharacterSet {
             let candidate = resolved.supportedCharacters
@@ -500,101 +549,114 @@ public struct FontExamples: View {
         }
         
         @State private var chars: [Character] = []
-        @State private var selected: Character?
-        @State private var isLoading: Bool = true
+        @State private var isLoading: Bool = false
         
-        private func process(only includeSet: CharacterSet) -> [Character] {
-            var nc: [Character] = []
-            
-            for i in 0x00000 ... 0xfffff {
-                if let s = UnicodeScalar(i), includeSet.contains(s) {
-                    let ch = Character(s)
-                    if !ch.isWhitespace {
-                        nc.append(Character(s))
+        private func load() {
+            isLoading = true
+            let set = set
+            Task.detached {
+                var result: [Character] = []
+                
+                for i in 0x00000 ... 0xfffff {
+                    if let s = UnicodeScalar(i), set.contains(s) {
+                        let ch = Character(s)
+                        if !ch.isWhitespace {
+                            result.append(Character(s))
+                        }
                     }
+                }
+                
+                await MainActor.run {
+                    self.chars = result
+                    self.isLoading = false
+                }
+            }
+        }
+        
+        struct Cell: View {
+            
+            @State private var isPresented = false
+            @State private var matching = false
+            
+            let c: Character
+            
+            var body: some View {
+                Button{ isPresented = true } label: {
+                    InnerView(c: c, size: 24)
+                        .presentationMatch(c, active: matching)
+                }
+                .presentation(isPresented: $isPresented){
+                    InnerView(c: c, size: 250)
+                        .presentationMatch(c)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background{
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.background)
+                        }
+                        .onTapGesture { isPresented = false }
+                        .ignoresSafeArea()
+                        .transition(.opacity.animation(.easeOut))
+                        .presentationBackdrop(.disabled)
+                        .onAppear{ matching = true }
+                        .onDisappear{ matching = false }
                 }
             }
             
-            return nc
-        }
-        
-        private func load() {
-            Task {
-                self.isLoading = true
-                self.chars = self.process(only: set)
-                self.isLoading = false
+            struct InnerView: View {
+                
+                @Environment(\.fontParameters) private var params
+                
+                let c: Character
+                let size: Double
+                
+                var body: some View {
+                    Text(String(c))
+                        .font(params.copy(replacing: \.size, with: size))
+                }
             }
         }
         
         var body: some View {
             GeometryReader { proxy in
-                let rows: Double = proxy.size.height < 320 ? 5 : 8
-                let tileSize = proxy.size.height / rows
-                ZStack {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHGrid(
-                            rows: Array(repeating: .init(.fixed(tileSize), spacing: 1), count: Int(rows)),
-                            spacing: 1
-                        ) {
-                            ForEach(chars, id: \.self){ c in
-                                if selected != c {
-                                    Button(action: { selected = c }){
-                                        ZStack {
+                let width = proxy.size.width
+                let columns: Double = floor(width < 320 ? 5 : 8)
+                let tileSize = width / columns
+                let rows = Int(ceil(Double(chars.count) / columns))
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0){
+                        ForEach(0..<rows, id: \.self) { row in
+                            HStack(spacing: 0){
+                                ForEach(0..<Int(columns), id: \.self) { col in
+                                    let index = row * Int(columns) + col
+                                    ZStack {
+                                        if chars.indices.contains(index) {
+                                            let char = chars[index]
+                                            Cell(c: char).id(char)
+                                        } else {
                                             Color.clear
-                                            Text(String(c))
-                                                .padding(5)
                                         }
                                     }
-                                    .matchedGeometryEffect(id: c, in: ns)
                                     .frame(width: tileSize, height: tileSize)
-                                } else {
-                                    Color.clear.frame(width: tileSize, height: tileSize)
                                 }
                             }
+                            .frame(height: tileSize)
+                            .transition(.scale.animation(.smooth))
                         }
-                        .padding(.horizontal)
-                        #if os(macOS)
-                        .padding(.bottom, 14) // Removes weird dead zone on macOS. Probably has to do with hidden scroll bar not removing its event tracker.
-                        #endif
                     }
-                    .opacity(selected == nil ? 1 : 0)
-                    .opacity(isLoading ? 0.1 : 1)
-                    .allowsHitTesting(selected == nil)
-                    
-                    if let selected {
-                        Button(action: { self.selected = nil }){
-                            ZStack {
-                                Color.clear
-                                Text(String(selected))
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .matchedGeometryEffect(id: selected, in: ns)
-                        
-                        Button(action: { self.selected = nil }){
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                                .padding()
-                                .opacity(0.2)
-                        }
-                        .keyboardShortcut(KeyEquivalent.escape, modifiers: [])
-                        .transition(
-                            .move(edge: .leading).animation(.easeInOut.delay(0.5))
-                        )
-                    }
-                    
-                    if isLoading && selected == nil {
+                    #if os(macOS)
+                    .padding(.bottom, 14) // Removes weird dead zone on macOS. Probably has to do with hidden scroll bar not removing its event tracker.
+                    #endif
+                }
+                .opacity(isLoading ? 0.1 : 1)
+                .overlay {
+                    if isLoading {
                         LoadingCircle(state: .indefinite)
-                            .frame(width: proxy.size.height / 5, height: proxy.size.height / 5)
+                            .frame(width: 50, height: 50)
+                            .transition((.scale(0.6) + .opacity).animation(.smooth))
                     }
                 }
-                .resolveFont(overriding: \.size, value: proxy.size.height)
-                .minimumScaleFactor(0.05)
             }
             .buttonStyle(.plain)
-            .animation(.smooth, value: chars)
-            .animation(.fastSpringInterpolating, value: selected)
             .onChangePolyfill(of: set, initial: true){
                 load()
             }

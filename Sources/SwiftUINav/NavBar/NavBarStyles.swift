@@ -78,7 +78,7 @@ public struct BarButtonStyle: SwiftUI.PrimitiveButtonStyle {
             let pressing = configuration.isPressed
             let hasSelection = isHighlighted
             configuration.label
-                .symbolEffectBounce(
+                .symbolEffectBounceIfAvailable(
                     value: isHighlighted || overscroll >= 1,
                     grouping: .byLayer
                 )
