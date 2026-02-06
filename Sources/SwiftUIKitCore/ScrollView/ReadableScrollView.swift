@@ -46,6 +46,7 @@ public struct ReadableScrollView<Content: View>: View {
                 content
                     .id("ScrollContent")
                     .onGeometryChangePolyfill(of: { $0.frame(in: .named("ScrollView")).origin }){ offset in
+                        if isPresentedOn { return }
                         passthrough?.contentOffset.send(offset)
                         contentOffset(offset)
                         handlesReset = {
@@ -55,11 +56,13 @@ public struct ReadableScrollView<Content: View>: View {
                         }()
                     }
                     .onGeometryChangePolyfill(of: \.size){
+                        if isPresentedOn { return }
                         passthrough?.contentSize.send($0)
                         contentSize($0)
                     }
             }
             .coordinateSpace(name: "ScrollView")
+            .containedBoundsContext("ScrollView")
             .resetAction(active: handlesReset && !isPresentedOn){ @MainActor in
                 withAnimation(.smooth){
                     proxy.scrollTo("ScrollContent", anchor: axis == .vertical ? .top : .leading)
@@ -68,6 +71,7 @@ public struct ReadableScrollView<Content: View>: View {
         }
         .stickyContext()
         .onGeometryChangePolyfill(of: \.size){
+            if isPresentedOn { return }
             passthrough?.size.send($0)
         }
     }
