@@ -1,9 +1,9 @@
 import SwiftUI
 
 
-public extension View {
+extension View {
     
-    nonisolated func containerFrameContext() -> some View {
+    nonisolated public func containerFrameContext() -> some View {
         backgroundPreferenceValue(ContainerFramePreferenceKey.self){ prefs in
             GeometryReader{ proxy in
                 Color.clear.onChangePolyfill(of: proxy.size, initial: true){
@@ -13,34 +13,65 @@ public extension View {
                 }
             }
         }
+        .preferenceKeyReset(ContainerFramePreferenceKey.self)
     }
     
-    nonisolated func containerRelativeFramePolyfill(_ axes: Axis.Set, alignment: Alignment = .center) -> some View {
+    nonisolated public func containerRelativeFramePolyfill(_ axes: Axis.Set, alignment: Alignment = .center) -> some View {
         modifier(RelativeFrameModifier(axes: axes, alignment: alignment))
     }
     
 }
 
+extension EnvironmentValues {
+    
+    @Entry public internal(set) var containerConstrained: Axis.Set = []
+    
+}
 
 struct RelativeFrameModifier: ViewModifier {
     
-    @State private var size = CGSize([10,10])
+    @State private var width: CGFloat?
+    @State private var height: CGFloat?
+    @State private var constrained: Axis.Set = []
     
     let axes: Axis.Set
     let alignment: Alignment
     
     func body(content: Content) -> some View {
         content.frame(
-            maxWidth: axes.contains(.horizontal) ? size.width : nil,
-            maxHeight: axes.contains(.vertical) ? size.height : nil,
+            maxWidth: axes.contains(.horizontal) ? width : nil,
+            maxHeight: axes.contains(.vertical) ? height : nil,
             alignment: alignment
         )
-        .background {
-            if !axes.isEmpty {
-                Color.clear.preference(key: ContainerFramePreferenceKey.self, value: [{
-                    self.size = $0
-                }])
+        .environment(\.containerConstrained, constrained)
+        .onChangePolyfill(of: width == nil){
+            if width == nil {
+                constrained.remove(.horizontal)
+            } else {
+                constrained.insert(.horizontal)
             }
+        }
+        .onChangePolyfill(of: height == nil){
+            if height == nil {
+                constrained.remove(.vertical)
+            } else {
+                constrained.insert(.vertical)
+            }
+        }
+        .background {
+            Color.clear.preference(key: ContainerFramePreferenceKey.self, value: [{
+                if axes.contains(.horizontal){
+                    width = $0.width
+                } else {
+                    width = nil
+                }
+                
+                if axes.contains(.vertical){
+                    height = $0.height
+                } else {
+                    height = nil
+                }
+            }])
         }
     }
     
