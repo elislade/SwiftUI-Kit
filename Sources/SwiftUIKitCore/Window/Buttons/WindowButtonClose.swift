@@ -3,7 +3,7 @@ import SwiftUI
 
 public struct WindowButtonClose: View {
     
-    @Environment(\.performWindowAction) private var perform
+    @State private var action: () -> Void = {}
     
     let shouldQuit: Bool
     
@@ -13,7 +13,7 @@ public struct WindowButtonClose: View {
     
     public var body: some View {
         Button(role: .destructive) {
-            perform(.close(shouldQuit: shouldQuit))
+            action()
         } label : {
             Label{
                 Text("Close Window\(shouldQuit ? " and Quit." : ".")")
@@ -22,6 +22,13 @@ public struct WindowButtonClose: View {
             }
         }
         .tint(.red)
+        #if os(macOS)
+        .windowReference{ window in
+            action = {
+                window.close()
+            }
+        }
+        #endif
     }
     
 }

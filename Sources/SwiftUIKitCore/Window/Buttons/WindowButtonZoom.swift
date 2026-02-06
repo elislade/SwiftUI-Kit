@@ -2,13 +2,16 @@ import SwiftUI
 
 
 public struct WindowButtonZoom: View {
-    
-    @Environment(\.performWindowAction) private var perform
+
+    @State private var action: () -> Void = { }
+    @State private var fullscreen = true
     
     public init(){}
     
     public var body: some View {
-        Button{ perform(.zoom) } label: {
+        Button{
+            action()
+        } label: {
             Label{
                 Text("Maximize Window")
             } icon: {
@@ -16,6 +19,14 @@ public struct WindowButtonZoom: View {
             }
         }
         .tint(.green)
+        #if os(macOS)
+        .windowReference{ window in
+            action = {
+                window.collectionBehavior.insert(.fullScreenPrimary)
+                window.toggleFullScreen(nil)
+            }
+        }
+        #endif
     }
     
 }

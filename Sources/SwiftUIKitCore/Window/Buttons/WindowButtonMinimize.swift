@@ -3,12 +3,14 @@ import SwiftUI
 
 public struct WindowButtonMinimize: View {
     
-    @Environment(\.performWindowAction) private var perform
+    @State private var action: () -> Void = {}
     
     public init() { }
     
     public var body: some View {
-        Button{ perform(.minimize) } label: {
+        Button{
+            action()
+        } label: {
             Label{
                 Text("Minimize Window")
             } icon: {
@@ -16,6 +18,11 @@ public struct WindowButtonMinimize: View {
             }
         }
         .tint(.orange)
+        #if os(macOS)
+        .windowReference{ window in
+            action = { window.miniaturize(nil) }
+        }
+        #endif
     }
     
 }
