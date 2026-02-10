@@ -88,7 +88,7 @@ struct FocusPresentationContext: ViewModifier {
                             }
                             .transition((.opacity + .hitTestingDisabled).animation(.easeInOut.speed(1.3)))
                             .matchedGeometryEffect(id: "Item", in: presentation.namespace)
-                            .frame(minWidth: safeSize.width, minHeight: safeSize.height)
+                            .frame(maxWidth: safeSize.width, maxHeight: safeSize.height)
                             .offset(safeOffsets(for: bounds, in: proxy.size))
                             .geometryGroupIfAvailable()
                             .onAppear{
