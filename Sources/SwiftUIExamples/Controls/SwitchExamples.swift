@@ -13,14 +13,14 @@ public struct SwitchExamples : View {
     @State private var controlSize = ControlSize.regular
     
     private var offLabel: some View {
-        Image(systemName: "car.fill")
+        Image(systemName: "figure.walk")
             .resizable()
             .scaledToFit()
             .opacity(0.5)
     }
     
     private var onLabel: some View {
-        Image(systemName: "dog.fill")
+        Image(systemName: "figure.run")
             .resizable()
             .scaledToFit()
             .foregroundStyle(Color.white)
@@ -61,31 +61,33 @@ public struct SwitchExamples : View {
             .disabled(disable)
             .animation(.bouncy, value: isOn)
         } parameters: {
-            Toggle(isOn: $disable){
-                Text("Disable")
-                    .font(.exampleParameterTitle)
+            ExampleSection(isExpanded: true){
+                HStack {
+                    Toggle(isOn: $disable){
+                        Text("Disable")
+                    }
+                    
+                    ExampleCell.ControlRoundness(value: $controlRoundness)
+                }
+                
+                Toggle(isOn: $accessibleOnOffLabelsEnabled){
+                    Text("Accessible Labels")
+                }
+                
+                Toggle(isOn: $useCustomLabels){
+                    Text("Use Custom Labels")
+                }
+                
+                HStack {
+                    ExampleCell.ControlSize(value: $controlSize)
+                        .fixedSize()
+                    ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
+                }
+                
+                ExampleCell.LayoutDirection(value: $direction)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-            
-            ExampleCell.ControlRoundness(value: $controlRoundness)
-
-            Toggle(isOn: $accessibleOnOffLabelsEnabled){
-                Text("Accessible Labels")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-
-            Toggle(isOn: $useCustomLabels){
-                Text("Use Custom Labels")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.ControlSize(value: $controlSize)
-            
-            ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
-            
-            ExampleCell.LayoutDirection(value: $direction)
         }
     }
     

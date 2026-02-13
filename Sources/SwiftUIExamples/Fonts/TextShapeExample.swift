@@ -60,24 +60,12 @@ public struct TextShapeExample: View {
             }
             .padding()
         } parameters : {
-            VStack {
-                HStack {
-                    Text("Font Size")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(fontSize, format: .number)
-                        .font(.exampleParameterValue)
-                     + Text("pt.")
-                }
-                
-                Slider(value: $fontSize, in: 10...200, step: 1)
+            ExampleSlider(value: .init($fontSize, in: 10...200)){
+                Text("Font Size")
             }
-            .exampleParameterCell()
             
-            TextField("String", text: $customString){}
-                .exampleParameterCell()
+            TextField("String", text: $customString)
+                .controlSize(.large)
         }
     }
     

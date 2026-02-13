@@ -8,9 +8,9 @@ public struct ShadowMaterialExample: View {
         case outer
     }
     
-    @State private var radius: CGFloat = 10
-    @State private var angle: Angle = .degrees(0)
-    @State private var amount: CGFloat = 10
+    @State private var radius: Double = 10
+    @State private var angle = Measurement(value: 0, unit: UnitAngle.degrees)
+    @State private var amount: Double = 10
     @State private var direction: Direction = .inner
     
     private var shape: some InsettableShape {
@@ -21,104 +21,65 @@ public struct ShadowMaterialExample: View {
     
     public var body: some View {
         ExampleView(title: "Shadow Material"){
-            switch direction {
-            case .inner:
-                InnerShadowMaterial(
-                    shape,
-                    radius: radius,
-                    angle: angle,
-                    amount: amount
-                )
-                .padding()
-            case .outer:
-                OuterShadowMaterial(
-                    shape,
-                    radius: radius,
-                    angle: angle,
-                    amount: amount
-                )
-                .padding()
-            }
-        } parameters: {
-            SegmentedPicker(
-                selection: $direction.animation(.bouncy),
-                items: Direction.allCases
-            ){ dir in
-                switch dir {
-                case .inner: Text("Inner")
-                case .outer: Text("Outer")
+            Group {
+                switch direction {
+                case .inner:
+                    InnerShadowMaterial(
+                        shape,
+                        radius: radius,
+                        angle: .degrees(angle.value),
+                        amount: amount
+                    )
+                case .outer:
+                    OuterShadowMaterial(
+                        shape,
+                        radius: radius,
+                        angle: .degrees(angle.value),
+                        amount: amount
+                    )
                 }
             }
-            .exampleParameterCell()
-            
+            .padding()
+            .frame(maxWidth: 600, maxHeight: 600)
+        } parameters: {
             HStack {
-                Text("Actions")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
+                ExampleInlinePicker(
+                    data: Direction.allCases,
+                    selection: $direction.animation(.bouncy)
+                ){ dir in
+                    switch dir {
+                    case .inner: Text("Inner")
+                    case .outer: Text("Outer")
+                    }
+                }
                 
                 Button{
                     withAnimation(.bouncy){
                         radius = .random(in: 0...100)
                         amount = .random(in: 0...100)
-                        angle = .degrees(.random(in: -180...180))
+                        angle.value = .random(in: -180...180)
                     }
                 } label: {
-                    Text("Random")
+                    Label("Random", systemImage: "dice")
                 }
             }
-            .exampleParameterCell()
             
-            VStack {
-                HStack {
-                    Text("Radius")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(radius, format: .increment(0.1))
-                        .font(.exampleParameterValue)
+            HStack {
+                ExampleSlider(value: .init($radius, in: 0...100)){
+                    Label("Radius", systemImage:"beziercurve")
                 }
                 
-                Slider(value: $radius, in: 0...100)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Angle")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(
-                        Measurement<UnitAngle>(value: angle.degrees, unit: .degrees),
-                        format: .measurement(
-                            width: .narrow,
-                            numberFormatStyle: .increment(0.1)
-                        )
-                    )
-                    .font(.exampleParameterValue)
+                ExampleSlider(
+                    value: $angle, in: -180...180,
+                    format: .parse(.degrees)
+                ){
+                    Label("Angle", systemImage: "angle")
                 }
-                
-                Slider(value: $angle.degrees, in: -180...180)
             }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Amount")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(amount, format: .increment(0.1))
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $amount, in: 0...100)
+
+            ExampleSlider(value: .init($amount, in: 0...100)){
+                Label("Magnitude", systemImage: "arrow.right.circle.dotted")
             }
-            .exampleParameterCell()
         }
     }
     

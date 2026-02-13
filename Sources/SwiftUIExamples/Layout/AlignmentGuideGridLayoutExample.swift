@@ -65,54 +65,33 @@ public struct AlignmentGuideGridLayoutExample : View {
     }
     
     public var body: some View {
+        let numberOfElements = Binding(
+            get: { elements.count },
+            set: {
+                if $0 > elements.count {
+                    add()
+                } else {
+                    remove()
+                }
+            }
+        )
         ExampleView(title: "AlignmentGuide Grid Layout"){
             grid
                 .animation(.bouncy, value: elements.count)
                 .animation(.bouncy, value: columns)
         } parameters: {
-            HStack {
-                Text("Columns").font(.exampleParameterTitle)
-                Spacer()
-                Text("\(columns)")
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                
-                Stepper(value: $columns, in: 1...5)
+            ExampleStepper(value: $columns, range: 1...5){
+                Text("Columns")
             }
-            .exampleParameterCell()
             
-            HStack {
-                Text("Count").font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Text(elements.count, format: .number)
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                
-                Stepper(
-                    onIncrement: add,
-                    onDecrement: !elements.isEmpty ? { remove() } : nil
-                )
+            ExampleStepper(value: numberOfElements, range: 0...20){
+                Text("Number of Elements")
             }
-            .exampleParameterCell()
             
-            VStack {
-                HStack(spacing: 16) {
-                    Text("Spacing").font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(spacing, format: .number)
-                        .font(.exampleParameterValue)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Slider(value: $spacing, in: 0...50, step: 1)
+            ExampleSlider(value: .init($spacing, in: 0...50, step: 1)){
+                Text("Spacing")
             }
-            .exampleParameterCell()
         }
-        .contentTransitionNumericText()
         .task{ @MainActor in
             for _ in 0...10 {
                 try? await Task.sleep(for: .seconds(0.05))

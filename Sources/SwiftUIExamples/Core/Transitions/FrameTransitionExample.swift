@@ -33,46 +33,36 @@ public struct FrameTransitionExample: View {
         }
         
         var body: some View {
-            VStack {
-                HStack {
+            HStack {
+                ExampleSlider(
+                    value: .init($width, in: 0...200, step: 1)
+                ){
                     Text("Max Width")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                        
-                    Text(width, format: .increment(1))
-                        .font(.exampleParameterValue)
-                    
-                    Switch(isOn: !$widthIsNill)
-                        .controlSize(ControlSize.mini)
                 }
-
-                Slider(value: $width, in: 0...200, step: 1)
-                    .disabled(widthIsNill)
+                .disabled(widthIsNill)
+                
+                Toggle(isOn: !$widthIsNill){
+                    Text("Enabled")
+                }
             }
-            .exampleParameterCell()
             .onChangePolyfill(of: width){ update(transition, nil) }
             .onChangePolyfill(of: widthIsNill){ update(transition, nil) }
             .onAppear { update(transition, nil) }
+            .toggleHintIndicatorVisibility(.hidden)
             
-            VStack {
-                HStack {
+            HStack {
+                ExampleSlider(
+                    value: .init($height, in: 0...200, step: 1)
+                ){
                     Text("Max Height")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                        
-                    Text(height, format: .increment(1))
-                        .font(.exampleParameterValue)
-                    
-                    Switch(isOn: !$heightIsNill)
-                        .controlSize(ControlSize.mini)
                 }
-        
-                Slider(value: $height, in: 0...200, step: 1)
-                    .disabled(heightIsNill)
+                .disabled(heightIsNill)
+                
+                Toggle(isOn: !$heightIsNill){
+                    Text("Enabled")
+                }
             }
-            .exampleParameterCell()
+            .toggleHintIndicatorVisibility(.hidden)
             .onChangePolyfill(of: height){ update(transition, nil) }
             .onChangePolyfill(of: heightIsNill){ update(transition, nil) }
             

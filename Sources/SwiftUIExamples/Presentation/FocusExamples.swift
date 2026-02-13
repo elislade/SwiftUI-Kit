@@ -28,15 +28,11 @@ public struct FocusExamples : View {
         } parameters: {
             Toggle(isOn: $useCustom){
                 Text("Custom Focused View")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
             
             Toggle(isOn: $useAccessory){
                 Text("Accessory")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
         }
     }
     

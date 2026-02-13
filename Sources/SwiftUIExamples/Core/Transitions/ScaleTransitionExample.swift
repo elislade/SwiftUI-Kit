@@ -25,32 +25,28 @@ public struct ScaleTransitionExample: View {
         @State private var anchor = UnitPoint.center
         
         var body: some View {
-            VStack {
-                HStack {
-                    Text("Scale")
-                        .font(.exampleParameterTitle)
-                    
-                    Button("Linked", systemImage: "lock\(isLinked ? "" : ".open" ).fill"){
-                        isLinked.toggle()
-                    }
-                    .labelStyle(.iconOnly)
-                    .symbolRenderingMode(.hierarchical)
-                    
-                    Spacer()
-                    Group {
-                        Text(scale.x, format: .increment(0.01))
-                        Text(scale.y, format: .increment(0.01))
-                    }
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
+            HStack {
+                ExampleSlider(value: .init($scale.x, in : -1...3, step: 0.1)){
+                    Text("Scale X")
                 }
                 
-                HStack(alignment: .center) {
-                    Slider(value: $scale.x, in : -1...3, step: 0.1)
-                    Slider(value: $scale.y, in : -1...3, step: 0.1)
+                ExampleSlider(value: .init($scale.y, in : -1...3, step: 0.1)){
+                    Text("Scale Y")
                 }
+                
+                Toggle(isOn: $isLinked){
+                    Label{ Text("Linked") } icon: {
+                        Color.clear
+                            .aspectRatio(0.5, contentMode: .fit)
+                            .overlay{
+                                Image(systemName: "lock\(isLinked ? "" : ".open" ).fill")
+                            }
+                    }
+                    .labelStyle(.iconOnly)
+                }
+                .toggleHintIndicatorVisibility(.hidden)
+                .symbolRenderingMode(.hierarchical)
             }
-            .exampleParameterCell()
             .onAppear { update(transition, nil) }
             .onChangePolyfill(of: scale){ old, new in
                 if isLinked {
@@ -62,23 +58,8 @@ public struct ScaleTransitionExample: View {
                 update(transition, nil)
             }
             
-            HStack(alignment: .top) {
-                Text("Anchor")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Group {
-                    Text(anchor.x, format: .increment(0.01))
-                    Text(anchor.y, format: .increment(0.01))
-                }
-                .font(.exampleParameterValue)
-                
-                ExampleControl.Anchor(value: $anchor)
-                    .frame(width: 130, height: 130)
-            }
-            .exampleParameterCell()
-            .onChangePolyfill(of: anchor){ update(transition, nil) }
+            ExampleCell.Anchor(anchor: $anchor)
+                .onChangePolyfill(of: anchor){ update(transition, nil) }
         }
     }
 }

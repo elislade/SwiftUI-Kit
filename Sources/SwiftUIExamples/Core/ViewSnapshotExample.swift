@@ -93,43 +93,30 @@ public struct ViewSnapshotExample: View {
             }
             .ignoresSafeArea()
         } parameters: {
-            #if !os(watchOS)
-            Toggle(isOn: $showBackgroundBlurArtifacting){
-                Text("Test BG Blur")
-                    .font(.exampleParameterTitle)
-                    .minimumScaleFactor(0.8)
-            }
-            .exampleParameterCell()
-            #endif
-            
-            HStack(spacing: 10) {
+            ExampleSection(isExpanded: true){
+                HStack {
+#if !os(watchOS)
+                    Toggle(isOn: $showBackgroundBlurArtifacting){
+                        Text("Test BG Blur")
+                    }
+#endif
+                    Button { signal.toggle() } label: {
+                        Label("Capture", systemImage: "camera.aperture")
+                    }
+                    .keyboardShortcut(KeyEquivalent.space, modifiers: [])
+                }
+                
                 SnapList(
                     ns: ns,
                     viewing: $selected,
                     snaps: snapshots
                 )
                 .environment(\.layoutDirection, .rightToLeft)
-                
-                Button { signal.toggle() } label: {
-                    Label{ Text("Capture") } icon: {
-                        Image(systemName: "camera.aperture")
-                            .resizable()
-                            .scaledToFit()
-                            .scaleEffect(0.6)
-                            .foregroundStyle(.white)
-                            .background{
-                                ContainerRelativeShape().fill(.tint)
-                            }
-                    }
-                }
-                .labelStyle(.iconOnly)
-                .keyboardShortcut(KeyEquivalent.space, modifiers: [])
+                .containerShape(RoundedRectangle(cornerRadius: 14))
+                .frame(height: 74)
+            } label: {
+                Text("Parameters")
             }
-            .buttonStyle(.plain)
-            .containerShape(RoundedRectangle(cornerRadius: 14))
-            .frame(height: 74)
-            .padding()
-
         }
         .animation(.smooth.speed(1.6), value: selected)
         .animation(.smooth.speed(1.6), value: snapshots)
@@ -190,8 +177,9 @@ public struct ViewSnapshotExample: View {
                 }
                 .clipShape(ContainerRelativeShape())
                 .background{
+                    SunkenControlMaterial(ContainerRelativeShape())
                     ContainerRelativeShape()
-                        .fill(.gray.opacity(0.4))
+                        .fill(.gray.opacity(0.1))
                 }
             }
         }

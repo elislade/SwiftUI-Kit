@@ -20,58 +20,52 @@ public struct FlipExamplesView: View {
                     Card(name: "Back", aspect: 1.8)
                 }
                 .padding()
+                .frame(maxWidth: 600)
                 .animation(.bouncy, value: horizontal)
                 .animation(.bouncy, value: vertical)
                 .animation(.bouncy, value: isFlipped)
         } parameters: {
             HStack {
-                Text("Actions")
-                    .font(.exampleParameterTitle)
+                Toggle(isOn: $isFlipped.animation(.bouncy)){
+                    Text("Flipped")
+                }
+                .fixedSize()
                 
-                Spacer()
-                
-                Button("Random Flip"){
+                Button{
                     vertical = Bool.random() ? .allCases.randomElement() : .none
                     horizontal = Bool.random() ? .allCases.randomElement() : .none
                     isFlipped.toggle()
+                } label: {
+                    Label("Random", systemImage: "dice")
                 }
-                .font(.exampleParameterValue)
+                
             }
-            .exampleParameterCell()
             
-            Toggle(isOn: $isFlipped){
-                Text("Is flipped")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            HStack {
+            ExampleMenuPicker(
+                data: [nil, .top, .bottom],
+                selection: $vertical
+            ){ dir in
+                if let dir {
+                    Text("\(dir)".capitalized)
+                } else {
+                    Text("None")
+                }
+            } label: {
                 Text("Vertical Direction")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $vertical){
-                    Text("None").tag(Optional<VerticalEdge>(nil))
-                    Text("Top").tag(Optional(VerticalEdge.top))
-                    Text("Bottom").tag(Optional(VerticalEdge.bottom))
-                }
             }
-            .exampleParameterCell()
             
-            HStack {
-                Text("Horizontal Direction")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $horizontal){
-                    Text("None").tag(Optional<HorizontalEdge>(nil))
-                    Text("Leading").tag(Optional(HorizontalEdge.leading))
-                    Text("Trailing").tag(Optional(HorizontalEdge.trailing))
+            ExampleMenuPicker(
+                data: [nil, .leading, .trailing],
+                selection: $horizontal
+            ){ dir in
+                if let dir {
+                    Text("\(dir)".capitalized)
+                } else {
+                    Text("None")
                 }
+            } label: {
+                Text("Horizontal Direction")
             }
-            .exampleParameterCell()
         }
     }
     

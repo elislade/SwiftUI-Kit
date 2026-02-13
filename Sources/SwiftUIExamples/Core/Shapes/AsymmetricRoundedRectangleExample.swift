@@ -23,103 +23,50 @@ public struct AsymmetricRoundedRectangleExamples: View {
                 
                 AsymmetricRoundedRectangle(values: values)
                     .inset(by: inset)
-                    .strokeBorder(.primary, style: .init(lineWidth: 3, lineCap: .round, dash: [4,6]))
+                    .strokeBorder(
+                        .primary,
+                        style: .init(lineWidth: 3, lineCap: .round, dash: [4,6])
+                    )
             }
             .padding()
+            .frame(maxWidth: 600, maxHeight: 600)
         } parameters: {
-            VStack {
-                HStack {
-                    Text("Inset")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(inset, format: .increment(0.1))
-                        .font(.exampleParameterValue)
-                }
-                Slider(value: $inset, in: 0...50)
+            ExampleSlider(value: .init($inset, in: 0...50)){
+                Text("Inset")
             }
-            .padding()
-            
-            Divider()
             
             ExampleSection("Radius", isExpanded: true){
+                Button{
+                    withAnimation(.smooth){
+                        values.topLeft = .random(in: radiusRange)
+                        values.topRight = .random(in: radiusRange)
+                        values.bottomLeft = .random(in: radiusRange)
+                        values.bottomRight = .random(in: radiusRange)
+                    }
+                } label: {
+                    Label("Random", systemImage: "dice")
+                        .frame(maxWidth: .infinity)
+                }
+                
                 HStack {
-                    Text("Random")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Button("Animate"){
-                        withAnimation(.smooth){
-                            values.topLeft = .random(in: radiusRange)
-                            values.topRight = .random(in: radiusRange)
-                            values.bottomLeft = .random(in: radiusRange)
-                            values.bottomRight = .random(in: radiusRange)
-                        }
-                    }
-                }
-                .exampleParameterCell()
-                
-                VStack {
-                    HStack {
+                    ExampleSlider(value: .init($values.topLeft, in: radiusRange)){
                         Text("Top Left")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(values.topLeft, format: .increment(0.1))
-                            .font(.exampleParameterValue)
                     }
                     
-                    Slider(value: $values.topLeft, in: radiusRange)
-                }
-                .exampleParameterCell()
-                
-                VStack {
-                    HStack {
+                    ExampleSlider(value: .init($values.topRight, in: radiusRange)){
                         Text("Top Right")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(values.topRight, format: .increment(0.1))
-                            .font(.exampleParameterValue)
                     }
-                    
-                    Slider(value: $values.topRight, in: radiusRange)
                 }
-                .exampleParameterCell()
                 
-                VStack {
-                    HStack {
+                HStack {
+                    ExampleSlider(value: .init($values.bottomLeft, in: radiusRange)){
                         Text("Bottom Left")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(values.bottomLeft, format: .increment(0.1))
-                            .font(.exampleParameterValue)
                     }
                     
-                    Slider(value: $values.bottomLeft, in: radiusRange)
-                }
-                .exampleParameterCell()
-                
-                VStack {
-                    HStack {
+                    ExampleSlider(value: .init($values.bottomRight, in: radiusRange)){
                         Text("Bottom Right")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(values.bottomRight, format: .increment(0.1))
-                            .font(.exampleParameterValue)
                     }
-                    
-                    Slider(value: $values.bottomRight, in: radiusRange)
                 }
-                .exampleParameterCell()
             }
         }
     }

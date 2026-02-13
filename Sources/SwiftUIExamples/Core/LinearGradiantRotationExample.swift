@@ -3,7 +3,7 @@ import SwiftUIKit
 
 public struct LinearGradiantRotationExample : View {
     
-    @State private var rotationDegrees: Double = .zero
+    @State private var rotation = Measurement(value: 0, unit: UnitAngle.degrees)
     
     public init() {}
     
@@ -12,12 +12,17 @@ public struct LinearGradiantRotationExample : View {
             RoundedRectangle(cornerRadius: 30)
                 .fill(LinearGradient.rotated(
                     Gradient(colors: [.purple, .yellow]),
-                    angle: .degrees(rotationDegrees)
+                    angle: .degrees(rotation.value)
                 ))
                 .ignoresSafeArea()
         } parameters: {
-            Slider(value: $rotationDegrees, in: 0...360)
-                .exampleParameterCell()
+            ExampleSlider(
+                value: $rotation,
+                in: 0...360,
+                format: .parse(.degrees)
+            ){
+                Text("Degrees")
+            }
         }
     }
     

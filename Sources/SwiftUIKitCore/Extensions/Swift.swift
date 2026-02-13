@@ -40,9 +40,9 @@ public func powRetainSign<V: BinaryFloatingPoint>(_ base: V, _ exponent: V) -> V
 }
 
 
-public extension String {
+extension StringProtocol {
     
-    var splitCamelCaseFormat: String {
+    public var splitCamelCaseFormat: String {
         reduce(into: ""){ res, partial in
             if res.isEmpty {
                 res.append(partial.uppercased())
@@ -138,7 +138,8 @@ public extension ClosedRange where Bound : BinaryFloatingPoint {
 public extension ClosedRange where Bound : BinaryFloatingPoint, Bound.Stride : BinaryFloatingPoint {
     
     func numberOfSteps(_ step: Bound.Stride) -> Int {
-        Int(floor(Bound.Stride(upperBound - lowerBound) / step))
+        let steps = floor(Bound.Stride(upperBound - lowerBound) / step)
+        return Int(steps.clamped(to: Bound.Stride(Int.min)...Bound.Stride(Int.max)))
     }
     
 }
@@ -224,44 +225,6 @@ public func pow<T: BinaryInteger>(_ base: T, _ power: T) -> T {
 
     return expBySq(1, base, power)
 }
-
-
-public func formatFrequency(_ hertz: Int, compact: Bool = true) -> (value: String, postfix: String) {
-    let attributedString = Measurement(
-        value: Double(hertz),
-        unit: UnitFrequency.hertz
-    ).convertedToNearestWhole.formatted(.measurement(width: compact ? .narrow : .wide, usage: .asProvided).attributed)
-    
-    var value: [String] = []
-    for run in attributedString.runs {
-        let sub = attributedString.characters[run.range]
-        if !sub.allSatisfy(\.isWhitespace) {
-            value.append(String(sub))
-        }
-    }
-    
-    return (value[0], value[1])
-}
-
-public extension Measurement where UnitType == UnitFrequency {
-    
-    var convertedToNearestWhole: Self {
-        let divisions: [UnitType] = [.nanohertz, .microhertz, .millihertz, .hertz, .kilohertz, .megahertz, .gigahertz, .terahertz]
-        var index: Int = 0
-
-        while true {
-            let converted = converted(to: divisions[index])
-            
-            if converted.value.rounded() >= 1000 && divisions.indices.contains(index + 1) {
-                index += 1
-            } else {
-                return Self(value: converted.value.rounded(), unit: converted.unit)
-            }
-        }
-    }
-    
-}
-
 
 public extension SetAlgebra {
     

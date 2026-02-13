@@ -24,20 +24,10 @@ public struct AxisStackExampleView : View {
             .animation(.bouncy, value: axis)
         } parameters: {
             ExampleCell.Axis(axis: $axis.animation(.smooth))
-                .exampleParameterCell()
             
-            VStack {
-                LabeledContent {
-                    Text(spacing, format: .increment(0.1))
-                        .font(.exampleParameterValue)
-                } label: {
-                    Text("Spacing")
-                        .font(.exampleParameterTitle)
-                }
-                
-                Slider(value: $spacing, in: 0...30)
+            ExampleSlider(value: .init($spacing, in: 0...30)){
+                Text("Spacing")
             }
-            .exampleParameterCell()
         }
     }
     

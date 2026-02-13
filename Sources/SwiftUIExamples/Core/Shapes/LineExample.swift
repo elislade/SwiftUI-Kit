@@ -15,54 +15,16 @@ public struct LineShapeExample: View {
                 .stroke(lineWidth: thickness)
                 .padding()
         } parameters: {
-            VStack {
-                HStack {
+            ExampleCell.Axis(axis: $axis.animation(.bouncy))
+
+            ExampleControlGroup {
+                ExampleSlider(value: .init($thickness, in: 0.5...30)){
                     Text("Thickness")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(thickness, format: .number.rounded(increment: 0.1))
                 }
                 
-                Slider(value: $thickness, in: 0.5...30)
-                    .font(.exampleParameterValue)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.Axis(axis: $axis.animation(.bouncy))
-                .exampleParameterCell()
-
-            if axis == .vertical {
-                VStack {
-                    HStack {
-                        Text("Anchor X")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(anchor.x, format: .number.rounded(increment: 0.1))
-                            .font(.exampleParameterValue)
-                    }
-                    
-                    Slider(value: $anchor.x)
+                ExampleSlider(value: .init($anchor[axis.inverse])){
+                    Text("Anchor")
                 }
-                .exampleParameterCell()
-            } else {
-                VStack {
-                    HStack {
-                        Text("Anchor Y")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(anchor.y, format: .number.rounded(increment: 0.1))
-                            .font(.exampleParameterValue)
-                    }
-                    
-                    Slider(value: $anchor.y)
-                }
-                .exampleParameterCell()
             }
         }
     }

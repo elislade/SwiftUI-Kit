@@ -3,18 +3,17 @@ import SwiftUIKit
 
 #if canImport(UIKit) && !os(visionOS) && !os(tvOS)
 
+//TODO: Depricate BarMasks as iOS 15 is no longer suported so `toolbarColorScheme` can be used.
 struct SystemUIOverrideExamples: View {
     
     @State private var color: ColorScheme = .dark
     @State private var showAlert = false
     @State private var mask: SystemUIMask = .bars
     
-    private func view(_ label: String, for mask: SystemUIMask) -> some View {
+    private func view(_ label: LocalizedStringKey, for mask: SystemUIMask) -> some View {
         Toggle(isOn: Binding($mask, contains: mask)){
             Text(label)
-                .font(.exampleParameterTitle)
         }
-        .exampleParameterCell()
     }
     
     
@@ -22,29 +21,24 @@ struct SystemUIOverrideExamples: View {
         ExampleView(title: "System Overrides"){
             TabView {
                 NavigationView {
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            VStack(spacing: 0) {
-                                Color.white
-                                Color.secondary.id("Target")
-                                Color.black
-                            }
-                            .frame(height: 1200)
-                            .onAppear{
-                                proxy.scrollTo("Target", anchor: .center)
-                            }
-                        }
-                        .ignoresSafeArea()
+                    ScrollView {
+                        LinearGradient(
+                            colors: [.red, .yellow],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .frame(height: 1200)
                     }
-                    .navigationTitle("Test")
+                    .ignoresSafeArea()
+                    .navigationTitle("Title")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
-                        ToolbarItem(placement: .bottomBar){
+                        ToolbarItem(placement: .automatic){
                             Button("Show Alert"){ showAlert.toggle() }
                         }
                     }
                     .alert(isPresented: $showAlert){
-                        Alert(title: Text("What?!?"))
+                        Alert(title: Text("Alert Title"))
                     }
                     
                 }
@@ -57,12 +51,14 @@ struct SystemUIOverrideExamples: View {
         } parameters: {
             ExampleCell.ColorScheme(value: $color)
 
-            ExampleSection("UI Mask", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 view("Status Bar", for: .sceneStatusbar)
                 view("Tab Bar", for: .tabbar)
                 view("Tool Bar", for: .bottomToolbar)
                 view("Navigation Bar", for: .navigationTitlebar)
                 view("Alert", for: .alert)
+            } label: {
+                Text("UI Mask")
             }
         }
     }

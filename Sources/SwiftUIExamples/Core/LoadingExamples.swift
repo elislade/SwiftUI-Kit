@@ -29,32 +29,24 @@ public struct LoadingExamples: View {
             .padding()
             .environment(\.layoutDirection, layoutDirection)
             .animation(.smooth, value: loadingState)
+            .frame(maxWidth: 600)
         } parameters: {
-            Toggle(isOn: $loadingIndefinite){
-                Text("Indefinite")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-         
-            VStack {
-                HStack {
-                    Text("Progress")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(loadingProgress, format: .number.rounded(increment: 0.1))
-                        .font(.exampleParameterValue)
+            ExampleSection(isExpanded: true){
+                Toggle(isOn: $loadingIndefinite){
+                    Text("Indefinite")
                 }
                 
-                Slider(value: $loadingProgress)
+                ExampleSlider(value: .init($loadingProgress)){
+                    Text("Progress")
+                }
+                .onChangePolyfill(of: loadingProgress){
+                    loadingIndefinite = false
+                }
+                
+                ExampleCell.LayoutDirection(value: $layoutDirection)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-            .onChangePolyfill(of: loadingProgress){
-                loadingIndefinite = false
-            }
-
-            ExampleCell.LayoutDirection(value: $layoutDirection)
         }
     }
     

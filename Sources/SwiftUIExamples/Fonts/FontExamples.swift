@@ -34,33 +34,29 @@ public struct FontExamples: View {
             )
         } parameters: {
             ExampleSection("Parameters", isExpanded: true){
-                HStack {
-                    Text("Font Resolver")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Picker("", selection: $fontResolverType){
-                        Text("Core Text").tag(ResolverType.coreText)
-                        Text("SwiftUI").tag(ResolverType.swiftUI)
-                    }
-                }
-                .exampleParameterCell()
                 
                 HStack {
-                    Text("Dynamic Type")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Picker("", selection: $dynamicSize){
-                        ForEach(DynamicTypeSize.allCases, id: \.hashValue){ size in
-                            Text("\(size)".splitCamelCaseFormat)
-                                .tag(size)
+                    ExampleMenuPicker(
+                        data: ResolverType.allCases,
+                        selection: $fontResolverType
+                    ){ type in
+                        switch type {
+                        case .coreText: Text("Core Text")
+                        case .swiftUI: Text("SwiftUI")
                         }
+                    } label: {
+                        Text("Font Resolver")
+                    }
+
+                    ExampleMenuPicker(
+                        data: DynamicTypeSize.allCases,
+                        selection: $dynamicSize
+                    ){ type in
+                        Text("\(type)".splitCamelCaseFormat)
+                    } label: {
+                        Text("Dynamic Type")
                     }
                 }
-                .exampleParameterCell()
                 
                 ParameterEditor(parameters: $parameters)
             }
@@ -90,40 +86,6 @@ public struct FontExamples: View {
         }
         
         var body: some View {
-//            Menu{
-//                Text("Design")
-//                    .font(.caption[.medium])
-//                    .opacity(0.5)
-//                    .equalInsetItem()
-//                    //.scrollPosition(<#T##position: Binding<ScrollPosition>##Binding<ScrollPosition>#>)
-//                
-//                ForEach(Font.Design.allCases){ item in
-//                    Button { resource = .system(design: item) } label: {
-//                        Label{ Text(name(for: item)) } icon: {
-//                            Image(systemName: "checkmark")
-//                                .opacity(0)
-//                        }
-//                    }
-//                }
-//                
-//                Text("Library")
-//                    .font(.caption[.medium])
-//                    .opacity(0.5)
-//                    .equalInsetItem()
-//        
-//                ForEach(AvailableFont.fontFamilies, id: \.self){ f in
-//                    let r = FontResource.library(familyName: f)
-//                    Button { resource = r } label: {
-//                        Label{ Text(f) } icon: {
-//                            Image(systemName: "checkmark")
-//                                .opacity(resource == r ? 1 : 0)
-//                        }
-//                    }
-//                }
-//            } label: {
-//                Text(resource.description)
-//                    .menuIndicatorStyle()
-//            }
             Picker(selection: $resource){
                 Section("Design"){
                     ForEach(Font.Design.allCases){
@@ -155,51 +117,27 @@ public struct FontExamples: View {
         }
         
         var body: some View {
-            HStack(spacing: 0) {
-                Button(action: { value = -1 }){
-                    Text("-1")
-                        .fontWeight(.semibold)
-                        .frame(width: 24, alignment: .leading)
-                }
-                .disabled(value == -1)
-                
-                SliderView(
-                    x: .init($value, in: -1...1, step: 0.1),
-                    hitTestHandle: false
-                ){
-                    SunkenControlMaterial(Capsule(), isTinted: true)
-                        .frame(width: 8)
-                        .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
-                }
-                .background {
-                    HStack(spacing: 0) {
-                        ForEach(0...20){ i in
-                            if i == 10 {
-                                Capsule()
-                                    .frame(width: 4)
-                                    .frame(maxWidth: .infinity)
-                            } else {
-                                Capsule()
-                                    .frame(width: i.isMultiple(of: 5) ? 2 : 1)
-                                    .frame(maxWidth: .infinity)
-                                    .opacity(i.isMultiple(of: 5) ? 1 : 0.3)
-                            }
-                        }
-                    }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, -4)
-                }
-                .frame(height: height)
-                .buttonStyle(.tinted)
-                
-                Button(action: { value = 1 }){
-                    Text("+1")
-                        .fontWeight(.semibold)
-                        .frame(width: 24, alignment: .trailing)
-                }
-                .disabled(value == 1)
+            SliderView(
+                x: .init($value, in: -1...1, step: 0.1),
+                hitTestHandle: false
+            ){
+                SunkenControlMaterial(Capsule(), isTinted: true)
+                    .scaleEffect(y: -1)
+                    .frame(width: 17)
+                    .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
             }
+            .background {
+                HStack(spacing: 2) {
+                    ForEach(0...20){ i in
+                        RoundedRectangle(cornerRadius: 8)
+                            .opacity(i == 10 ? 1 : i.isMultiple(of: 5) ? 0.9 : 0.2)
+                    }
+                }
+                .padding(.vertical, 5)
+            }
+            .frame(height: height)
             .buttonStyle(.tinted)
+            .animation(.bouncy, value: value)
         }
     }
     
@@ -208,78 +146,60 @@ public struct FontExamples: View {
         @Binding var parameters: FontParameters
         
         var body: some View {
-            VStack(spacing: 0) {
-                VStack(spacing: 5) {
-                    HStack {
-                        Text("Size")
-                            .font(.exampleParameterTitle)
-                        
-                        Text("\(Int(parameters.size))")
-                            .font(.exampleParameterValue)
-                        
-                        Spacer()
-                        
-                        Text("\(Font.TextStyle(closestToStaticSize: parameters.size))".splitCamelCaseFormat)
-                            .font(.exampleParameterValue)
-                            .opacity(0.6)
-                    }
-                    .animation(nil, value: parameters.size)
+            ExampleSlider(
+                value: .init($parameters.size, in: 10...120, step: 1)
+            ){
+                Label("Size", systemImage: "character.cursor.ibeam")
+            }
+            .symbolRenderingMode(.hierarchical)
+          
+            VStack(spacing: 5) {
+                HStack {
+                    Text("Width")
+                        .font(.exampleParameterTitle)
                     
-                    Slider(value: $parameters.size, in: 10...120, step: 1)
-                }
-                .exampleParameterCell()
-              
-                VStack(spacing: 5) {
-                    HStack {
-                        Text("Width")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(Font.Width(parameters.width).staticDefinedClosest.description)
-                            .opacity(0.6)  
-                    }
-                    .animation(nil, value: parameters.width)
+                    Spacer()
                     
-                    FontParameterSlider(value: $parameters.width)
+                    Text(Font.Width(parameters.width).staticDefinedClosest.description)
+                        .opacity(0.6)
                 }
-                .exampleParameterCell()
+                .animation(nil, value: parameters.width)
                 
-                VStack(spacing: 5) {
-                    HStack {
-                        Text("Slant")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(parameters.slant, format: .number.rounded(increment: 0.01))
-                            .opacity(0.6)
-                            .font(.exampleParameterValue)
-                    }
-                    .animation(nil, value: parameters.slant)
+                FontParameterSlider(value: $parameters.width)
+            }
+            
+            VStack(spacing: 5) {
+                HStack {
+                    Text("Slant")
+                        .font(.exampleParameterTitle)
                     
-                    FontParameterSlider(value: $parameters.slant)
+                    Spacer()
+                    
+                    Text(parameters.slant, format: .number.rounded(increment: 0.01))
+                        .opacity(0.6)
+                        .font(.exampleParameterValue)
                 }
-                .exampleParameterCell()
+                .animation(nil, value: parameters.slant)
+                
+                FontParameterSlider(value: $parameters.slant)
+            }
 
-                VStack(spacing: 5) {
-                    HStack {
-                        Text("Weight")
-                            .font(.exampleParameterTitle)
-                        
-                        Text(Font.Weight(closestToValue: parameters.weight).value, format: .number)
-                            .font(.exampleParameterValue)
-                        
-                        Spacer()
-                        
-                        Text(verbatim: "\(Font.Weight(closestToValue: parameters.weight))")
-                            .opacity(0.6)
-                    }
-                    .animation(nil, value: parameters.weight)
+            VStack(spacing: 5) {
+                HStack {
+                    Text("Weight")
+                        .font(.exampleParameterTitle)
                     
-                    FontParameterSlider(value: $parameters.weight)
+                    Text(Font.Weight(closestToValue: parameters.weight).value, format: .number)
+                        .font(.exampleParameterValue)
+                    
+                    Spacer()
+                    
+                    Text(verbatim: "\(Font.Weight(closestToValue: parameters.weight))")
+                        .opacity(0.6)
                 }
-                .exampleParameterCell()
+                .animation(nil, value: parameters.weight)
+                
+                FontParameterSlider(value: $parameters.weight)
             }
         }
     }
@@ -313,7 +233,7 @@ public struct FontExamples: View {
                         .textFieldStyle(.plain)
                         .transition(.scale(0.5) + .opacity)
                 case .paragraph:
-                    Text("The quick brown fox jumps over the lazy dog, scaring the Cup to run away with the Spoon and get Hepatitis TEA.")
+                    Text("The quick brown fox jumps over the lazy dog.")
                         .multilineTextAlignment(.center)
                         .resolveFont()
                         .padding(.horizontal)
@@ -330,7 +250,10 @@ public struct FontExamples: View {
                     Spacer(minLength: 10)
                     
                     HStack {
-                        SegmentedPicker(selection: $mode.animation(.smooth), items: Mode.allCases){ m in
+                        SegmentedPicker(
+                            selection: $mode.animation(.smooth),
+                            items: Mode.allCases
+                        ){ m in
                             switch m {
                             case .chars: Image(systemName: "abc")
                             case .text: Image(systemName: "character.cursor.ibeam")
@@ -340,8 +263,8 @@ public struct FontExamples: View {
                         .controlRoundness(1)
                         .frame(width: 140)
                         
-                        Button("Reset", systemImage: "arrow.clockwise"){
-                            parameters = .identity
+                        Button{ parameters = .identity } label: {
+                            Label("Reset", systemImage: "arrow.clockwise")
                         }
                         .font(.title[.bold])
                         .labelStyle(.iconOnly)
@@ -382,7 +305,7 @@ public struct FontExamples: View {
             var body: some View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .firstTextBaseline) {
-                        Text(key.splitCamelCaseFormat)
+                        Text(LocalizedStringKey(key.splitCamelCaseFormat))
                             .font(.exampleParameterTitle)
                         
                         Spacer()
@@ -397,12 +320,11 @@ public struct FontExamples: View {
                     if value.count > 60 {
                         Text(value)
                             .opacity(0.5)
+                            .lineLimit(5)
+                            //.fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
         }
 
@@ -411,8 +333,6 @@ public struct FontExamples: View {
                 Info(info: resolved.info)
             }
            
-            Divider()
-            
             ExampleSection("Metrics", isExpanded: false) {
                 Metrics(metrics: resolved.metrics)
             }

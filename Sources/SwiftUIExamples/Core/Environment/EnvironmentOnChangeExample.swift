@@ -38,9 +38,11 @@ public struct EnvironmentOnChangeExample : View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .padding()
-                        .transitions(.scale(0.8), .opacity)
-                        
-                        Divider()
+                        .overlay(alignment: .bottom) {
+                            Divider()
+                                .ignoresSafeArea()
+                        }
+                        .transition(.scale(0.8) + .opacity)
                     }
                 }
                 .animation(.smooth, value: filterdValues.indices)
@@ -55,6 +57,7 @@ public struct EnvironmentOnChangeExample : View {
                         let key = String(keyValue[0])
                             .trimmingCharacters(in: .whitespacesAndNewlines)
                             .replacingOccurrences(of: "EnvironmentPropertyKey", with: "")
+                            .replacingOccurrences(of:"__Key_", with: "")
                         
                         let value = String(keyValue[1]).trimmingCharacters(in: .whitespaces)
                         parsed.append(Pair(key: key, value: value))
@@ -66,24 +69,27 @@ public struct EnvironmentOnChangeExample : View {
             .environment(\.layoutDirection, layout)
             .environment(\.reduceMotion, reduceMotion)
         } parameters: {
-            TextField("Filter Keys", text: $filter){
-                Image(systemName: "magnifyingglass")
-                    .allowsHitTesting(false)
-                    .font(.exampleParameterValue)
+            ExampleSection(isExpanded: true) {
+                TextField("Filter Keys", text: $filter){
+                    Image(systemName: "magnifyingglass")
+                        .allowsHitTesting(false)
+                        .font(.exampleParameterValue)
+                }
+                .textFieldStyle(.plain)
+                .font(.exampleParameterTitle)
+                .controlSize(.large)
+                
+                Toggle(isOn: $reduceMotion) {
+                    Text("Reduce Motion")
+                }
+                
+                HStack {
+                    ExampleCell.LayoutDirection(value: $layout)
+                    ExampleCell.ColorScheme(value: $colorScheme)
+                }
+            } label: {
+                Text("Parameters")
             }
-            .textFieldStyle(.plain)
-            .font(.exampleParameterTitle)
-            .exampleParameterCell()
-            
-            ExampleCell.ColorScheme(value: $colorScheme)
-            
-            Toggle(isOn: $reduceMotion) {
-                Text("Reduce Motion")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.LayoutDirection(value: $layout)
         }
     }
     

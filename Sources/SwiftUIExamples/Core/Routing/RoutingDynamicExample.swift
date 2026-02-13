@@ -22,7 +22,9 @@ public struct RoutingDynamicExample: View {
             Reciever()
                 .presentationContext()
         } parameters: {
-            Sender()
+            ExampleSection("Parameters", isExpanded: true){
+                Sender()
+            }
         }
         .router()
     }
@@ -237,14 +239,8 @@ public struct RoutingDynamicExample: View {
         
         
         var body: some View {
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    RouteComposer(tab: $tab, elements: $elements)
-                    
-                    Capsule()
-                        .frame(width: 3, height: 32)
-                        .opacity(0.5)
-                    
+            RouteComposer(tab: $tab, elements: $elements)
+                .safeAreaInset(edge: .trailing, spacing: 10){
                     Button{
                         let path = ([tab.description] + elements.map(\.style.rawValue)).joined(separator: "/")
                         open(.example(path))
@@ -252,16 +248,21 @@ public struct RoutingDynamicExample: View {
                         Label{ Text("Run") } icon: {
                             Image(systemName: "play")
                         }
-                        .padding()
+                    }
+                    .background {
+                        LinearGradient(
+                            colors: [
+                                .clear, .black.opacity(0.9),
+                                .black.opacity(0.7), .black
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     }
                 }
-                .font(.title2[.semibold])
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .labelStyle(.iconOnly)
-                .symbolRenderingMode(.hierarchical)
-                .symbolVariant(.fill)
-            }
+            .labelStyle(.iconOnly)
+            .symbolRenderingMode(.hierarchical)
+            .symbolVariant(.fill)
         }
         
         

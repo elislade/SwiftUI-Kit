@@ -18,16 +18,21 @@ public struct TextField<Leading: View>: View {
     @Environment(\.font) private var font
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
-    @FocusState private var focusState
     @Environment(\.controlSize) private var controlSize: ControlSize
     @Environment(\.controlRoundness) private var controlRoundness
     @Environment(\.interactionGranularity) private var interactionGranularity
+    @FocusState private var focusState: UUID?
     
+    @State private var focusID = UUID()
     private let placeholder: LocalizedStringKey
     private let leading: Leading
     
     @Binding var text: String
     private let clearButtonVisibility: TextFieldElementVisibility
+    
+    private var isFocused: Bool {
+        focusState == focusID
+    }
     
     public init(
         _ titleKey: LocalizedStringKey,
@@ -49,8 +54,8 @@ public struct TextField<Leading: View>: View {
         switch clearButtonVisibility {
         case .never: false
         case .always: !text.isEmpty
-        case .whileEditing: focusState == true && !text.isEmpty
-        case .whileNotEditing: focusState == false && !text.isEmpty
+        case .whileEditing: isFocused && !text.isEmpty
+        case .whileNotEditing: !isFocused && !text.isEmpty
         }
     }
     
@@ -80,7 +85,7 @@ public struct TextField<Leading: View>: View {
     public var body: some View {
         SwiftUI.TextField("", text: $text)
             .textFieldStyle(.plain)
-            .focused($focusState)
+            .focused($focusState, equals: focusID)
             .overlay(alignment: .leading){
                 Text(placeholder)
                     .allowsHitTesting(false)
@@ -118,18 +123,18 @@ public struct TextField<Leading: View>: View {
             .padding(.leading, radius / 4)
             .padding(.leading, showLeading ? 0 : padding)
             .frame(height: height)
-            .foregroundColor(focusState ? .black : colorScheme == .dark ? .white : .black)
+            .foregroundColor(isFocused ? .black : colorScheme == .dark ? .white : .black)
             .background{
-                SunkenControlMaterial(RoundedRectangle(cornerRadius: radius), isTinted: focusState)
+                SunkenControlMaterial(RoundedRectangle(cornerRadius: radius), isTinted: isFocused)
                 RaisedControlMaterial(
-                    RoundedRectangle(cornerRadius: radius).inset(by: focusState ? 2 : 0),
+                    RoundedRectangle(cornerRadius: radius).inset(by: isFocused ? 2 : 0),
                     isPressed: true
                 )
-                .opacity(focusState ? 1 : 0)
+                .opacity(isFocused ? 1 : 0)
             }
             .contentShape(RoundedRectangle(cornerRadius: radius))
             #if !os(tvOS)
-            .onTapGesture { focusState = true }
+            .onTapGesture { focusState = focusID }
             #endif
             .opacity(isEnabled ? 1 : 0.5)
             .animation(.fastSpringInterpolating, value: focusState)

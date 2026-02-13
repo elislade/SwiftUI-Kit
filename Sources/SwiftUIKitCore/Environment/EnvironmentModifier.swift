@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-public struct EnvironmentModifierWrap <Modifier: ViewModifier> {
+public struct EnvironmentModifierWrap<Modifier: ViewModifier> {
     
     private let closure: (EnvironmentValues) -> Modifier
     

@@ -11,24 +11,14 @@ struct ExampleCell {
         @Binding var value: Direction
         
         var body: some View {
-            HStack {
+            ExampleInlinePicker(
+                data: [.leftToRight, .rightToLeft],
+                selection: $value.animation(.smooth),
+                content: Label.init
+            ){
                 Text("Layout Direction")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                
-                SegmentedPicker(
-                    selection: $value.animation(.smooth),
-                    items: [.leftToRight, .rightToLeft]
-                ){
-                    Label($0)
-                }
-                .labelStyle(.iconOnly)
-                .frame(width: 90)
-                .fontWeight(.bold)
             }
-            .exampleParameterCell()
+            .labelStyle(.iconOnly)
         }
         
         struct Label: View {
@@ -60,19 +50,31 @@ struct ExampleCell {
         @Binding var value: Suggestion
         
         var body: some View {
-            HStack {
+            ExampleMenuPicker(
+                data: [.useSystemDefault, .useTopToBottom, .useBottomToTop],
+                selection: $value
+            ){
+                _Label($0)
+            } label: {
                 Text("Layout Suggestion")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $value){
-                    Text("Use System").tag(Suggestion.useSystemDefault)
-                    Text("Top to Bottom").tag(Suggestion.useTopToBottom)
-                    Text("Bottom to Top").tag(Suggestion.useBottomToTop)
+            }
+        }
+        
+        struct _Label: View {
+            
+            let suggestion: Suggestion
+            
+            init(_ suggestion: Suggestion) {
+                self.suggestion = suggestion
+            }
+            
+            var body: some View {
+                switch suggestion {
+                case .useSystemDefault: Text("Use System")
+                case .useTopToBottom: Text("Top to Bottom")
+                case .useBottomToTop: Text("Bottom to Top")
                 }
             }
-            .exampleParameterCell()
         }
     }
     
@@ -84,26 +86,22 @@ struct ExampleCell {
         @Binding var value: Scheme
         
         var body: some View {
-            HStack {
-                Text("Color Scheme")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(
-                    selection: $value.animation(.smooth),
-                    items: Scheme.allCases
-                ){
-                    switch $0 {
-                    case .light: Text("Light")
-                    case .dark: Text("Dark")
-                    @unknown default: EmptyView()
+            ExampleInlinePicker(
+                data: Scheme.allCases,
+                selection: $value.animation(.smooth),
+                content: { v in
+                    Group {
+                        switch v {
+                        case .light: Label("Light", systemImage: "sun.max")
+                        case .dark: Label("Dark", systemImage: "moon.stars.fill")
+                        @unknown default: EmptyView()
+                        }
                     }
                 }
-                .frame(width: 120)
-                .controlRoundness(1)
+            ){
+                Text("Color Scheme")
             }
-            .exampleParameterCell()
+            .labelStyle(.iconOnly)
         }
     }
     
@@ -115,19 +113,11 @@ struct ExampleCell {
         @Binding var value: Size
         
         var body: some View {
-            HStack {
+            ExampleMenuPicker(data: Size.allCases, selection: $value){ value in
+                Text("\(value)".splitCamelCaseFormat)
+            } label: {
                 Text("Control Size")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $value){
-                    ForEach(Size.allCases, id: \.self){
-                        Text("\($0)".splitCamelCaseFormat).tag($0)
-                    }
-                }
             }
-            .exampleParameterCell()
         }
     }
     
@@ -137,20 +127,15 @@ struct ExampleCell {
         @Binding var value: Double
         
         var body: some View {
-            VStack {
-                HStack {
-                    Text("Control Roundness")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(value, format: .increment(0.1))
-                        .font(.exampleParameterValue)
+            ExampleSlider(value: .init($value)){
+                Label { Text("Roundness") } icon: {
+                    PercentageRoundedRectangle(.vertical, percentage: value)
+                        //.trim(from: 0.25, to: 0.75)
+                        .strokeBorder(lineWidth: 3)
+                        .aspectRatio(1, contentMode: .fit)
+                        .frame(height: 24)
                 }
-                
-                Slider(value: $value, in: 0...1)
             }
-            .exampleParameterCell()
         }
     }
     
@@ -167,23 +152,14 @@ struct ExampleCell {
             @Binding var value: HorizontalAlignment
             
             var body: some View {
-                HStack {
+                ExampleInlinePicker(
+                    data: Array(0...2),
+                    selection: $optionIndex.animation(.bouncy)
+                ){ i in
+                    Label(options[i])
+                } label: {
                     Text("Horizontal Alignment")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    SegmentedPicker(selection: $optionIndex.animation(.bouncy), items: Array(0...2)){ i in
-                        Label(options[i])
-                            .layoutDirectionMirror()
-                    }
-                    .frame(width: 120)
-                    .labelStyle(.iconOnly)
-                    .symbolVariant(.fill)
-                    .symbolRenderingMode(.hierarchical)
-                    .imageScale(.small)
                 }
-                .exampleParameterCell()
                 .onChangePolyfill(of: optionIndex){
                     value = options[optionIndex]
                 }
@@ -218,22 +194,14 @@ struct ExampleCell {
             @Binding var value: VerticalAlignment
             
             var body: some View {
-                HStack {
+                ExampleInlinePicker(
+                    data: Array(0...2),
+                    selection: $optionIndex.animation(.bouncy)
+                ){ i in
+                    Label(options[i])
+                } label: {
                     Text("Vertical Alignment")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    SegmentedPicker(selection: $optionIndex.animation(.bouncy), items: Array(0...2)){ i in
-                        Label(options[i])
-                    }
-                    .frame(width: 120)
-                    .labelStyle(.iconOnly)
-                    .symbolVariant(.fill)
-                    .symbolRenderingMode(.hierarchical)
-                    .imageScale(.small)
                 }
-                .exampleParameterCell()
                 .onChangePolyfill(of: optionIndex){
                     value = options[optionIndex]
                 }
@@ -260,8 +228,13 @@ struct ExampleCell {
         }
         
         var body: some View {
-            Horizontal(value: $value.horizontal)
-            Vertical(value: $value.vertical)
+            HStack {
+                Horizontal(value: $value.horizontal)
+                Vertical(value: $value.vertical)
+            }
+            .labelStyle(.iconOnly)
+            .symbolRenderingMode(.hierarchical)
+            .symbolVariant(.fill)
         }
         
     }
@@ -274,17 +247,32 @@ struct ExampleCell {
         @Binding var edge: Edge?
         
         var body: some View {
-            SegmentedPicker(selection: $edge, items: [Edge.leading, nil, Edge.trailing]){ edge in
+            ExampleInlinePicker(
+                data:[Edge.leading, nil, Edge.trailing],
+                selection: $edge,
+                content: _Label.init
+            )
+        }
+        
+        struct _Label : View {
+            
+            let edge: SwiftUI.HorizontalEdge?
+            
+            init(_ edge: SwiftUI.HorizontalEdge?) {
+                self.edge = edge
+            }
+            
+            var body: some View {
                 if let edge {
                    switch edge {
-                   case .leading: Text("Leading")
-                   case .trailing: Text("Trailing")
-                }
+                   case .leading: Label("Leading", systemImage: "inset.filled.leadinghalf.rectangle")
+                   case .trailing: Label("Trailing", systemImage: "inset.filled.trailinghalf.rectangle")
+                   }
                 } else {
-                    Text("None")
+                    Label("None", systemImage: "rectangle.slash")
                 }
             }
-            .font(.caption)
+            
         }
     }
     
@@ -294,22 +282,62 @@ struct ExampleCell {
         @Binding var axis: SwiftUI.Axis
         
         var body: some View {
-            HStack {
-                Text("Axis")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(selection: $axis, items: [.horizontal, .vertical]){ axis in
-                    switch axis {
-                    case .horizontal: Label("Horizontal", systemImage: "arrow.left.and.right")
-                    case .vertical: Label("Vertical", systemImage: "arrow.up.and.down")
-                    }
+            ExampleInlinePicker(data:  [.horizontal, .vertical], selection: $axis){ axis in
+                switch axis {
+                case .horizontal: Label("Horizontal", systemImage: "arrow.left.and.right")
+                case .vertical: Label("Vertical", systemImage: "arrow.up.and.down")
                 }
-                .font(.caption)
-                .labelStyle(.iconOnly)
-                .frame(width: 100)
             }
+        }
+    }
+    
+    struct Anchor: View {
+        
+        @Binding var anchor: UnitPoint
+        
+        var body: some View {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Text("Anchor")
+                        .font(.exampleParameterTitle)
+                    
+                    Spacer()
+                    
+                    VStack(spacing: 5) {
+                        LabeledContent{
+                            Text(anchor.x, format: .increment(0.01))
+                        } label: {
+                            Text("X Axis")
+                                .fontWeight(.bold)
+                                .opacity(0.7)
+                        }
+                        .padding(4).padding(.horizontal, 4)
+                        .background{
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(.black.opacity(0.2))
+                        }
+                        
+                        LabeledContent{
+                            Text(anchor.y, format: .increment(0.01))
+                        } label: {
+                            Text("Y Axis")
+                                .fontWeight(.bold)
+                                .opacity(0.7)
+                        }
+                        .padding(4).padding(.horizontal, 4)
+                        .background{
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(.black.opacity(0.2))
+                        }
+                    }
+                    .font(.exampleParameterValue)
+                    .padding(5)
+                }
+
+                ExampleControl.Anchor(value: $anchor)
+                    .frame(width: 130, height: 130)
+            }
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
     
@@ -319,7 +347,8 @@ struct ExampleCell {
 extension View {
     
     func exampleParameterCell() -> some View {
-        padding(.cellPadding)
+        containerShape(RoundedRectangle(cornerRadius: 25))
+            .padding(.cellPadding)
             .toggleStyle(.swiftUIKitSwitch)
             .labeledContentStyle(.exampleCell)
             .fixedSize(horizontal: false, vertical: true)
@@ -335,7 +364,7 @@ extension View {
 
 extension EdgeInsets {
     
-    static let cellPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+    static let cellPadding = EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
 }
 
 

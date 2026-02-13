@@ -8,7 +8,7 @@ public struct StickyExample: View  {
     @State private var stickyItems: [Int] = [3, 5]
     @State private var axis: Axis? = .vertical
     @State private var grouping: StickyGrouping = .stacked
-    @State private var inset: CGFloat = 0
+    @State private var inset: Double = 0
     
     public init(){}
     
@@ -25,48 +25,37 @@ public struct StickyExample: View  {
                     .stickyGrouping(grouping)
             }
         } parameters: {
-            HStack {
-                Text("Axis")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $axis){
-                    Text("Both").tag(Optional<Axis>(nil))
-                    Text("Horizontal").tag(Optional<Axis>(.horizontal))
-                    Text("Vertical").tag(Optional<Axis>(.vertical))
-                }
-            }
-            .exampleParameterCell()
-            
-            HStack {
-                Text("Grouping")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $grouping){
-                    ForEach(StickyGrouping.allCases, id: \.self){
-                        Text("\($0)".capitalized).tag($0)
+            ExampleSection(isExpanded: true){
+                ExampleControlGroup {
+                    ExampleMenuPicker(
+                        data: [nil, Axis.horizontal, .vertical],
+                        selection: $axis
+                    ){ axis in
+                        if let axis {
+                            Text("\(axis)".capitalized)
+                        } else {
+                            Text("Both")
+                        }
+                    } label: {
+                        Text("Axis")
+                    }
+                    
+                    ExampleMenuPicker(
+                        data: StickyGrouping.allCases,
+                        selection: $grouping
+                    ){
+                        Text("\($0)".capitalized)
+                    } label: {
+                        Text("Grouping")
                     }
                 }
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Edge Inset")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(inset, format: .number.rounded(increment: 0.1))
-                        .font(.exampleParameterValue)
-                }
                 
-                Slider(value: $inset, in: 0...20)
+                ExampleSlider(value: .init($inset, in: 0...20)){
+                    Text("Edge Inset")
+                }
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
         }
     }
     
@@ -84,7 +73,7 @@ public struct StickyExample: View  {
                 Spacer(minLength: 0)
                 if isSticky {
                     Text("🍯")
-                        .transitions(.scale, .opacity)
+                        .transition(.scale + .opacity)
                 }
             }
             .padding()
@@ -93,6 +82,7 @@ public struct StickyExample: View  {
                 if isSticky {
                     Rectangle()
                         .fill(.background)
+                        .ignoresSafeArea()
                         .opacity(isSticking ? 1 : 0)
                 }
             }
@@ -186,6 +176,10 @@ public struct StickyExample: View  {
                             }
                             .buttonStyle(.tinted)
                             .id(i)
+                            .overlay(alignment: .bottom) {
+                                Divider()
+                                    .ignoresSafeArea()
+                            }
                             .sticky(edges: stickyItems.contains(i) ? .init(axis) : [], inset: inset){ state in
                                 if state.isSticking {
                                     self.isSticking.insert(i)
@@ -193,8 +187,6 @@ public struct StickyExample: View  {
                                     self.isSticking.remove(i)
                                 }
                             }
-                            
-                            Divider()
                         }
                     }
                 }

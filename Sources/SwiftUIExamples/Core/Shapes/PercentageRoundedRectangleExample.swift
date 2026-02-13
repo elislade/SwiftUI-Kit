@@ -11,48 +11,30 @@ struct PercentageRoundedRectangleExample: View {
     
     var body: some View {
         ExampleView(title: "Percentage Rounded Rectangle"){
-            PercentageRoundedRectangle(axis, percentage: percentage)
-                .fill(.tint)
-                .frame(
-                    maxWidth: axis == .horizontal ? size : nil,
-                    maxHeight: axis == .vertical ? size : nil
-                )
-                .animation(.smooth, value: size)
-                .animation(.smooth, value: axis)
-                .padding()
+            PercentageRoundedRectangle(
+                axis,
+                percentage: percentage
+            )
+            .fill(.tint)
+            .frame(
+                maxWidth: axis == .horizontal ? size : nil,
+                maxHeight: axis == .vertical ? size : nil
+            )
+            .animation(.smooth, value: size)
+            .animation(.smooth, value: axis)
+            .padding()
         } parameters: {
-            VStack {
-                HStack {
-                    Text("Size")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(size, format: .increment(0.01))
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $size, in: 20...700)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Percentage")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(percentage, format: .increment(0.01))
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $percentage)
-            }
-            .exampleParameterCell()
-            
             ExampleCell.Axis(axis: $axis.animation(.bouncy))
-                .exampleParameterCell()
+            
+            HStack {
+                ExampleSlider(value: .init($size, in: 20...700)){
+                    Text("Size")
+                }
+                
+                ExampleSlider(value: .init($percentage)){
+                    Label("Percentage", systemImage: "percent")
+                }
+            }
         }
     }
 }

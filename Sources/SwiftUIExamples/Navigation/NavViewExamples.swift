@@ -35,40 +35,29 @@ public struct NavViewExamples: View {
                 .presentationContext()
                 .environment(\.layoutDirection, layout)
             } parameters: {
-                Toggle(isOn: $useCustomTransition){
-                    Text("Use Custom Transition")
-                        .font(.exampleParameterTitle)
-                }
-                .exampleParameterCell()
-                
-                HStack {
-                    Text("Bar Mode")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Picker(selection: $barMode){
-                        ForEach(NavViewBarMode.allCases, id: \.self){ mode in
-                           BarModeLabel(mode)
-                                .tag(mode)
+                ExampleSection(isExpanded: true){
+                    HStack {
+                        Toggle(isOn: $useCustomTransition){
+                            Text("Custom Transition")
                         }
-                    } label: {
-                        EmptyView()
+                        
+                        Button{ reset() } label: {
+                            Label("Reset", systemImage: "arrow.clockwise")
+                        }
                     }
-                }
-                .exampleParameterCell()
-                
-                HStack {
-                    Text("Reset Action")
-                        .font(.exampleParameterTitle)
                     
-                    Spacer()
+                    ExampleMenuPicker(
+                        data: NavViewBarMode.allCases,
+                        selection: $barMode,
+                        content: BarModeLabel.init
+                    ){
+                        Text("Bar Mode")
+                    }
                     
-                    Button("Trigger"){ reset() }
+                    ExampleCell.LayoutDirection(value: $layout)
+                } label: {
+                    Text("Parameters")
                 }
-                .exampleParameterCell()
-                
-                ExampleCell.LayoutDirection(value: $layout)
             }
         }
         

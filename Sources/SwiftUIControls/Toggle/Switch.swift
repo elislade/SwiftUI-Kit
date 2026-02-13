@@ -2,16 +2,7 @@ import SwiftUI
 import SwiftUIKitCore
 
 
-/// An improved version of `SwiftUI.Toggle`.
-///
-/// Benifit of using this explicit Switch over the default switchStyle of Toggle are as follows:
-/// - Properly animated values with the current `Transaction` animation. Base `UIKit` bridge does not participate in the `Transaction` animation properly.
-/// - Works inside a `DrawingGroup` as it does not bridge to `UIKit` or `AppKit`.
-/// - Works with `ControlSize` of environment on all platforms.
-/// - Support for ``EnvironmentValues/isOnOffSwitchLabelsEnabled`` EnvironmentValue.
-/// - Support for ``EnvironmentValues/controlRadius-property`` modifer.
-/// - Support for ``LayoutDirectionSuggestion`` with vertical layouts.
-/// - Ability to add custom on/off labels.
+/// An explicit type of Toggle for Switch Behaviour.
 public struct Switch<OnLabel: View, OffLabel: View>: View {
     
     @Environment(\.interactionGranularity) private var interactionGranularity

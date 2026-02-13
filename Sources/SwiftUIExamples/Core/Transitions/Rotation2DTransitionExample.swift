@@ -16,55 +16,25 @@ public struct Rotation2DTransitionExample: View {
         
         var update: (_ normal: AnyTransition, _ inverse: AnyTransition?) -> Void = { _, _ in }
         
-        @State private var rot: Double = .zero
+        @State private var rot = Measurement(value: 0, unit: UnitAngle.degrees)
         @State private var anchor = UnitPoint.center
         
         private var transition: AnyTransition {
-            .rotation(angle: .degrees(rot), anchor: anchor)
+            .rotation(angle: .degrees(rot.value), anchor: anchor)
         }
         
         var body: some View {
-            VStack {
-                HStack {
-                    Text("Degrees")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(
-                        Measurement<UnitAngle>(value: rot, unit: .degrees),
-                        format: .measurement(width: .abbreviated)
-                    )
-                    .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $rot, in : -360...360, step: 1)
+            ExampleSlider(
+                value: $rot, in: -360...360, step: 1,
+                format: .parse(.degrees)
+            ){
+                Text("Degrees")
             }
-            .exampleParameterCell()
             .onChangePolyfill(of: rot){ update(transition, nil) }
             .onAppear { update(transition, nil) }
             
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Text("Anchor").font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Group {
-                        Text("X: ") + Text(anchor.x, format: .increment(0.01))
-                        Text("Y: ") + Text(anchor.y, format: .increment(0.01))
-                    }
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-                
-                ExampleControl.Anchor(value: $anchor)
-                    .frame(width: 120, height: 120)
-            }
-            .exampleParameterCell()
-            .onChangePolyfill(of: anchor){ update(transition, nil) }
+            ExampleCell.Anchor(anchor: $anchor)
+                .onChangePolyfill(of: anchor){ update(transition, nil) }
         }
     }
     

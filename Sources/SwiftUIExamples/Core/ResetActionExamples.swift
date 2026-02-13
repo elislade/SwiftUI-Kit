@@ -25,9 +25,12 @@ struct ResetActionExamples: View {
                     ChildView()
                 }
                 .padding()
+                .frame(maxWidth: 700)
             } parameters: {
-                Button("Reset"){ reset() }
-                    .padding()
+                Button{ reset() } label: {
+                    Label("Reset", systemImage: "arrow.clockwise")
+                        .frame(maxWidth: .infinity)
+                }
             }
         }
         

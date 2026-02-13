@@ -4,7 +4,7 @@ import SwiftUIKit
 struct ReadableScrollViewExample : View {
     
     @Environment(\.reset) private var reset
-    @State private var size: CGFloat = 1000
+    @State private var size: Double = 1000
     @State private var offset = CGPoint()
     @State private var axis: Axis.Set = [.vertical]
     
@@ -65,42 +65,21 @@ struct ReadableScrollViewExample : View {
             }
         } parameters: {
             Toggle(isOn: Binding($axis, contains: .horizontal)){
-                Text("Horizontal Axis")
-                    .font(.exampleParameterTitle)
+                Label("Horizontal Axis", systemImage: "arrow.left.and.right")
             }
-            .exampleParameterCell()
             
             Toggle(isOn: Binding($axis, contains: .vertical)){
-                Text("Vertical Axis")
-                    .font(.exampleParameterTitle)
+                Label("Vertical Axis", systemImage: "arrow.up.and.down")
             }
-            .exampleParameterCell()
             
-            HStack {
-                Text("Reset Action")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Button("Trigger", action: { reset() })
-                    //.disabled(resetAction == nil)
+            Button{ reset() } label: {
+                Label("Reset", systemImage: "arrow.clockwise")
+                    .frame(maxWidth: .infinity)
             }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack{
-                    Text("Size")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(size, format: .number)
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $size, in: 300...1300, step: 10)
+
+            ExampleSlider(value: .init($size, in: 300...1300, step: 10)){
+                Label("Size", systemImage: "ruler.fill")
             }
-            .exampleParameterCell()
         }
     }
     

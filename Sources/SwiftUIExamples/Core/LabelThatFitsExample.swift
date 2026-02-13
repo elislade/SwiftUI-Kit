@@ -49,42 +49,26 @@ public struct LabelThatFitsExample: View {
                 prefersTitle ? .viewThatFits(preferring: \.title) : .viewThatFits(preferring: \.icon)
             )
         } parameters: {
-            VStack {
-                LabeledContent {
-                    Group {
-                        Text(width.value, format: .increment(1)) +
-                        Text(" , ") +
-                        Text(height.value, format: .increment(1))
-                    }
-                    .font(.exampleParameterValue)
-                } label: {
-                    Text("Size")
-                        .font(.exampleParameterTitle)
-                }
-
-                HStack {
-                    Slider($width)
-                    Slider($height)
-                }
-            }
-            .exampleParameterCell()
-            
             HStack {
-                Text("Prefers")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(selection: $prefersTitle.animation(.smooth), items: [true, false]){
-                    Text($0 ? "Title" : "Icon")
+                ExampleSlider(value: $width){
+                    Label("Width", systemImage: "arrow.left.and.right")
                 }
-                .frame(width: 130)
-                .controlRoundness(1)
+                
+                ExampleSlider(value: $height){
+                    Label("Height", systemImage: "arrow.up.and.down")
+                }
             }
-            .exampleParameterCell()
+            
+            ExampleInlinePicker(
+                data: [true, false],
+                selection: $prefersTitle.animation(.smooth)
+            ){
+                Text($0 ? "Title" : "Icon")
+            } label: {
+                Text("Prefers")
+            }
             
             ExampleCell.LayoutDirectionSuggestion(value: $suggestion)
-            
         }
     }
     

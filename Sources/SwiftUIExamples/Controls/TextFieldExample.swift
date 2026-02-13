@@ -9,6 +9,8 @@ public struct TextFieldExample: View {
     @State private var roundness = 0.5
     @State private var text = ""
     @State private var showLeading = false
+    @State private var direction = LayoutDirection.leftToRight
+    @State private var disabled = false
     @State private var clearVisibility: TextFieldElementVisibility = .whileEditing
     
     public init() {}
@@ -40,37 +42,45 @@ public struct TextFieldExample: View {
             .controlSize(size)
             .controlRoundness(roundness)
             .focused($focusState)
+            .environment(\.layoutDirection, direction)
+            .disabled(disabled)
         } parameters: {
-            HStack{
-                Text("Clear Visibility")
-                    .font(.exampleParameterTitle)
+            ExampleSection(isExpanded: true){
+                HStack {
+                    Toggle(isOn: $disabled){
+                        Text("Disabled")
+                    }
+                    
+                    ExampleCell.ControlRoundness(value: $roundness)
+                }
                 
-                Spacer()
-                
-                Picker("", selection: $clearVisibility){
-                    ForEach(TextFieldElementVisibility.allCases){
-                        Text("\($0)".splitCamelCaseFormat).tag($0)
+                HStack {
+                    Toggle(isOn: $isFocused){
+                        Text("Focus")
+                    }
+                    .syncValue(_isFocused, _focusState)
+                    
+                    Toggle(isOn: $showLeading){
+                        Text("Show Leading")
                     }
                 }
+                
+                HStack {
+                    ExampleCell.ControlSize(value: $size)
+                    ExampleMenuPicker(
+                        data: TextFieldElementVisibility.allCases,
+                        selection: $clearVisibility
+                    ){
+                        Text("\($0)".splitCamelCaseFormat)
+                    } label: {
+                        Text("Clear Visibility")
+                    }
+                }
+                
+                ExampleCell.LayoutDirection(value: $direction)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-            
-            Toggle(isOn: $isFocused){
-                Text("Focus")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            .syncValue(_isFocused, _focusState)
-
-            Toggle(isOn: $showLeading){
-                Text("Show Leading")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.ControlRoundness(value: $roundness)
-            
-            ExampleCell.ControlSize(value: $size)
         }
     }
     

@@ -102,40 +102,30 @@ public struct KeyPressExample: View {
                 }
             }
         } parameters: {
-            ExampleSection("Phases", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 Toggle(isOn: Binding($phase, contains: .up)) {
-                    Text("Up").font(.exampleParameterTitle)
+                    Text("Up")
                 }
-                .exampleParameterCell()
                 
                 Toggle(isOn: Binding($phase, contains: .down)) {
-                    Text("Down").font(.exampleParameterTitle)
+                    Text("Down")
                 }
-                .exampleParameterCell()
                 
                 Toggle(isOn: Binding($phase, contains: .repeat)) {
-                    Text("Repeat").font(.exampleParameterTitle)
+                    Text("Repeat")
                 }
-                .exampleParameterCell()
+            } label: {
+                Text("Phases")
             }
             
-            ExampleSection("Input Mask", isExpanded: true){
-                HStack {
-                    Text("Type").font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Menu {
-                        MenuPicker(selection: $mask, data: MaskType.allCases){ mask in
-                            MaskTypeLabel(mask)
-                        }
-                    } label: {
-                        MaskTypeLabel(mask)
-                            .foregroundStyle(.tint)
-                            .menuIndicatorStyle()
-                    }
+            ExampleSection(isExpanded: true){
+                ExampleMenuPicker(
+                    data: MaskType.allCases,
+                    selection: $mask,
+                    content: MaskTypeLabel.init
+                ){
+                    Text("Type")
                 }
-                .exampleParameterCell()
                 
                 VStack(spacing: 4) {
                     switch mask {
@@ -149,6 +139,8 @@ public struct KeyPressExample: View {
                 }
                 .labelStyle(MaskCellLabelStyle())
                 .equalSizeContext{ $0.width > $1.width }
+            } label: {
+                Text("Input Mask")
             }
             .symbolRenderingMode(.hierarchical)
         }

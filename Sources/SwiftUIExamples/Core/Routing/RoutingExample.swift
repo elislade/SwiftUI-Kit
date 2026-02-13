@@ -54,50 +54,46 @@ public struct RoutingExample: View {
             .font(.largeTitle.weight(.bold))
             .padding()
         } parameters: {
-            HStack {
-                Text("Links")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                VStack(spacing: 10) {
-                    Link("Root", destination: .example("/"))
-                    HStack(spacing: 16) {
-                        VStack(spacing: 10) {
-                            Link("A", destination: .example("/a"))
-                            HStack(spacing: 16) {
-                                Link("1", destination: .example("/a/1"))
-                                Link("2", destination: .example("/a/2"))
-                            }
-                        }
-                        
-                        VStack(spacing: 10) {
-                            Link("B", destination: .example("/b"))
-                            HStack(spacing: 16) {
-                                Link("1", destination: .example("/b/1"))
-                                Link("2", destination: .example("/b/2"))
-                            }
-                        }
-                    }
-                }
-                .disabled(deferred)
-            }
-            .buttonStyle(.tinted)
-            .exampleParameterCell()
-            
-            Toggle(isOn: $deferred){
-                HStack {
-                    Text("Defer Links")
+            ExampleSection("Parameters", isExpanded: true){
+                HStack(alignment: .top) {
+                    Text("Links")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
+                    
+                    VStack(spacing: 10) {
+                        Link("Root", destination: .example("/"))
+                        HStack(spacing: 16) {
+                            VStack(spacing: 10) {
+                                Link("A", destination: .example("/a"))
+                                HStack(spacing: 16) {
+                                    Link("1", destination: .example("/a/1"))
+                                    Link("2", destination: .example("/a/2"))
+                                }
+                            }
+                            
+                            VStack(spacing: 10) {
+                                Link("B", destination: .example("/b"))
+                                HStack(spacing: 16) {
+                                    Link("1", destination: .example("/b/1"))
+                                    Link("2", destination: .example("/b/2"))
+                                }
+                            }
+                        }
+                    }
+                    .disabled(deferred)
+                }
+                .buttonStyle(.tinted)
+                
+                HStack {
+                    Toggle(isOn: $deferred){
+                        Text("Defer Links")
+                    }
                     
                     Link("Trigger", destination: .example("deferred"))
                         .disabled(!deferred)
                 }
             }
-            .exampleParameterCell()
-            .toggleStyle(.swiftUIKitSwitch)
         }
         .router(shouldDeferUnhandled: deferred)
     }

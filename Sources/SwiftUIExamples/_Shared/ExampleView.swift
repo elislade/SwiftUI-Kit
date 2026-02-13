@@ -4,6 +4,7 @@ import SwiftUIKit
 struct ExampleView<Example: View, Parameters: View>: View {
     
     @State private var color: Color = .systemAllWithHue.randomElement()!
+    @State private var parameterSize: Double = 60
     
     let title: String
     @ViewBuilder let example: Example
@@ -12,16 +13,10 @@ struct ExampleView<Example: View, Parameters: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            //let maxHeight = (size.height / 1.8) - 75
-            let isLandscape = size.width > size.height * 1.2
             Color.black
                 .ignoresSafeArea()
                 .overlay {
-                    AxisStack(
-                        isLandscape ? .horizontal : .vertical,
-                        alignment: .topLeading,
-                        spacing:  isLandscape ? 10 : 0
-                    ) {
+                    VStack(spacing: 0){
                         Color.clear.contentShape(Rectangle()).overlay {
                             example
                         }
@@ -33,35 +28,64 @@ struct ExampleView<Example: View, Parameters: View>: View {
                                 .ignoresSafeArea()
                         }
                         .containerShape(RoundedRectangle(cornerRadius: 28))
-                        .zIndex(2)
-                    
-                        ViewThatFits(in: .vertical) {
-                            VStack(spacing: 0) {
-                                ExampleTitle(title)
-                                    .padding(.horizontal)
-                                    .padding(.vertical, 8)
-                                
-                                parameters
-                            }
-                            
-                            ScrollView {
-                                VStack(spacing: 0) {
-                                    ExampleTitle(title)
-                                        .padding(.horizontal)
-                                        .padding(.vertical, 8)
-                                    
-                                    parameters
+                 
+                        ScrollViewReader{ proxy in
+                            ScrollView{
+                                VStack(alignment: .leading) {
+                                    if size.width < 680 {
+                                        ExampleTitle(title)
+                                        
+                                        VStack(spacing: 16) {
+                                            parameters
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .environment(\.horizontalSizeClass, .compact)
+                                    } else {
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(alignment: .top, spacing: 0) {
+                                                ExampleTitle(title)
+                                                    .frame(minHeight: .controlSize)
+                                                    .sticky(edges: .top)
+                                                
+                                                Spacer(minLength: 22)
+                                                
+                                                HStack(alignment: .top, spacing: 22) {
+                                                    parameters
+                                                }
+                                                //.scrollTargetLayoutIfAvailable()
+                                                .padding(10)
+                                            }
+                                            .frame(minWidth: size.width)
+                                        }
+                                        //.scrollTargetViewAlignedIfAvailable()
+                                        .scrollClipDisabledIfAvailable()
+                                        .environment(\.horizontalSizeClass, .regular)
+                                    }
+                                }
+                                .toggleStyle(.example)
+                                .buttonStyle(.example)
+                                .onGeometryChangePolyfill(of: \.size.height){ size in
+                                    //withAnimation(.smooth.speed(1.6)){
+                                        parameterSize = size
+                                    //}
+                                }
+                                .environment(\.scrollTo){ id in
+                                    withAnimation(.smooth){
+                                        proxy.scrollTo(id, anchor: .topLeading)
+                                    }
                                 }
                             }
                         }
+                        .stickyContext()
+                        .frame(maxHeight: parameterSize)
+                        .stickyGrouping(size.width < 680 ? .displaced : .none)
+                        .symbolRenderingMode(.hierarchical)
                         .environment(\.colorScheme, .dark)
-                        .frame(
-                            maxWidth: isLandscape ? min(proxy.size.width / 2.5, 400) : nil
-                        )
                         .zIndex(1)
                 }
             }
         }
+        .animation(.smooth.speed(1.6), value: parameterSize)
         #if os(macOS)
         .containerShape(RoundedRectangle(cornerRadius: 16))
         #else
@@ -153,5 +177,12 @@ extension View {
         #endif
     }
 #endif
+    
+}
+
+
+extension EnvironmentValues {
+    
+    @Entry var scrollTo: (AnyHashable) -> Void = { _ in }
     
 }

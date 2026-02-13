@@ -49,19 +49,24 @@ public struct StepperExamples: View {
             .controlSize(controlSize)
             .controlRoundness(controlRoundness)
         } parameters: {
-            Toggle(isOn: $disable){
-                Text("Disable")
-                    .font(.exampleParameterTitle)
+            ExampleSection(isExpanded: true){
+                Toggle(isOn: $disable){
+                    Text("Disable")
+                }
+                
+                ExampleCell.ControlRoundness(value: $controlRoundness)
+                
+                HStack {
+                    ExampleCell.ControlSize(value: $controlSize)
+                        .fixedSize()
+                    
+                    ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
+                }
+                
+                ExampleCell.LayoutDirection(value: $direction)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-
-            ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
-            
-            ExampleCell.LayoutDirection(value: $direction)
-            
-            ExampleCell.ControlSize(value: $controlSize)
-
-            ExampleCell.ControlRoundness(value: $controlRoundness)
         }
     }
     

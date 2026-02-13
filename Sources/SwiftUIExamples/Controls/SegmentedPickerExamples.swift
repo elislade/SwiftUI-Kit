@@ -17,7 +17,7 @@ public struct SegmentedPickerExamples : View {
     }
     
     private func set(index: Int){
-        let i = index > options.count - 1 ? 0 : index
+        let i = index > options.count - 1 ? 0 : index < 0 ? options.count - 1  : index
         selection = options[i]
     }
     
@@ -60,38 +60,42 @@ public struct SegmentedPickerExamples : View {
             }
             .animation(.bouncy, value: suggetion)
             .controlRoundness(controlRoundness)
-            //.interactionGranularity(1)
             .controlSize(controlSize)
             .layoutDirectionSuggestion(suggetion)
             .environment(\.layoutDirection, layout)
             .disabled(disable)
             .padding()
         } parameters: {
-            HStack {
-                Text("Actions")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Button("Select Next"){
-                    set(index: selectionIndex + 1)
+            ExampleSection(isExpanded: true){
+                HStack {
+                    Toggle(isOn: $disable){
+                        Text("Disable")
+                    }
+                    
+                    Button{ set(index: selectionIndex - 1) } label: {
+                        Label("Previous", systemImage: "arrow.left")
+                            .labelStyle(.iconOnly)
+                    }
+                    
+                    Button{ set(index: selectionIndex + 1) } label: {
+                        Label("Next", systemImage: "arrow.right")
+                            .labelStyle(.iconOnly)
+                    }
                 }
+                
+                ExampleCell.ControlRoundness(value: $controlRoundness)
+                
+                HStack {
+                    ExampleCell.ControlSize(value: $controlSize)
+                        .fixedSize()
+                    
+                    ExampleCell.LayoutDirectionSuggestion(value: $suggetion)
+                }
+                
+                ExampleCell.LayoutDirection(value: $layout)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-          
-            Toggle(isOn: $disable){
-                Text("Disable")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.ControlRoundness(value: $controlRoundness)
-            
-            ExampleCell.ControlSize(value: $controlSize)
-            
-            ExampleCell.LayoutDirection(value: $layout)
-            
-            ExampleCell.LayoutDirectionSuggestion(value: $suggetion)
         }
     }
     

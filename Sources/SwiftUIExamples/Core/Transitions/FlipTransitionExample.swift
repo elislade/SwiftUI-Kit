@@ -43,38 +43,38 @@ public struct FlipTransitionExample: View {
         
         var body: some View {
             HStack {
-                Text("Horizontal")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $horizontal) {
-                    ForEach(HorizontalEdge.allCases, id: \.rawValue) { edge in
-                        Text("\(edge)".splitCamelCaseFormat).tag(edge)
+                ExampleMenuPicker(
+                    data: [nil] + HorizontalEdge.allCases,
+                    selection: $horizontal
+                ){ v in
+                    Group {
+                        if let v {
+                            Text("\(v)".splitCamelCaseFormat)
+                        } else {
+                            Text("None")
+                        }
                     }
-                    
-                    Text("None").tag(Optional<HorizontalEdge>(nil))
+                } label: {
+                    Text("Horizontal")
+                }
+                
+                ExampleMenuPicker(
+                    data: [nil] + VerticalEdge.allCases,
+                    selection: $vertical
+                ){ v in
+                    Group {
+                        if let v {
+                            Text("\(v)".splitCamelCaseFormat)
+                        } else {
+                            Text("None")
+                        }
+                    }
+                } label: {
+                    Text("Vertical")
                 }
             }
-            .exampleParameterCell()
             .onChangePolyfill(of: horizontal){ update(transition, transitionInverse) }
             .onAppear { update(transition, transitionInverse) }
-            
-            HStack {
-                Text("Vertical")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Picker("", selection: $vertical) {
-                    ForEach(VerticalEdge.allCases, id: \.rawValue) { edge in
-                        Text("\(edge)".splitCamelCaseFormat).tag(edge)
-                    }
-                    
-                    Text("None").tag(Optional<VerticalEdge>(nil))
-                }
-            }
-            .exampleParameterCell()
             .onChangePolyfill(of: vertical){ update(transition, transitionInverse) }
         }
         

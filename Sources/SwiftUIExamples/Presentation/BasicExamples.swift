@@ -49,10 +49,7 @@ public struct BasicExamples: View {
         } parameters: {
             Toggle(isOn: $isPresented){
                 Text("Is Presented")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
-            .animation(.fastSpring, value: isPresented)
 
             ExampleCell.Alignment(value: $alignment)
         }

@@ -30,10 +30,8 @@ public struct LayoutDirectionMirrorExample: View {
             }
         } parameters: {
             Toggle(isOn: $mirror){
-                Text("Is Mirror Enabled")
-                    .font(.exampleParameterTitle)
+                Text("Mirror Enabled")
             }
-            .exampleParameterCell()
         }
     }
     

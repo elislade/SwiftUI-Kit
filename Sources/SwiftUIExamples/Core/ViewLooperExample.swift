@@ -48,74 +48,34 @@ public struct ViewLooperExample: View {
             }
             .padding()
         } parameters: {
-            ExampleCell.Axis(axis: $axis.animation(.smooth))
-                .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Spacing")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(spacing, format: .increment(0.1))
-                        .font(.exampleParameterValue)
-                }
+            ExampleSection(isExpanded: true){
+                ExampleCell.Axis(axis: $axis.animation(.smooth))
                 
-                Slider(value: $spacing, in: 0...20)
-            }
-            .exampleParameterCell()
-            
-            VStack {
                 HStack {
-                    Text("Edge Fade")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(edgeFadeAmount, format: .increment(0.1))
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $edgeFadeAmount, in: 0...24)
-            }
-            .exampleParameterCell()
-            
-            ExampleSection("Animation", isExpanded: true){
-                VStack {
-                    HStack(spacing: 0) {
-                        Text("Speed")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer(minLength: 10)
-                        
-                        Text(speed, format: .increment(0.1))
-                            .font(.exampleParameterValue)
+                    ExampleSlider(value: .init($spacing, in: 0...20)){
+                        Text("Spacing")
                     }
                     
-                    Slider(value: $speed, in: 0...2)
+                    ExampleSlider(value: .init($edgeFadeAmount, in: 0...24)){
+                        Text("Edge Fade")
+                    }
                 }
-                .exampleParameterCell()
-                
-                VStack {
-                    HStack {
-                        Text("Delay")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(delay, format: .increment(0.1))
-                            .font(.exampleParameterValue)
-                        +
-                        
-                        Text(" Seconds")
-                            .font(.caption2)
-                            .foregroundColor(.primary.opacity(0.5))
+            } label: {
+                Text("Parameters")
+            }
+            
+            ExampleSection(isExpanded: true){
+                HStack {
+                    ExampleSlider(value: .init($speed, in: 0...2)){
+                        Label("Speed", systemImage: "hare.fill")
                     }
                     
-                    Slider(value: $delay, in: 0...10)
+                    ExampleSlider(value: .init($delay, in: 0...10)){
+                        Label("Delay", systemImage: "clock.fill")
+                    }
                 }
-                .exampleParameterCell()
+            } label: {
+                Text("Animation")
             }
         }
     }

@@ -82,85 +82,67 @@ public struct LineWrapLayoutExample: View {
             .animation(.smooth, value: index)
             .animation(.smooth, value: groupByWhitespace)
         } parameters: {
-            HStack{
-                Text("Content")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Group {
-                    Button("Previous", systemImage: "arrow.left"){
-                        if index == 0 {
-                            index = phrases.count - 1
-                        } else {
-                            index -= 1
-                        }
-                    }
-                    
-                    Button("Next", systemImage: "arrow.right"){
-                        if index == phrases.count - 1 {
-                            index = 0
-                        } else {
-                            index += 1
-                        }
-                    }
-                }
-                .buttonStyle(.tinted)
-                .font(.largeTitle)
-                .labelStyle(.iconOnly)
-                .symbolRenderingMode(.hierarchical)
-                .symbolVariant(.circle.fill)
-            }
-            .exampleParameterCell()
-         
-            Toggle(isOn: $showBorders){
-                Text("Show Borders")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-                
-            Toggle(isOn: $groupByWhitespace){
-                Text("Group By Whitespace")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-
-            VStack {
-                HStack {
-                    Text("Size")
+            ExampleSection(isExpanded: true){
+                HStack{
+                    Text("Content")
                         .font(.exampleParameterTitle)
                     
                     Spacer()
                     
-                    Text(size, format: .number.rounded(increment: 1))
-                        .font(.exampleParameterValue)
-                }
-                
-                Slider(value: $size, in: 6...160, step: 4)
-            }
-            .exampleParameterCell()
-            
-            HStack {
-                Text("Alignment")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                SegmentedPicker(selection: $alignment, items: TextAlignment.allCases){ a in
                     Group {
-                        switch a {
-                        case .leading: Image(systemName: "text.alignleft")
-                        case .center: Image(systemName: "text.aligncenter")
-                        case .trailing: Image(systemName: "text.alignright")
+                        Button{
+                            if index == 0 {
+                                index = phrases.count - 1
+                            } else {
+                                index -= 1
+                            }
+                        } label: {
+                            Label("Previous", systemImage: "arrow.left")
+                        }
+                        
+                        Button{
+                            if index == phrases.count - 1 {
+                                index = 0
+                            } else {
+                                index += 1
+                            }
+                        } label: {
+                            Label("Next", systemImage: "arrow.right")
                         }
                     }
-                    .font(.body[.heavy])
-                    .padding(4)
+                    .symbolVariant(.circle.fill)
                 }
-                .frame(width: 130)
-                .controlRoundness(1)
+                
+                Toggle(isOn: $showBorders){
+                    Text("Show Borders")
+                }
+                
+                Toggle(isOn: $groupByWhitespace){
+                    Text("Group By Whitespace")
+                }
+                
+                HStack {
+                    ExampleSlider(value: .init($size, in: 6...160, step: 4)){
+                        Text("Size")
+                    }
+                    
+                    ExampleInlinePicker(
+                        data: TextAlignment.allCases,
+                        selection: $alignment
+                    ){ value in
+                        Group {
+                            switch value {
+                            case .leading: Image(systemName: "text.alignleft")
+                            case .center: Image(systemName: "text.aligncenter")
+                            case .trailing: Image(systemName: "text.alignright")
+                            }
+                        }
+                    }
+                    .fixedSize()
+                }
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
         }
         .animation(.bouncy, value: alignment)
     }

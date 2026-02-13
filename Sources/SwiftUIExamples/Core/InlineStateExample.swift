@@ -20,17 +20,9 @@ public struct InlineStateExample: View {
                     .id(identity)
                 }
         } parameters: {
-            HStack {
-                Text("Actions")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Button("Change Identity"){
-                    identity.toggle()
-                }
+            Button{ identity.toggle() } label: {
+                Label("Change Identity", systemImage: "arrow.2.circlepath")
             }
-            .exampleParameterCell()
         }
     }
     

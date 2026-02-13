@@ -70,9 +70,7 @@ public struct MouseEventExamples: View {
         } parameters: {
             Toggle(isOn: $enabled){
                 Text("Enabled")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
         }
     }
     

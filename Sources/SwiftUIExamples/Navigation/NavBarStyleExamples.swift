@@ -53,10 +53,15 @@ public struct NavBarStyleExamples : View {
             .environment(\.controlRoundness, controlRondness)
             .preferredColorScheme(colorScheme)
         } parameters: {
-            ExampleCell.ControlRoundness(value: $controlRondness)
-            ExampleCell.ControlSize(value: $controlSize)
-            ExampleCell.LayoutDirection(value: $layoutDirection)
-            ExampleCell.ColorScheme(value: $colorScheme)
+            HStack {
+                ExampleCell.ControlRoundness(value: $controlRondness)
+                ExampleCell.ControlSize(value: $controlSize)
+            }
+            
+            HStack {
+                ExampleCell.LayoutDirection(value: $layoutDirection)
+                ExampleCell.ColorScheme(value: $colorScheme)
+            }
         }
     }
 }

@@ -11,7 +11,9 @@ public struct InlineEnvironmentValueExample: View {
                 ZStack {
                     Color.clear
                     
-                    Text("Display Scale ").foregroundColor(.gray) + Text(scale, format: .number)
+                    Text("Display Scale ")
+                        .foregroundColor(.gray)
+                    + Text(scale, format: .number)
                 }
                 .font(.title.bold())
             }

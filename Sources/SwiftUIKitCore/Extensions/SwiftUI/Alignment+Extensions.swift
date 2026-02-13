@@ -97,7 +97,22 @@ extension UnitPoint {
     nonisolated public func invert(_ axis: Axis) -> UnitPoint {
         invert(axis.asSet)
     }
-    
+        
+    nonisolated public subscript(axis: Axis) -> Double {
+        get {
+            switch axis {
+            case .horizontal: x
+            case .vertical: y
+            }
+        }
+        set {
+            switch axis {
+            case .horizontal: x = newValue
+            case .vertical: y = newValue
+            }
+        }
+    }
+
 }
 
 

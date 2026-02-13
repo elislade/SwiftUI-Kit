@@ -41,25 +41,21 @@ public struct IndirectScrollExample: View {
         } parameters: {
             Toggle(isOn: $useMomentum){
                 Text("Use Momentum")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
             .disabled(axes.isEmpty)
             
             ExampleCell.LayoutDirection(value: $layout)
             
             ExampleSection("Axes", isExpanded: true){
-                Toggle(isOn: Binding($axes, contains: .horizontal)){
-                    Text("Horizontal")
-                        .font(.exampleParameterTitle)
+                HStack {
+                    Toggle(isOn: Binding($axes, contains: .horizontal)){
+                        Label("X", systemImage: "arrow.left.and.right")
+                    }
+                    
+                    Toggle(isOn: Binding($axes, contains: .vertical)){
+                        Label("Y", systemImage: "arrow.up.and.down")
+                    }
                 }
-                .exampleParameterCell()
-                
-                Toggle(isOn: Binding($axes, contains: .vertical)){
-                    Text("Vertical")
-                        .font(.exampleParameterTitle)
-                }
-                .exampleParameterCell()
             }
         }
     }

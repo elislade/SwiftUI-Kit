@@ -38,7 +38,7 @@ struct SystemDragAndDropExamples: View {
         
         var body: some View {
             VStack(spacing: 12) {
-                ForEach(items){ item in
+                ForEach(items, id: \.self){ item in
                     if pendingDropIndex == items.firstIndex(of: item) {
                         ExampleTile("")
                             .opacity(0.2)

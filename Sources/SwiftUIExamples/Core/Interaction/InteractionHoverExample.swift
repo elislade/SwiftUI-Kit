@@ -5,8 +5,11 @@ public struct InteractionHoverExample: View  {
 
     @State private var priority: InteractionPriority = .normal
     @State private var groupEvents: [InteractionHoverGroupEvent] = []
-    @State private var delayInMilliseconds: Double = 0
     @State private var showContent: Bool = false
+    @State private var delay = Measurement(
+        value: 0,
+        unit: UnitDuration.milliseconds
+    )
     
     public init(){}
     
@@ -23,7 +26,7 @@ public struct InteractionHoverExample: View  {
                     Content()
                         .interactionHoverGroup(
                             priority: priority,
-                            delay: .milliseconds(delayInMilliseconds)
+                            delay: .milliseconds(delay.value)
                         ){
                             groupEvents.append($0)
                             
@@ -47,39 +50,22 @@ public struct InteractionHoverExample: View  {
             .animation(.bouncy, value: showContent)
             .animation(.bouncy, value: priority)
         } parameters: {
-            HStack{
-                Text("Priority")
-                    .font(.exampleParameterTitle)
-
-                Picker(selection: $priority){
-                    ForEach(InteractionPriority.allCases){ priority in
-                        PriorityLabel(priority)
-                            .tag(priority)
-                    }
-                } label: {
-                    EmptyView()
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack{
-                    Text("Delay")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(
-                        Measurement<UnitDuration>(value: delayInMilliseconds, unit: .milliseconds),
-                        format: .measurement(width: .narrow)
-                    )
-                    .font(.exampleParameterValue)
+            HStack {
+                ExampleMenuPicker(
+                    data: InteractionPriority.allCases,
+                    selection: $priority,
+                    content: PriorityLabel.init
+                ){
+                    Text("Priority")
                 }
                 
-                Slider(value: $delayInMilliseconds, in: 0...500, step: 5)
+                ExampleSlider(
+                    value: $delay, in: 0...500, step: 5,
+                    format: .parse(.milliseconds, format: .increment(1))
+                ){
+                    Text("Delay")
+                }
             }
-            .exampleParameterCell()
         }
     }
     

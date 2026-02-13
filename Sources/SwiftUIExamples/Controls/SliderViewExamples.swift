@@ -36,22 +36,34 @@ public struct SliderViewExamples : View {
             .environment(\.layoutDirection, direction)
             .indirectScrollGroup()
         } parameters: {
-            ExampleCell.LayoutDirection(value: $direction)
-            
             Toggle(isOn: $hitTestHandle){
                 Text("Hit Test Handle")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
             
-            ExampleSection("X: \(x.value.formatted(.increment(0.01)))", isExpanded: true){
+            ExampleCell.LayoutDirection(value: $direction)
+            
+            ExampleSection(isExpanded: true){
                 EditStep(step: $x.step, bounds: x.bounds)
                 EditBounds(bounds: $x.bounds)
+            } label: {
+                LabeledContent{
+                    Text(x.value, format: .increment(0.01))
+                } label: {
+                    Text("X Value")
+                }
+                .monospacedDigit()
             }
             
-            ExampleSection("Y: \(y.value.formatted(.increment(0.01)))", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 EditStep(step: $y.step, bounds: x.bounds)
                 EditBounds(bounds: $y.bounds)
+            } label: {
+                LabeledContent{
+                    Text(y.value, format: .increment(0.01))
+                } label: {
+                    Text("Y Value")
+                }
+                .monospacedDigit()
             }
         }
     }
@@ -60,51 +72,26 @@ public struct SliderViewExamples : View {
         
         @Binding var bounds: ClosedRange<Double>
         
-        private var lower: Binding<Double> {
-            .init(
+        var body: some View {
+            let lower = Binding<Double>(
                 get: { bounds.lowerBound },
                 set: { bounds = $0...bounds.upperBound }
             )
-        }
-        
-        private var upper: Binding<Double> {
-            .init(
+            
+            let upper = Binding<Double>(
                 get: { bounds.upperBound },
                 set: { bounds = bounds.lowerBound...$0 }
             )
-        }
-        
-        var body: some View {
-            VStack {
-                HStack(spacing: 0){
-                    Text("Range")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer(minLength: 10)
-                    Spacer(minLength: 10)
-                    
-                    Text(bounds.lowerBound, format: .increment(0.1))
-                        .font(.exampleParameterValue) +
-                    Text(" ... ") +
-                    Text(bounds.upperBound, format: .increment(0.1))
-                        .font(.exampleParameterValue)
+            
+            HStack {
+                ExampleSlider(value: .init(lower, in: (bounds.upperBound - 10)...(bounds.upperBound - 1))){
+                    Text("Lower Bound")
                 }
                 
-                HStack {
-                    Slider(
-                        value: lower,
-                        in: (bounds.upperBound - 10)...(bounds.upperBound - 1),
-                        step: 0.1
-                    )
-                    
-                    Slider(
-                        value: upper,
-                        in: (bounds.lowerBound + 1)...(bounds.lowerBound + 10),
-                        step: 0.1
-                    )
+                ExampleSlider(value: .init(upper, in: (bounds.lowerBound + 1)...(bounds.lowerBound + 10))){
+                    Text("Upper Bound")
                 }
             }
-            .exampleParameterCell()
         }
         
     }
@@ -114,36 +101,28 @@ public struct SliderViewExamples : View {
         @Binding var step: Double?
         let bounds: ClosedRange<Double>
         
-        private var binding: Binding<Double> {
-            .init(
-                get: { step ?? 0 },
-                set: { step = $0 }
+        var body: some View {
+            let binding = Binding<Clamped<Double>>(
+                get: { .init(step ?? 0) },
+                set: { step = $0.value }
             )
-        }
-        
-        private var enabled: Binding<Bool> {
-            .init(
+            
+            let enabled = Binding<Bool>(
                 get: { step != nil },
                 set: { step = $0 ? 0.1 : nil }
             )
-        }
-        
-        var body: some View {
-            VStack {
-                HStack{
-                    Toggle(isOn: enabled){
-                        Text("Step")
-                            .font(.exampleParameterTitle)
-                    }
-          
-                    Text(binding.wrappedValue, format: .increment(0.1))
-                        .font(.exampleParameterValue)
+            
+            HStack{
+                ExampleSlider(value: binding){
+                    Text("Step")
                 }
+                .disabled(step == nil)
                 
-                Slider(value: binding)
-                    .disabled(!enabled.wrappedValue)
+                Toggle(isOn: enabled){
+                    Text("Enabled")
+                }
+                .toggleHintIndicatorVisibility(.hidden)
             }
-            .exampleParameterCell()
         }
         
     }
@@ -307,21 +286,14 @@ struct SliderViewEqualizerExample: View {
             .indirectScrollGroup()
             .indirectScrollInvertY()
         } parameters: {
-            HStack{
-                Text("Action")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Button("Animate Random"){
-                    for i in frequencies.indices {
-                        frequencies[i].gain = .random(in: -12.0...12.0)
-                    }
+            Button{
+                for i in frequencies.indices {
+                    frequencies[i].gain = .random(in: -12.0...12.0)
                 }
-                .font(.exampleParameterValue)
-                .buttonStyle(.tinted)
+            } label: {
+                Label("Randomize", systemImage: "dice")
+                    .frame(maxWidth: .infinity)
             }
-            .exampleParameterCell()
         }
     }
     

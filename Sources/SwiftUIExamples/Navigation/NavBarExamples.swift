@@ -51,22 +51,22 @@ public struct NavBarExamples: View {
             }
             .scrollPassthroughContext()
         } parameters: {
-            ExampleSection("Bar", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 Toggle(isOn: $barHidden){
                     Text("Hide")
-                        .font(.exampleParameterTitle)
                 }
-                .exampleParameterCell()
+            } label: {
+                Text("Bar")
             }
             
-            ExampleSection("Placements", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 ForEach(NavBarItemMetadata.Placement.allCases, id: \.rawValue){ placement in
                     Toggle(isOn: Binding($placements, contains: placement)){
                         Text(verbatim: "Show \(placement)")
-                            .font(.exampleParameterTitle)
                     }
-                    .exampleParameterCell()
                 }
+            } label: {
+                Text("Placements")
             }
             .disabled(barHidden)
         }

@@ -13,7 +13,7 @@ public struct SwipeActionExamples: View {
     }
     
     struct Element: Identifiable, Equatable {
-        let id = UUID()
+        let id = UniqueID()
         let createdOn = Date()
         let color: Color
         var isArchived: Bool = .random()
@@ -22,7 +22,7 @@ public struct SwipeActionExamples: View {
     
     @State private var cells: [Element] = (0..<3).map{ _ in .init(color: .random) }
     @State private var cellRadius: Double = 16
-    @State private var swipeState: [UUID: HorizontalEdge] = [:]
+    @State private var swipeState: [UniqueID: HorizontalEdge] = [:]
     @State private var actionState: [Action: HorizontalEdge] = [
         .pin : .leading, .archive : .trailing, .delete : .trailing
     ]
@@ -44,40 +44,29 @@ public struct SwipeActionExamples: View {
             .environment(\.layoutDirection, layoutDirection)
             .swipeActionInvalidation(invalidation)
         } parameters: {
-            ExampleSection("Invalidation", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 Toggle(isOn: Binding($invalidation, subset: .onMove)){
                     Text("On Move")
-                        .font(.exampleParameterTitle)
                 }
-                .exampleParameterCell()
                 
                 Toggle(isOn: Binding($invalidation, subset: .onOpen)){
                     Text("On Open")
-                        .font(.exampleParameterTitle)
                 }
-                .exampleParameterCell()
+            } label: {
+                Text("Invalidation")
             }
             
-            ExampleSection("Cell Style", isExpanded: true){
-                VStack {
-                    HStack {
-                        Text("Radius")
-                            .font(.exampleParameterTitle)
-                        
-                        Spacer()
-                        
-                        Text(cellRadius, format: .number.rounded(increment: 0.1))
-                            .monospacedDigit()
-                    }
-                    
-                    Slider(value: $cellRadius, in: 0...36)
+            ExampleSection(isExpanded: true){
+                ExampleSlider(value: .init($cellRadius, in: 0...36)){
+                    Text("Radius")
                 }
-                .exampleParameterCell()
                 
                 ExampleCell.LayoutDirection(value: $layoutDirection)
+            } label: {
+                Text("Cell Style")
             }
             
-            ExampleSection("Active Edges", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 ForEach(cells){ cell in
                     let index = cells.firstIndex(of: cell)!
                     HStack {
@@ -86,26 +75,33 @@ public struct SwipeActionExamples: View {
                         
                         Spacer()
                         
-                        ExampleCell.HorizontalEdge(edge: $swipeState[cell.id].animation(.smooth))
-                            .frame(maxWidth: 180)
+                        ExampleCell.HorizontalEdge(
+                            edge: $swipeState[cell.id].animation(.smooth)
+                        )
+                        .fixedSize()
                     }
-                    .exampleParameterCell()
                 }
+            } label: {
+                Text("Active Edges")
             }
             
-            ExampleSection("Action Visibility", isExpanded: true){
+            ExampleSection(isExpanded: true){
                 ForEach(Action.allCases, id: \.self){ action in
-                    HStack {
+                    HStack{
                         ActionLabel(action)
                             .font(.exampleParameterTitle)
                         
                         Spacer()
                         
-                        ExampleCell.HorizontalEdge(edge: $actionState[action].animation(.smooth))
-                            .frame(maxWidth: 180)
+                        ExampleCell.HorizontalEdge(
+                            edge: $actionState[action].animation(.smooth)
+                        )
+                        .fixedSize()
                     }
-                    .exampleParameterCell()
+                    .tint(Color(action))
                 }
+            } label: {
+                Text("Action Visibility")
             }
         }
     }
@@ -114,7 +110,7 @@ public struct SwipeActionExamples: View {
     struct Content: View {
         
         @Binding var cells: [Element]
-        @Binding var swipeState: [UUID: HorizontalEdge]
+        @Binding var swipeState: [UniqueID: HorizontalEdge]
         
         var cellRadius: Double = 16
         let actionState: [Action: HorizontalEdge]
@@ -130,14 +126,24 @@ public struct SwipeActionExamples: View {
                 .indirectScrollGroup()
             }
             .safeAreaInset(edge: .top, spacing: 0){
+                Header{
+                    cells.append(.init(color: .random))
+                }
+            }
+        }
+        
+        
+        struct Header: View {
+            
+            var addAction: () -> Void
+            
+            var body: some View {
                 HStack {
                     Text("Elements")
                     
                     Spacer()
                     
-                    Button{
-                        cells.append(.init(color: .random))
-                    } label: {
+                    Button{ addAction() } label: {
                         Label("Add", systemImage: "plus.circle.fill")
                     }
                     .buttonStyle(.tinted)
@@ -147,12 +153,8 @@ public struct SwipeActionExamples: View {
                 .font(.largeTitle[.semibold])
                 .padding()
                 .background(alignment: .bottom){
-                    VisualEffectView()
+                    BlurEffectView()
                         .ignoresSafeArea()
-                    
-                    ExampleBackground()
-                        .ignoresSafeArea()
-                        .opacity(0.6)
                     
                     Divider()
                         .frame(maxHeight: .infinity, alignment: .bottom)
@@ -161,10 +163,11 @@ public struct SwipeActionExamples: View {
             }
         }
         
+        
         struct ScrollBody: View {
             
             @Binding var cells: [Element]
-            @Binding var swipeState: [UUID: HorizontalEdge]
+            @Binding var swipeState: [UniqueID: HorizontalEdge]
             var cellRadius: Double = 10
             let actionState: [Action: HorizontalEdge]
             
@@ -203,11 +206,11 @@ public struct SwipeActionExamples: View {
                                     )
                             }
                         }
+                        .geometryGroupIfAvailable()
                         .transition((.scale(0.5) + .opacity))
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .geometryGroupPolyfill()
                 .animation(.bouncy, value: cellRadius == 0)
                 .padding(cellRadius == 0 ? 0 : 16)
                 .animation(.smooth, value: elements.map(\.wrappedValue))
@@ -338,7 +341,7 @@ public struct SwipeActionExamples: View {
                         .fill(.yellow.opacity(0.1))
                 }
             }
-            .geometryGroupPolyfill()
+            .geometryGroupIfAvailable()
             .swipeViews(activeEdge: $activeEdge) {
                 list(.leading)
                     .imageStyle(.exampleSwipe)
@@ -389,6 +392,7 @@ public struct SwipeActionExamples: View {
                         .monospacedDigit()
                         .padding(5)
                         .background(.quaternary, in: .capsule)
+                        .geometryGroupIfAvailable()
                         .animation(.bouncy, value: tapCount)
                     
                     if element.isArchived {

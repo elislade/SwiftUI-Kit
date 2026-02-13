@@ -57,26 +57,15 @@ public struct AnimationThresholdChangeExample : View {
             .drawingGroup()
             .animation(.linear(duration: duration), value: animate)
         } parameters: {
-            Toggle(isOn: $animate){
-                Text("Show")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
-                    Text("Threshold")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(threshold, format: .increment(0.01))
-                        .font(.exampleParameterValue)
+            HStack {
+                Toggle(isOn: $animate){
+                    Text("Show")
                 }
                 
-                Slider(value: $threshold)
+                ExampleSlider(value: .init($threshold)){
+                    Text("Threshold")
+                }
             }
-            .exampleParameterCell()
         }
     }
     

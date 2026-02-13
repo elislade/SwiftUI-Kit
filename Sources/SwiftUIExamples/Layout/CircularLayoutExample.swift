@@ -7,9 +7,10 @@ public struct CircularLayoutExample : View {
         .random(in: 0.1...1), .random(in: 0.1...1),  .random(in: 0.1...1)
     ]
     
+    @State private var numberOfItems: Int = 3
     @State private var radius: Double = 100
     @State private var rangeLower: Angle = .zero
-    @State private var rangeUpper: Angle = .degrees(360)
+    @State private var rangeUpper = Measurement(value: 360, unit: UnitAngle.degrees)
     @State private var offset: Angle = .zero
     @State private var compensateForRotation = false
     
@@ -17,7 +18,7 @@ public struct CircularLayoutExample : View {
         CircularCollectionLayout(
             radius: radius,
             offset: offset,
-            range: rangeLower...rangeUpper,
+            range: rangeLower...Angle.degrees(rangeUpper.value),
             compensateForRotation: compensateForRotation
         )
     }
@@ -34,9 +35,9 @@ public struct CircularLayoutExample : View {
     
     public var body: some View {
         ExampleView(title: "Circular Layout"){
-            ZStackCollectionLayout(layout, data: elements.indices) { idx in
+            ZStackCollectionLayout(layout, data: Array(0...numberOfItems)) { idx in
                 SunkenControlMaterial(RoundedRectangle(cornerRadius: 16), isTinted: true)
-                    .opacity(Double(idx) / Double(elements.count))
+                    .opacity(Double(idx) / Double(numberOfItems))
                     .background(in: RoundedRectangle(cornerRadius: 16))
                     .frame(width: 60, height: 60)
                     .transition(.scale)
@@ -45,78 +46,34 @@ public struct CircularLayoutExample : View {
             .animation(.fastSpring, value: compensateForRotation)
             .animation(.bouncy, value: elements)
         } parameters: {
-            HStack {
+            ExampleStepper(value: $numberOfItems, range: 0...120){
                 Text("Number of Items")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Text(elements.count, format: .number)
-                    .font(.exampleParameterValue)
-                
-                Stepper(
-                    onIncrement: { add() },
-                    onDecrement: elements.isEmpty ? nil : { remove() }
-                )
             }
-            .exampleParameterCell()
-
-            VStack {
-                HStack {
+            
+            HStack {
+                ExampleSlider(value: .init($radius, in: 50...150, step: 1)){
                     Text("Radius")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(radius, format: .number)
-                        .font(.exampleParameterValue)
                 }
                 
-                Slider(value: $radius, in: 50...150, step: 1)
-            }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack {
+                ExampleSlider(value: .init($offset.degrees, in: 0...360, step: 1)){
                     Text("Offset")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(offset.degrees, format: .number)
-                        .font(.exampleParameterValue)
                 }
-                
-                Slider(value: $offset.degrees, in: 0...360, step: 1)
             }
-            .exampleParameterCell()
             
-            VStack {
-                HStack {
+            HStack {
+                ExampleSlider(
+                    value: $rangeUpper,
+                    in: 0...360,
+                    step: 1,
+                    format: .parse(.degrees)
+                ){
                     Text("Range")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(rangeUpper.degrees, format: .number)
-                        .font(.exampleParameterValue)
-                }
-                
-                HStack {
-                    Slider(
-                        value: $rangeUpper.degrees,
-                        in: 0...360,
-                        step: 1
-                    )
                 }
             }
-            .exampleParameterCell()
             
             Toggle(isOn: $compensateForRotation){
                 Text("Compensate Rotation")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
         }
     }
 }

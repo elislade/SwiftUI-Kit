@@ -29,12 +29,9 @@ public struct ToolTipExamples: View {
         } parameters: {
             Toggle(isOn: $isPresented){
                 Text("Presented")
-                    .font(.exampleParameterTitle)
             }
-            .exampleParameterCell()
             
             ExampleCell.Axis(axis: $axis.animation(.bouncy))
-                .exampleParameterCell()
         }
     }
     

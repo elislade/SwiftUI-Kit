@@ -33,32 +33,36 @@ public struct SliderExamples: View {
             .disabled(disable)
             .indirectScrollGroup()
         } parameters: {
-            HStack {
-                Text("Test Animation")
-                    .font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Button("Animate") {
-                    withAnimation(.bouncy){
-                        value = .random(in: 0...1)
+            ExampleSection(isExpanded: true){
+                HStack {
+                    Toggle(isOn: $disable){
+                        Text("Disable")
+                    }
+                    
+                    Button{
+                        withAnimation(.bouncy){
+                            value = .random(in: 0...1)
+                        }
+                    } label: {
+                        Label("Random", systemImage: "dice")
                     }
                 }
-                .buttonStyle(.tinted)
+                
+                ExampleCell.ControlRoundness(value: $controlRoundness)
+                
+                HStack {
+                    ExampleCell.ControlSize(value: $controlSize)
+                        .fixedSize()
+                    
+                    ExampleCell.LayoutDirectionSuggestion(
+                        value: $directionSuggestion
+                    )
+                }
+                
+                ExampleCell.LayoutDirection(value: $direction)
+            } label: {
+                Text("Parameters")
             }
-            .exampleParameterCell()
-            
-            Toggle(isOn: $disable){
-                Text("Disable")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)
-            
-            ExampleCell.LayoutDirection(value: $direction)
-
-            ExampleCell.ControlRoundness(value: $controlRoundness)
         }
     }
     

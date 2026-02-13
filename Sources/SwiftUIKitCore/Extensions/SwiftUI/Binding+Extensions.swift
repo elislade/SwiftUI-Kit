@@ -67,6 +67,17 @@ public extension Binding where Value: Sendable {
     
 }
 
+extension Binding where Value : BinaryFloatingPoint, Value: Sendable {
+    
+    nonisolated public var double: Binding<Double> {
+        .init(
+            get: { Double(wrappedValue) },
+            set: { wrappedValue = Value($0) }
+        )
+    }
+    
+}
+
 
 // Don't think there is an issue with making keypaths sendable because they don't seem to be mutable.
 // You can append paths but that returns a copy.

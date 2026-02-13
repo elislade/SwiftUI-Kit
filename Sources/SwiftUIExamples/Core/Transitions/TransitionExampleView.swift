@@ -26,30 +26,27 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
             .padding()
             .animation(.smooth(extraBounce: 0.5).speed(speed), value: show)
         } parameters: {
-            Toggle(isOn: $show){
-                Text("Show")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-
-            VStack {
-                HStack{
-                    Text("Speed")
-                        .font(.exampleParameterTitle)
+            ExampleSection(isExpanded: true) {
+                HStack {
+                    Toggle(isOn: $show){
+                        Text("Show")
+                    }
                     
-                    Spacer()
-                    
-                    Text(speed, format: .increment(0.1))
-                        .font(.exampleParameterValue)
+                    ExampleSlider(value: .init($speed, in: (0.1)...(1.7))){
+                        Text("Speed")
+                    }
                 }
-                
-                Slider(value: $speed, in: (0.1)...(1.7))
+            } label: {
+                Text("Animation")
             }
-            .exampleParameterCell()
-            
-            Provider { normal, inverse in
-                transition = normal
-                self.inverse = inverse
+
+            ExampleSection(isExpanded: true) {
+                Provider { normal, inverse in
+                    transition = normal
+                    self.inverse = inverse
+                }
+            } label: {
+                Text("Parameters")
             }
         }
     }

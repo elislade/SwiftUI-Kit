@@ -25,43 +25,28 @@ import SwiftUIKit
 
 struct GridViewExample : View {
     
-    @State private var colors = Array(repeating: 0, count: 3).map{ _ in Color.random }
+    @State private var numberOfItems = 3
     @State private var spacing = 0.0
     @State private var columns = 4
     
-    private func add(){
-        withAnimation(.fastSpring){
-            colors.append(Color.random)
-        }
-    }
-    
-    private func remove(_ color: Color? = nil){
-        guard !colors.isEmpty else { return }
-        withAnimation(.fastSpring){
-            guard let color else {
-                colors.removeLast()
-                return
-            }
-            
-            colors.removeAll(where: { $0 == color })
-        }
-    }
-    
     private var grid: some View {
         ScrollView([.horizontal, .vertical]){
-            GridView(colors, spacing: spacing, columns: columns){ color in
-                Button(action: { remove(color) }){
-                    color.frame(width: 70, height: 70)
+            GridView(0..<numberOfItems, spacing: spacing, columns: columns){ i in
+                Button(action: {  }){
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(.tint)
+                        .opacity(Double(i + 1) / Double(numberOfItems))
+                        .frame(width: 70, height: 70)
                 }
                 .buttonStyle(.plain)
-                .transitions(
+                .transition(
                     .insertion(
                         .scale(0.5),
                         .rotation3D(axis: .y),
                         .offset(x: 400),
                         .blur()
-                    ),
-                    .removal(.hinge(.random()))
+                    )
+                    + .removal(.hinge(.random()))
                 )
             }
         }
@@ -71,56 +56,26 @@ struct GridViewExample : View {
         ExampleView(title: "Grid View"){
             grid
                 .animation(.bouncy, value: columns)
+                .animation(.bouncy, value: numberOfItems)
         } parameters: {
-            HStack {
-                Text("Columns").font(.exampleParameterTitle)
-                
-                Spacer()
-                
-                Text("\(columns)")
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                
-                Stepper(value: $columns, in: 1...5)
+            ExampleStepper(value: $columns, range: 1...5){
+                Text("Columns")
             }
-            .exampleParameterCell()
             
-            HStack {
-                Text("Count").font(.exampleParameterTitle)
-            
-                Spacer()
-                
-                Text("\(colors.count)")
-                    .font(.exampleParameterValue)
-                    .foregroundStyle(.secondary)
-                
-                Stepper(
-                    onIncrement: add,
-                    onDecrement: !colors.isEmpty ? { remove() } : nil
-                )
+            ExampleStepper(value: $numberOfItems, range: 0...20){
+                Text("Count")
             }
-            .exampleParameterCell()
-            
-            VStack {
-                HStack(spacing: 16) {
-                    Text("Spacing").font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Text(spacing, format: .number)
-                        .font(.exampleParameterValue)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Slider(value: $spacing, in: 0...50, step: 1)
+
+            ExampleSlider(value: .init($spacing, in: 0...50, step: 1)){
+                Text("Spacing")
             }
-            .exampleParameterCell()
         }
         .contentTransitionNumericText()
-        .onAppear{
-            for i in 0...10 {
-                withAnimation(.bouncy.delay(Double(i) / 10)){
-                    colors.append(Color.random)
+        .task{
+            for _ in 0...10 {
+                try? await Task.sleep(for: .seconds(0.05))
+                withAnimation(.bouncy){
+                    numberOfItems += 1
                 }
             }
         }

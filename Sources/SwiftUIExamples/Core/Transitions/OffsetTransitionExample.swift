@@ -23,27 +23,15 @@ public struct OffsetTransitionExample: View {
         }
         
         var body: some View {
-            VStack {
-                HStack {
-                    Text("Offset")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                        
-                    Group {
-                        Text(offset.x, format: .increment(0.01))
-                        Text(offset.y, format: .increment(0.01))
-                    }
-                    .font(.exampleParameterValue)
+            HStack {
+                ExampleSlider(value: .init($offset.x, in: -400...400)){
+                    Text("Offset X")
                 }
-                .lineLimit(1)
                 
-                HStack {
-                    Slider(value: $offset.x, in: -400...400)
-                    Slider(value: $offset.y, in: -400...400)
+                ExampleSlider(value: .init($offset.y, in: -400...400)){
+                    Text("Offset Y")
                 }
             }
-            .exampleParameterCell()
             .onChangePolyfill(of: offset){ update(transition, nil) }
             .onAppear { update(transition, nil) }
         }

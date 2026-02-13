@@ -52,22 +52,16 @@ public struct BoundsExamples: View {
                     }
                     touchingIndices = newIndices
                 }
+                .allowsHitTesting(false)
             } parameters: {
-                HStack {
-                    Text("Randomize Items")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                    
-                    Button{
-                        withAnimation(.bouncy){
-                            randomItems(in: proxy.size)
-                        }
-                    } label: {
-                        Text("Perform")
+                Button{
+                    withAnimation(.bouncy){
+                        randomItems(in: proxy.size)
                     }
+                } label: {
+                    Label("Randomize", systemImage: "dice")
+                        .frame(maxWidth: .infinity)
                 }
-                .exampleParameterCell()
             }
         }
     }

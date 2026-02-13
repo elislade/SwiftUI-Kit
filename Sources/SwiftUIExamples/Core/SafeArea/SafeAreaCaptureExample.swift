@@ -10,42 +10,44 @@ public struct SafeAreaCaptureExample: View {
     
     public var body: some View {
         ExampleView(title: "Safe Area Capture") {
-            HStack(spacing: 0) {
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 5, height: 100)
+            VStack(alignment: .leading) {
+                Text("Pan around.")
+                    .font(.title[.bold])
                 
-                VStack(spacing: 0) {
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 100, height: 5)
-                    
-                    VStack(alignment: .leading) {
-                        Text("Pan around.")
-                            .font(.title[.bold])
-                        
-                        Text("Notice how the background interacts with the safearea.")
-                            .font(.title3[.bold])
-                            .opacity(0.5)
-                    }
-                    .frame(maxWidth: 320)
-                    .padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 100, height: 5)
-                }
-                
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 5, height: 100)
+                Text("Notice how the background interacts with the safearea.")
+                    .font(.title3[.bold])
+                    .opacity(0.5)
             }
-            .padding(5)
+            .frame(maxWidth: 320)
+            .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                ZStack{
+                    Capsule()
+                        .frame(width: 100, height: 5)
+                        .frame(maxHeight: .infinity, alignment: .top)
+                    
+                    Capsule()
+                        .frame(width: 100, height: 5)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                    
+                    Capsule()
+                        .frame(width: 5, height: 100)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Capsule()
+                        .frame(width: 5, height: 100)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                .foregroundStyle(
+                    captureEnabled ? AnyShapeStyle(.tint) : AnyShapeStyle(.white.shadow(.drop(color: .black.opacity(0.1), radius: 1, y: 1)))
+                )
+                .padding(10)
+            }
             .releaseContainerSafeArea()
             .background{
                 ContainerRelativeShape()
-                    .fill(.tint)
+                    .fill(.tint.opacity(0.15))
                     .ignoresSafeArea(edges: captureEnabled ? [] : .all)
             }
             .offset(offset)
@@ -60,10 +62,7 @@ public struct SafeAreaCaptureExample: View {
         } parameters: {
             Toggle(isOn: $captureEnabled){
                 Text("Capture Enabled")
-                    .font(.exampleParameterTitle)
             }
-            .toggleStyle(.swiftUIKitSwitch)
-            .exampleParameterCell()
         }
     }
     

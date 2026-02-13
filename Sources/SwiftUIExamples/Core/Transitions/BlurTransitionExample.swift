@@ -24,30 +24,17 @@ public struct BlurTransitionExample: View {
         }
         
         var body: some View {
-            Toggle(isOn: $isOpaque){
-                Text("Is Opaque")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            .onChangePolyfill(of: isOpaque){ update(transition, nil) }
-            .onAppear { update(transition, nil) }
-            
-            VStack {
-                HStack {
-                    Text("Radius")
-                        .font(.exampleParameterTitle)
-                    
-                    Spacer()
-                        
-                    Text(radius, format: .increment(1))
-                        .font(.exampleParameterValue)
+            HStack {
+                Toggle(isOn: $isOpaque){
+                    Text("Opaque")
                 }
-                .lineLimit(1)
+                .onChangePolyfill(of: isOpaque){ update(transition, nil) }
+                .onAppear { update(transition, nil) }
                 
-        
-                Slider(value: $radius, in: 0...200, step: 1)
+                ExampleSlider(value: .init($radius, in: 0...200, step: 1)){
+                    Text("Radius")
+                }
             }
-            .exampleParameterCell()
             .onChangePolyfill(of: radius){ update(transition, nil) }
         }
     }

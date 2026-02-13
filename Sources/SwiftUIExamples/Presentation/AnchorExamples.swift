@@ -109,53 +109,51 @@ public struct AnchorPresentationExample : View   {
             .presentationContext()
             .presentationEnvironmentBehaviour(.usePresentation)
         } parameters: {
-            Toggle(isOn: $isPresented){
-                Text("Is Presented")
-                    .font(.exampleParameterTitle)
-            }
-            .exampleParameterCell()
-            
-            ExampleCell.LayoutDirection(
-                value: $direction.animation(.smooth)
-            )
-            
-            SegmentedPicker(
-                selection: $type.animation(.bouncy),
-                items: AnchorType.allCases
-            ){
-                TypeLabel($0)
-                    .font(.caption[.monospaced])
-                    .opacity(0.5)
-            }
-            .exampleParameterCell()
-            
-            Group {
-                switch type {
-                case .explicit:
-                    HStack(spacing: 16) {
-                        AnchorView(
-                            title: Text("Source"),
-                            anchor: $sourceAnchor
+            ExampleSection(isExpanded: true){
+                Toggle(isOn: $isPresented){
+                    Text("Presented")
+                }
+                
+                ExampleCell.LayoutDirection(
+                    value: $direction.animation(.smooth)
+                )
+                
+                ExampleInlinePicker(
+                    data: AnchorType.allCases,
+                    selection: $type.animation(.bouncy),
+                    content: TypeLabel.init
+                )
+                
+                Group {
+                    switch type {
+                    case .explicit:
+                        HStack(spacing: 16) {
+                            AnchorView(
+                                title: Text("Source"),
+                                anchor: $sourceAnchor
+                            )
+                            
+                            AnchorView(
+                                title: Text("Destination"),
+                                anchor: $presentationAnchor
+                            )
+                        }
+                        .padding()
+                        .frame(height: 200)
+                    case .horizontal:
+                        ExampleCell.Alignment.Vertical(
+                            value: $verticalAlign.animation(.bouncy)
                         )
-
-                        AnchorView(
-                            title: Text("Destination"),
-                            anchor: $presentationAnchor
+                    case .vertical:
+                        ExampleCell.Alignment.Horizontal(
+                            value: $horizontalAlign.animation(.bouncy)
                         )
                     }
-                    .padding()
-                    .frame(maxHeight: 200)
-                case .horizontal:
-                    ExampleCell.Alignment.Vertical(
-                        value: $verticalAlign.animation(.bouncy)
-                    )
-                case .vertical:
-                    ExampleCell.Alignment.Horizontal(
-                        value: $horizontalAlign.animation(.bouncy)
-                    )
                 }
+                .transition(.scale(0.8) + .opacity)
+            } label: {
+                Text("Parameters")
             }
-            .transition(.scale(0.8) + .opacity)
         }
     }
         
