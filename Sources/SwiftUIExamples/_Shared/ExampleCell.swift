@@ -276,6 +276,45 @@ struct ExampleCell {
         }
     }
     
+    struct Edge: View {
+        
+        typealias Edge = SwiftUI.Edge
+        
+        @Binding var edge: Edge
+        
+        var body: some View {
+            ExampleMenuPicker(
+                data: [.top, .bottom, .leading, .trailing],
+                selection: $edge,
+                content: _Label.init
+            ){
+                Text("Edge")
+            }
+        }
+        
+        struct _Label : View {
+            
+            let edge: Edge?
+            
+            init(_ edge: Edge?) {
+                self.edge = edge
+            }
+            
+            var body: some View {
+                if let edge {
+                    switch edge {
+                    case .leading: Label("Leading", systemImage: "inset.filled.leadingthird.rectangle")
+                    case .trailing: Label("Trailing", systemImage: "inset.filled.trailingthird.rectangle")
+                    case .top: Label("Top", systemImage: "inset.filled.topthird.rectangle")
+                    case .bottom: Label("Bottom", systemImage: "inset.filled.bottomthird.rectangle")
+                    }
+                } else {
+                    Label("None", systemImage: "rectangle.slash")
+                }
+            }
+            
+        }
+    }
     
     struct Axis: View {
         

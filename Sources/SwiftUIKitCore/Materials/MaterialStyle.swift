@@ -34,3 +34,10 @@ public struct AnyMaterialStyle: MaterialStyle {
 }
 
 
+extension InsettableShape {
+    
+    @MainActor public func material(_ style: some MaterialStyle) -> some View {
+        style.makeAnyBody(self)
+    }
+    
+}
