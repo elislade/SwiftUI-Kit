@@ -148,6 +148,10 @@ extension EventModifiers {
             res.insert(.control)
         }
         
+        if flags.contains(.option) {
+            res.insert(.option)
+        }
+        
         if flags.contains(.numericPad){
             res.insert(.numericPad)
         }
