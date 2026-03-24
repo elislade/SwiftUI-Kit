@@ -7,8 +7,6 @@ import SwiftUI
     
     private let dockTileUpdater = DockTileUpdater()
     private unowned let window: SwiftUIWindow
-    private var previousWindowRadius: CGFloat?
-    private var overrideRadius: CGFloat?
     private var windowFrameTask: Task<Void, Error>?
     private var persistanceFrameKey: String {
         let id = window.restoreIdentifier ?? "default"
@@ -83,22 +81,6 @@ import SwiftUI
         }
     }
     
-    func set(radius: CGFloat?) {
-        guard radius != overrideRadius else { return }
-        overrideRadius = radius
-        guard !wantsFullscreen else { return }
-        
-        if let radius {
-            previousWindowRadius = window.contentView?.layer?.cornerRadius
-            window.contentView?.layer?.cornerRadius = radius
-            window.invalidateShadow()
-        } else {
-            if let previousWindowRadius {
-                window.contentView?.layer?.cornerRadius = previousWindowRadius
-            }
-        }
-    }
-    
     func restore() {
         if
             let string = UserDefaults.standard.string(forKey: persistanceFrameKey),
@@ -157,15 +139,10 @@ extension WindowState : NSWindowDelegate {
     
     public func windowDidEnterFullScreen(_ notification: Notification) {
         wantsFullscreen = true
-        previousWindowRadius = window.contentView?.layer?.cornerRadius
-        window.contentView?.layer?.cornerRadius = 0
     }
     
     public func windowDidExitFullScreen(_ notification: Notification) {
         wantsFullscreen = false
-        if let radius = overrideRadius ?? previousWindowRadius {
-            window.contentView?.layer?.cornerRadius = radius
-        }
     }
     
 }

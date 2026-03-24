@@ -5,7 +5,6 @@ import SwiftUI
 struct WindowRootView<Content: View>: View {
     
     @State private var title: String?
-    @State private var radius: CGFloat = 10
     @State private var zIndex: WindowZIndex = .normal
     @State private var pickerPositioning: WindowPickerPositioning = .managed
     @State private var dockTile: DockTilePreference?
@@ -16,11 +15,7 @@ struct WindowRootView<Content: View>: View {
     
     var body: some View {
         content
-            .containerShape(RoundedRectangle(cornerRadius: radius))
             .environment(\.windowIsKey, state.isKey)
-            .onPreferenceChange(WindowCornerRadiusKey.self){ values in
-                radius = values.last ?? 16
-            }
             .onPreferenceChange(WindowTitleKey.self){ values in
                 title = values.last
             }
@@ -41,9 +36,6 @@ struct WindowRootView<Content: View>: View {
             }
             .environment(\.performWindowAction){ state.perform(action: $0) }
             .environment(\.scenePhase, state.phase)
-            .onChangePolyfill(of: radius){
-                state.set(radius: radius)
-            }
             .onChangePolyfill(of: title){
                 state.setTitle(title ?? "")
             }
