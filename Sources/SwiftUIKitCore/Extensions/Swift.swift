@@ -279,10 +279,10 @@ public extension BinaryFloatingPoint {
     func rubberBand(outside range: ClosedRange<Self>, withResistance resistance: CGFloat = 0.3) -> Self {
         if self > range.upperBound {
             let diff = self - range.upperBound
-            return range.upperBound + Self(pow(Double(diff), 1 - resistance.clamped(to: 0...1)))
+            return range.upperBound + Self(pow(Double(diff), 1.0 - resistance.clamped(to: 0...1)))
         } else if self < range.lowerBound {
             let diff = abs(self - range.lowerBound)
-            return range.lowerBound - Self(pow(Double(diff), 1 - resistance.clamped(to: 0...1)))
+            return range.lowerBound - Self(pow(Double(diff), 1.0 - resistance.clamped(to: 0...1)))
         } else {
             return self
         }

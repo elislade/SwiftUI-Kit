@@ -11,6 +11,10 @@ public struct InteractionGlowMaterial<Shape: InsettableShape> {
     public nonisolated init(_ shape: Shape) {
         self.shape = shape
     }
+
+}
+
+extension InteractionGlowMaterial : View {
     
     public var body: some View {
         Color.clear.background {
@@ -58,8 +62,6 @@ public struct InteractionGlowMaterial<Shape: InsettableShape> {
     }
     
 }
-
-extension InteractionGlowMaterial: View {}
 
 #Preview {
     InteractionGlowMaterial(.circle)

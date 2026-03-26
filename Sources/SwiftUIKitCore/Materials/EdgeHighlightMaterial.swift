@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-public struct EdgeHighlightMaterial<Shape: InsettableShape>: View {
+public struct EdgeHighlightMaterial<Shape: InsettableShape> {
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.reduceMotion) private var reduceMotion
@@ -15,7 +15,10 @@ public struct EdgeHighlightMaterial<Shape: InsettableShape>: View {
         self.shape = shape
     }
     
-    // TODO: Add Device Motion Tracking
+}
+
+extension EdgeHighlightMaterial: View {
+
     public var body: some View {
         AngularGradient(
             stops: [
@@ -42,18 +45,6 @@ public struct EdgeHighlightMaterial<Shape: InsettableShape>: View {
         }
         .drawingGroup()
         .allowsHitTesting(false)
-//        .onContinuousHoverPolyfill{ phase in
-//            switch phase {
-//            case .active(let p):
-//                center = .init(
-//                    x: p.x / proxy.size.width,
-//                    y: p.y / proxy.size.height
-//                )
-//            case .ended:
-//                center = .center
-//            }
-//        }
     }
     
 }
-

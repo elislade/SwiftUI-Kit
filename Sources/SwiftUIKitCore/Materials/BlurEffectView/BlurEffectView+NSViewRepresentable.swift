@@ -35,7 +35,7 @@ extension BlurEffectView : NSViewRepresentable {
 public class NativeBlurEffectView : NSVisualEffectView {
     
     convenience init(filtersDisabled: BlurEffectView.Filters, blurRadius: Double? = nil) {
-        self.init(frame: .infinite)
+        self.init(frame: .zero)
         self.material = .hudWindow
         self.blendingMode = .withinWindow
         self.filtersDisabled = filtersDisabled

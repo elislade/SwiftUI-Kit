@@ -5,8 +5,8 @@ struct SubmenuPresenter<Label: View, Content: View>: View {
     
     @State private var isPresented = false
     
-    @ViewBuilder let label: @MainActor() -> Label
-    @ViewBuilder let content: @MainActor() -> Content
+    @ViewBuilder let label: @MainActor () -> Label
+    @ViewBuilder let content: @MainActor () -> Content
     
     private func present() {
         isPresented = true

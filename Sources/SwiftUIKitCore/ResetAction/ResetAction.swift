@@ -16,9 +16,9 @@ public struct AsyncResetAction: Equatable {
     }
     
     let id: UUID
-    let action: () async -> Void
+    let action: @MainActor () async -> Void
 
-    public func callAsFunction() async {
+    @MainActor public func callAsFunction() async {
         await action()
     }
     
@@ -59,7 +59,7 @@ public extension View {
     ///   - action : The action that the view wants to be called to reset itself.
     ///
     /// - Returns: A view that set its ResetAction.
-    nonisolated func resetAction(active: Bool = true, _ action: @escaping () async -> Void) -> some View {
+    nonisolated func resetAction(active: Bool = true, _ action: @MainActor @escaping () async -> Void) -> some View {
         background{
             InlineState(UUID()){ id in
                 Color.clear.preference(
@@ -71,7 +71,7 @@ public extension View {
     }
     
     /// Like reset action but overrides container child actions
-    nonisolated func resetActionContainer(active: Bool = true, _ action: @escaping () async -> Void) -> some View {
+    nonisolated func resetActionContainer(active: Bool = true, _ action: @MainActor @escaping () async -> Void) -> some View {
         InlineState(UUID()){ id in
             transformPreference(ResetActionsKey.self){ actions in
                 if active {

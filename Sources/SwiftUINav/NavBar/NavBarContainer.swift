@@ -61,7 +61,7 @@ public struct NavBarContainer<Content: View> : View {
                         }
                         
                         // compensate for iPadOS 26 TrafficLights / Window controls
-                        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
+                        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                             GeometryReader { proxy in
                                 let width: CGFloat = proxy.containerCornerInsets.topLeading.width
                                 Color.clear.onChangePolyfill(of: width, initial: true){

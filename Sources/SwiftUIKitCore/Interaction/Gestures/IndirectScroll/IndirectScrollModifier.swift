@@ -18,8 +18,8 @@ public struct IndirectScrollGesture: IndirectGesture {
     
     internal nonisolated init(
         _ base: IndirectScrollGesture,
-        onChange: (@MainActor(Value) -> Void)? = nil,
-        onEnd: (@MainActor(Value) -> Void)? = nil
+        onChange: (@MainActor (Value) -> Void)? = nil,
+        onEnd: (@MainActor (Value) -> Void)? = nil
     ){
         self.axes = base.axes
         self.invertY = base.invertY

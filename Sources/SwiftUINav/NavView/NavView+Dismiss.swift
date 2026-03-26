@@ -48,16 +48,25 @@ struct BackButton: View {
             }
             .presentationBackdrop(.changedPassthrough)
             .transition(
-                .asymmetric(
-                    insertion: .scale(y: 0.1, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu)
-                    + .scale(x: 0.2, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu.delay(0.1)),
-                    removal: .scale(y: 0.1, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu.delay(0.1))
-                    + .scale(x: 0.2, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu),
-                )
+                .navMenuSquish
                 + .opacity.animation(.linear)
                 + .blur(radius: 10).animation(.linear)
             )
         }
+    }
+    
+}
+
+
+extension AnyTransition {
+    
+    static var navMenuSquish: AnyTransition {
+        .asymmetric(
+            insertion: .scale(y: 0.1, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu)
+            + .scale(x: 0.2, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu.delay(0.1)),
+            removal: .scale(y: 0.1, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu.delay(0.1))
+            + .scale(x: 0.2, anchor: .init(x: 0.1, y: 0.1)).animation(.navMenu),
+        )
     }
     
 }

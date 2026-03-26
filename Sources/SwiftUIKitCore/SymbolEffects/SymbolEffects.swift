@@ -7,7 +7,7 @@ extension View {
         grouping: SymbolEffectGrouping = .whole,
         isActive: Bool = true
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
             symbolEffect(.drawOn, isActive: isActive)
         } else {
             self
@@ -18,7 +18,7 @@ extension View {
         grouping: SymbolEffectGrouping = .whole,
         isActive: Bool = true
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
             symbolEffect(.drawOff, isActive: isActive)
         } else {
             self

@@ -17,7 +17,11 @@ struct RoutingModifier {
         (port != nil ? port == url.port : true)
     }
     
-    @discardableResult private func handle(_ comps: [LinkComponent]) async -> Bool {
+}
+
+extension RoutingModifier: ViewModifier {
+    
+    @discardableResult @MainActor private func handle(_ comps: [LinkComponent]) async -> Bool {
         var handled: [UUID: Bool] = [:]
         var next: RoutePreference? = children.filter({ !handled.keys.contains($0.id) }).first
         
@@ -29,7 +33,7 @@ struct RoutingModifier {
         return handled.values.contains(true)
     }
     
-    @discardableResult private func handle(url: URL) async -> Bool {
+    @discardableResult @MainActor private func handle(url: URL) async -> Bool {
         guard
             valid(url: url),
             let comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
@@ -55,9 +59,6 @@ struct RoutingModifier {
         return true
     }
     
-}
-
-extension RoutingModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
