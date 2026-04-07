@@ -6,9 +6,9 @@ extension View {
     nonisolated public func containerFrameContext() -> some View {
         backgroundPreferenceValue(ContainerFramePreferenceKey.self){ prefs in
             GeometryReader{ proxy in
-                Color.clear.onChangePolyfill(of: proxy.size, initial: true){
+                Color.clear.onChange(of: proxy.size, initial: true){
                     prefs.forEach { $0(proxy.size) }
-                }.onChangePolyfill(of: prefs.count, initial: true){
+                }.onChange(of: prefs.count, initial: true){
                     prefs.forEach { $0(proxy.size) }
                 }
             }
@@ -44,14 +44,14 @@ struct RelativeFrameModifier: ViewModifier {
             alignment: alignment
         )
         .environment(\.containerConstrained, constrained)
-        .onChangePolyfill(of: width == nil){
+        .onChange(of: width == nil){
             if width == nil {
                 constrained.remove(.horizontal)
             } else {
                 constrained.insert(.horizontal)
             }
         }
-        .onChangePolyfill(of: height == nil){
+        .onChange(of: height == nil){
             if height == nil {
                 constrained.remove(.vertical)
             } else {

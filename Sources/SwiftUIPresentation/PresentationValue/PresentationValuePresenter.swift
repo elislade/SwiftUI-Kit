@@ -43,7 +43,7 @@ extension PresentationValuePresenter: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onDisappear{ wasHidden = true }
-            .onChangePolyfill(of: value.isPresented, initial: true){
+            .onChange(of: value.isPresented, initial: true){
                 guard !wasHidden else { wasHidden = false; return }
  
                 if value.isPresented {
@@ -79,7 +79,7 @@ extension PresentationValuePresenter: ViewModifier {
                     }
                 }
             }
-            .onChangePolyfill(of: behaviour.customHashable){
+            .onChange(of: behaviour.customHashable){
                 customID = behaviour.customHashable == nil ? nil : .init()
             }
     }

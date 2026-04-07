@@ -48,7 +48,7 @@ public struct ScaleTransitionExample: View {
                 .symbolRenderingMode(.hierarchical)
             }
             .onAppear { update(transition, nil) }
-            .onChangePolyfill(of: scale){ old, new in
+            .onChange(of: scale){ old, new in
                 if isLinked {
                     let changeMask = old .!= new
                     if let changeIdx = changeMask.indices.first(where: { changeMask[$0] }){
@@ -59,7 +59,7 @@ public struct ScaleTransitionExample: View {
             }
             
             ExampleCell.Anchor(anchor: $anchor)
-                .onChangePolyfill(of: anchor){ update(transition, nil) }
+                .onChange(of: anchor){ update(transition, nil) }
         }
     }
 }

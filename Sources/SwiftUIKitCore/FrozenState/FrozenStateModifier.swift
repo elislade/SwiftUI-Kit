@@ -34,7 +34,7 @@ struct SizeFrozenModifier: ViewModifier {
             )
             .background{
                 GeometryReader{ proxy in
-                    Color.clear.onChangePolyfill(of: axesFrozen, initial: true){
+                    Color.clear.onChange(of: axesFrozen, initial: true){
                         if axesFrozen.contains(.horizontal) && proxy.size.width > 0 {
                             width = proxy.size.width
                         } else {

@@ -94,7 +94,7 @@ struct FocusPresentationContext: ViewModifier {
                             .onAppear{
                                 accessoryIsPresented = presentation.accessory() != nil
                             }
-                            .onChangePolyfill(of: accessoryIsPresented){
+                            .onChange(of: accessoryIsPresented){
                                 if !accessoryIsPresented {
                                     isFocused = false
                                 }
@@ -111,7 +111,7 @@ struct FocusPresentationContext: ViewModifier {
                 }
                 .onPresentationBackdropChange{ backdropPreference = $0 }
                 .animation(.bouncy.speed(1.3), value: isFocused)
-                .onChangePolyfill(of: isFocused){
+                .onChange(of: isFocused){
                     if !isFocused {
                         dismiss()
                         //accessoryIsPresented = false

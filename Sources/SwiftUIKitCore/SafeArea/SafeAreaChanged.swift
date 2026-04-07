@@ -10,7 +10,7 @@ struct SafeAreaChangeModifier {
         content.background{
             GeometryReader { proxy in
                 let insets = proxy.safeAreaInsets
-                Color.clear.onChangePolyfill(of: insets, initial: true){
+                Color.clear.onChange(of: insets, initial: true){
                     action(insets)
                 }
             }

@@ -99,7 +99,7 @@ extension InteractionLeader: ViewModifier {
                         )
                         .ignoresSafeArea()
                         .frame(width: 20)
-                        .onChangePolyfill(of: isActive){
+                        .onChange(of: isActive){
                             if !isActive {
                                 if progress > 0.3 {
                                     // This will force a loop caught by the NavView which then processes disposal then passes a wantsRemoval back down, causing the animation to then complete.
@@ -125,14 +125,14 @@ extension InteractionLeader: ViewModifier {
             //        }
             //    )
             //}
-            .onChangePolyfill(of: wantsRemoval){
+            .onChange(of: wantsRemoval){
                 guard wantsRemoval else { return }
                 phase = .disappearing
                 phaseChange(.willComplete(.disappear))
                 interactiveProgress.send(1)
                 progress = 1
             }
-            .onChangePolyfill(of: wantsCancellationIfActive){
+            .onChange(of: wantsCancellationIfActive){
                 guard wantsCancellationIfActive, phase != .presented else { return }
                 if progress > 0.3 {
                     dismiss()

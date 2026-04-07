@@ -25,7 +25,7 @@ extension View {
             let leader = sorted.first(where: \.isLeader)
             let sizeToMatch = leader?.size ?? sorted.first?.size
             
-            Color.clear.onChangePolyfill(of: sizeToMatch, initial: true){
+            Color.clear.onChange(of: sizeToMatch, initial: true){
                 guard let sizeToMatch else { return }
                 for element in sorted {
                     if element.size == sizeToMatch { continue }
@@ -146,14 +146,14 @@ extension EqualSizeElementContent: ViewModifier {
                 height: height,
                 alignment: alignment
             )
-            .onChangePolyfill(of: width == nil){
+            .onChange(of: width == nil){
                 if width == nil {
                     constrained.remove(.horizontal)
                 } else {
                     constrained.insert(.horizontal)
                 }
             }
-            .onChangePolyfill(of: height == nil){
+            .onChange(of: height == nil){
                 if height == nil {
                     constrained.remove(.vertical)
                 } else {

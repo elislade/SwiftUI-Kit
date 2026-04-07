@@ -32,7 +32,7 @@ public struct OffsetTransitionExample: View {
                     Text("Offset Y")
                 }
             }
-            .onChangePolyfill(of: offset){ update(transition, nil) }
+            .onChange(of: offset){ update(transition, nil) }
             .onAppear { update(transition, nil) }
         }
     }

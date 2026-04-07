@@ -37,7 +37,7 @@ extension InteractionHoverElementModifier: ViewModifier {
                             )] : []
                         )
                     }
-                    .onChangePolyfill(of: lastState){
+                    .onChange(of: lastState){
                         if let lastState {
                             action(lastState)
                         }

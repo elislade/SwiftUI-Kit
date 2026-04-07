@@ -149,12 +149,12 @@ struct IndirectScrollModifier: ViewModifier {
                         ]
                     )
                 }
-                .onChangePolyfill(of: endValue){
+                .onChange(of: endValue){
                     if let endValue {
                         gesture.callEnded(with: endValue)
                     }
                 }
-                .onChangePolyfill(of: changeValue){
+                .onChange(of: changeValue){
                     if let changeValue {
                         gesture.callChanged(with: changeValue)
                     }

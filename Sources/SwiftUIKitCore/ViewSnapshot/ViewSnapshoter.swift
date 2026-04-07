@@ -32,7 +32,7 @@ extension ViewSnapshoter: View {
     
     var body: some View {
         content
-            .onChangePolyfill(of: value, initial: initial){
+            .onChange(of: value, initial: initial){
                 action(AnyView(content))
             }
     }

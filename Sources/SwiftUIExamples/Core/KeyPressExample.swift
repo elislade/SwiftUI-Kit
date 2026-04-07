@@ -49,7 +49,7 @@ public struct KeyPressExample: View {
                         }
                         .padding()
                     }
-                    .onChangePolyfill(of: string){
+                    .onChange(of: string){
                         proxy.scrollTo("end")
                     }
                 }
@@ -96,7 +96,7 @@ public struct KeyPressExample: View {
                             }
                         }
                     }
-                    .onChangePolyfill(of: presses.indices){
+                    .onChange(of: presses.indices){
                         proxy.scrollTo(presses.indices.last)
                     }
                 }

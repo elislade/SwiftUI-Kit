@@ -48,7 +48,7 @@ struct ValueSyncModifier<A: PropertyWrapper, B: PropertyWrapper>: ViewModifier w
     
     func body(content: Content) -> some View {
         content
-            .onChangePolyfill(of: a.wrappedValue, initial: options.contains(.initialA)){
+            .onChange(of: a.wrappedValue, initial: options.contains(.initialA)){
                 if hasUsedInitialA == false && options.contains(.initialA) {
                     sync(a)
                     hasUsedInitialA = true
@@ -56,7 +56,7 @@ struct ValueSyncModifier<A: PropertyWrapper, B: PropertyWrapper>: ViewModifier w
                     sync(a)
                 }
             }
-            .onChangePolyfill(of: b.wrappedValue, initial: options.contains(.initialB)){
+            .onChange(of: b.wrappedValue, initial: options.contains(.initialB)){
                 if hasUsedInitialB == false && options.contains(.initialB) {
                     sync(b)
                     hasUsedInitialB = true

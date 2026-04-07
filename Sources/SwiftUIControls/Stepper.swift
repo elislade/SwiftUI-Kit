@@ -137,7 +137,7 @@ public struct Stepper: View {
                 height: isVertical ? nil : size
             )
             .fixedSize()
-            .onChangePolyfill(of: actionTimerCount){
+            .onChange(of: actionTimerCount){
                 guard let activeDirection else {
                     stopActionRepitition()
                     return

@@ -14,7 +14,7 @@ struct OnEqualInsetChangeModifier<V: Equatable> {
             .preference(key: EqualItemInsetPreferenceKey.self, value: [
                 .init(id: id, proposal: nil){ value = transform($0) }
             ])
-            .onChangePolyfill(of: value){
+            .onChange(of: value){
                 if let value {
                     action(value)
                 }

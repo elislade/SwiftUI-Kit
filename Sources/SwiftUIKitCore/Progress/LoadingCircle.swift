@@ -79,7 +79,7 @@ public struct LoadingCircle: View {
                 toggle()
             }
         }
-        .onChangePolyfill(of: state, initial: true){
+        .onChange(of: state, initial: true){
             if state == .indefinite {
                 toggle()
             }

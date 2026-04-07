@@ -88,7 +88,7 @@ struct BasicPresentationContext: ViewModifier {
                         }
                     }
                     .animation(.smooth, value: value.alignment)
-                    .onChangePolyfill(of: value.wantsDisposal){
+                    .onChange(of: value.wantsDisposal){
                         if value.wantsDisposal {
                             presented.remove(value.id)
                         }

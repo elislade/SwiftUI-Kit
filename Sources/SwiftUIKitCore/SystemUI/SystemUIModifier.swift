@@ -70,7 +70,7 @@ struct SystemUIOverrideModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .id(viewIdentity)
-            .onChangePolyfill(of: (scheme.hashValue + Int(mask.rawValue)), initial: true){
+            .onChange(of: (scheme.hashValue + Int(mask.rawValue)), initial: true){
                 update()
             }
             .background {

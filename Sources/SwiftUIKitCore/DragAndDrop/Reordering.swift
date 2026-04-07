@@ -77,7 +77,7 @@ struct ReorderingContext: ViewModifier {
             .onPreferenceChange(ReorderingPreference.self){
                 _items.wrappedValue = $0
             }
-            .onChangePolyfill(of: locationInWindow){ old, new in
+            .onChange(of: locationInWindow){ old, new in
                 if let new {
                     didChangeIndex(calculate(for: items, loc: new))
                 } else {

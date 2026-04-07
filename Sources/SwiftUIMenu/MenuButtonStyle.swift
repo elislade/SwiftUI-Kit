@@ -64,7 +64,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                 dismiss(.context)
             }
         }
-        .onChangePolyfill(of: isBeingPresentedOn){
+        .onChange(of: isBeingPresentedOn){
             if isBeingPresentedOn {
                 activatedAt = nil
             }

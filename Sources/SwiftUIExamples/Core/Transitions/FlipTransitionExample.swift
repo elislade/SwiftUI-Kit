@@ -73,9 +73,9 @@ public struct FlipTransitionExample: View {
                     Text("Vertical")
                 }
             }
-            .onChangePolyfill(of: horizontal){ update(transition, transitionInverse) }
+            .onChange(of: horizontal){ update(transition, transitionInverse) }
             .onAppear { update(transition, transitionInverse) }
-            .onChangePolyfill(of: vertical){ update(transition, transitionInverse) }
+            .onChange(of: vertical){ update(transition, transitionInverse) }
         }
         
     }

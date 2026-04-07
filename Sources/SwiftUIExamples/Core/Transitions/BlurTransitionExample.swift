@@ -28,14 +28,14 @@ public struct BlurTransitionExample: View {
                 Toggle(isOn: $isOpaque){
                     Text("Opaque")
                 }
-                .onChangePolyfill(of: isOpaque){ update(transition, nil) }
+                .onChange(of: isOpaque){ update(transition, nil) }
                 .onAppear { update(transition, nil) }
                 
                 ExampleSlider(value: .init($radius, in: 0...200, step: 1)){
                     Text("Radius")
                 }
             }
-            .onChangePolyfill(of: radius){ update(transition, nil) }
+            .onChange(of: radius){ update(transition, nil) }
         }
     }
     

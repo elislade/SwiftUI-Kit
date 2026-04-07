@@ -128,8 +128,8 @@ public struct TransformExample: View {
             .background{
                 if scaleSynced {
                     Color.clear
-                        .onChangePolyfill(of: scale.x){ scale.y = scale.x }
-                        .onChangePolyfill(of: scale.y){ scale.x = scale.y }
+                        .onChange(of: scale.x){ scale.y = scale.x }
+                        .onChange(of: scale.y){ scale.x = scale.y }
                 }
             }
             

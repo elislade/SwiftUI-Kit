@@ -53,7 +53,7 @@ extension AnimationThresholdChangeViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .onChangePolyfill(of: changed, action)
+            .onChange(of: changed, action)
     }
     
 }

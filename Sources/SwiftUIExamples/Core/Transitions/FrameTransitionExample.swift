@@ -45,8 +45,8 @@ public struct FrameTransitionExample: View {
                     Text("Enabled")
                 }
             }
-            .onChangePolyfill(of: width){ update(transition, nil) }
-            .onChangePolyfill(of: widthIsNill){ update(transition, nil) }
+            .onChange(of: width){ update(transition, nil) }
+            .onChange(of: widthIsNill){ update(transition, nil) }
             .onAppear { update(transition, nil) }
             .toggleHintIndicatorVisibility(.hidden)
             
@@ -63,11 +63,11 @@ public struct FrameTransitionExample: View {
                 }
             }
             .toggleHintIndicatorVisibility(.hidden)
-            .onChangePolyfill(of: height){ update(transition, nil) }
-            .onChangePolyfill(of: heightIsNill){ update(transition, nil) }
+            .onChange(of: height){ update(transition, nil) }
+            .onChange(of: heightIsNill){ update(transition, nil) }
             
             ExampleCell.Alignment(value: $alignment)
-                .onChangePolyfill(of: alignment){ update(transition, nil) }
+                .onChange(of: alignment){ update(transition, nil) }
         }
     }
     

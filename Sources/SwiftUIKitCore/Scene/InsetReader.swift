@@ -39,7 +39,7 @@ extension InsetReader: View {
     public var body: some View {
         content(frozenInsets ?? calculate())
             .onGeometryChangePolyfill(of: { $0.globalFrame() }){ frame = $0 }
-            .onChangePolyfill(of: shouldFreeze, initial: true){
+            .onChange(of: shouldFreeze, initial: true){
                 frozenInsets = shouldFreeze ? calculate() : nil
             }
     }

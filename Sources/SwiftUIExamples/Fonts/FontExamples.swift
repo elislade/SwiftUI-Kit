@@ -577,7 +577,7 @@ public struct FontExamples: View {
                 }
             }
             .buttonStyle(.plain)
-            .onChangePolyfill(of: set, initial: true){
+            .onChange(of: set, initial: true){
                 load()
             }
         }

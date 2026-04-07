@@ -39,7 +39,7 @@ public struct LoadingExamples: View {
                 ExampleSlider(value: .init($loadingProgress)){
                     Text("Progress")
                 }
-                .onChangePolyfill(of: loadingProgress){
+                .onChange(of: loadingProgress){
                     loadingIndefinite = false
                 }
                 

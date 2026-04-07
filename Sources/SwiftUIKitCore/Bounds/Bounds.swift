@@ -140,7 +140,7 @@ struct ChildBoundsChangeModifier: ViewModifier {
             .transformPreference(TaggedBoundsKey.self) { value in
                 value.removeAll(where: { $0.tag == tag })
             }
-            .onChangePolyfill(of: bounds.wrappedValue){
+            .onChange(of: bounds.wrappedValue){
                 didChange(bounds.wrappedValue.map{ proxy[$0.bounds] })
             }
     }

@@ -26,7 +26,7 @@ extension TaskCoordinator: ViewModifier {
                 .onAppear{
                     task = Task(priority: .low, operation: operation)
                 }
-                .onChangePolyfill(of: shouldWait, initial: true){
+                .onChange(of: shouldWait, initial: true){
                     guard !shouldWait, let task else { return }
                     self.task = nil
                     Task(priority: .low) { @MainActor in
@@ -35,7 +35,7 @@ extension TaskCoordinator: ViewModifier {
                 }
                 .id(innerID)
         }
-        .onChangePolyfill(of: id){
+        .onChange(of: id){
             innerID = UniqueID()
         }
     }

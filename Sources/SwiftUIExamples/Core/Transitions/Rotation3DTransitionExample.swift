@@ -45,7 +45,7 @@ public struct Rotation3DTransitionExample: View {
                 ){
                     Text("X")
                 }
-                .onChangePolyfill(of: rotX){ update(transition, nil) }
+                .onChange(of: rotX){ update(transition, nil) }
                 
                 ExampleSlider(
                     value: $rotY,
@@ -55,7 +55,7 @@ public struct Rotation3DTransitionExample: View {
                 ){
                     Text("Y")
                 }
-                .onChangePolyfill(of: rotY){ update(transition, nil) }
+                .onChange(of: rotY){ update(transition, nil) }
                 
                 ExampleSlider(
                     value: $rotZ,
@@ -65,17 +65,17 @@ public struct Rotation3DTransitionExample: View {
                 ){
                     Text("Z")
                 }
-                .onChangePolyfill(of: rotZ){ update(transition, nil) }
+                .onChange(of: rotZ){ update(transition, nil) }
             }
             .onAppear { update(transition, nil) }
             
             ExampleSlider(value: .init($depth, in: -100...100, step: 1)){
                 Text("Depth")
             }
-            .onChangePolyfill(of: depth){ update(transition, nil) }
+            .onChange(of: depth){ update(transition, nil) }
             
             ExampleCell.Anchor(anchor: $anchor)
-                .onChangePolyfill(of: anchor){ update(transition, nil) }
+                .onChange(of: anchor){ update(transition, nil) }
         }
     }
     

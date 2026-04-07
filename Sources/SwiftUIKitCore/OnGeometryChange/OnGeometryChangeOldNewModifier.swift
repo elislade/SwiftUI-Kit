@@ -14,7 +14,7 @@ struct OnGeometryChangeOldNewModifier<Value: Equatable> {
             .background {
                 if isEnabled && frozenState.isThawed {
                     GeometryReader{ proxy in
-                        Color.clear.onChangePolyfill(of: transform(proxy), initial: true){ old, new in
+                        Color.clear.onChange(of: transform(proxy), initial: true){ old, new in
                             didChange(old, new)
                         }
                     }

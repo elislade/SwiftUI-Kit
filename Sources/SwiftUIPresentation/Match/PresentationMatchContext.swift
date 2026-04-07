@@ -58,7 +58,7 @@ struct PresentationMatchContextModifier: ViewModifier {
                     .transition(.identity)
                 }
             }
-            .onChangePolyfill(of: group.destination, initial: true){ old, new in
+            .onChange(of: group.destination, initial: true){ old, new in
                 if isAwaitingRemoval {
                     if old != nil, new == nil {
                         direction = .disappearing
@@ -155,7 +155,7 @@ struct PresentationMatchContextModifier: ViewModifier {
 //                    .onChangePolyfill(of: src.origin, initial: true){
 //                        sourceOrigin = src.origin.simd
 //                    }
-                    .onChangePolyfill(of: direction, initial: true){
+                    .onChange(of: direction, initial: true){
                         if direction == .disappearing {
                             showViews = false
                         } else {

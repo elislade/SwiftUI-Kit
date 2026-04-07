@@ -67,7 +67,7 @@ struct NavViewPresenter<Value: ValuePresentable, Destination: View>: ViewModifie
                 ),
                 content: destination
             )
-            .onChangePolyfill(of: value.isPresented){
+            .onChange(of: value.isPresented){
                 guard value.isPresented else { return }
                 sortDate = Date()
             }

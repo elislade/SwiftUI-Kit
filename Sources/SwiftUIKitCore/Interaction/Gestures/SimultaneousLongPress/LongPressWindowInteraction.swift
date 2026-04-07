@@ -20,7 +20,7 @@ struct LongPressWindowInteraction: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onGeometryChangePolyfill(of: { $0.frame(in: .global) }){ rect = $0 }
-            .onChangePolyfill(of: shouldTrigger){
+            .onChange(of: shouldTrigger){
                 if shouldTrigger {
                     trigger()
                 }

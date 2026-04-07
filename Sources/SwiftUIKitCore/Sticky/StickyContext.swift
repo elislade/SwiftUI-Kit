@@ -82,7 +82,7 @@ struct StickyContext : ViewModifier {
             .overlayPreferenceValue(StickyPreferenceKey.self) { value in
                 GeometryReader{ proxy in
                     Color.clear
-                        .onChangePolyfill(of: value, initial: true){
+                        .onChange(of: value, initial: true){
                             calculateSticky(in: proxy, for: value)
                         }
                 }

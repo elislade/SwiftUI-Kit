@@ -12,16 +12,19 @@ struct OnGeometryChangeModifier<Value: Equatable> {
     func body(content: Content) -> some View {
         content
             .background {
-                if isEnabled && frozenState.isThawed {
-                    GeometryReader{ proxy in
-                        let value = transform(proxy)
-                        
-                        Color.clear.onChangePolyfill(of: value, initial: true){
-                            didChange(value)
+                ZStack {
+                    if isEnabled && frozenState.isThawed {
+                        GeometryReader{ proxy in
+                            let value = transform(proxy)
+                            
+                            Color.clear.onChange(of: value, initial: true){
+                                didChange(value)
+                            }
                         }
+                        .hidden()
                     }
-                    .hidden()
                 }
+                .animationDisabled()
             }
     }
     

@@ -22,7 +22,7 @@ extension View {
             /// Polyfills to just writing and has no reading capabilities
             /// It's recommeded to use on appear of each view in scroll to read the currently scrolled view.
             ScrollViewReader { proxy in
-                self.onChangePolyfill(of: id.wrappedValue, initial: true){
+                self.onChange(of: id.wrappedValue, initial: true){
                     if let animation = id.transaction.animation {
                         withAnimation(animation) {
                             proxy.scrollTo(id.wrappedValue, anchor: anchor)

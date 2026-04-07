@@ -41,7 +41,7 @@ extension ContainedBoundsContext: ViewModifier {
                             }
                         }()
                         
-                        Color.clear.onChangePolyfill(of: state, initial: true){
+                        Color.clear.onChange(of: state, initial: true){
                             match.didChangeVisibility(state)
                         }
                     }

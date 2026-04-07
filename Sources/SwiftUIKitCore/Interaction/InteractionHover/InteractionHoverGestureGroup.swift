@@ -27,7 +27,7 @@ extension InteractionHoverGestureGroup: ViewModifier {
             .preferenceChangeConsumer(InteractionHoverElementPreference.self){
                 elements = $0
             }
-            .onChangePolyfill(of: isActive){
+            .onChange(of: isActive){
                 if !isActive {
                     if let previousIndex = elements.firstIndex(where: { $0.id == previousID }) {
                         elements[previousIndex](.left)

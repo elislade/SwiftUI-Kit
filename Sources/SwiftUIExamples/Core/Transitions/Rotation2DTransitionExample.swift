@@ -30,11 +30,11 @@ public struct Rotation2DTransitionExample: View {
             ){
                 Text("Degrees")
             }
-            .onChangePolyfill(of: rot){ update(transition, nil) }
+            .onChange(of: rot){ update(transition, nil) }
             .onAppear { update(transition, nil) }
             
             ExampleCell.Anchor(anchor: $anchor)
-                .onChangePolyfill(of: anchor){ update(transition, nil) }
+                .onChange(of: anchor){ update(transition, nil) }
         }
     }
     

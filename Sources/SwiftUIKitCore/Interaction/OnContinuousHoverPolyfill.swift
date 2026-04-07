@@ -60,7 +60,7 @@ extension OnContinuousHoverPolyfill: ViewModifier {
                     }
                 }
             }
-            .onChangePolyfill(of: phase){
+            .onChange(of: phase){
                 action(phase)
             }
     }

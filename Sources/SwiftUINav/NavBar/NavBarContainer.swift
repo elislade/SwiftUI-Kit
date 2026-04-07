@@ -64,14 +64,14 @@ public struct NavBarContainer<Content: View> : View {
                         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
                             GeometryReader { proxy in
                                 let width: CGFloat = proxy.containerCornerInsets.topLeading.width
-                                Color.clear.onChangePolyfill(of: width, initial: true){
+                                Color.clear.onChange(of: width, initial: true){
                                     leadingInset = width
                                 }
                             }
                             
                             GeometryReader { proxy in
                                 let height: CGFloat = proxy.containerCornerInsets.topLeading.height
-                                Color.clear.onChangePolyfill(of: height, initial: true){
+                                Color.clear.onChange(of: height, initial: true){
                                     topInset = height != 0 ? 20 : 0
                                 }
                             }

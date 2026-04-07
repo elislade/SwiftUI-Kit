@@ -133,7 +133,7 @@ public struct StickyExample: View  {
                     }
                     .lineLimit(1)
                 }
-                .onChangePolyfill(of: stickyItems.last){
+                .onChange(of: stickyItems.last){
                     isSticking = []
                     withAnimation(.fastSpring){
                         proxy.scrollTo(stickyItems.last, anchor: .center)
@@ -190,7 +190,7 @@ public struct StickyExample: View  {
                         }
                     }
                 }
-                .onChangePolyfill(of: stickyItems.last){
+                .onChange(of: stickyItems.last){
                     isSticking = []
                     withAnimation(.fastSpring){
                         proxy.scrollTo(stickyItems.last, anchor: .center)

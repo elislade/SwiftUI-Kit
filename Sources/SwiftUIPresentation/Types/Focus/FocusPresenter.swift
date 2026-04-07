@@ -48,7 +48,7 @@ struct FocusPresenter<Value: ValuePresentable, Focus: View>: ViewModifier {
                 }
                 .onDisappear{ showMatch = true }
             }
-            .onChangePolyfill(of: value.isPresented){
+            .onChange(of: value.isPresented){
                 if value.isPresented {
                     active = true
                 } else {

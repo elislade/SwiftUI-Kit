@@ -160,7 +160,7 @@ struct ExampleCell {
                 } label: {
                     Text("Horizontal Alignment")
                 }
-                .onChangePolyfill(of: optionIndex){
+                .onChange(of: optionIndex){
                     value = options[optionIndex]
                 }
             }
@@ -202,7 +202,7 @@ struct ExampleCell {
                 } label: {
                     Text("Vertical Alignment")
                 }
-                .onChangePolyfill(of: optionIndex){
+                .onChange(of: optionIndex){
                     value = options[optionIndex]
                 }
             }

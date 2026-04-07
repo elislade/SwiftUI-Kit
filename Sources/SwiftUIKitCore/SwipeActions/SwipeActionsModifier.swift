@@ -226,12 +226,12 @@ extension SwipeActionsModifier: ViewModifier  {
             }
             .animation(.bouncy, value: activeEdge)
             .animation(.fastSpringInterpolating, value: horizontalOffset)
-            .onChangePolyfill(of: activeID){
+            .onChange(of: activeID){
                 if activeID != id {
                     close()
                 }
             }
-            .onChangePolyfill(of: activeEdge){
+            .onChange(of: activeEdge){
                 if activeEdge != nil {
                     Task {
                         try await Task.sleep(for: .milliseconds(80))

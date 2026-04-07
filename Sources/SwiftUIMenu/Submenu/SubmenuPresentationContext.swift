@@ -44,7 +44,7 @@ extension SubmenuPresentationContext: ViewModifier {
                                         visuallyPresented.remove(item.id)
                                         item.dispose()
                                     }
-                                    .onChangePolyfill(of: item.wantsDisposal){
+                                    .onChange(of: item.wantsDisposal){
                                         visuallyPresented.remove(item.id)
                                     }
                                     .environment(\.presentationDepth, isLast ? 0 : presentedStack.count - (visualIdx + 1))

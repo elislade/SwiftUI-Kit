@@ -85,7 +85,7 @@ public struct DropStack<Value: Hashable, Content: View, Cursor: View>: View {
         }
         .animation(.bouncy, value: pendingIndex)
         .animation(.bouncy, value: draggingIndices)
-        .onChangePolyfill(of: isTargeting){
+        .onChange(of: isTargeting){
             isTargeted(isTargeting)
         }
         .reorderingContext(

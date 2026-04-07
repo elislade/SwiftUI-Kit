@@ -36,16 +36,16 @@ struct WindowRootView<Content: View>: View {
             }
             .environment(\.performWindowAction){ state.perform(action: $0) }
             .environment(\.scenePhase, state.phase)
-            .onChangePolyfill(of: title){
+            .onChange(of: title){
                 state.setTitle(title ?? "")
             }
-            .onChangePolyfill(of: zIndex){
+            .onChange(of: zIndex){
                 state.set(index: zIndex)
             }
-            .onChangePolyfill(of: pickerPositioning){
+            .onChange(of: pickerPositioning){
                 state.set(positioning: pickerPositioning)
             }
-            .onChangePolyfill(of: dockTile){
+            .onChange(of: dockTile){
                 if let dockTile {
                     state.set(dockTile: dockTile)
                 }

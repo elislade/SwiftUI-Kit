@@ -37,7 +37,7 @@ struct AnchorPresentationContext: ViewModifier {
                     .environment(\.layoutDirection, layoutDirection(for: root))
                     .id(root.id)
                     .onDisappear{ isPresentedOn = false }
-                    .onChangePolyfill(of: root){ old, new in
+                    .onChange(of: root){ old, new in
                         if new.id != old.id {
                             old.dispose()
                         }
@@ -70,7 +70,7 @@ struct AnchorPresentationContext: ViewModifier {
                                 showRoot = false
                                 root.dispose()
                             }
-                            .onChangePolyfill(of: root.wantsDisposal){
+                            .onChange(of: root.wantsDisposal){
                                 if root.wantsDisposal {
                                     showRoot = false
                                 }
@@ -100,7 +100,7 @@ struct AnchorPresentationContext: ViewModifier {
                                 show: Binding($presented, contains: child.id),
                                 dispose: child.dispose
                             ))
-                            .onChangePolyfill(of: child.wantsDisposal){
+                            .onChange(of: child.wantsDisposal){
                                 if child.wantsDisposal {
                                     presented.remove(child.id)
                                 }

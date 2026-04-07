@@ -51,13 +51,13 @@ struct StickyModifier {
                     }
                 )] : []
              }
-             .onChangePolyfill(of: shouldStick){ old, new in
+             .onChange(of: shouldStick){ old, new in
                  if old && new == false {
                      onChange(.init())
                      offset = .zero
                  }
              }
-             .onChangePolyfill(of: state){
+             .onChange(of: state){
                  onChange(state)
              }
     }

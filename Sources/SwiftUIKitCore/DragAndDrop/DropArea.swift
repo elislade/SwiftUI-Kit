@@ -58,7 +58,7 @@ struct DropAreaModifier<Value: Hashable>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onGeometryChangePolyfill(of: { $0.frame(in: .global).rounded(.toNearestOrEven) }){ frame = $0 }
-            .onChangePolyfill(of: targeting){ isTargeted(targeting) }
+            .onChange(of: targeting){ isTargeted(targeting) }
             .preference(
                 key: DropAreaPreference<Value>.self,
                 value: [

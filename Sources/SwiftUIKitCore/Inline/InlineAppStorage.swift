@@ -30,7 +30,7 @@ extension InlineAppStorage: View {
     
     public var body: some View {
         content(value.projectedValue)
-            .onChangePolyfill(of: value.wrappedValue){
+            .onChange(of: value.wrappedValue){
                 storage.wrappedValue = try? JSONEncoder().encode(value.wrappedValue)
             }
     }

@@ -22,7 +22,7 @@ struct EnvironmentChangeModifier {
 extension EnvironmentChangeModifier.InnerModifier : ViewModifier {
     
     func body(content: Content) -> some View {
-        content.onChangePolyfill(of: environment.description, initial: true){
+        content.onChange(of: environment.description, initial: true){
             onChange(environment)
         }
     }

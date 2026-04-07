@@ -89,7 +89,7 @@ struct DragAndDropSession<Value: Hashable & Sendable, Layout: DragSessionStackLa
                     handle(location: l)
                 }
             }
-            .onChangePolyfill(of: scenePhase){
+            .onChange(of: scenePhase){
                 self.end()
             }
             .overlay{

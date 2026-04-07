@@ -16,7 +16,7 @@ struct AppDockTileModifier<ID: Hashable, DockTile: View>: ViewModifier {
             .onAppear {
                 updater.dockTile = NSApp.dockTile
             }
-            .onChangePolyfill(of: tileID, initial: true){
+            .onChange(of: tileID, initial: true){
                 updater.update(with: DockTilePreference(
                     id: id,
                     updateValue: tileID,

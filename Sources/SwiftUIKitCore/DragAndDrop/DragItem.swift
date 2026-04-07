@@ -87,7 +87,7 @@ struct DragItemModifier<Value: Hashable, DragView: View>: ViewModifier {
         .onGeometryChangePolyfill(of: { $0.frame(in: .global).rounded(.toNearestOrEven) }){
             self.frame = $0
         }
-        .onChangePolyfill(of: active){
+        .onChange(of: active){
             didChangeDragging(active)
         }
         #if !os(tvOS)

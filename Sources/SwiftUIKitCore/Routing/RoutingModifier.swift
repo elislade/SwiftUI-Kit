@@ -85,7 +85,7 @@ extension RoutingModifier: ViewModifier {
                     return .systemAction
                 }
             })
-            .onChangePolyfill(of: shouldDefer){
+            .onChange(of: shouldDefer){
                 if !shouldDefer, let deferredURL {
                     Task {
                         try await Task.sleep(nanoseconds: NSEC_PER_SEC / 10)

@@ -64,7 +64,7 @@ struct ExampleSection<C: View, Label: View> : View {
             maxWidth: horizontalSize == .compact || !isExpanded ? nil : 440
         )
         .id(id)
-        .onChangePolyfill(of: isExpanded){
+        .onChange(of: isExpanded){
             if isExpanded {
                 scrollTo(id)
             }

@@ -26,7 +26,7 @@ public struct OpacityTransitionExample: View {
             ExampleSlider(value: .init($opacity)){
                 Text("Opacity")
             }
-            .onChangePolyfill(of: opacity){ update(transition, nil) }
+            .onChange(of: opacity){ update(transition, nil) }
             .onAppear { update(transition, nil) }
         }
     }

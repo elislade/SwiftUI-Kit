@@ -36,7 +36,7 @@ struct AnchorPresenter<Value: ValuePresentable, PresentationView: View>: ViewMod
                 ),
                 content: presentation
             )
-            .onChangePolyfill(of: value.isPresented){
+            .onChange(of: value.isPresented){
                 //guard value.isPresented else { return }
                 sortDate = Date()
             }
