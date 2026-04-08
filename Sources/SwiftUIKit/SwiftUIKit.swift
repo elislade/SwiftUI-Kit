@@ -25,9 +25,3 @@ public typealias Axis3D = SwiftUIKitCore.Axis3D
 
 #endif
 
-
-#if os(tvOS)
-
-public typealias ControlSize = SwiftUIKitCore.ControlSize
-
-#endif

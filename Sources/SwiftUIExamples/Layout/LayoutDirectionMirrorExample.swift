@@ -27,6 +27,7 @@ public struct LayoutDirectionMirrorExample: View {
                     
                     Divider()
                 }
+                .minimumScaleFactor(0.5)
             }
         } parameters: {
             Toggle(isOn: $mirror){

@@ -47,7 +47,7 @@ public struct IndirectScrollExample: View {
             ExampleCell.LayoutDirection(value: $layout)
             
             ExampleSection("Axes", isExpanded: true){
-                HStack {
+                ExampleControlGroup {
                     Toggle(isOn: Binding($axes, contains: .horizontal)){
                         Label("X", systemImage: "arrow.left.and.right")
                     }

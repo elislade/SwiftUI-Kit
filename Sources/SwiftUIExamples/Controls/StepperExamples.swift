@@ -56,7 +56,7 @@ public struct StepperExamples: View {
                 
                 ExampleCell.ControlRoundness(value: $controlRoundness)
                 
-                HStack {
+                ExampleControlGroup{
                     ExampleCell.ControlSize(value: $controlSize)
                         .fixedSize()
                     

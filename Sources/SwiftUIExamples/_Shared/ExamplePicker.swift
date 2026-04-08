@@ -48,6 +48,7 @@ struct ExampleInlinePicker<Data: RandomAccessCollection, Content: View, Label: V
             label()
                 .foregroundStyle(.primary.opacity(0.5))
                 .font(.caption[.bold])
+                .multilineTextAlignment(.center)
         }
         .containerShape(PercentageRoundedRectangle(.vertical, percentage: 0.7))
     }
@@ -59,7 +60,7 @@ extension ExampleInlinePicker where Label == EmptyView {
     init(
         data: Data,
         selection: Binding<Data.Element>,
-        content: @escaping (Data.Element) -> Content
+        @ViewBuilder content: @escaping (Data.Element) -> Content
     ){
         self.init(
             data: data,

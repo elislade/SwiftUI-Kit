@@ -38,39 +38,42 @@ public struct RoutingDynamicExample: View {
         var index: Int = 0
         
         var body: some View {
-            ZStack{
-                Color.clear
-                
-                Text("Content \(index)")
-                    .font(.largeTitle[.bold])
-                    .navBarTitle(Text("Content \(index)"))
-                    .presentation(isPresented: $showModal){
-                        NavView{
-                            Content(index: index + 1)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: 320)
-                        .background(.regularMaterial)
-                        .transition(.offset([0, 340]).animation(.fastSpring))
-                    }
-                    .navDestination(isPresented: $showDetail){
+            Text("Content \(index)")
+                .font(.title[.bold])
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .navBarTitle{
+                    Text("Content \(index)")
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .presentation(isPresented: $showModal){
+                    NavView{
                         Content(index: index + 1)
                     }
-            }
-            .background{ ExampleBackground().ignoresSafeArea() }
-            .onRouteRegex(/modal|detail/){ match in
-                switch match {
-                case "modal":
-                    showModal = true
-                    showDetail = false
-                case "detail":
-                    showDetail = true
-                    showModal = false
-                default: return
+                    .frame(maxWidth: .infinity, maxHeight: 320)
+                    .background(.regularMaterial)
+                    .transition(.offset([0, 340]).animation(.fastSpring))
                 }
-            } other: {
-                showModal = false
-                showDetail = false
-            }
+                .navDestination(isPresented: $showDetail){
+                    Content(index: index + 1)
+                }
+                .background{
+                    ExampleBackground().ignoresSafeArea()
+                }
+                .onRouteRegex(/modal|detail/){ match in
+                    switch match {
+                    case "modal":
+                        showModal = true
+                        showDetail = false
+                    case "detail":
+                        showDetail = true
+                        showModal = false
+                    default: return
+                    }
+                } other: {
+                    showModal = false
+                    showDetail = false
+                }
         }
     }
     
@@ -92,6 +95,9 @@ public struct RoutingDynamicExample: View {
                         .routeRelay()
                     }
                 }
+                #if os(watchOS)
+                .ignoresSafeArea()
+                #endif
             }
             .padding(.bottom, 1)
             .routeRelayReceiver()

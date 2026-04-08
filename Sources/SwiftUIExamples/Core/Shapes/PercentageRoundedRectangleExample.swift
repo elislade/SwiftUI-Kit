@@ -26,7 +26,7 @@ struct PercentageRoundedRectangleExample: View {
         } parameters: {
             ExampleCell.Axis(axis: $axis.animation(.bouncy))
             
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init($size, in: 20...700)){
                     Text("Size")
                 }

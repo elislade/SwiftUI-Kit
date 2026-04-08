@@ -39,7 +39,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
         content
             .contentShape(Rectangle())
             .focused($isFocused)
-            .onHoverPolyfill{ isHovering = $0 }
+            .onHover{ isHovering = $0 }
             .task(id: shouldPresent, priority: .low) {
                 if let _ = try? await Task.sleep(for: .seconds(0.3)) {
                     isPresented.wrappedValue = shouldPresent
@@ -50,9 +50,7 @@ struct ToolTipPresenter<Tip: View>: ViewModifier {
                 type: type
             ){
                 tip()
-                    #if !os(tvOS)
                     .onTapGesture { isPresented.wrappedValue = false }
-                    #endif
                     .toolTipPresentationStyle()
             }
     }

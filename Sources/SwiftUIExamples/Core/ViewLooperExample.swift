@@ -51,7 +51,7 @@ public struct ViewLooperExample: View {
             ExampleSection(isExpanded: true){
                 ExampleCell.Axis(axis: $axis.animation(.smooth))
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(value: .init($spacing, in: 0...20)){
                         Text("Spacing")
                     }
@@ -65,7 +65,7 @@ public struct ViewLooperExample: View {
             }
             
             ExampleSection(isExpanded: true){
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(value: .init($speed, in: 0...2)){
                         Label("Speed", systemImage: "hare.fill")
                     }

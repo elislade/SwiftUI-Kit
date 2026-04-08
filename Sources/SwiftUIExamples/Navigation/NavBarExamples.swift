@@ -90,7 +90,7 @@ public struct NavBarExamples: View {
         
         var body: some View {
             Toggle(isOn: $arbitraryState.animation(.bouncy)){
-                Text(arbitraryState ? "Unselect" : "Select")
+                Label(arbitraryState ? "Unselect" : "Select", systemImage: "checkmark")
                     .contentTransitionNumericText()
             }
         }

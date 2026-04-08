@@ -41,7 +41,9 @@ struct ExampleSection<C: View, Label: View> : View {
                 )
                 .ignoresSafeArea()
             }
+            #if !os(watchOS)
             .sticky(edges: .top)
+            #endif
             .fixedSize(
                 horizontal: horizontalSize == .compact ? false : !isExpanded,
                 vertical: true
@@ -59,10 +61,12 @@ struct ExampleSection<C: View, Label: View> : View {
                 )
             }
         }
+        #if !os(watchOS)
         .frame(
             minWidth: isExpanded ? 320 : nil,
             maxWidth: horizontalSize == .compact || !isExpanded ? nil : 440
         )
+        #endif
         .id(id)
         .onChange(of: isExpanded){
             if isExpanded {
@@ -80,14 +84,15 @@ struct ExampleSection<C: View, Label: View> : View {
             } label: {
                 HStack {
                     configuration.label
-                    Spacer()
+                    Spacer(minLength: 10)
                     Image(systemName: "chevron.right")
                         .rotationEffect(.degrees(configuration.isOn ? 90 : 0))
                         .font(.title3[.bold])
                         .opacity(0.5)
                 }
+                #if !os(watchOS)
                 .padding(.horizontal, 5)
-               // .padding(.cellPadding)
+                #endif
                 .frame(height: .controlSize)
                 .contentShape(Rectangle())
             }
@@ -137,18 +142,4 @@ extension ExampleSection where Label == Text {
     }
     .stickyContext()
     .preferredColorScheme(.dark)
-}
-
-
-struct ExampleControlGroup<Content: View> : View {
-    
-    @ViewBuilder let content: Content
-    
-    var body: some View {
-        HStack {
-            content
-        }
-        .frame(minWidth: 320, maxWidth: 440)
-    }
-    
 }

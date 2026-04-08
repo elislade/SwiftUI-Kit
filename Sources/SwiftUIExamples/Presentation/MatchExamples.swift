@@ -134,6 +134,8 @@ public struct MatchExampleView: View {
             .navBarTitle{
                 Text("Element \(value + 1)")
                     .font(.title.bold())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
             .navBarTrailing{
                 Button{ dismiss(.context) } label: {

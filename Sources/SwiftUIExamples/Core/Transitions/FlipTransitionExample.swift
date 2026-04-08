@@ -42,7 +42,7 @@ public struct FlipTransitionExample: View {
         }
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 ExampleMenuPicker(
                     data: [nil] + HorizontalEdge.allCases,
                     selection: $horizontal

@@ -85,7 +85,7 @@ public struct RoutingExample: View {
                 }
                 .buttonStyle(.tinted)
                 
-                HStack {
+                ExampleControlGroup {
                     Toggle(isOn: $deferred){
                         Text("Defer Links")
                     }

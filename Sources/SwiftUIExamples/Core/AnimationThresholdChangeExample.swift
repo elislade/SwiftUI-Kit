@@ -57,7 +57,7 @@ public struct AnimationThresholdChangeExample : View {
             .drawingGroup()
             .animation(.linear(duration: duration), value: animate)
         } parameters: {
-            HStack {
+            ExampleControlGroup {
                 Toggle(isOn: $animate){
                     Text("Show")
                 }

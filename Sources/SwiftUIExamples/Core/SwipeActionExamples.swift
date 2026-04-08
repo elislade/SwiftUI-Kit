@@ -100,6 +100,7 @@ public struct SwipeActionExamples: View {
                     }
                     .tint(Color(action))
                 }
+                .labelStyle(.viewThatFits)
             } label: {
                 Text("Action Visibility")
             }
@@ -150,6 +151,8 @@ public struct SwipeActionExamples: View {
                     .labelStyle(.iconOnly)
                     .symbolRenderingMode(.hierarchical)
                 }
+                .minimumScaleFactor(0.3)
+                .lineLimit(1)
                 .font(.largeTitle[.semibold])
                 .padding()
                 .background(alignment: .bottom){

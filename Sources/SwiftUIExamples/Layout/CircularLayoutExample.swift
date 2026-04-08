@@ -50,7 +50,7 @@ public struct CircularLayoutExample : View {
                 Text("Number of Items")
             }
             
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init($radius, in: 50...150, step: 1)){
                     Text("Radius")
                 }

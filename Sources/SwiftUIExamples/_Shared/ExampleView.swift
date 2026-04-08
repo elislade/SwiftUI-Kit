@@ -21,8 +21,10 @@ struct ExampleView<Example: View, Parameters: View>: View {
                             example
                         }
                         .contentMarginsIfAvailable(.bottom, 28.0)
-                        .background(.secondary.opacity(0.15))
-                        .background(.background)
+                        .background{
+                            ExampleBackground()
+                                .ignoresSafeArea()
+                        }
                         .mask {
                             ContainerRelativeShape()
                                 .ignoresSafeArea()
@@ -38,7 +40,9 @@ struct ExampleView<Example: View, Parameters: View>: View {
                                         VStack(spacing: 16) {
                                             parameters
                                         }
+                                        #if !os(watchOS)
                                         .padding(.horizontal, 10)
+                                        #endif
                                         .environment(\.horizontalSizeClass, .compact)
                                     } else {
                                         ScrollView(.horizontal, showsIndicators: false) {
@@ -52,12 +56,12 @@ struct ExampleView<Example: View, Parameters: View>: View {
                                                 HStack(alignment: .top, spacing: 22) {
                                                     parameters
                                                 }
-                                                //.scrollTargetLayoutIfAvailable()
                                                 .padding(10)
                                             }
+                                            #if !os(watchOS)
                                             .frame(minWidth: size.width)
+                                            #endif
                                         }
-                                        //.scrollTargetViewAlignedIfAvailable()
                                         .scrollClipDisabledIfAvailable()
                                         .environment(\.horizontalSizeClass, .regular)
                                     }
@@ -65,9 +69,7 @@ struct ExampleView<Example: View, Parameters: View>: View {
                                 .toggleStyle(.example)
                                 .buttonStyle(.example)
                                 .onGeometryChangePolyfill(of: \.size.height){ size in
-                                    //withAnimation(.smooth.speed(1.6)){
-                                        parameterSize = size
-                                    //}
+                                    parameterSize = size
                                 }
                                 .environment(\.scrollTo){ id in
                                     withAnimation(.smooth){
@@ -94,16 +96,21 @@ struct ExampleView<Example: View, Parameters: View>: View {
         .persistentSystemOverlays(.hidden)
         .presentationContext()
         .tint(color)
+        #if os(watchOS)
+        .ignoresSafeArea()
+        #endif
     }
     
 }
 
 struct ExampleBackground: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some View {
         ZStack {
             Rectangle()
-                .fill(.background)
+                .fill(Color(white: colorScheme == .light ? 1 : 0.1))
             
             Rectangle()
                 .fill(.tint)

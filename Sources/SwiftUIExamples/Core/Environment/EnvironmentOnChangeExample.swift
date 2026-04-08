@@ -64,6 +64,7 @@ public struct EnvironmentOnChangeExample : View {
                     }
                 }
             }
+            .background{ ExampleBackground() }
             .environment(\.colorScheme, colorScheme)
             .preferredColorScheme(colorScheme)
             .environment(\.layoutDirection, layout)

@@ -46,7 +46,7 @@ public struct TextFieldExample: View {
             .disabled(disabled)
         } parameters: {
             ExampleSection(isExpanded: true){
-                HStack {
+                ExampleControlGroup {
                     Toggle(isOn: $disabled){
                         Text("Disabled")
                     }
@@ -54,7 +54,7 @@ public struct TextFieldExample: View {
                     ExampleCell.ControlRoundness(value: $roundness)
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     Toggle(isOn: $isFocused){
                         Text("Focus")
                     }
@@ -65,7 +65,7 @@ public struct TextFieldExample: View {
                     }
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleCell.ControlSize(value: $size)
                     ExampleMenuPicker(
                         data: TextFieldElementVisibility.allCases,

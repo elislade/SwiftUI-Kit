@@ -17,7 +17,7 @@ extension MouseScrollModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .windowReference{ windowRef = $0 }
-            .onHoverPolyfill {
+            .onHover {
                 if $0 {
                     MouseScrollEventCoordinator.shared.registerListener(key: id, action, in: windowRef)
                 } else {

@@ -64,7 +64,7 @@ struct PointedShapeExamples: View {
                     Text("Type")
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(
                         value: $inset,
                         in: -25...25,
@@ -94,7 +94,7 @@ struct PointedShapeExamples: View {
                         Text("Corner Style")
                     }
                     
-                    HStack {
+                    ExampleControlGroup {
                         ExampleSlider(
                             value: $radius,
                             in: 0...150,

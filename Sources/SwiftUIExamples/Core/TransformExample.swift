@@ -23,7 +23,7 @@ public struct TransformExample: View {
     public init() {}
     
     private func row(for component: Transform.Component) -> some View {
-        HStack {
+        ExampleControlGroup {
             switch component {
             case .translation:
                 ExampleSlider(value: .init($translation.x, in: -100...100)){
@@ -83,7 +83,7 @@ public struct TransformExample: View {
                     )
             }
         } parameters: {
-            HStack {
+            ExampleControlGroup {
                 Button{
                     withAnimation(.smooth){
                         shear = .random(in: -1...1)

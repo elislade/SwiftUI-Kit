@@ -23,7 +23,7 @@ public struct OffsetTransitionExample: View {
         }
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init($offset.x, in: -400...400)){
                     Text("Offset X")
                 }

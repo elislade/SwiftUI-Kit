@@ -33,7 +33,7 @@ public struct FrameTransitionExample: View {
         }
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(
                     value: .init($width, in: 0...200, step: 1)
                 ){
@@ -50,7 +50,7 @@ public struct FrameTransitionExample: View {
             .onAppear { update(transition, nil) }
             .toggleHintIndicatorVisibility(.hidden)
             
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(
                     value: .init($height, in: 0...200, step: 1)
                 ){

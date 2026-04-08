@@ -121,7 +121,7 @@ public struct LineWrapLayoutExample: View {
                     Text("Group By Whitespace")
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(value: .init($size, in: 6...160, step: 4)){
                         Text("Size")
                     }

@@ -27,7 +27,7 @@ struct TransitionExampleView<Provider: TransitionProviderView>: View {
             .animation(.smooth(extraBounce: 0.5).speed(speed), value: show)
         } parameters: {
             ExampleSection(isExpanded: true) {
-                HStack {
+                ExampleControlGroup {
                     Toggle(isOn: $show){
                         Text("Show")
                     }

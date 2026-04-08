@@ -118,7 +118,7 @@ public struct MenuButtonStyle: PrimitiveButtonStyle {
                 }
             }
         }
-        .onHoverPolyfill{ isHovering in
+        .onHover{ isHovering in
             if isHovering {
                 activatedAt = Date()
             } else {

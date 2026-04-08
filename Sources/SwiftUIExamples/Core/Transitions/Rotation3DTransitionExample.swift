@@ -36,7 +36,7 @@ public struct Rotation3DTransitionExample: View {
         }
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(
                     value: $rotX,
                     in: -360...360,

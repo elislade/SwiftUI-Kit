@@ -36,7 +36,7 @@ public struct NavViewExamples: View {
                 .environment(\.layoutDirection, layout)
             } parameters: {
                 ExampleSection(isExpanded: true){
-                    HStack {
+                    ExampleControlGroup {
                         Toggle(isOn: $useCustomTransition){
                             Text("Custom Transition")
                         }

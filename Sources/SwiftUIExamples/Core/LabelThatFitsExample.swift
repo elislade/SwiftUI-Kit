@@ -49,7 +49,7 @@ public struct LabelThatFitsExample: View {
                 prefersTitle ? .viewThatFits(preferring: \.title) : .viewThatFits(preferring: \.icon)
             )
         } parameters: {
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: $width){
                     Label("Width", systemImage: "arrow.left.and.right")
                 }

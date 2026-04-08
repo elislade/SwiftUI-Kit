@@ -42,7 +42,7 @@ public struct ShadowMaterialExample: View {
             .padding()
             .frame(maxWidth: 600, maxHeight: 600)
         } parameters: {
-            HStack {
+            ExampleControlGroup {
                 ExampleInlinePicker(
                     data: Direction.allCases,
                     selection: $direction.animation(.bouncy)
@@ -64,7 +64,7 @@ public struct ShadowMaterialExample: View {
                 }
             }
             
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init($radius, in: 0...100)){
                     Label("Radius", systemImage:"beziercurve")
                 }

@@ -83,7 +83,7 @@ public struct SliderViewExamples : View {
                 set: { bounds = bounds.lowerBound...$0 }
             )
             
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init(lower, in: (bounds.upperBound - 10)...(bounds.upperBound - 1))){
                     Text("Lower Bound")
                 }
@@ -112,7 +112,7 @@ public struct SliderViewExamples : View {
                 set: { step = $0 ? 0.1 : nil }
             )
             
-            HStack{
+            ExampleControlGroup {
                 ExampleSlider(value: binding){
                     Text("Step")
                 }
@@ -224,15 +224,15 @@ struct SliderViewEqualizerExample: View {
             ZStack {
                 Color.clear
 
-                HStack(spacing: 0) {
+                HStack(spacing: 3) {
                     VStack(spacing: 0) {
                         Slider(value: $master, size: 18)
                         Text("Preamp")
                             .font(.system(.caption2, design: .serif)[.bold])
                             .lineLimit(1)
                             .frame(height: footerSize, alignment: .bottom)
+                            .minimumScaleFactor(0.4)
                     }
-                    .fixedSize(horizontal: true, vertical: false)
                     
                     VStack(alignment: .trailing) {
                         Text("+12")
@@ -245,6 +245,7 @@ struct SliderViewEqualizerExample: View {
                     .padding(.vertical, 4)
                     .padding(.bottom, footerSize)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.4)
                     
                     ForEach($frequencies){ f in
                         VStack(spacing: 0) {
@@ -260,12 +261,12 @@ struct SliderViewEqualizerExample: View {
                             }
                             .font(.system(.caption2, design: .serif)[.bold])
                             .lineLimit(1)
-                            .minimumScaleFactor(0.4)
+                            .minimumScaleFactor(0.3)
                             .frame(height: footerSize, alignment: .bottom)
                         }
                     }
                 }
-                .frame(height: 300)
+                .frame(maxHeight: 300)
                 .background{
                     VStack(spacing: 0) {
                         GridLine(isMajor: true)

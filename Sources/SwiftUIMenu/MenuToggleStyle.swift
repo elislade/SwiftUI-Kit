@@ -12,7 +12,7 @@ struct MenuToggleStyle: ToggleStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         Button{ configuration.isOn.toggle() } label: {
-            HStack {
+            HStack(spacing: 10) {
                 configuration.label
                     .frame(maxWidth: .infinity, alignment: .leading)
                 

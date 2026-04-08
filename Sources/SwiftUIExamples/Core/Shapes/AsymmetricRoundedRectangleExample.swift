@@ -48,7 +48,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                         .frame(maxWidth: .infinity)
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(value: .init($values.topLeft, in: radiusRange)){
                         Text("Top Left")
                     }
@@ -58,7 +58,7 @@ public struct AsymmetricRoundedRectangleExamples: View {
                     }
                 }
                 
-                HStack {
+                ExampleControlGroup {
                     ExampleSlider(value: .init($values.bottomLeft, in: radiusRange)){
                         Text("Bottom Left")
                     }

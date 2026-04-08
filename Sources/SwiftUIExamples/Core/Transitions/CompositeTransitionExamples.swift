@@ -193,6 +193,7 @@ public struct CompositeTransitionExamples: View {
                     }
                     .font(.title)
                     .symbolRenderingMode(.hierarchical)
+                    .buttonStyle(.tinted)
                 }
                 .padding()
                 .fixedSize(horizontal: false, vertical: true)

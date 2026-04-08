@@ -9,17 +9,10 @@ struct SimultaneousLongPressModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         if #available(iOS 18, macOS 15, tvOS 18, *){
-            #if os(tvOS)
-            content.gesture(
-                LongPressGesture()
-                    .onEnded{ _ in trigger() }
-            )
-            #else
             content.gesture(
                 LongPressGesture(minimumDuration: minimumDuration, maximumDistance: maximumDistance)
                     .onEnded{ _ in trigger() }
             )
-            #endif
         } else {
             content
                 .overlay{

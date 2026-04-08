@@ -62,7 +62,7 @@ public struct SwitchExamples : View {
             .animation(.bouncy, value: isOn)
         } parameters: {
             ExampleSection(isExpanded: true){
-                HStack {
+                ExampleControlGroup{
                     Toggle(isOn: $disable){
                         Text("Disable")
                     }
@@ -78,7 +78,7 @@ public struct SwitchExamples : View {
                     Text("Use Custom Labels")
                 }
                 
-                HStack {
+                ExampleControlGroup{
                     ExampleCell.ControlSize(value: $controlSize)
                         .fixedSize()
                     ExampleCell.LayoutDirectionSuggestion(value: $directionSuggestion)

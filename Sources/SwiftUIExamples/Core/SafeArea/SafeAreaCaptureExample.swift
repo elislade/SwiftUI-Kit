@@ -18,6 +18,7 @@ public struct SafeAreaCaptureExample: View {
                     .font(.title3[.bold])
                     .opacity(0.5)
             }
+            .minimumScaleFactor(0.5)
             .frame(maxWidth: 320)
             .padding(24)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -25,7 +25,7 @@ public struct ScaleTransitionExample: View {
         @State private var anchor = UnitPoint.center
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 ExampleSlider(value: .init($scale.x, in : -1...3, step: 0.1)){
                     Text("Scale X")
                 }

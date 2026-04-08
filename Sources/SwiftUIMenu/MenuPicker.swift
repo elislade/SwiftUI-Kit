@@ -76,6 +76,8 @@ public struct MenuPicker<V: Hashable, Data: RandomAccessCollection, Label: View>
                 Text("What's your favourite option?")
                     .font(.system(.title2, design: .serif)[.bold])
                     .accessibilityHeading(.h1)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.6)
                 
                 Text("You can only pick one.")
                     .font(.system(.body, design: .serif).italic())

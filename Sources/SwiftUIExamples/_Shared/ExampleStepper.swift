@@ -16,7 +16,7 @@ struct ExampleStepper<Label: View>: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(alignment: .bottom) {
             Button{ performAction(.decrement) } label: {
                 SwiftUI.Label("Decriment", systemImage: "minus")
                     .labelStyle(.iconOnly)
@@ -34,12 +34,14 @@ struct ExampleStepper<Label: View>: View {
                     .multilineTextAlignment(.center)
                     .font(.exampleParameterValue)
             }
+            #if !os(watchOS)
             .frame(height: .controlSize)
             .background{
                 ContainerRelativeShape()
                     .opacity(0.1)
             }
-        
+            #endif
+            
             Button{  performAction(.increment) } label: {
                 SwiftUI.Label("Incriment", systemImage: "plus")
                     .labelStyle(.iconOnly)

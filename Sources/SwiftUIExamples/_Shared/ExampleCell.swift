@@ -228,7 +228,7 @@ struct ExampleCell {
         }
         
         var body: some View {
-            HStack {
+            ExampleControlGroup {
                 Horizontal(value: $value.horizontal)
                 Vertical(value: $value.vertical)
             }

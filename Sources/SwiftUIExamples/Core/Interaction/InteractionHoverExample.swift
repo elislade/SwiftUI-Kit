@@ -50,7 +50,7 @@ public struct InteractionHoverExample: View  {
             .animation(.bouncy, value: showContent)
             .animation(.bouncy, value: priority)
         } parameters: {
-            HStack {
+            ExampleControlGroup {
                 ExampleMenuPicker(
                     data: InteractionPriority.allCases,
                     selection: $priority,

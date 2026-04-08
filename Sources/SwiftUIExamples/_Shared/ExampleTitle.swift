@@ -13,7 +13,7 @@ struct ExampleTitle: View {
         Text(title)
             .font(.exampleTitle)
             .lineLimit(1)
-            .minimumScaleFactor(0.5)
+            .minimumScaleFactor(0.3)
             .frame(maxWidth: .infinity, alignment: .leading)
         #else
         HStack(alignment: .lastTextBaseline, spacing: nil) {
